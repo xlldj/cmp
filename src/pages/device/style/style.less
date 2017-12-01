@@ -1,0 +1,153 @@
+ 
+@gray: #f5f5f5;
+@blue: #ebf4fd;
+@liHeight: 45px;
+@labelWidth: 130px;
+.fi(@alignItems: center; @justifyContent: flex-start){
+  display: inline-flex;
+  flex: none;
+  flex-wrap: nowrap;
+  justify-content: @justifyContent;
+  align-items: @alignItems;
+}
+.flex(@justifyContent: flex-start; @alignItems: center){
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  justify-content: @justifyContent;
+  align-items: @alignItems;
+}
+.deviceInfo{
+	.rateSets{
+		span{
+			padding-right:5px;
+		}
+	}
+  .repairLogs{
+  	width: 100%;
+    margin-left: 141px;
+    padding: 30px;
+    background-color: @gray;
+  }
+  .repairSlot{
+    font-size: 14px;
+    
+    &>ul{
+      &>li{
+        line-height: @liHeight;
+        width: 100%;
+        height: @liHeight;
+        color: #222;
+
+        .fi;
+
+        &>p{
+          width: @labelWidth;
+          text-align: right;
+          color: #222;
+          padding-right: 20px
+        }
+        button,span{
+          margin-right: 5px;
+        }
+      }
+    }
+  }
+}
+.rateInfo{
+	.rateSets{
+		span{
+			padding-right: 5px;
+		}
+	}
+}
+.repair{
+	.waiting{
+		color: #ff5555;
+	}
+	.repairing{
+		color: #FFBF00;
+	}
+	.finished{
+		color: #00A854
+	}
+}
+.prepayInfo{
+	input{
+		width: 50px;
+	}
+}
+.censorModal{
+	margin-left: 50%;
+	transform: translate(-50%,0);
+	width: 600px;
+
+	.censorInput{
+		height: 100px;
+		width: 100%;
+		padding: 6px;
+	}
+}
+.addSupplierModal{
+	label{
+		margin-right: 30px;
+	}
+	.device{
+		display: inline-flex;
+		align-items: center;
+		height: 40px;
+		margin-bottom: 20px;
+	}
+	.question{
+		height: 40px;
+		label{
+			margin-right: 22px;
+		}
+		input{
+			width: 145px;
+			height: 28px;
+		}
+	}
+}
+.timeset{
+	.timepicker{
+		margin-right: 0;
+	}
+	.timepicker:nth-child(2){
+		margin-left: 12px;
+	}
+}
+.repairInfo{
+}
+
+.columnLayout{
+  column-count: 2;
+  column-gap: 16px;
+  column-fill: balance;
+}
+.infoBlock{
+  -moz-page-break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  break-inside: avoid;
+
+  &>h3{
+  	padding: 20px;
+  }
+  &>ul{
+    padding: 20px;
+  }
+}
+.noPadding{
+  &>h3{
+  	padding: 30px;
+  }
+  &>ul{
+    padding: 30px;
+  }
+}
+.divider{
+  height: 22px;
+  display: inline-block;
+  border-left: 2px solid #ddd;
+  margin-right: 10px;
+}

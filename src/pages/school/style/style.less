@@ -1,0 +1,355 @@
+.schoolInfoEdit{
+  .mapContainer{
+    width: 400px;
+    height: 300px;
+  }
+  .accountType{
+      span{
+        margin-right: 3px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+  }
+  .citySelect{
+    font-size: inherit;
+    width: 140px;
+    color: #222;
+  }
+}
+.addingBlock{
+  .roomsWrapper{
+    width: 400px;
+    display: flex;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    margin: 10px 0;
+    .roomNum{
+      display: inline-flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom: 5px;
+    }
+  } 
+  .addingBlockInput{
+    margin-left: 15px;
+  }   
+}
+.blockManage{
+  position: relative;
+  .nameHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    .schoolName{
+    }
+  }           
+  .roomTable{
+    margin:10px auto;
+    height: 300px;
+    width: 500px;
+    overflow-y: scroll;
+    .roomItem{
+      border: 1px solid #eee;
+      width: 500px;
+      margin:0px auto;
+      padding: 5px 20px;
+      display: flex;
+      flex-wrap:no-wrap;
+      span{
+        width: 33%;
+        text-align: center;
+      }
+    }
+    .roomHeader{
+      background-color: #f7f7f7;
+      position: absolute;
+    }
+    .roomList{
+      margin-top: 30px;
+    }
+  }
+  .panelHeader{
+    .editLink{
+      position: absolute;
+      right: 100px;
+    }
+  }
+  .floorLoading{
+    width: 100%;
+    padding-left: 100px;
+  }
+}
+.room{
+  display: inline-block;
+  width: 20%;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  background-color: #999;
+  border-radius: 4px;
+}
+.roomset{
+  display: inline-flex;
+  justify-content:flex-end;
+  width:100%;
+}
+/* for flex layout */
+.flexIn(@alignItems: center){
+  display: inline-flex;
+  flex: none;
+  flex-wrap: no-wrap;
+  align-items: @alignItems;
+}
+.schoolOverview{
+  tr{
+    box-sizing: border-box;
+    display: inline-flex;
+    flex: none;
+    flex-wrap: no-wrap;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+  th{
+     box-sizing: border-box;
+     display: inline-flex;
+     flex: none;
+     flex-wrap: no-wrap;
+     align-items: center;
+     padding: 0 !important;
+     height: 50px;
+  }
+  td{
+    box-sizing: border-box;
+    padding: 0 !important;
+    display: inline-flex;
+    flex: none;
+    flex-wrap: no-wrap;
+    align-items: center;
+    height: auto;
+    min-height: 100px;
+  }
+  .schoolName{
+    width: 6%;
+  }
+  .userCount{
+    width: 5%;
+  }
+  .deviceWrapper{
+    width: 33%;
+    position: relative;
+    .deviceHeader{
+      position: absolute;
+      width: 100%;
+      height: 50px;
+      top: 0;
+      p{
+        display: inline-block;
+        line-height: 50px;
+        height: 100%;
+        padding: 10px;
+        border-right: 1px solid #e9e9e9;
+      }
+      p:first-child{
+        width: 20%;
+      }
+      p:nth-child(2){
+        width: 20%;
+      }
+      p:nth-child(3){
+        width: 30%;
+      }
+      p:last-child{
+        width: 30%;
+        border-right: none;
+      }
+    }
+    .deviceContent{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      .deviceItem{
+        position: relative;
+        flex-grow: 1;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        width: 100%;
+        margin: 0 !important;
+        border-bottom: 1px solid #e9e9e9;
+        .deviceTypeWrapper, .supplierWrapper, .rateGroupsWrapper{
+          display: inline-flex;
+          align-items: center;
+          position: absolute;
+          height: 100%;
+          padding: 10px;
+        }
+        .deviceTypeWrapper{
+          width: 20%;
+          border-right: 1px solid #e9e9e9;
+        }
+        .supplierWrapper{
+          left: 20%;
+          width: 20%;
+          height: 100%;
+          padding: 0;
+          border-right: 1px solid #e9e9e9;
+          .supplierItem{
+            width: 100%;
+            .flexIn;
+            height: 100%;
+            .supplierName{
+              width: 100%;
+              height: 100%;
+              padding: 10px;
+              .flexIn;
+            }
+          }
+        }
+        .rateGroupsWrapper{
+          left: 40%;
+          width: 30%;
+          height: 100%;
+          padding: 10px;
+          border-right: 1px solid #e9e9e9;
+
+            display: flex;
+            flex: none;
+            flex-wrap: wrap;
+            align-items: center;
+          .rateItem{
+            left: 40%;
+            width: 100%;
+            height: 18px;
+            overflow: hidden;
+            white-space:nowrap;
+          }
+        }
+        .waterItemsWrapper{
+          position: absolute;
+          display: flex;
+          flex: none;
+          flex-wrap: wrap;
+          align-items: center;
+          padding: 10px;
+          height: 100%;
+          width: 30%;
+          left: 70%;
+          .waterTimeRange{
+            display: block;
+            width: 100%;
+          }
+        }
+      }
+      .deviceItem:last-child{
+        border-bottom: none;
+      }
+    }
+  }
+  .pad10{
+    padding: 10px;
+  }
+  .repairmans{
+    width: 10%;
+    .repairmanItem{
+    }
+  }
+  .bonusAct{
+    width: 10%;
+  }
+  .depositAct{
+    width: 10%;
+  }
+  .withdrawTime{
+    width: 8%;
+  }
+  .notify{
+    width: 8%;
+  }
+  .remark{
+    width: 10%;
+    border-right: 1px solid #e9e9e9;
+    .remarkInput{
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+.editableCell{
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 2px;
+  box-sizing: border-box;
+  .remarkTA{
+    display: block;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 90%;
+    height: 80%;
+    padding-right: 4px;
+  }
+  .inputCheck{
+    position: absolute;
+    bottom: -2px;
+    right: 2px;
+  }
+  .inputCheck:hover {
+    color: #108ee9;
+  }
+  .textWrapper:hover{
+    display: inline-block;
+  }
+}
+.infoSetLinkWrapper{
+  text-align: center;
+}
+.infoSetInfo{
+  ul>li>p{
+    width: 150px !important;
+  }
+}
+// for schoollist
+.infoSetLink{
+  span{
+    margin-right: 10px;
+    padding-right: 10px;
+    border-right: 1px solid #ddd;
+  }
+}
+
+.ulWrapper{
+  &>p{
+    margin-top: 10px;
+    line-height: 30px;
+  }
+  ul{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    li{
+      display: flex;
+      line-height: 30px;
+      flex: none;
+      flex-wrap: nowrap;
+      &>p{
+        width: inherit !important;
+        margin-right: 10px;
+        margin-left: 0;
+        padding: 0;
+      }
+      .drinkerItems{
+        display: flex;
+        flex-direction: column;
+        span{
+          height: 28px;
+        }
+      }
+    }
+  }
+}
+.mgl15{
+  margin-left: 15px;
+}

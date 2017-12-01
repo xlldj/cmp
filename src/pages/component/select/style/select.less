@@ -1,0 +1,200 @@
+@blue: #ecf6fd;
+@shadowBlue: #d3e8f9;
+@blueBorder: #54abe8;
+@grayBG: #f1f1f1;
+@liHeight: 30px;
+
+.light-styleWrapper{// used to change the select to a inline element
+  height: @liHeight;
+  display: inline-flex;
+  flex: none;
+  flex-wrap: wrap;
+  position: relative;
+  background-color: #fff;
+  border-radius: 5px;
+}
+.light-selectWrapper{
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  position: relative;
+  width: 100%;
+  height: @liHeight;
+  max-height: 280px;
+  outline: none;
+  color: #444;
+  .selectWindow{
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    height: @liHeight;
+    outline: none;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    z-index: 21;
+    transition: border .2s ease;
+    .light-currentOption{
+      position: relative;
+      width: 100%;
+      height: @liHeight;
+      line-height: @liHeight;
+      padding-left: 6px;
+      padding-right: 5px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      z-index: 22;
+
+      cursor: pointer;
+      img{
+          position: absolute;
+          top: 50%;
+          right: 10px;
+          width: 6px;
+          transform: translate(0, -50%);
+        }
+      span{
+        cursor: pointer;
+      }
+    }
+    .light-searchInput{
+      display: inline-flex;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      outline: none !important;
+      border: none !important;
+      z-index: 23;
+    }
+  }
+  .selectWindow:hover{
+    border: 1px solid #54abe8;
+    border-radius: 5px;
+  }
+  .activeWindow{
+    border-color: @blueBorder;
+    border-radius: 5px;
+    box-shadow: 0 0 0px 2px @shadowBlue;
+    outline: none;
+  }
+  .light-selectUl{ // this is the root ul
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    position: relative;
+    margin-top: 5px;
+    outline: none;
+    box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 24;
+    li{
+      width: 100%;
+      height: @liHeight;
+      line-height: @liHeight;
+      padding-left: 6px;
+      padding-right: 5px;
+      background-color: #fff;
+      
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      z-index: 25;
+
+      cursor: pointer;
+    }
+    &>li:first-child{ // 如果第一个元素是直接option，设置border-radius
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
+    }
+    &.li:last-child{
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+    &>div.light-optWrapper:last-child li:last-child{
+      border-bottom-right-radius: 5px;
+      border-bottom-left-radius: 5px;
+    }
+    li.selected{
+      background-color: @blue;
+    }
+    li:hover{
+      background-color: @blue;
+    }
+    li.selected:hover{
+      background-color: @blue;
+    }
+    li.noSearchResult{
+      color: #bbb;
+    }
+    .light-optWrapper{
+      width: 100%;
+      .light-optTitle{
+        width: 100%;
+        height: 22px;
+        line-height: 22px;
+        background: #fff;
+        font-size: 0.8em;
+        color: #bbb;
+        padding-left: 12px;
+      }
+      li{
+        padding-left: 12px;
+        color: #666;
+      }
+      li:last-child{
+        border-bottom: 1px solid #ddd;
+      }
+    }
+  }
+
+}
+.light-selectUl::-webkit-scrollbar {
+  display: block;
+  width: 4px;
+}
+
+.light-selectUl::-webkit-scrollbar-track {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  background-color: #eee;
+  width: 4px;
+}
+
+.light-selectUl::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+}
+.light-selectUl::-webkit-scrollbar-thumb:hover {
+  background: #7d7d7d; 
+  -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.3); 
+}
+
+@media screen and (min-width: 1440px) {
+  @sHeight: 34px;
+  .light-styleWrapper{
+    height: @sHeight;
+  }
+
+  .light-selectWrapper{
+    height: @sHeight;
+    .selectWindow{
+      height: @sHeight;
+      .light-currentOption{
+        height: @sHeight;
+        line-height: @sHeight;
+      }
+    }
+    .light-selectUl{
+      li{
+        height: @sHeight;
+        line-height: @sHeight;
+      }
+    }
+  }
+}

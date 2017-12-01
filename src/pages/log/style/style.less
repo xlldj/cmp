@@ -1,0 +1,148 @@
+@bdc: #f5f5f5;
+@blue: #3c8ee2;
+
+.logForm{
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+
+  font-size: 1.2rem;
+
+  background-color: #fff;
+  .logWrapper{
+    margin-bottom: 30px;
+    width: 100%;
+    .header{
+      width: 100%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+
+      padding-bottom: 20px;
+      img{
+        display: inline-block;
+        width: 80px;
+        margin-right: 20px;
+      }
+      .divider{
+        display: inline-block;
+        border-left: 1px solid black;
+        height: 14px;
+      }
+      .logTitle{
+        color: #222;
+        margin-left: 20px;
+      }
+    }
+    .logBody{
+      width: 70%;
+      margin: 0 auto;
+      padding-top: 60px;
+      padding-bottom: 20px;
+      border-top: 1px solid @bdc;
+      border-bottom: 1px solid @bdc;
+      .inputSection, .remember{
+        width: 250px;
+        margin: 0 auto;
+        button{
+          width: 100%;
+        }
+      }
+      .inputSection{
+        margin-bottom: 25px;
+        .title{
+          color: @blue;
+          margin-bottom: 20px;
+        }
+        .value{
+          position: relative;
+          input{
+            color: #222;
+            width: 100%;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            padding-left: 0 !important;
+            border: none;
+            border-bottom: 1px solid #eee;
+            border-radius: 0;
+            outline: none;
+            caret-color: @blue;
+            vertical-align: middle;
+            line-height: 1.6rem;
+            font-size: 1.6rem;
+            font-weight: 500;
+            background-color: #fff;
+          }
+          input:-webkit-autofill {
+              -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+          }
+          input::placeholder{
+            font-size: 1.2rem;
+            font-weight: normal;
+            padding-bottom: 4px;
+          }
+          .border{
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 1px;
+            background-color: @blue;
+            transition: width .8s ease;
+          }
+        }
+        .hint{
+          height: 1.4rem;
+
+          font-size: 1rem;
+          text-align: left;
+
+          margin-top: 4px;
+          margin-left: 0;
+        }
+      }
+      .remember>p{
+        display: inline-flex;
+        flex: none;
+        flex-wrap: nowrap;
+        align-items: center;
+        height: 1rem;
+        margin-bottom: 12px;
+        font-size: 1rem;
+        cursor: pointer;
+        img{
+          width: 1rem;
+          margin-right: 8px;
+        }
+        span{
+          cursor: pointer;
+        }
+      }
+
+    }
+    .footer{
+      margin-top: 10px;
+      text-align: center;
+      color: #bbb;
+    }
+  }
+}
+.activeBorder{
+  width: 100% !important;
+}
+.error{
+  background-color: red !important;
+}
+@keyframes bdmove{
+  from {
+    width: 0;
+    background-color: red;
+  }
+  to {
+    width: 100%;
+    background-color: red;
+  }
+}
