@@ -6,7 +6,8 @@ import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import AddPlusAbs from '../../component/addPlusAbs'
 import CONSTANTS from '../../component/constants'
-import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
+import SchoolSelector from '../../component/schoolSelectorWithoutAll'
+import DeviceWithouAll from '../../component/deviceWithoutAll'
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
@@ -22,7 +23,8 @@ class SupplierInfo extends React.Component {
       nameError: false,
       alias: '',
       aliasError: false,
-      agreement: ''
+      version: '',
+      versionError: false
     }
   }
   fetchData =(body)=>{
@@ -32,14 +34,14 @@ class SupplierInfo extends React.Component {
         throw new Error(json.error.displayMessage || json.error)
       }else{
         if(json.data){
-          let {id, name, alias, agreement} = json.data
+          let {id, name, alias, version} = json.data
           let nextState={
             id: id,
             name: name,
             alias: alias
           }
-          if (agreement) {
-            nextState.agreement = agreement
+          if (version) {
+            nextState.version = version
           }
           this.setState(nextState)
         }else{
@@ -63,14 +65,14 @@ class SupplierInfo extends React.Component {
     this.props.hide(true)
   }
   completeEdit = () => {
-    let {id, name, alias, agreement} = this.state
+    let {id, name, alias, version} = this.state
 
     const body = {
       name: name,
       alias: alias
     }
-    if (agreement) {
-      body.agreement = parseInt(agreement, 10)
+    if (version) {
+      body.version = version
     }
     const resource = '/supplier/save'
     if (id){
@@ -91,7 +93,7 @@ class SupplierInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   confirm = () => {
-    let {id, name, alias, agreement} = this.state
+    let {id, name, alias, version} = this.state
     if (!name) {
       return this.setState({
         nameError: true
@@ -103,9 +105,9 @@ class SupplierInfo extends React.Component {
         aliasError: true
       })
     }
-    if (!agreement) {
+    if (!version) {
       return this.setState({
-        agreementError: true
+        versionError: true
       })
     }*/
     /*
@@ -190,14 +192,14 @@ class SupplierInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeAgreement = (v) => {
+  changeVersion = (e) => {
     this.setState({
-      agreement: v
+      version: e.target.value
     })
   }
 
   render () {
-    let {id, name, nameError, alias, aliasError, agreement} = this.state
+    let {id, name, nameError, alias, aliasError, version, versionError} = this.state
 
     return (
       <div className='infoList '>
@@ -213,15 +215,10 @@ class SupplierInfo extends React.Component {
             {aliasError ? <span className='checkInvalid'>别名不能为空！</span> : null}
           </li> 
           <li>
-            <p>协议:</p>
-            <BasicSelectorWithoutAll 
-              invalidTitle='选择设备协议' 
-              staticOpts={CONSTANTS.DEVICEPROTOCOL} 
-              width={CONSTANTS.SELECTWIDTH} 
-              selectedOpt={agreement}  
-              changeOpt={this.changeAgreement}
-            />
-          </li>  
+            <p>版本号:</p>
+            <input value={version} onChange={this.changeVersion} />
+            {versionError ? <span className='checkInvalid'>别名不能为空！</span> : null}
+          </li>   
         </ul>
 
         <div className='btnArea'>
