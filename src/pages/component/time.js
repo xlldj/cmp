@@ -224,6 +224,12 @@ Time.ago1Week = (x) => {
   return Time.getDayFormat(ts)
 }
 
+Time.weekAgo = (x) => {
+  let t = new Date(x)
+  let ts = Date.parse(t) - 7 * 24 * 3600 * 1000
+  return Time.formatDate(ts)
+}
+
 Time.getDatesOfCurrMonth = (x) => {
   let t = Date.parse(new Date(x))
   let result = Time.getMonthEnd(t)
