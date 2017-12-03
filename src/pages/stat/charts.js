@@ -332,7 +332,7 @@ export default class Charts extends Component {
           newData.map((r,i)=>{
             r.lasty = 0
             r.lasty2 =0
-            let lastX = Time.ago1Week(r.x)//取得24小时之前的时间
+            let lastX = Time.weekAgo(r.x)//取得24小时之前的时间
             r.lastX = lastX
           })
           firstPoints&&firstPoints.map((r,i)=>{
