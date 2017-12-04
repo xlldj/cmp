@@ -161,7 +161,7 @@ const changeLost = (state = initialLostState, action) => {
 const initialUserState = {
   userList: {
     page: 1,
-    schoolId: 'all',
+    schoolId: selectedSchool,
     selectKey: ''
   }
 }
@@ -181,24 +181,29 @@ const initialTaskState = {
     assigned: false,
     sourceType: 'all',
     pending: 'all',
-    all: '1'
+    all: '1',
+    schoolId: selectedSchool
   },
   log: {
+    schoolId: selectedSchool,
     page: 1,
     all: '1'
   },
   abnormal: {
+    schoolId: selectedSchool,
     page: 1,
     selectKey: ''
   },
   complaint: {
+    schoolId: selectedSchool,
     page: 1,
     type: 'all',
     status: 'all',
     selectKey: ''
   },
   feedback: {
-    page: 1
+    page: 1,
+    schoolId: selectedSchool
   }
 }
 const changeTask = (state = initialTaskState, action) => {

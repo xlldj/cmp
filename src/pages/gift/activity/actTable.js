@@ -23,14 +23,14 @@ const subModule = 'act'
 const Option = Select.Option
 const typeName = CONSTANTS.GIFTACTTYPE
 const STATUS ={
-  3:'是',
+  3:'已过期',
   2:'否',
-  1:'已过期'
+  1:'是'
 }
 const HINTSTATUS ={
-  3:'success',
+  3:'error',
   2:'default',
-  1:'error'
+  1:'success'
 }
 const SIZE = CONSTANTS.PAGINATION
 
@@ -51,38 +51,54 @@ class ActTable extends React.Component {
     this.columns = [{
       title: '学校名称',
       dataIndex: 'schoolName',
-      width: '21%',
+      width: '15%',
       className: 'firstCol'
     }, {
       title: (<p >活动名称</p>),
       dataIndex: 'name',
-      width: '12%'
+      width: '10%'
     }, {
       title: (<p >活动类型</p>),
       dataIndex: 'type',
-      width: '12%',
+      width: '10%',
       render:(text)=>(typeName[text])
     }, {
-      title: (<p >活动创建日期</p>),
-      dataIndex: 'updateTime',
-      width: '15%',
-      render: (text,record,index) => {
-        return Time.getTimeStr(record.updateTime)
+      title: (<p >库存</p>),
+      dataIndex: 'inventory',
+      width: '14%',
+      render:(text, record) => {
+        if (record.type === 3) {
+          return <span>总量:{record.planInventory}/剩余:{record.inventory}</span>
+        } else {
+          return <span>----</span>
+        }
       }
     }, {
-      title: (<p >活动截止日期</p>),
+      title: (<p >活动上线时间</p>),
+      dataIndex: 'startTime',
+      width: '15%',
+      render: (text,record,index) => {
+        return Time.getTimeStr(record.startTime)
+      }
+    }, {
+      title: (<p >活动截止时间</p>),
       dataIndex: 'endTime',
       width: '15%',
       render: (text,record,index) => {
-        return Time.getDayFormat(record.endTime)
+        return Time.getTimeStr(record.endTime)
       }
     },{
       title: (<p >上线状态</p>),
       dataIndex: 'online',
-      width: '10%',
-      render: (text,record,index) => (
-        <Badge status={HINTSTATUS[record.online]} text={STATUS[record.online]} />
-      )
+      width: '8%',
+      render: (text,record,index) => {
+        let passStartTime = Date.parse(new Date()) >= record.startTime
+        let outdated = Date.parse(new Date()) <= record.endTime
+        let online = outdated ? 3 : (passStartTime ? record.online : 2)
+        return (
+          <Badge status={HINTSTATUS[online]} text={STATUS[online]} />
+        )
+      }
     },{
       title: (<p >操作</p>),
       dataIndex: 'operation',

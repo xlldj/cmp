@@ -402,6 +402,7 @@ export default class Charts extends Component {
     }
     if (i) {
       let nextState = {
+        nextState: Time.getNow(),
         currentChart: i,
         target: 1 // remember to set target to 1
       }
@@ -426,9 +427,9 @@ export default class Charts extends Component {
 
       /* else fetch the line data */
       let body = {}
-      let {startTime, endTime, timeUnit, selectedSchool} = this.state
+      let {startTime, timeUnit, selectedSchool} = this.state
       body.startTime = startTime
-      body.endTime = endTime
+      body.endTime = Time.getNow()
       body.timeUnit = timeUnit
       body.target = 1
       if(selectedSchool!=='all'){
@@ -492,12 +493,13 @@ export default class Charts extends Component {
   }
   changeSchool = (v) => {
     this.setState({
-      selectedSchool: v
+      selectedSchool: v,
+      endTime: Time.getNow()
     })
 
     let body = {}, currentChart = this.state.currentChart
     body.startTime = this.state.startTime
-    body.endTime = this.state.endTime
+    body.endTime = Time.getNow()
     body.timeUnit = this.state.timeUnit
     if(v !== 'all'){
       body.schoolId = parseInt(v, 10)
@@ -514,7 +516,7 @@ export default class Charts extends Component {
     e.preventDefault()
     let nextState = {}, timeUnit = 2
     let v = parseInt(e.target.getAttribute('data-value')), timeSpan=this.state.timeSpan, newStartTime, newEndTime, body = {}
-    if(v===timeSpan){
+    if(v === timeSpan){
       return
     }
     nextState.timeSpan = v
@@ -551,7 +553,8 @@ export default class Charts extends Component {
 
   compareLast = (checked)=>{
     let nextState = {
-      compare: checked
+      compare: checked,
+      endTime: Time.getNow()
     }
     this.setState(nextState)
 

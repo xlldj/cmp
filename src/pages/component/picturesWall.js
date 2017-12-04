@@ -152,7 +152,7 @@ class PicturesWall extends React.Component {
     return (
       <div className={cn} >
         <Upload
-          accept='image/*'
+          accept={this.props.accept ? this.props.accept : 'image/*'}
           action={CONSTANTS.FILESERVER}
           listType="picture-card"
           fileList={fileList}

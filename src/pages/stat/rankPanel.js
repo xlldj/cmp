@@ -285,12 +285,13 @@ export default class RankPanel extends Component {
     }
     let nextState = {
       currentRank: i,
-      page: 1
+      page: 1,
+      endTime: Time.getNow()
     }
-    let {startTime, endTime, selectedSchool, schoolName} = this.state
+    let {startTime, selectedSchool, schoolName} = this.state
     let body = {
       startTime: startTime,
-      endTime: endTime,
+      endTime: Time.getNow(),
       page: 1,
       size: SIZE
     }
@@ -302,10 +303,10 @@ export default class RankPanel extends Component {
   }
 
   changeSchool = (v, name) => {
-    let nextState = {selectedSchool: v, page: 1}
-    let {currentRank, startTime, endTime} = this.state, body = {}
+    let nextState = {selectedSchool: v, page: 1, endTime: Time.getNow()}
+    let {currentRank, startTime} = this.state, body = {}
     body.startTime = startTime
-    body.endTime = endTime
+    body.endTime = Time.getNow()
     body.page = 1
     body.size = SIZE
     if(v !== 'all'){
@@ -317,14 +318,15 @@ export default class RankPanel extends Component {
   }
   changePage = (pageObj) => {
     let page = pageObj.current
-    let {currentRank, startTime, endTime, selectedSchool, schoolName} = this.state
+    let {currentRank, startTime, selectedSchool, schoolName} = this.state
     this.setState({
       page: page,
-      loading: true
+      loading: true,
+      endTime: Time.getNow()
     })
     const body ={
       startTime: startTime,
-      endTime: endTime,
+      endTime: Time.getNow(),
       page: page,
       size: SIZE
     }

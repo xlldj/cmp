@@ -158,6 +158,7 @@ class UserInfo extends React.Component {
           <li><p>用户昵称:</p>{data.nickName}</li>
           <li><p>用户性别:</p>{SEX[data.sex]}</li>
           <li><p>手机号:</p>{data.mobile}</li>
+          <li><p>手机型号:</p>{data.mobileModel || '未知'}</li>
           <li><p>学校:</p>{data.schoolName}</li>
           <li><p>宿舍楼栋:</p>{data.buildingName}</li>
           <li><p>宿舍楼层:</p>{data.floorName}</li>

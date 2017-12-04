@@ -93,6 +93,11 @@ class MyMenu extends React.Component {
       this.props.changeFund('fundList', {schoolId: selectedSchool})
       this.props.changeLost('lostList', {schoolId: selectedSchool})
       this.props.changeUser('userList', {schoolId: selectedSchool})
+      this.props.changeTask('taskList', {schoolId: selectedSchool})
+      this.props.changeTask('log', {schoolId: selectedSchool})
+      this.props.changeTask('abnormal', {schoolId: selectedSchool})
+      this.props.changeTask('complaint', {schoolId: selectedSchool})
+      this.props.changeTask('feedback', {schoolId: selectedSchool})
     }
   }
   setDefaultSchool = () => {
@@ -111,6 +116,11 @@ class MyMenu extends React.Component {
         this.props.changeFund('fundList', {schoolId: selectedSchool})
         this.props.changeLost('lostList', {schoolId: selectedSchool})
         this.props.changeUser('userList', {schoolId: selectedSchool}) 
+        this.props.changeTask('taskList', {schoolId: selectedSchool}) 
+        this.props.changeTask('log', {schoolId: selectedSchool})
+        this.props.changeTask('abnormal', {schoolId: selectedSchool})
+        this.props.changeTask('complaint', {schoolId: selectedSchool})
+        this.props.changeTask('feedback', {schoolId: selectedSchool})
       } 
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -199,22 +209,30 @@ class MyMenu extends React.Component {
 
 
   setStatusFortask = () => {
-    this.clearStatus4taskIIlist()
+    /* 工单列表的状态不需要在离开后改变 */
+    // this.clearStatus4taskIIlist()
   }
   clearStatus4taskIIlist = () => {
-    const taskList = 'taskList'
+    /* 工单列表的状态不需要在离开后改变 */
+    /* const taskList = 'taskList'
+    this.getDefaultSchool()
     this.props.changeTask(taskList, {page: 1, assigned: false, sourceType: 'all', pending: 'all', all: '1'})
+    */
   }
   clearStatus4taskIIlog = () => {
+    this.getDefaultSchool()
     this.props.changeTask('log', {page: 1, all: '1'})
   }
   clearStatus4taskIIabnormal = () => {
+    this.getDefaultSchool()
     this.props.changeTask('abnormal', {page: 1, selectKey: ''})
   }
   clearStatus4taskIIcomplaint = () => {
+    this.getDefaultSchool()
     this.props.changeTask('complaint', {page: 1, type: 'all', status: 'all', selectKey: ''})
   }
   clearStatus4taskIIfeedback = () => {
+    this.getDefaultSchool()
     this.props.changeTask('feedback', {page: 1})
   }
 

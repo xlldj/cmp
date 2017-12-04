@@ -10,6 +10,7 @@ import AjaxHandler from '../ajax'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../actions'
+import './style/style.css'
 
 const OrderTable = asyncComponent(() => import(/* webpackChunkName: "orderTable" */ "./orderTable"))
 const OrderInfo = asyncComponent(() => import(/* webpackChunkName: "orderInfo" */ "./orderInfo"))

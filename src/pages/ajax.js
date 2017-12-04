@@ -143,9 +143,9 @@ AjaxHandler.ajax = (resource, body, cb, errorCb) => {
   if (resource.includes('/api')) {
     resource = resource.replace('/api', '')
   }
-  // const url = 'http://116.62.236.67:5080' + resource
+  const url = 'http://116.62.236.67:5080' + resource
   // const url = 'http://10.0.0.4:5080' + resource
-  const url = 'https://api.xiaolian365.com/m' + resource
+  // const url = 'https://api.xiaolian365.com/m' + resource
   // const url = resource
 
   const token = getToken()
