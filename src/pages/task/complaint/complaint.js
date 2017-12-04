@@ -10,6 +10,7 @@ import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
 import Format from '../../component/format'
 import SearchLine from '../../component/searchLine'
+import SchoolSelector from '../../component/schoolSelector'
 import BasicSelector from '../../component/basicSelector'
 
 
@@ -46,7 +47,8 @@ class ComplaintTable extends React.Component {
     status: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired,
-    selectKey: PropTypes.string.isRequired
+    selectKey: PropTypes.string.isRequired,
+    schoolId: PropTypes.string.isRequired
   }
   constructor (props) {
     super(props)
@@ -66,10 +68,14 @@ class ComplaintTable extends React.Component {
       searchingText: ''
     }
     this.columns = [{
+      title: '学校',
+      className: 'firstCol',
+      dataIndex: 'schoolName',
+      width: '10%'
+    }, {
       title: '投诉类型',
       dataIndex: 'orderType',
       width: '8%',
-      className: 'firstCol',
       render: (text,record)=>(CONSTANTS.COMPLAINTTYPES[record.orderType])
     }, {
       title: '订单/流水号',
@@ -78,15 +84,15 @@ class ComplaintTable extends React.Component {
     }, {
       title: '投诉用户',
       dataIndex: 'mobile',
-      width: '12%'
+      width: '10%'
     },{
       title: '投诉内容',
       dataIndex: 'content',
-      width: '18%'
+      width: '12%'
     },{
       title: '图片',
       dataIndex: 'images',
-      width: '15%',
+      width: '13%',
       render: (text, record, index) => {
         let imagelis = record.images.map((r, i) => (
           <li className='thumbnail' key={i} >
@@ -185,10 +191,13 @@ class ComplaintTable extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    let {page, status, type, selectKey} = this.props
+    let {page, status, type, selectKey, schoolId} = this.props
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
@@ -208,10 +217,13 @@ class ComplaintTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page, status, type, selectKey} = nextProps
+    let {page, status, type, selectKey, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (type !== 'all') {
       body.orderType = parseInt(type, 10)
@@ -311,7 +323,6 @@ class ComplaintTable extends React.Component {
     })
   }
   changePage = (pageObj) => {
-    let {selectedType, selectedStatus} = this.state
     let page = pageObj.current
     this.props.changeTask('complaint', {'page': page})
   }
@@ -341,10 +352,16 @@ class ComplaintTable extends React.Component {
       this.props.changeTask('complaint', {selectKey: searchingText, page: 1})
     }
   }
+  changeSchool = (v) => {
+    let schoolId = this.props.schoolId
+    if (v !== schoolId) {
+      this.props.changeTask('complaint', {schoolId: v})
+    }
+  }
   
   render () {
     let {dataSource, showImgs, editing, initialSlide, total, loading, searchingText} = this.state
-    let {page, type, status} = this.props
+    let {page, type, status, schoolId} = this.props
 
     const carouselItems = (dataSource[editing]&&dataSource[editing].images&&dataSource[editing].images.length>0)&&(dataSource[editing].images.map((r,i) => {
       return <img key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
@@ -365,8 +382,14 @@ class ComplaintTable extends React.Component {
           pressEnter={this.pressEnter} 
           changeSearch={this.changeSearch} 
 
-          selector1={<BasicSelector allTitle='全部类型' staticOpts={ORDERTYPES} selectedOpt={type} changeOpt={this.changeType} />} 
-          selector2={<BasicSelector allTitle='全部状态' staticOpts={HANDLESTATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
+          selector2={<BasicSelector allTitle='全部类型' staticOpts={ORDERTYPES} selectedOpt={type} changeOpt={this.changeType} />} 
+          selector3={<BasicSelector allTitle='全部状态' staticOpts={HANDLESTATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
         />
 
         <div className='tableList complaint'>
@@ -405,10 +428,11 @@ class ComplaintTable extends React.Component {
 
 // export default ComplaintTable
 const mapStateToProps = (state, ownProps) => ({
-  type: state.changeTask.complaint.type,
-  page: state.changeTask.complaint.page,
-  status: state.changeTask.complaint.status,
-  selectKey: state.changeTask.complaint.selectKey
+  type: state.changeTask[subModule].type,
+  page: state.changeTask[subModule].page,
+  status: state.changeTask[subModule].status,
+  selectKey: state.changeTask[subModule].selectKey,
+  schoolId: state.changeTask[subModule].schoolId
 })
 
 export default connect(mapStateToProps, {

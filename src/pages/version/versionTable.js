@@ -38,15 +38,16 @@ class VersionTable extends React.Component {
       dataIndex: 'type',
       width: '10%',
       render: (text, record) => (UPDATE[record.type])
-    },{
-      title: 'iOS地址',
-      dataIndex: 'ios',
-      width: '16%'
-    },{
-      title: 'Android地址',
-      dataIndex: 'android',
-      width: '16%'
-    },{
+    }, {
+      title: '系统',
+      dataIndex: 'system',
+      width: '8%',
+      render: (text, record) => (CONSTANTS.SYSTEMS[record.system])
+    }, {
+      title: '地址',
+      dataIndex: 'url',
+      width: '20%'
+    }, {
       title: '更新内容',
       dataIndex: 'content',
       width: '28%'

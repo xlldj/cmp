@@ -6,6 +6,7 @@ import AjaxHandler from '../ajax'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
 import Noti from '../noti'
 import CONSTANTS from '../component/constants'
+import PicturesWall from '../component/picturesWall'
 
 const VALUELENGTH = '150px'
 
@@ -18,14 +19,20 @@ class VersionInfo extends React.Component {
       originalVersion: '',
       codeError: false,
       type: '',
-      typeError: false,
-      android: '',
-      androidError: false,
-      ios: '',
-      iosError: false,
       content: '',
       contentError: '',
-      contentErrorMsg: ''
+      contentErrorMsg: '',
+      system: '',
+      defaultIOS: '',
+      defaultAndroid: '',
+      systemError: false,
+      method: '',
+      methodError: false,
+      url: '',
+      urlError: false,
+      method: '',
+      apkError: false,
+      fileList: []
     }
   }
   fetchData =(body)=>{
@@ -59,19 +66,100 @@ class VersionInfo extends React.Component {
       this.setState({
         id: id
       })
+    } else {
+      this.getLatestVersion()
     }
+  }
+  getLatestVersion () {
+    this.getLatestIOS()
+    this.getLatestAndroid()
+  }
+  getDefaultVersion (arr) {
+    let reversed = arr.reverse()
+    let over = false
+    reversed.forEach((r, index, current) => {
+      if (!over) {
+        let i = parseInt(r, 10)
+        if (i < 9) {
+          r = i + 1
+          current[index] = r
+          over = true
+        }
+      }
+    })
+    return reversed.reverse().join('.')
+  }
+  getLatestIOS () {
+    let resource = '/version/list'
+    const body = {
+      page: 1,
+      size: 1,
+      system: 1
+    }
+    const cb = (json) => {
+      if (json.data && json.data.versions) {
+        let ios = json.data.versions[0].versionNo
+        let vs = ios.split('.')
+        let nextVersion = this.getDefaultVersion(vs)
+        let nextState = {
+          defaultIOS: nextVersion
+        }
+        if (this.state.system === '1') {
+          nextState.versionNo = nextVersion
+        }
+        this.setState(nextState)
+      } else {
+        throw {
+          title: '请求出错',
+          message: json.error.displayMessage || '网络错误，请稍后重试'
+        }
+      }
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
+  getLatestAndroid () {
+    let resource = '/version/list'
+    const body = {
+      page: 1,
+      size: 1,
+      system: 2
+    }
+    const cb = (json) => {
+      if (json.data && json.data.versions) {
+        let android = json.data.versions[0].versionNo
+        let vs = android.split('.')
+        let nextVersion = this.getDefaultVersion(vs)
+        let nextState = {
+          defaultAndroid: nextVersion
+        }
+        if (this.state.system === '2') {
+          nextState.versionNo = nextVersion
+        }
+        this.setState(nextState)
+      } else {
+        throw {
+          title: '请求出错',
+          message: json.error.displayMessage || '网络错误，请稍后重试'
+        }
+      }
+    }
+    AjaxHandler.ajax(resource, body, cb)
   }
   componentWillUnmount () {
     this.props.hide(true)
   }
   postInfo = () => {
-    let {versionNo, type, ios, android, content, id} = this.state
+    let {system, versionNo, type, method, url, content, id, fileList} = this.state
     const body = {
+      system: system,
       versionNo: versionNo,
       type: parseInt(type, 10),
-      ios: ios,
-      android: android,
       content: content
+    }
+    if (method === '1') {
+      body.url = url
+    } else if (method === '2') {
+      body.url = fileList[0].url
     }
     let resource
     if (id) {
@@ -101,8 +189,12 @@ class VersionInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   comleteEdit = () => {
-    let {versionNo, type, ios, android, content} = this.state, nextState = {}
-
+    let {system, versionNo, type, method, url, content, fileList} = this.state, nextState = {}
+    if (!system) {
+      nextState.systemError = true
+      return this.setState(nextState)
+    }
+    nextState.systemError = false
     if (!versionNo) {
       nextState.codeError = true
       nextState.codeErrorMsg = '版本号不能为空！'
@@ -113,35 +205,41 @@ class VersionInfo extends React.Component {
       nextState.codeErrorMsg = '版本号格式不正确，请输入如1.1.1格式的数字,每个数字不超过两位'
       return this.setState(nextState)
     }
+    nextState.codeError = false
     if (!type) {
-      return this.setState({
-        typeError: true
-      })
+      nextState.typeError = true
+      return this.setState(nextState)
     }
-    if (!ios) {
-      return this.setState({
-        iosError: true
-      })
+    nextState.typeError = false
+    if (!method) {
+      nextState.methodError = true
+      return this.setState(nextState)
     }
-    if (!android) {
-      return this.setState({
-        androidError: true
-      })
+    nextState.methodError = false
+    if (method === '1' && !url) {
+      return nextState.urlError = true
     }
+    nextState.urlError = false
+    if (method === '2' && fileList.length === 0) {
+      nextState.methodError = true
+      return this.setState(nextState)
+    }
+    nextState.methodError = false
     if (!content) {
-      return this.setState({
-        contentError: true,
-        contentErrorMsg: '更新内容不能为空！'
-      })
+      nextState.contentError = true
+      nextState.contentErrorMsg = '更新内容不能为空！'
+      return this.setState(nextState)
     }
     if (content.length > 200) {
-      return this.setState({
-        contentError: true,
-        contentErrorMsg: '更新内容不能超过200字'
-      })
+      nextState.contentError = true
+      nextState.contentErrorMsg = '更新内容不能超过200字'
+      return this.setState(nextState)
     }
-    this.postInfo()
-    // this.checkExist(this.postInfo)
+    nextState.contentError = false
+    nextState.contentErrorMsg = ''
+    this.setState(nextState)
+    // this.postInfo()
+    this.checkExist(this.postInfo)
   }
   cancel = () => {
     this.props.history.goBack()
@@ -180,7 +278,7 @@ class VersionInfo extends React.Component {
     }
     let resource = '/version/check'
     const body = {
-      versionNo:versionNo.trim() 
+      versionNo: versionNo.trim() 
     }
     const cb = (json) => {
       if (json.error) {
@@ -220,42 +318,6 @@ class VersionInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeIos = (e) => {
-    this.setState({
-      ios: e.target.value
-    })
-  }
-  checkIos = (e) => {
-    let v = e.target.value.trim()
-    if (!v) {
-      return this.setState({
-        iosError: true,
-        ios: v
-      })
-    }
-    this.setState({
-      iosError: false,
-      ios: v
-    })
-  }
-  changeAndroid = (e) => {
-    this.setState({
-      android: e.target.value
-    })
-  }
-  checkAndroid = (e) => {
-    let v = e.target.value.trim()
-    if (!v) {
-      this.setState({
-        androidError: true,
-        android: v
-      })
-    }
-    this.setState({
-      androidError: false,
-      android: v
-    })
-  }
   changeContent = (e) => {
     let v = e.target.value
     this.setState({
@@ -281,13 +343,75 @@ class VersionInfo extends React.Component {
     }
     this.setState(nextState)
   }
+  changeSystem = (v) => {
+    let nextState = {
+      system: v
+    }
+    let {defaultIOS, defaultAndroid} = this.state
+    if (v === '1') {
+      nextState.versionNo = defaultIOS
+    } else if (v === '2') {
+      nextState.versionNo = defaultAndroid
+    }
+    this.setState(nextState)
+  }
+  checkSystem = (v) => {
+    if (!v) {
+      return this.setState({
+        systemError: true
+      })
+    }
+    let nextState = {}
+    if (this.state.systemError) {
+      nextState.systemError = false
+    }
+    this.setState(nextState)
+  }
+  setImages = (fileList) => {
+    this.setState({
+      fileList: JSON.parse(JSON.stringify(fileList))
+    })
+  }
+  changeMethod = (v) => {
+    this.setState({
+      method: v
+    })
+  }
+  checkMethod = (v) => {
+    if (!v) {
+      this.setState({
+        methodError: true
+      })
+    }
+    if (this.state.methodError) {
+      this.setState({
+        methodError: false
+      })
+    }
+  }
 
   render () {
-    let {id, type, typeError, versionNo, codeError, codeErrorMsg, ios, iosError, android, androidError, content, contentError, contentErrorMsg} = this.state
+    let {id, type, typeError, versionNo, codeError, codeErrorMsg, 
+      content, contentError, contentErrorMsg,
+      system, systemError, method, methodError,
+      url, urlError, apkError, fileList
+    } = this.state
 
     return (
       <div className='infoList versionInfo'>
         <ul>
+          <li>
+            <p>选择系统:</p>
+            <BasicSelectorWithoutAll
+              width={'140px'}
+              staticOpts={CONSTANTS.SYSTEMS}  
+              selectedOpt={system.toString()} 
+              changeOpt={this.changeSystem}
+              checkOpt={this.checkSystem}
+              invalidTitle='选择系统'
+            />
+            {systemError ? <span className='checkInvalid'>系统不能为空！</span>:null}        
+          </li>
           <li>
             <p>版本号:</p>
             <input value={versionNo} disabled={id} className={id ? 'disabled' : ''} onChange={this.changeCode} onBlur={this.checkCode} placeholder='' />
@@ -298,7 +422,7 @@ class VersionInfo extends React.Component {
             <BasicSelectorWithoutAll
               width={'140px'}
               staticOpts={CONSTANTS.UPDATETYPE}  
-              selectedOpt={type} 
+              selectedOpt={type.toString()} 
               changeOpt={this.changeType}
               checkOpt={this.checkType}
               invalidTitle='选择方式'
@@ -307,16 +431,37 @@ class VersionInfo extends React.Component {
           </li>
 
           <li>
-            <p>iOS地址:</p>
-            <input className='long' type='url' value={ios} onChange={this.changeIos} onBlur={this.checkIos} placeholder='' />
-            {iosError ? <span className='checkInvalid'>iOS地址不能为空！</span>:null}        
+            <p>地址输入方式:</p>
+            <BasicSelectorWithoutAll
+              width={'140px'}
+              staticOpts={CONSTANTS.VERSIONADDMETHOD}  
+              selectedOpt={method} 
+              changeOpt={this.changeMethod}
+              checkOpt={this.checkMethod}
+              invalidTitle='选择方式'
+            />
+            {methodError ? <span className='checkInvalid'>更新方式不能为空！</span>:null}        
           </li>
 
-          <li>
-            <p>Android地址:</p>
-            <input className='long' type='url' value={android} onChange={this.changeAndroid} onBlur={this.checkAndroid} placeholder='' />
-            {androidError ? <span className='checkInvalid'>Android地址不能为空！</span>:null}        
-          </li>
+          {
+            method === '1' || id ?
+              <li>
+                <p>地址:</p>
+                <input className='long' type='url' value={url} onChange={this.changeUrl} onBlur={this.checkUrl} placeholder='' />
+                {urlError ? <span className='checkInvalid'>地址不能为空！</span>:null}        
+              </li>
+            : null
+          }
+
+          {
+            method === '2' ?
+              <li className='itemsWrapper'>
+                <p>安装包上传:</p>
+                <PicturesWall accept='*' limit={1} setImages={this.setImages} fileList={fileList} dir='version-apk' /> 
+                {apkError ? <span className='checkInvalid'>请上传安装包！</span>:null}        
+              </li>
+            : null
+          }
 
           <li className='itemsWrapper high'>
             <p>更新内容:</p>

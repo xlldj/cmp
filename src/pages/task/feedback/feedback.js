@@ -9,6 +9,14 @@ import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
 import Format from '../../component/format'
+import SchoolSelector from '../../component/schoolSelector'
+import SearchLine from '../../component/searchLine'
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeTask } from '../../../actions'
+
 const HANDLESTATUS = {
   1: '已回复',
   2: '未回复'
@@ -20,7 +28,15 @@ const SIZE = CONSTANTS.PAGINATION
 //const Popconfirm = asyncComponent(() => import(/* webpackChunkName: "popconfirm" */ "antd/lib/popconfirm"))
 //const Modal = asyncComponent(() => import(/* webpackChunkName: "modal" */ "antd/lib/modal"))
 
+
+const subModule = 'feedback'
+
+
 class Feedback extends React.Component {
+  static propTypes = {
+    page: PropTypes.number.isRequired,
+    schoolId: PropTypes.string.isRequired
+  }
   constructor (props) {
     super(props)
     const dataSource = []
@@ -34,28 +50,31 @@ class Feedback extends React.Component {
       messageEmpty: false,
       orderId: 0,
       loading: false,
-      page: 1,
       total: 0
     }
-    this.columns = [ {
+    this.columns = [{
+      title: '学校',
+      className: 'firstCol',
+      dataIndex: 'schoolName',
+      width: '16%'
+    }, {
       title: '反馈用户',
       dataIndex: 'mobile',
-      width: '20%',
-      className: 'firstCol',
+      width: '15%',
       render: (text) => (text || '暂无')
     },{
       title: '反馈类型',
       dataIndex: 'option',
-      width: '20%',
+      width: '17%',
       render: (text,record)=>(CONSTANTS.FEEDBACKTYPES[record.option])
     },{
       title: '反馈内容',
       dataIndex: 'content',
-      width: '20%'
+      width: '17%'
     },{
       title: '反馈图片',
       dataIndex: 'images',
-      width: '20%',
+      width: '15%',
       render: (text, record, index) => {
         let imagelis = record.images&&record.images.map((r, i) => (
           <li className='thumbnail' key={i} >
@@ -104,14 +123,27 @@ class Feedback extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
+    let {page, schoolId} = this.props
     const body = {
-      page: 1,
-      size: SIZE
+      page: page
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
   }
   componentWillUnmount () {
     this.props.hide(true)
+  }
+  componentWillReceiveProps (nextProps) {
+    let {page, schoolId} = nextProps
+    const body = {
+      page: page
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+    this.fetchData(body)
   }
   setWH = (e) => {
     let img = e.target
@@ -148,18 +180,18 @@ class Feedback extends React.Component {
   }
   changePage = (pageObj) => {
     let page = pageObj.current
-    this.setState({
-      page: page,
-      loading: true
-    })
-    const body = {
-      page: page,
-      size: SIZE
+    this.props.changeTask(subModule, {page: page})
+  }
+  changeSchool = (v) => {
+    let schoolId = this.props.schoolId
+    if (v !== schoolId) {
+      this.props.changeTask(subModule, {schoolId: v})
     }
-    this.fetchData(body)
   }
   render () {
-    let {dataSource, showImgs, editing, initialSlide, page, total, loading} = this.state
+    let {dataSource, showImgs, editing, initialSlide, total, loading} = this.state
+    const {page, schoolId} = this.props
+
     const carouselItems = (dataSource&&dataSource[editing]&&dataSource[editing].images&&dataSource[editing].images.length>0)&&(dataSource[editing].images.map((r,i) => {
       return <img key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
     }))
@@ -172,6 +204,15 @@ class Feedback extends React.Component {
 
     return (
       <div className='contentArea'>
+        <SearchLine  
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
+        />
+
         <div className='tableList complaint'>
           <Table 
             bordered
@@ -192,4 +233,12 @@ class Feedback extends React.Component {
   }
 }
 
-export default Feedback
+// export default ComplaintTable
+const mapStateToProps = (state, ownProps) => ({
+  page: state.changeTask[subModule].page,
+  schoolId: state.changeTask[subModule].schoolId
+})
+
+export default connect(mapStateToProps, {
+  changeTask
+})(Feedback)

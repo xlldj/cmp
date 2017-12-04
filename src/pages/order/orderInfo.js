@@ -1,9 +1,10 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import  Button from 'antd/lib/button'
+import {Popconfirm, Button} from 'antd'
 import AjaxHandler from '../ajax'
 import CONSTANTS from '../component/constants'
 import Time from '../component/time'
+import Noti from '../noti'
 
 const typeName ={
   1: '热水器',
@@ -59,7 +60,10 @@ class OrderInfo extends React.Component {
 
   componentDidMount(){
     this.props.hide(false)
-    let id = parseInt(this.props.match.params.id.slice(1))
+    let id = parseInt(this.props.match.params.id.slice(1), 10)
+    this.setState({
+      id: id
+    })
     const body={
       id: id
     }
@@ -71,8 +75,27 @@ class OrderInfo extends React.Component {
   back = () => {
     this.props.history.goBack()
   }
+  confirmSettle = () => {
+    let resource = '/order/prepay/settle'
+    const body = {
+      id: this.state.id
+    }
+    const cb = (json) => {
+      if (json.data && json.data.result) {
+        Noti.hintSuccessWithoutSkip()
+      } else {
+        throw {
+          title: '请求出错',
+          message: json.error.displayMessage || '网络请求出错'
+        }
+      }
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   render () {
     let data = this.state.data
+
+    const popTitle = (<p className='popTitle'>退单后该笔订单的预付金额和代金券都将返还给用户，确定要退单么?</p>)
 
     return (
       <div className='infoList' >
@@ -93,6 +116,11 @@ class OrderInfo extends React.Component {
           <li><p>支付方式:</p>{PAYMENT[data.paymentType] || '暂无'}</li>
           <li><p>实际用水量:</p>{data.waterUsage||'待核算'}</li>
           <li><p>实际消费:</p><span className='shalowRed'>{data.consume?`¥${data.consume}`:'待核算'}</span></li>
+          <li><p></p>
+            <Popconfirm title={popTitle} onConfirm={this.confirmSettle} >
+              <Button >退单</Button>
+            </Popconfirm>
+          </li>
         </ul>
         <div className='btnArea'>
           <Button onClick={this.back}>返回</Button>

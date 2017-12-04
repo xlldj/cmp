@@ -6,6 +6,7 @@ import Time from '../../component/time'
 import Noti from '../../noti'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
+import SchoolSelector from '../../component/schoolSelector'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 
 import PropTypes from 'prop-types'
@@ -23,7 +24,8 @@ const SIZE = CONSTANTS.PAGINATION
 class TaskLogList extends React.Component {
   static propTypes = {
     all: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    schoolId: PropTypes.string.isRequired
   }
   constructor(props){
     super(props)
@@ -33,8 +35,12 @@ class TaskLogList extends React.Component {
       total: 0
     }
     this.columns = [{
-      title: '任务类型',
+      title: '学校',
       className: 'firstCol',
+      dataIndex: 'schoolName',
+      width: '14%'
+    }, {
+      title: '任务类型',
       dataIndex: 'type',
       width: '10%',
       render: (text, record) => (CONSTANTS.CREATEWORKTYPE[record.type])
@@ -50,11 +56,11 @@ class TaskLogList extends React.Component {
     }, {
       title: '创建人',
       dataIndex: 'username',
-      width: '20%'
+      width: '10%'
     }, {
       title: '任务状态',
       dataIndex: 'status',
-      width: '20%',
+      width: '10%',
       render: (text, record) => {
         if (record.type === 1) {
           return '无'
@@ -65,17 +71,12 @@ class TaskLogList extends React.Component {
     }, {
       title: '操作',
       dataIndex: 'operation',
-      width: '10%',
       className: 'lastCol',
       render: (text, record, index) => {
         return (
           <div className='editable-row-operations'>
       <span>
-        <Link to={`/task/log/detail/:${record.id}`}>编辑</Link>
-        <span className='ant-divider' />
-        <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
-          <a href="#">删除</a>
-        </Popconfirm>
+        <Link to={`/task/log/detail/:${record.id}`}>详情</Link>
       </span>
           </div>
         )
@@ -111,10 +112,13 @@ class TaskLogList extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    let {page, all} = this.props
+    let {page, all, schoolId} = this.props
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (all === '1') {
       body.all = false
@@ -127,10 +131,13 @@ class TaskLogList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page, all} = nextProps
+    let {page, all, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (all === '1') {
       body.all = false
@@ -160,6 +167,9 @@ class TaskLogList extends React.Component {
             page: this.props.page,
             size: SIZE
           }
+          if (this.props.schoolId !== 'all') {
+            data.schoolId = parseInt(this.props.schoolId, 10)
+          }
           if (this.props.all === '1') {
             data.all = false
           } else {
@@ -180,9 +190,15 @@ class TaskLogList extends React.Component {
     let page = pageObj.current
     this.props.changeTask(subModule, {page: page})
   }
+  changeSchool = (v) => {
+    let schoolId = this.props.schoolId
+    if (v !== schoolId) {
+      this.props.changeTask(subModule, {schoolId: v})
+    }
+  }
   render(){
     const {workNotes, total, loading} = this.state
-    const {page, all} = this.props
+    const {page, all, schoolId} = this.props
 
     return (
         <div className='contentArea'>
@@ -190,7 +206,13 @@ class TaskLogList extends React.Component {
           <SearchLine 
             addTitle='添加工作记录'
             addLink='/task/log/add'
-            selector1={<BasicSelectorWithoutAll selectedOpt={all} staticOpts={TARGETS} changeOpt={this.changeDivision} />} 
+            selector1={
+              <SchoolSelector
+                selectedSchool={schoolId}
+                changeSchool={this.changeSchool}
+              />
+            }
+            selector2={<BasicSelectorWithoutAll selectedOpt={all} staticOpts={TARGETS} changeOpt={this.changeDivision} />} 
           />
 
           <div className='tableList'>
@@ -211,7 +233,8 @@ class TaskLogList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
   page: state.changeTask[subModule].page,
-  all: state.changeTask[subModule].all
+  all: state.changeTask[subModule].all,
+  schoolId: state.changeTask[subModule].schoolId
 })
 
 export default withRouter(connect(mapStateToProps, {

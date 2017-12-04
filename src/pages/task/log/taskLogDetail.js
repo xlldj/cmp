@@ -1,5 +1,5 @@
 import React from 'react'
-import {Button, Modal, Table} from 'antd'
+import {Button, Modal, Table, Popconfirm} from 'antd'
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import Time from '../../component/time'
@@ -31,7 +31,8 @@ class TaskLogDetail extends React.Component {
       showModal: false,
       schoolName: '',
       priority: '',
-      remark: ''
+      remark: '',
+      needToast: false
     }
   }
   componentDidMount(){
@@ -53,7 +54,7 @@ class TaskLogDetail extends React.Component {
             description: data.description || ''
           }
           if (data.type) {
-            nextState.type = data.type
+            nextState.type = data.type.toString()
           }
           if (data.schoolId) {
             nextState.schoolId = data.schoolId
@@ -109,6 +110,7 @@ class TaskLogDetail extends React.Component {
       nextState.briefError = false
     }
     this.setState(nextState)
+    this.updateToast()
   }
   changeDescription = (e) => {
     let v = e.target.value.trim()
@@ -132,6 +134,7 @@ class TaskLogDetail extends React.Component {
       nextState.descriptionError = false
     }
     this.setState(nextState)
+    this.updateToast()
   }
   postInfo = () => {
     const {id, brief, description, fileList, type, schoolId, repairmanId, priority, remark} = this.state
@@ -217,6 +220,9 @@ class TaskLogDetail extends React.Component {
         typeError: false
       })
     }
+    if (v === '2') {
+      this.updateToast()
+    }
   }
   changeSchool = (id, name) => {
     this.setState({
@@ -235,6 +241,7 @@ class TaskLogDetail extends React.Component {
         schoolError: false
       })
     }
+    this.updateToast()
   }
   showAllocate = () => {
     this.setState({
@@ -247,7 +254,6 @@ class TaskLogDetail extends React.Component {
     })
   }
   setMaintainer = (id, name, priority, remark) => {
-    console.log(priority)
     this.setState({
       repairmanId: id,
       repairmanName: name,
@@ -255,6 +261,16 @@ class TaskLogDetail extends React.Component {
       remark: remark,
       showModal: false
     })
+    this.updateToast({repairmanId: id})
+  }
+  updateToast (info) {
+    let {id, type, brief, description, schoolId, repairmanId} = {...this.state, ...info}
+    let needToast = true, nextState = {}
+    if (id || type !== '2' || !brief || !description || !schoolId || !repairmanId) {
+      needToast = false
+    }
+    nextState.needToast = needToast
+    this.setState(nextState)
   }
   render () {
     const {id, titleError, type, typeError, brief, briefError,description, 
@@ -262,12 +278,14 @@ class TaskLogDetail extends React.Component {
       schoolId, schoolError, schoolName,
       showModal,
       repairmanId, repairmanName, repairmanError,
-      priority, remark
+      priority, remark,
+      needToast
     } = this.state
 
+    console.log(needToast)
     return (
       <div className='infoList' >
-        <div className='info'>
+        <div className='info takLogInfo'>
           <ul>
             <li>
               <p>工单类型：</p>
@@ -327,7 +345,7 @@ class TaskLogDetail extends React.Component {
                <li>
                 <p>选择维修员：</p>
                 {repairmanName ? <span>{repairmanName}</span> : null}
-                <Button type='primary' onClick={this.showAllocate}>指派维修员</Button>
+                {id ? null : <Button type='primary' onClick={this.showAllocate}>指派维修员</Button>}
                 {repairmanError && (<span className='checkInvalid'>请指派维修员！</span>)}
               </li>
               : null
@@ -337,7 +355,14 @@ class TaskLogDetail extends React.Component {
 
         <div className='btnArea'>
           {type === '2' && id ? null : <Button type='primary'  onClick={this.handleSubmit} >确认</Button>}
-          <Button onClick={this.cancelSubmit} >返回</Button>
+          {
+            needToast ?
+              <Popconfirm title="当前任务还未发布，确定要返回么?" onConfirm={this.cancelSubmit} okText="确认" cancelText="取消">
+                <Button >返回</Button>
+              </Popconfirm>
+            : 
+              <Button onClick={this.cancelSubmit} >返回</Button>
+          }
         </div>
 
         <RepairmanTable showModal={showModal} setMaintainer={this.setMaintainer} cancel={this.cancel}

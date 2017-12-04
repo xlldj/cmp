@@ -1,5 +1,6 @@
 import React from 'react'
-import { Button,Radio, Modal, Table, notification ,Icon,Upload, Select} from 'antd'
+import moment from 'moment'
+import { Button,Radio, Modal, Table, notification ,Icon,Upload, Select, DatePicker} from 'antd'
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import CONSTANTS from '../../component/constants'
@@ -23,19 +24,19 @@ class ActInfo extends React.Component {
     super(props)
     let fileList = []
     this.state = {
-      id: 0,
-      selectedSchool: '0',
+      id: '',
+      selectedSchool: '',
       originalSchool: '',
       schoolError: false,
-      type: '0',
+      type: '',
       originalType: '',
       typeError: false,
       name:'',
       originalName: '',
       nameError: false,      
-      endTime: new Date(),
+      endTime: moment(),
       endTimeError: false,
-      online: '',
+      online: true,
       onlineError: false,
       amount: 0,
       amountError: false,
@@ -54,6 +55,7 @@ class ActInfo extends React.Component {
       codeError: false,
       inventory: '',
       inventoryError: false,
+      remainInventory: '',
 
       schools: [],
       gifts: [],
@@ -61,6 +63,8 @@ class ActInfo extends React.Component {
       imageError: false,
 
       released: false,
+      startTime: moment(),
+      startTimeError: ''
     }
   }
   fetchGifts = () => {
@@ -140,7 +144,8 @@ class ActInfo extends React.Component {
               newState.amountRandom = d.amountRandom
             }
             if(d.type===3){
-              newState.inventory = d.inventory
+              newState.inventory = d.planInventory
+              newState.remainInventory = d.inventory
               newState.code = d.code.trim()
               newState.originalCode = d.code
             }else{
@@ -153,13 +158,15 @@ class ActInfo extends React.Component {
               }
               newState.url = d.url
             }
+            newState.startTime = d.startTime
             newState.endTime = d.endTime
-            if(d.online===2){
-              newState.released = false
-              newState.online = false
-            }else{
+            let passStartTime = Date.parse(new Date()) >= d.startTime
+            if(passStartTime && d.online===1){
               newState.released = true
               newState.online = true
+            }else{
+              newState.released = false
+              newState.online = false
             }
             d.gifts.map((g,i)=>{
               let gift = gifts.find((r,ind)=>(r.id===g.giftId))
@@ -307,16 +314,6 @@ class ActInfo extends React.Component {
         })
       }
     }
-    if(!endTime){
-      return this.setState({
-        endTimeError: true
-      })
-    }
-    if(online===''){
-      return this.setState({
-        onlineError: true
-      })
-    }
     if(released&&online){
       return this.props.history.push('/gift/act')
     }
@@ -370,7 +367,9 @@ class ActInfo extends React.Component {
   }
   postInfo = () => {
     let resource = '/api/gift/activity/save'
-    let {gifts,type,name,selectedSchool,amount,releaseMethod,amountRandom,fileList,url,inventory,code}=this.state,items=[]
+    let {gifts,type,name,selectedSchool,amount,releaseMethod,amountRandom,
+      startTime, endTime, fileList,url,inventory,code, online
+    }=this.state,items=[]
     gifts.map((g,i)=>{
       if(g.count){
         items.push({
@@ -379,18 +378,20 @@ class ActInfo extends React.Component {
         })
       }
     })
-    let end = new Date(this.state.endTime).getTime()
+    let start = parseInt(moment(startTime).valueOf(), 10)
+    let end = parseInt(moment(endTime).valueOf(), 10)
     const body = {
       schoolId: parseInt(selectedSchool),
       name: name,
       type: parseInt(type),
       amount: amount,
       releaseMethod: parseInt(releaseMethod),
+      startTime: start,
       endTime: end,
       gifts:items,
-      online: this.state.online,
+      online: online,
     }
-    if(releaseMethod==='2'){
+    if(releaseMethod === '2'){
       body.amountRandom = parseInt(amountRandom)
     }
     if(type==='3'){
@@ -417,7 +418,8 @@ class ActInfo extends React.Component {
                   released: false
                 })
               }else{
-                if(this.state.online){
+                let passStartTime = Date.parse(new Date()) >= start
+                if(this.state.online && passStartTime){
                    return Noti.hintAndRoute('当前活动已上线', '将返回活动列表！', this.props.history, '/gift/act')
                 }
                 Noti.hintSuccess(this.props.history,'/gift/act')
@@ -446,24 +448,15 @@ class ActInfo extends React.Component {
       duration: 2
     })
   }  
-  changeEndTime = (e) => {
-    let t = new Date(e.target.value)
+  changeEndTime = (v) => {
     this.setState({
-      endTime: t
+      endTime: v
     })
   }
-  checkEndTime = (e) => {
-    let t=e.target.value
-    if(!t){
-      return this.setState({
-        endTimeError: true
-      })
-    }
-    if(this.state.endTimeError){
-      this.setState({
-        endTimeError: false
-      })
-    }
+  changeStartTime = (t) => {
+    this.setState({
+      startTime: t
+    })
   }
   chooseGifts = (e,i) => {
     e.preventDefault()
@@ -501,13 +494,10 @@ class ActInfo extends React.Component {
     })
   }  
   changeOnline = (v) => {
-    let onlineO = {
+    let nextState = {
       online: v.target.value
     }
-    if(this.state.onlineError){
-      onlineO.onlineError=false
-    }
-    this.setState(onlineO)
+    this.setState(nextState)
   }
   checkOnline = (v) => {
     this.setState({
@@ -624,7 +614,7 @@ class ActInfo extends React.Component {
       url: v
     }
     if(this.state.urlError){
-      nextState.urlError = true
+      nextState.urlError = false
     }
     this.setState(nextState)
   }
@@ -640,10 +630,16 @@ class ActInfo extends React.Component {
     this.props.history.goBack()
   }
   render () {
-    let {id, selectedSchool,schoolError,type,typeError,name,nameError,endTime,endTimeError,online,onlineError,amount,amountError,releaseMethod,releaseMethodLock,releaseMethodError,releaseMethodLockHint,amountRandom,amountRandomError,randomErrorMessage,imageEntrance,url,urlError,code,codeError,inventory,inventoryError,schools,gifts,fileList,released, imageError} = this.state
-    let a = new Date(endTime),ay = a.getFullYear(),aM = a.getMonth()>8?parseInt(a.getMonth())+1:'0'+(parseInt(a.getMonth())+1)
-    let aD = a.getDate()>9?a.getDate():'0'+a.getDate()
-    let endTimeStr = `${ay}-${aM}-${aD}`
+    let {id, selectedSchool,schoolError,type,typeError,name,nameError,endTime,endTimeError,
+      online,onlineError,amount,amountError,releaseMethod,releaseMethodLock,releaseMethodError,
+      releaseMethodLockHint,amountRandom,amountRandomError,randomErrorMessage,imageEntrance,url,
+      urlError,code,codeError,
+      inventory,inventoryError, remainInventory,
+      schools,gifts,fileList,released, imageError,
+      startTime, startTimeError
+    } = this.state
+
+    let passStartTime = Date.parse(new Date()) > parseInt(moment(startTime).valueOf(),10)
 
     const codeArea = (
       <div className='info'>
@@ -720,7 +716,7 @@ class ActInfo extends React.Component {
             <li>
               <p>红包数量：</p>
               <input disabled className='center' value={amount?`已选择${amount}个红包`:'未选择'} /> 
-              <a style={{marginLeft:'10px'}} disabled={released?true:false} href='' onClick={this.chooseGifts} >选择红包</a>
+              <a className='mgl10' disabled={released?true:false} href='' onClick={this.chooseGifts} >选择红包</a>
               {amountError?(<span className='checkInvalid'>未选择红包！</span>):null}
             </li>
             : null
@@ -742,6 +738,7 @@ class ActInfo extends React.Component {
             <li>
               <p>红包库存：</p>
               <input type='number' disabled={released?true:false}  className={released ? 'disabled' : ''} value={inventory}  onChange={this.changeInventory} onBlur={this.checkInventory} placeholder="" /> 
+              {id ? <span className='mgl10'>(剩余库存:{remainInventory})</span> : null}
               {inventoryError?(<span className='checkInvalid'>请输入红包库存！</span>):null}
             </li> 
             : null
@@ -774,14 +771,38 @@ class ActInfo extends React.Component {
             : null
           }
           { type && type !== '0' ?
-            <li>
-              <p>活动截止日期：</p>
-              <input disabled={released?true:false}  className={released ? 'disabled' : ''} name='endTime' type='date' value={endTimeStr} onChange={this.changeEndTime} onBlur={this.checkEndTime} required />
-              {endTimeError?(<span className='checkInvalid'>请选择截止日期！</span>):null}
-            </li>
+              <li >
+                <p>活动上线时间:</p>
+                <DatePicker
+                  disabled={released?true:false}
+                  showTime
+                  className='timePicker'
+                  allowClear={false}
+                  value={moment(startTime)}
+                  format="YYYY-MM-DD HH:mm"
+                  onChange={this.changeStartTime}
+                />
+                {startTimeError?(<span className='checkInvalid'>请选择上线时间！</span>):null}
+              </li>
+            : null
+          }
+          { type && type !== '0' ?
+              <li >
+                <p>活动截至时间:</p>
+                <DatePicker
+                  showTime
+                  disabled={released?true:false}
+                  className='timePicker'
+                  allowClear={false}
+                  value={moment(endTime)}
+                  format="YYYY-MM-DD HH:mm"
+                  onChange={this.changeEndTime}
+                />
+                {endTimeError?(<span className='checkInvalid'>请选择截止时间！</span>):null}
+              </li>
             : null
           }     
-          { type && type !== '0' ?
+          { id && type && passStartTime ?
             <li>
               <p>活动是否上线：</p>
               <RadioGroup  onChange={this.changeOnline} value={online}>
@@ -789,7 +810,6 @@ class ActInfo extends React.Component {
                 <Radio value={false}>否</Radio>
               </RadioGroup>
               {released?<span className='checkInvalid'>上线活动不能编辑，请您先将活动下线！</span>:null}
-              {onlineError?<span className='checkInvalid'>请选择上下线状态！</span>:null}
             </li>
             : null
           }

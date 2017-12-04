@@ -1,7 +1,5 @@
 import React from 'react'
 import moment from 'moment';
-import TimePicker from 'rc-time-picker';
-import 'rc-time-picker/assets/index.css';
 
 import {Button, DatePicker, Table, Modal} from 'antd'
 
@@ -467,7 +465,7 @@ class NotifyInfo extends React.Component {
       <li >
         <p>公告截至时间:</p>
           <DatePicker
-            className='end'
+            className='timePicker'
             showTime
             allowClear={false}
             value={moment(endTime)}

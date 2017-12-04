@@ -6,6 +6,7 @@ import Time from '../component/time'
 import AjaxHandler from '../ajax'
 import CONSTANTS from '../component/constants'
 import SearchLine from '../component/searchLine'
+import SchoolSelector from '../component/schoolSelector'
 import BasicSelector from '../component/basicSelector'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
 
@@ -43,7 +44,8 @@ class TaskList extends React.Component {
     pending: PropTypes.string.isRequired, // 值为all，1，2
     sourceType: PropTypes.string.isRequired, // 值为all，1，2
     assigned: PropTypes.bool.isRequired,
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    schoolId: PropTypes.string.isRequired
   }
   constructor (props) {
     super(props)
@@ -53,29 +55,43 @@ class TaskList extends React.Component {
       total: 0
     }
     this.columns = [{
-      title: '任务类型',
+      title: '学校',
       className: 'firstCol',
+      dataIndex: 'schoolName',
+      width: '10%'
+    }, {
+      title: '任务类型',
       dataIndex: 'sourceType',
-      width: '10%',
+      width: '8%',
       render: (text) => (TYPES[text])
+    }, {
+      title: '用户',
+      dataIndex: 'mobile',
+      width: '10%',
+      render: (text, record) => (record.mobile || '')
+    }, {
+      title: '设备地址',
+      dataIndex: 'location',
+      width: '10%',
+      render: (text, record) => (record.location || '')
     }, {
       title: '任务申请时间',
       dataIndex: 'createTime',
-      width: '16%',
+      width: '14%',
       render:(text,record)=>(Time.showDate(text))
     }, {
       title: '任务等待时间',
       dataIndex: 'id',
-      width: '16%',
+      width: '14%',
       render: (text,record,index) => (Time.getSpan(record.createTime))
     }, {
       title: '提醒次数',
       dataIndex: 'remind',
-      width: '16%'
+      width: '8%'
     },{
       title: '任务分工',
       dataIndex: 'assignName',
-      width: '16%',
+      width: '8%',
       render: (text, record) => {
         switch(record.status) {
           case 1:
@@ -96,7 +112,7 @@ class TaskList extends React.Component {
     },{
       title: '处理状态',
       dataIndex: 'status',
-      width: '16%',
+      width: '11%',
       render: (text,record) => {
         if (record.sourceType === 1) {
           switch(record.status){
@@ -177,11 +193,14 @@ class TaskList extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   refetch = () => {
-    let {all, assigned, sourceType, pending, page} = this.props
+    let {all, assigned, sourceType, pending, page, schoolId} = this.props
     const body = {
       page: page,
       size: SIZE,
       assigned: assigned
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (all === '1') {
       body.all = false
@@ -198,13 +217,17 @@ class TaskList extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    let {all, assigned, sourceType, pending, page} = this.props
+    let {all, assigned, sourceType, pending, page, schoolId} = this.props
     const body = {
       page: page,
       size: SIZE,
       assigned: assigned
     }
     // console.log(all === '1')
+
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
     if (all === '1') {
       body.all = false
     } else {
@@ -222,11 +245,14 @@ class TaskList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {all, assigned, sourceType, pending, page} = nextProps
+    let {all, assigned, sourceType, pending, page, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE,
       assigned: assigned
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (all === '1') {
       body.all = false
@@ -277,8 +303,15 @@ class TaskList extends React.Component {
     let page = pageObj.current
     this.props.changeTask(subModule, {'page': page})
   }
+  changeSchool = (v) => {
+    let {schoolId} = this.props
+    if (v === schoolId) {
+      return
+    }
+    this.props.changeTask(subModule, {'schoolId': v})
+  }
   render () {
-    const {all, pending, sourceType, page, assigned, test} = this.props
+    const {all, pending, sourceType, page, assigned, schoolId} = this.props
     const {dataSource, total, loading} = this.state
 
     return (
@@ -288,9 +321,15 @@ class TaskList extends React.Component {
           <a href='#' className={assigned ? 'active' : ''} onClick={this.toAssigned} >已指派的任务</a>
         </div>
         <SearchLine 
-          selector1={<BasicSelector selectedOpt={sourceType} staticOpts={TYPES} allTitle='所有任务类型' changeOpt={this.changeType} />}
-          selector2={<BasicSelector selectedOpt={pending} staticOpts={PENDINGS} allTitle='所有等待时长' changeOpt={this.changePending} />}
-          selector3={<BasicSelectorWithoutAll selectedOpt={all} staticOpts={TARGETS} changeOpt={this.changeDivision} />} 
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
+          selector2={<BasicSelector selectedOpt={sourceType} staticOpts={TYPES} allTitle='所有任务类型' changeOpt={this.changeType} />}
+          selector3={<BasicSelector selectedOpt={pending} staticOpts={PENDINGS} allTitle='所有等待时长' changeOpt={this.changePending} />}
+          selector4={<BasicSelectorWithoutAll selectedOpt={all} staticOpts={TARGETS} changeOpt={this.changeDivision} />} 
         />
 
         <div className='tableList'>
@@ -312,11 +351,12 @@ class TaskList extends React.Component {
 // export default TaskList
 
 const mapStateToProps = (state, ownProps) => ({
-  assigned: state.changeTask.taskList.assigned,
-  all: state.changeTask.taskList.all,
-  pending: state.changeTask.taskList.pending,
-  sourceType: state.changeTask.taskList.sourceType,
-  page: state.changeTask.taskList.page
+  assigned: state.changeTask[subModule].assigned,
+  all: state.changeTask[subModule].all,
+  pending: state.changeTask[subModule].pending,
+  sourceType: state.changeTask[subModule].sourceType,
+  page: state.changeTask[subModule].page,
+  schoolId: state.changeTask[subModule].schoolId
 })
 
 export default withRouter(connect(mapStateToProps, {

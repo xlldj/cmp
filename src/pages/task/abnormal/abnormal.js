@@ -8,6 +8,7 @@ import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
+import SchoolSelector from '../../component/schoolSelector'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -19,7 +20,9 @@ const SIZE = CONSTANTS.PAGINATION
 
 class AbnormalOrder extends React.Component {
   static propTypes = {
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    schoolId: PropTypes.string.isRequired,
+    selectKey: PropTypes.string.isRequired
   }
   constructor (props) {
     super(props)
@@ -141,10 +144,13 @@ class AbnormalOrder extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    let {page, selectKey} = this.props
+    let {page, selectKey, schoolId} = this.props
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (selectKey) {
       body.selectKey = selectKey
@@ -158,10 +164,13 @@ class AbnormalOrder extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page, selectKey} = nextProps
+    let {page, selectKey, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (selectKey) {
       body.selectKey = selectKey
@@ -191,10 +200,16 @@ class AbnormalOrder extends React.Component {
       searchingText: e.target.value
     })
   }
+  changeSchool = (v) => {
+    let schoolId = this.props.schoolId
+    if (v !== schoolId) {
+      this.props.changeTask(subModule, {schoolId: v})
+    }
+  }
   
   render () {
     let {dataSource, total, loading, searchingText} = this.state
-    const {page} = this.props
+    const {page, schoolId} = this.props
 
 
     return (
@@ -205,6 +220,12 @@ class AbnormalOrder extends React.Component {
           searchingText={searchingText} 
           pressEnter={this.pressEnter} 
           changeSearch={this.changeSearch}  
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
         />
 
         <div className='tableList complaint'>
@@ -226,7 +247,8 @@ class AbnormalOrder extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
   selectKey: state.changeTask[subModule].selectKey,
-  page: state.changeTask[subModule].page
+  page: state.changeTask[subModule].page,
+  schoolId: state.changeTask[subModule].schoolId
 })
 
 export default withRouter(connect(mapStateToProps, {
