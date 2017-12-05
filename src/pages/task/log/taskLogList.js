@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Popconfirm, Table} from 'antd'
+import {Popconfirm, Table, Badge} from 'antd'
 import AjaxHandler from '../../ajax'
 import Time from '../../component/time'
 import Noti from '../../noti'
@@ -65,7 +65,22 @@ class TaskLogList extends React.Component {
         if (record.type === 1) {
           return '无'
         } else {
-          return CONSTANTS.REPAIRSTATUS[record.status]
+          switch(record.status){
+            case 7:
+              return <Badge status='success' text='已完成' />
+            case 3:
+              return <Badge status='warning' text='已指派' />
+            case 4:
+              return <Badge status='warning' text='已接受' />
+            case 1:
+              return <Badge status='error' text='待审核' />
+            case 2:
+              return <Badge status='error' text='待指派' />
+            case 5:
+              return <Badge status='error' text='未通过' />
+            case 6:
+              return <Badge status='error' text='已指派被拒绝' />
+          }
         }
       }
     }, {
