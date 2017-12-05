@@ -77,7 +77,9 @@ const initialOrderState = {
     schoolId: selectedSchool,
     deviceType: 'all',
     status: 'all',
-    selectKey: ''
+    selectKey: '',
+    startTime: 0,
+    endTime: 0
   }
 }
 const changeOrder = (state = initialOrderState, action) => {
@@ -97,7 +99,9 @@ const initialFundState = {
     schoolId: selectedSchool,
     type: 'all',
     status: 'all',
-    selectKey: ''
+    selectKey: '',
+    startTime: 0,
+    endTime: 0
   },
   cashtime: {
     page: 1

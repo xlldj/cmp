@@ -56,6 +56,8 @@ class ActInfo extends React.Component {
       inventory: '',
       inventoryError: false,
       remainInventory: '',
+      usedInventory: 0,
+      inventoryErrorMsg: '',
 
       schools: [],
       gifts: [],
@@ -146,6 +148,7 @@ class ActInfo extends React.Component {
             if(d.type===3){
               newState.inventory = d.planInventory
               newState.remainInventory = d.inventory
+              newState.usedInventory = d.planInventory - d.inventory
               newState.code = d.code.trim()
               newState.originalCode = d.code
             }else{
@@ -160,8 +163,8 @@ class ActInfo extends React.Component {
             }
             newState.startTime = d.startTime
             newState.endTime = d.endTime
-            let passStartTime = Date.parse(new Date()) >= d.startTime
-            if(passStartTime && d.online===1){
+            let timeValid = Date.parse(new Date()) >= d.startTime && Date.parse(new Date()) <= d.endTime
+            if(timeValid && d.online===1){
               newState.released = true
               newState.online = true
             }else{
@@ -266,7 +269,7 @@ class ActInfo extends React.Component {
   }
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
-    let {id, selectedSchool, name, type, amount, online, releaseMethod, inventory, endTime, code, released, fileList, imageError} = this.state
+    let {id, selectedSchool, name, type, amount, online, releaseMethod, inventory, usedInventory, endTime, code, released, fileList, imageError} = this.state
     if(selectedSchool==='0' || !selectedSchool){
       return this.setState({
         schoolError: true
@@ -300,9 +303,16 @@ class ActInfo extends React.Component {
       } 
       if(!inventory){
         return this.setState({
-          inventoryError: true
+          inventoryError: true,
+          inventoryErrorMsg: '库存不能为空'
         })
-      }     
+      }
+      if (usedInventory && inventory < usedInventory) {
+        return this.setState({
+          inventoryError: true,
+          inventoryErrorMsg: '库存不能小于已发个数'
+        })
+      }   
     } else {
       if (fileList.length < 1) {
         return this.setState({
@@ -418,8 +428,8 @@ class ActInfo extends React.Component {
                   released: false
                 })
               }else{
-                let passStartTime = Date.parse(new Date()) >= start
-                if(this.state.online && passStartTime){
+                let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
+                if(this.state.online && timeValid){
                    return Noti.hintAndRoute('当前活动已上线', '将返回活动列表！', this.props.history, '/gift/act')
                 }
                 Noti.hintSuccess(this.props.history,'/gift/act')
@@ -586,9 +596,18 @@ class ActInfo extends React.Component {
     })
   }
   checkInventory = (e) => {
-    if(!e.target.value){
+    let v = parseInt(e.target.value, 10)
+    if(!v){
       return this.setState({
-        inventoryError: true
+        inventoryError: true,
+        inventoryErrorMsg: '库存不能为空'
+      })
+    }
+    let {usedInventory} = this.state
+    if (usedInventory && v < this.state.usedInventory) {
+      return this.setState({
+        inventoryError: true,
+        inventoryErrorMsg: '库存不能小于已发个数'
       })
     }
     if(this.state.inventoryError){
@@ -634,12 +653,12 @@ class ActInfo extends React.Component {
       online,onlineError,amount,amountError,releaseMethod,releaseMethodLock,releaseMethodError,
       releaseMethodLockHint,amountRandom,amountRandomError,randomErrorMessage,imageEntrance,url,
       urlError,code,codeError,
-      inventory,inventoryError, remainInventory,
+      inventory,inventoryError, remainInventory, usedInventory, inventoryErrorMsg,
       schools,gifts,fileList,released, imageError,
       startTime, startTimeError
     } = this.state
 
-    let passStartTime = Date.parse(new Date()) > parseInt(moment(startTime).valueOf(),10)
+    let timeValid = Date.parse(new Date()) >= parseInt(moment(startTime).valueOf(), 10) && Date.parse(new Date()) <= parseInt(moment(endTime).valueOf(), 10)
 
     const codeArea = (
       <div className='info'>
@@ -658,9 +677,10 @@ class ActInfo extends React.Component {
     )
 
     const selectRandomGift = (
-        <span>{amount}个红包随机选择
-            <input disabled={released?true:false} type='number' min='0' max={amount} style={{width:'50px',marginLeft:'5px',marginRight:'5px'}} value={amountRandom} onChange={this.changeAmountRandom} onBlur={this.checkAmountRandom} />
-            个发放
+        <span>
+          {amount}个红包随机选择
+          <input disabled={released?true:false} type='number' min='0' max={amount} style={{width:'50px',marginLeft:'5px',marginRight:'5px'}} value={amountRandom} onChange={this.changeAmountRandom} onBlur={this.checkAmountRandom} />
+          个发放
         </span>
     )
 
@@ -737,9 +757,9 @@ class ActInfo extends React.Component {
           { type && type==='3'?           
             <li>
               <p>红包库存：</p>
-              <input type='number' disabled={released?true:false}  className={released ? 'disabled' : ''} value={inventory}  onChange={this.changeInventory} onBlur={this.checkInventory} placeholder="" /> 
-              {id ? <span className='mgl10'>(剩余库存:{remainInventory})</span> : null}
-              {inventoryError?(<span className='checkInvalid'>请输入红包库存！</span>):null}
+              <input type='number' min={id ? usedInventory : 0} disabled={released?true:false}  className={released ? 'disabled' : ''} value={inventory}  onChange={this.changeInventory} onBlur={this.checkInventory} placeholder="" /> 
+              {id ? <span className='mgl10'>(已发个数:{usedInventory}/剩余库存:{remainInventory})</span> : null}
+              {inventoryError?(<span className='checkInvalid'>{inventoryErrorMsg}</span>):null}
             </li> 
             : null
           }
@@ -802,7 +822,7 @@ class ActInfo extends React.Component {
               </li>
             : null
           }     
-          { id && type && passStartTime ?
+          { id && type && timeValid ?
             <li>
               <p>活动是否上线：</p>
               <RadioGroup  onChange={this.changeOnline} value={online}>

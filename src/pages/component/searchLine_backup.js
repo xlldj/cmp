@@ -51,6 +51,32 @@ const SearchLine = (props) => {
   return (
     <div className='searchLine'>
       <div className='left'>
+        {props.showTimeChoose
+          ? <div className='searchLine-timeChoose'>
+            <span>{props.timeChooseTitle}</span>
+            <DatePicker
+              className='timePicker start'
+              showTime
+              allowClear
+              value={props.startTime ? moment(new Date(props.startTime)) : null}
+              format='YYYY-MM-DD HH:mm'
+              onChange={props.changeStartTime}
+              onOk={props.confirmStartTime}
+              onOpenChange={props.startTimeOpenChange}
+            />
+            <span>至</span>
+            <DatePicker
+              className='timePicker'
+              showTime
+              allowClear
+              value={props.endTime ? moment(new Date(props.endTime)) : null}
+              format='YYYY-MM-DD HH:mm'
+              onChange={props.changeEndTime}
+              onOk={props.confirmEndTime}
+              onOpenChange={props.endTimeOpenChange}
+            />
+          </div>
+         : null}
         {desp1}
         {desp2}
         {add}

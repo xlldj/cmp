@@ -17,7 +17,6 @@ import { changeTask } from '../../actions'
 const subModule = 'taskList'
 
 const TYPES = {
-  3: '指派任务',
   2: '报修',
   1: '提现'
 }
@@ -68,12 +67,12 @@ class TaskList extends React.Component {
       title: '用户',
       dataIndex: 'mobile',
       width: '10%',
-      render: (text, record) => (record.mobile || '')
+      render: (text, record) => (record.mobile || '----')
     }, {
       title: '设备地址',
       dataIndex: 'location',
       width: '10%',
-      render: (text, record) => (record.location || '')
+      render: (text, record) => (record.location || '----')
     }, {
       title: '任务申请时间',
       dataIndex: 'createTime',
@@ -106,7 +105,7 @@ class TaskList extends React.Component {
             return record.assignName;
             break;
           default: 
-            return record.csName || '暂无'
+            return record.csName || '----'
         }
       }
     },{
@@ -126,7 +125,7 @@ class TaskList extends React.Component {
             case 4: 
               return <Badge status='success' text={CONSTANTS.WITHDRAWSTATUS[record.status]} />
             default:
-              return <Badge status='warning' text='未知' />
+              return <Badge status='warning' text='----' />
           }
         } else {
           switch(record.status){

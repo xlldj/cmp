@@ -92,8 +92,9 @@ const LEGEND = {
 const AREATIMEUNIT = 3
 const CURMONTHSTR = Time.getMonthFormat(NOW)
 /*----------timeUnit:1-hour,2-day------------*/
-/*----------target:1-订单数量，2-订单收益--------*/
+/*----------target: 切换图表内的分支-----------*/
 /*----------timespan: 1-今日，2-本周,3-本月-----*/
+/*----------compare: 对比flag-----------------*/
 
 const initilaState = {
   data: [],
@@ -110,17 +111,18 @@ const initilaState = {
   monthStr: '',
   areaData: [],
   areaStartTime: Time.getFirstWeekStart(Time.getMonthStart(NOW))
-};
+}
 
 export default class Charts extends Component {
 
   state = initilaState;
 
-  fetchData = (body, chartIndex) => {
+  fetchData = (body, newState) => {
     this.setState({
       loading: true
     })
-    let currentChart = chartIndex || this.state.currentChart
+    /* in case: 1. change chart index, 2. change target. The state won't change immediately when fetchDate, so need to pass newState through parameters */
+    let {currentChart, target} = {...this.state, ...newState}
     let resource = `/statistics/${CHARTTYPES[currentChart]}/polyline`
     const cb = (json)=>{
       let nextState = {
@@ -130,9 +132,19 @@ export default class Charts extends Component {
         throw new Error(json.error)
       }else{
         let firstPoints = json.data[data1Name[currentChart]], secondPoints = json.data[data2Name[currentChart]] || null
-        // let showerPoints = json.data.showerPoints, secondPoints = json.data.secondPoints
+        /* change the denomination when the result is about money */
+        if (target === 2) {
+          if (currentChart === 1 || currentChart === 3 || currentChart === 4) {
+            firstPoints.forEach((f, i, arr) => {
+              arr[i].y = parseInt(f.y / 100)
+            })
+            secondPoints.forEach((s, i, arr) => {
+              arr[i].y = parseInt(s.y / 100)
+            })
+          }
+        }
         let {startTime,endTime,timeUnit} = this.state,data
-        if(timeUnit===2){
+        if (timeUnit===2) {
           data =Time.getDateArray(startTime,endTime)
           data.map((r,i)=>{
             let t = Date.parse(new Date(r.x))
@@ -145,17 +157,17 @@ export default class Charts extends Component {
             let x = Format.dayFormat(r.x)
             let xInData = data.find((r,i)=>(r.x===x))
             if(xInData){
-              xInData.y = r.y//push shower points into data array
+              xInData.y = r.y//push first array data into data array
             }
           })
           secondPoints&&secondPoints.map((r,i)=>{
             let x = Format.dayFormat(r.x)
             let xInData = data.find((r,i)=>(r.x===x))
             if(xInData){
-              xInData.y2 = r.y//push shower points into data array
+              xInData.y2 = r.y//push second array data into data array
             }
           })
-        }else{
+        } else {
           data = Time.getHourArray(startTime,endTime)
           data.map((r,i)=>{
             let t = Date.parse(new Date(r.x))
@@ -263,7 +275,7 @@ export default class Charts extends Component {
     if(selectedSchool!=='all'){
       body.schoolId = parseInt(selectedSchool)
     }
-    this.fetchData(body)
+    this.fetchData(body, {target: v})
 
     let nextState = {
       target: v
@@ -436,7 +448,7 @@ export default class Charts extends Component {
         body.schoolId = parseInt(selectedSchool)
       }
       this.setState(nextState)
-      this.fetchData(body, i)
+      this.fetchData(body, {currentChart: i})
     }
   }  
   changeCurrent = (e) =>{
@@ -566,7 +578,7 @@ export default class Charts extends Component {
   }
 
   render() {
-    const { data, selectedSchool,startTime,endTime, timeUnit,loading,target,timeSpan,compare, currentChart, currentMonth, monthStr, areaData } = this.state;
+    const { data, selectedSchool,startTime, endTime, timeUnit,loading,target,timeSpan,compare, currentChart, currentMonth, monthStr, areaData } = this.state;
     
     return (
       <div className='chart'>
@@ -654,7 +666,7 @@ export default class Charts extends Component {
                   margin={{ top: 10, right: 20, bottom: 0, left: 40 }}
                 >
                   <CartesianGrid vertical={false} horizontal={false} />
-                  <XAxis axisLine={{stroke:'#ddd'}} name='date' dataKey="x" tick={<CustomizedXAxisTick timeUnit={timeUnit} />} tickLine={false}/>
+                  <XAxis padding={{left: 20}} axisLine={{stroke:'#ddd'}} name='date' dataKey="x" tick={<CustomizedXAxisTick timeUnit={timeUnit} />} tickLine={false}/>
                   <YAxis axisLine={{stroke:'#ddd'}} domain={[0, 'dataMax']} tickLine={false} tick={<CustomizedAxisTick />} />
                   <Tooltip isAnimationActive={false} cursor={{ stroke: '#222', strokeWidth: 1 }} content={<CustomizedTooltip timeUnit={timeUnit} />}  />
                   <Legend align='left' verticalAlign="top" iconType='line' margin={{left:-20}} wrapperStyle={{paddingLeft:20,top:-15}} width={300} height={36}  />
@@ -676,7 +688,7 @@ export default class Charts extends Component {
                   margin={{ top: 10, right: 20, bottom: 0, left: 40 }}
                 >
                   <CartesianGrid vertical={false} horizontal={false} />
-                  <XAxis axisLine={{stroke:'#ddd'}} name='' dataKey="x" tickLine={false}/>
+                  <XAxis padding={{left: 20}} axisLine={{stroke:'#ddd'}} name='' dataKey="x" tickLine={false}/>
                   <YAxis axisLine={{stroke:'#ddd'}} domain={[0, 'dataMax']} tickLine={false} tick={<AreaYAxisTick />} />
                   <Tooltip isAnimationActive={false} cursor={{ stroke: '#222', strokeWidth: 1 }} content={<AreaTooltip monthStr={monthStr} />} />
                   <Legend align='left' verticalAlign="top" margin={{left:-20}} wrapperStyle={{paddingLeft:20,top:-15}} content={<AreaLegend  />} height={36}  />

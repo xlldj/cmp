@@ -12,9 +12,10 @@ const typeName ={
   3: '洗衣机',
   4: '电吹风'
 }
-const STATUS = {
-  1: '使用中',
-  2: '使用结束'
+const STATUSCLASS = {
+  1: 'warning',
+  2: 'success',
+  4: ''
 }
 const PAYMENT = CONSTANTS.PAYMENTTYPE
 
@@ -76,13 +77,16 @@ class OrderInfo extends React.Component {
     this.props.history.goBack()
   }
   confirmSettle = () => {
-    let resource = '/order/prepay/settle'
+    let resource = '/order/chargeback'
     const body = {
       id: this.state.id
     }
     const cb = (json) => {
       if (json.data && json.data.result) {
         Noti.hintSuccessWithoutSkip()
+        this.fetchData({
+          id: this.state.id
+        })
       } else {
         throw {
           title: '请求出错',
@@ -111,17 +115,33 @@ class OrderInfo extends React.Component {
             <span className='padR20'>{data.mobile||'暂无'}</span>
             <Link to={{pathname:`/user/userInfo/:${data.userId}`,state:{path: 'fromOrder'}}} >查看用户详情</Link>
           </li>
-          <li><p>使用时间:</p>{Time.getTimeStr(data.createTime)}</li>
-          <li><p>使用状态:</p><span className={data.status===1?'warning':'success'}>{STATUS[data.status]}</span></li>
+          <li><p>开始时间:</p>{Time.getTimeStr(data.createTime)}</li>
+          {
+            data.status !== 1 ?
+              <li><p>结束时间:</p>{data.finishTime ? Time.getTimeStr(data.finishTime) : ''}</li>
+            : null
+          }
+          <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
           <li><p>支付方式:</p>{PAYMENT[data.paymentType] || '暂无'}</li>
           <li><p>实际用水量:</p>{data.waterUsage||'待核算'}</li>
-          <li><p>实际消费:</p><span className='shalowRed'>{data.consume?`¥${data.consume}`:'待核算'}</span></li>
-          <li><p></p>
-            <Popconfirm title={popTitle} onConfirm={this.confirmSettle} >
-              <Button >退单</Button>
-            </Popconfirm>
-          </li>
+          <li><p>实际消费:</p><span className='shalowRed'>{data.status !== 1 ? `¥${data.consume}` : '待核算'}</span></li>
+          {
+            data.status !== 4 ?
+              <li><p></p>
+                <Popconfirm title={popTitle} onConfirm={this.confirmSettle} >
+                  <Button >退单</Button>
+                </Popconfirm>
+              </li>
+            : null
+          }
         </ul>
+        {
+          data.status === 4 ?
+            <div className='btnArea'>
+              <p>该订单已手动退单</p>
+            </div>
+          : null
+        }
         <div className='btnArea'>
           <Button onClick={this.back}>返回</Button>
         </div>

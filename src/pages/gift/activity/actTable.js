@@ -93,7 +93,7 @@ class ActTable extends React.Component {
       width: '8%',
       render: (text,record,index) => {
         let passStartTime = Date.parse(new Date()) >= record.startTime
-        let outdated = Date.parse(new Date()) <= record.endTime
+        let outdated = Date.parse(new Date()) >= record.endTime
         let online = outdated ? 3 : (passStartTime ? record.online : 2)
         return (
           <Badge status={HINTSTATUS[online]} text={STATUS[online]} />

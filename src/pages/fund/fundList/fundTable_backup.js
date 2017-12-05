@@ -35,7 +35,9 @@ class FundTable extends React.Component {
     type: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     selectKey: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    startTime: PropTypes.number.isRequired,
+    endTime: PropTypes.number.isRequired
   }
   constructor(props){
     super(props)
@@ -157,7 +159,12 @@ class FundTable extends React.Component {
       return this.fetchData(body)
     }
 
-    let {page, schoolId, type, status, selectKey} = this.props
+    let {page, schoolId, type, status, selectKey, startTime, endTime} = this.props
+    if (startTime && endTime) {
+      body.startTime = startTime
+      body.endTime = endTime
+      body.timeQueryType = 1 // 选择时间类型为create_time
+    }
     body.page = page
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
@@ -180,10 +187,15 @@ class FundTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page, schoolId, type, status, selectKey} = nextProps
+    let {page, schoolId, type, status, selectKey, startTime, endTime} = nextProps
     const body = {
       page: page,
       size: SIZE
+    }
+    if (startTime && endTime) {
+      body.startTime = startTime
+      body.endTime = endTime
+      body.timeQueryType = 1
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
@@ -248,14 +260,59 @@ class FundTable extends React.Component {
   back=()=>{
     this.props.history.goBack()
   }
+  changeStartTime = (v) => {
+    let newStartTime = v ? parseInt(v.valueOf(), 10) : 0
+    this.setState({
+      subStartTime: newStartTime
+    })
+    if (newStartTime === 0) {
+      return this.confirmStartTime({
+        subStartTime: 0
+      })
+    }
+  }
+  changeEndTime = (v) => {
+    let newEndTime = v ? parseInt(v.valueOf(), 10) : 0
+    this.setState({
+      subEndTime: newEndTime
+    })
+    if (newEndTime === 0) {
+      return this.confirmEndTime({
+        subEndTime: 0
+      })
+    }
+  }
+  confirmStartTime = (state) => {
+    let {subStartTime} = {...this.state, ...state}
+    let {startTime} = this.props
+    if (startTime !== subStartTime) {
+      this.props.changeFund(subModule, {startTime: subStartTime, page: 1})
+    }
+  }
+  confirmEndTime = (state) => {
+    let {subEndTime} = {...this.state, ...state}
+    let {endTime} = this.props
+    if (endTime !== subEndTime) {
+      this.props.changeFund(subModule, {endTime: subEndTime, page: 1})
+    }
+  }
 
   render () {
-    const {searchingText,dataSource, total, loading} = this.state
-    let {page, schoolId, type, status} = this.props
+    const {searchingText,dataSource, total, loading, subStartTime, subEndTime} = this.state
+    let {page, schoolId, type, status, startTime, endTime} = this.props
 
     return (
       <div className='contentArea'>
         <SearchLine 
+          showTimeChoose={true}
+          timeChooseTitle='开始时间'
+          startTime={subStartTime}
+          endTime={subEndTime}
+          changeStartTime={this.changeStartTime}
+          changeEndTime={this.changeEndTime}
+          confirmStartTime={this.confirmStartTime}
+          confirmEndTime={this.confirmEndTime}
+
           searchInputText='用户／订单号' 
           searchingText={searchingText} 
           pressEnter={this.pressEnter} 
