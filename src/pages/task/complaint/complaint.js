@@ -66,7 +66,8 @@ class ComplaintTable extends React.Component {
       total: 0,
       settleStatus: 1,
       searchingText: '',
-      confirmClickable: true
+      confirmClickable: true,
+      replying: false
     }
     this.columns = [{
       title: '学校',
@@ -138,6 +139,13 @@ class ComplaintTable extends React.Component {
     })
   }
   setReply = (e, id) => {
+    if (this.state.replying) {
+      return
+    }
+
+    this.setState({
+      replying: true
+    })
     let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
     let order = dataSource.find((r) => (r.id === id))
     let resource = '/complaint/settle'
@@ -146,19 +154,16 @@ class ComplaintTable extends React.Component {
       settleType: 2
     }
     const cb = (json) => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error.message)
-      } else {
-        if (json.data.result) {
-          order.settleStatus = 2
-          this.setState({
-            messageVisible: false,
-            dataSource: dataSource
-          })
-        } else {
-          Noti.hintAndClick('回复出错', json.data.failReason || '请稍后重试', null)
-        }
+      const nextState = {
+        replying: false
       }
+      if (json.data.result) {
+        order.settleStatus = 2
+        nextState.dataSource = dataSource
+      } else {
+        Noti.hintServiceError(json.data.failReason)
+      }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }

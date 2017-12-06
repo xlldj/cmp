@@ -5,6 +5,14 @@ import Time from '../component/time'
 import Noti from '../noti'
 import CONSTANTS from '../component/constants'
 import AjaxHandler from '../ajax'
+
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeOrder, changeFund } from '../../actions'
+
+
 const SEX = {
   1:'男',
   2:'女'
@@ -145,6 +153,26 @@ class UserInfo extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
+  toOrderOfUser = () => {
+    this.props.changeOrder('order', 
+      {
+        page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
+        selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+      }
+    )
+    let id = this.state.data.id
+    this.props.history.push({pathname: '/order', state: {path: 'fromUser', id: id}})
+  }
+  toFundOfUser = () => {
+    let {mobile} = this.state.data
+    this.props.changeFund('fundList', 
+      {
+        page: 1, selectKey: mobile.toString(), type: 'all', status: 'all', schoolId: 'all',
+        startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+      }
+    )
+    this.props.history.push({pathname:'/fund/list',state:{path: 'fromUser', mobile: mobile}})
+  }
   render () {
     let data = this.state.data
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
@@ -165,8 +193,8 @@ class UserInfo extends React.Component {
           <li><p>宿舍号:</p>{data.roomName}</li>
           <li><p>账户余额:</p>{data.balance ? '¥' + data.balance : '暂无'}</li>
           <li><p>注册时间:</p>{time}</li>
-          <li><p>用户订单记录:</p><Link to={{pathname:'/order',state:{path: 'fromUser', id: data.id}}}>查看详情</Link></li>
-          <li><p>充值提现记录:</p><Link to={{pathname:'/fund/list',state:{path: 'fromUser', mobile: data.mobile}}}>查看详情</Link></li>
+          <li><p>用户订单记录:</p><a onClick={this.toOrderOfUser} >查看详情</a></li>
+          <li><p>充值提现记录:</p><a onClick={this.toFundOfUser}>查看详情</a></li>
           <li>
             <p>重置密码:</p>
             <Popconfirm title="确定要重置么?" onConfirm={this.resetPwd} okText="确认" cancelText="取消">
@@ -208,4 +236,7 @@ class UserInfo extends React.Component {
   }
 }
 
-export default UserInfo
+
+export default withRouter(connect(null, {
+  changeOrder, changeFund
+})(UserInfo))

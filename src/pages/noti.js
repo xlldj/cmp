@@ -1,6 +1,7 @@
 import React from 'react'
 import notification from 'antd/lib/notification'
 import Button from 'antd/lib/button'
+import CONSTANTS from './component/constants'
 
 const Noti = {}
 
@@ -20,8 +21,24 @@ Noti.hintOccupied = () => {
 }
 Noti.hintLock = (message, description) => {
   notification['error']({
-    message: message,
+    message: message || '请求出错',
     description: description,
+    duration: 2
+  })
+}
+/* 通用网络错误 */
+Noti.hintNetworkError = (description) => {
+  notification['error']({
+    message: '请求出错',
+    description: description || CONSTANTS.NETWORKERRORMESSAGE,
+    duration: 2
+  })
+}
+/* 提示业务错误，非网络错误 */
+Noti.hintServiceError = (description) => {
+  notification['error']({
+    message: '请求出错',
+    description: description || CONSTANTS.ERRORALTMESSAGE,
     duration: 2
   })
 }

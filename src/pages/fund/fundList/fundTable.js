@@ -35,7 +35,9 @@ class FundTable extends React.Component {
     type: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     selectKey: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    startTime: PropTypes.number.isRequired,
+    endTime: PropTypes.number.isRequired
   }
   constructor(props){
     super(props)
@@ -144,21 +146,17 @@ class FundTable extends React.Component {
 
   componentDidMount(){
     this.props.hide(false) 
-    const body={
+    let {page, schoolId, type, status, selectKey, startTime, endTime} = this.props
+    const body = {
+      page: page,
       size: SIZE
     }
-    if(this.props.location.state){
-      this.props.changeFund(subModule, {page: 1, selectKey: this.props.location.state.mobile.toString(), type: 'all', status: 'all', schoolId: 'all'})
-      body.page = 1
-      body.selectKey = this.props.location.state.mobile.toString()
-      this.setState({
-        searchingText:this.props.location.state.mobile.toString()
-      })
-      return this.fetchData(body)
-    }
 
-    let {page, schoolId, type, status, selectKey} = this.props
-    body.page = page
+    if (startTime) {
+      body.startTime = startTime
+      body.timeQueryType = 1 // 选择create_time
+      body.endTime = endTime
+    }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
@@ -180,10 +178,16 @@ class FundTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page, schoolId, type, status, selectKey} = nextProps
+    let {page, schoolId, type, status, selectKey, startTime, endTime} = nextProps
     const body = {
       page: page,
       size: SIZE
+    }
+
+    if (startTime) {
+      body.startTime = startTime
+      body.timeQueryType = 1 // 选择create_time
+      body.endTime = endTime
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
@@ -249,13 +253,48 @@ class FundTable extends React.Component {
     this.props.history.goBack()
   }
 
+  changeRange = (dates,dateStrings)=>{
+    let timeStamps = dates.map((r) => (r.valueOf()))
+    this.setState({
+      subStartTime: timeStamps[0],
+      subEndTime: timeStamps[1]
+    })
+  }
+  confirmRange = (time) => {
+    let timeStamps = time.map((r) => (r.valueOf()))
+    this.props.changeFund(subModule, {startTime: timeStamps[0], endTime: timeStamps[1], page: 1})
+
+    /* the flag to hint if confirm button is clicked */
+    /* if use this.state.confirmed, the 'onOpenChange' handler will not get the right flag */
+    this.confirmed = true
+  }
+  onOpenChange = (open) => {
+    if (open) {
+      // set default time
+    } else {
+      if (!this.confirmed) { // close range picker and did not confirm, set the time to props
+        this.setState({
+          subStartTime: this.props.startTime,
+          subEndTime: this.props.endTime
+        })
+      }
+      this.confirmed = false
+    }
+  }  
   render () {
-    const {searchingText,dataSource, total, loading} = this.state
-    let {page, schoolId, type, status} = this.props
+    const {searchingText,dataSource, total, loading, subStartTime, subEndTime} = this.state
+    let {page, schoolId, type, status, startTime, endTime} = this.props
 
     return (
       <div className='contentArea'>
         <SearchLine 
+          showTimeChoose={true}
+          startTime={subStartTime}
+          endTime={subEndTime}
+          changeRange={this.changeRange}
+          confirm={this.confirmRange}
+          onOpenChange={this.onOpenChange}
+
           searchInputText='用户／订单号' 
           searchingText={searchingText} 
           pressEnter={this.pressEnter} 
@@ -285,7 +324,9 @@ const mapStateToProps = (state, ownProps) => ({
   type: state.changeFund[subModule].type,
   status: state.changeFund[subModule].status,
   selectKey: state.changeFund[subModule].selectKey,
-  page: state.changeFund[subModule].page
+  page: state.changeFund[subModule].page,
+  startTime: state.changeFund[subModule].startTime,
+  endTime: state.changeFund[subModule].endTime
 })
 
 export default withRouter(connect(mapStateToProps, {

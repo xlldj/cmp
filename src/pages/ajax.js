@@ -93,6 +93,7 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
                                           // message = error.displayMessage
                                           message = '当前操作针对的信息已在别处被更改，请稍后重新查看其状态'
                                         } else {
+                                          console.log(error.message)
                                           message = error.message || error.displayMessage || '网络错误，请稍后刷新重试'
                                         }
                                         // 若为异地登录，提示重新登录，

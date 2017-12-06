@@ -2,6 +2,7 @@ import * as ActionTypes from '../actions'
 import merge from 'lodash/merge'
 import { combineReducers } from 'redux'
 import {getLocal} from '../pages/util/storage'
+import Time from '../pages/component/time'
 
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
@@ -78,8 +79,8 @@ const initialOrderState = {
     deviceType: 'all',
     status: 'all',
     selectKey: '',
-    startTime: 0,
-    endTime: 0
+    startTime: Time.get7DaysAgo(),
+    endTime: Time.getNow()
   }
 }
 const changeOrder = (state = initialOrderState, action) => {
@@ -100,8 +101,8 @@ const initialFundState = {
     type: 'all',
     status: 'all',
     selectKey: '',
-    startTime: 0,
-    endTime: 0
+    startTime: Time.get7DaysAgo(),
+    endTime: Time.getNow()
   },
   cashtime: {
     page: 1

@@ -2,6 +2,7 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 import {Icon, Input, Button, DatePicker} from 'antd'
 import moment from 'moment'
+const {RangePicker} = DatePicker
 
 /* ----------如果有searchinput,必须附带searchingtext，onenterpress，changesearch属性--------------- */
 const SearchLine = (props) => {
@@ -51,6 +52,23 @@ const SearchLine = (props) => {
   return (
     <div className='searchLine'>
       <div className='left'>
+        {props.showTimeChoose
+          ? <div className='searchLine-timeChoose'>
+            <span>{props.timeChooseTitle}</span>
+            <RangePicker
+              allowClear={false}
+              showTime
+              format='YYYY-MM-DD HH:mm:ss'
+              placeholder={['开始时间', '结束时间']}
+              value={props.startTime && props.endTime ? [moment(props.startTime), moment(props.endTime)] : [null, null]}
+              className='searchLine-rangePicker'
+              onChange={props.changeRange ? props.changeRange : null}
+              onOk={props.confirm ? props.confirm : null}
+              onOpenChange={props.onOpenChange ? props.onOpenChange : null}
+              />
+          </div>
+        : null}
+
         {desp1}
         {desp2}
         {add}

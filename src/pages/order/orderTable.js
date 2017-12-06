@@ -39,7 +39,9 @@ class OrderTable extends React.Component {
     deviceType: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     selectKey: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    startTime: PropTypes.number.isRequired,
+    endTime: PropTypes.number.isRequired
   }
   constructor(props){
     super(props)
@@ -48,7 +50,9 @@ class OrderTable extends React.Component {
       dataSource, 
       loading: false,
       total: 0,
-      searchingText: ''
+      searchingText: '',
+      subStartTime: this.props.startTime,
+      subEndTime: this.props.endTime
     }    
     this.columns = [{
       title: '订单号',
@@ -151,38 +155,39 @@ class OrderTable extends React.Component {
 
   componentDidMount(){
     this.props.hide(false)
+    console.log(this.props.history)
     let {state}=this.props.location
-    let {page, schoolId, deviceType, status, selectKey} = this.props
+    // this.props.changeOrder('order', {startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
+
+    let {page, schoolId, deviceType, status, selectKey, startTime, endTime} = this.props
     const body={
       page: page,
       size: SIZE
     }
-    if (state) { // 如果是来自设备详情 或 用户详情，复位其它状态。
-      body.page = 1
-      this.props.changeOrder('order', {page: 1, schoolId: 'all', deviceType: 'all', status: 'all', selectKey: ''})
-      if(state.path === 'fromDevice'){
-        body.residenceId = state.id
-        body.deviceType = state.deviceType
-      } else if (state.path === 'fromUser'){
-        body.userId = state.id
-      }
-      this.fetchData(body)
-      return
-    }
-    if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10)
+    if (startTime) {
+      body.startTime = startTime
+      body.timeQueryType = 1 // 选择create_time
+      body.endTime = endTime
     }
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
     }
     if (selectKey) {
       body.selectKey = selectKey
-      this.setState({
-        searchingText: selectKey
-      })
+    }
+    if (state) {
+      if (state.path === 'fromDevice') {
+        body.residenceId = state.id
+        body.deviceType = state.deviceType
+      } else if (state.path === 'fromUser') {
+        body.userId = state.id
+      }
     }
     this.fetchData(body)
   }
@@ -190,10 +195,16 @@ class OrderTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {schoolId, deviceType, status, selectKey, page} = nextProps
+    let {schoolId, deviceType, status, selectKey, page, startTime, endTime} = nextProps
     const body={
       page: page,
       size: SIZE
+    }
+
+    if (startTime) {
+      body.startTime = startTime
+      body.timeQueryType = 1 // 选择create_time
+      body.endTime = endTime
     }
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
@@ -260,14 +271,49 @@ class OrderTable extends React.Component {
     let page = pageObj.current
     this.props.changeOrder('order', {page: page})
   }
+  changeRange = (dates,dateStrings)=>{
+    let timeStamps = dates.map((r) => (r.valueOf()))
+    this.setState({
+      subStartTime: timeStamps[0],
+      subEndTime: timeStamps[1]
+    })
+  }
+  confirmRange = (time) => {
+    let timeStamps = time.map((r) => (r.valueOf()))
+    this.props.changeOrder('order', {startTime: timeStamps[0], endTime: timeStamps[1], page: 1})
+
+    /* the flag to hint if confirm button is clicked */
+    /* if use this.state.confirmed, the 'onOpenChange' handler will not get the right flag */
+    this.confirmed = true
+  }
+  onOpenChange = (open) => {
+    if (open) {
+      // set default time
+    } else {
+      if (!this.confirmed) { // close range picker and did not confirm, set the time to props
+        this.setState({
+          subStartTime: this.props.startTime,
+          subEndTime: this.props.endTime
+        })
+      }
+      this.confirmed = false
+    }
+  }
   render () {
-    const {schoolId, deviceType, status, page} = this.props
-    const {dataSource, total, loading, searchingText} = this.state
+    const {schoolId, deviceType, status, page, startTime, endTime} = this.props
+    const {dataSource, total, loading, searchingText, subStartTime, subEndTime} = this.state
     const {state} = this.props.location
 
     return (
       <div className='contentArea'>
         <SearchLine
+          showTimeChoose={true}
+          startTime={subStartTime}
+          endTime={subEndTime}
+          changeRange={this.changeRange}
+          confirm={this.confirmRange}
+          onOpenChange={this.onOpenChange}
+
           searchInputText='宿舍／订单号' 
           searchingText={this.state.searchingText} 
           pressEnter={this.pressEnter} 
@@ -306,7 +352,9 @@ const mapStateToProps = (state, ownProps) => {
     deviceType: state.changeOrder.order.deviceType,
     status: state.changeOrder.order.status,
     selectKey: state.changeOrder.order.selectKey,
-    page: state.changeOrder.order.page
+    page: state.changeOrder.order.page,
+    startTime: state.changeOrder.order.startTime,
+    endTime: state.changeOrder.order.endTime
   }
 }
 

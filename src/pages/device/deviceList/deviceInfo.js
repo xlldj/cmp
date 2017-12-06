@@ -8,6 +8,13 @@ import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
 
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeOrder } from '../../../actions'
+
+
 const typeName = CONSTANTS.DEVICETYPE
 const STATUS = CONSTANTS.DEVICESTATUS
 const REPAIRSTATUS = CONSTANTS.REPAIRSTATUS
@@ -79,28 +86,21 @@ class DeviceInfo extends React.Component {
     }
     AjaxHandler.ajax(resource,body,cb)
   }
-  /*componentDidMount(){
-    this.props.hide(false)
-    let resource = '/api/device/query/one'
-    const body = {
-      id: parseInt(this.props.match.params.id.slice(1))
-    }
-    const cb=(json)=>{
-      if(json.error){
-        throw new Error(json.error)
-      }else{
-        this.setState({
-          data: json.data
-        })
-      }
-    }
-    AjaxHandler.ajax(resource,body,cb)
-  }*/
   componentWillUnmount () {
     this.props.hide(true)
   }
   back = () => {
     this.props.history.goBack()
+  }
+  toOrderOfDevice = () => {
+    this.props.changeOrder('order', 
+      {
+        page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
+        selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+      }
+    )
+    let {data, deviceType} = this.state
+    this.props.history.push({pathname:'/order',state:{path: 'fromDevice', id: data.residenceId, deviceType: deviceType}})
   }
   render () {
     let {data, deviceType, residenceId, repairs} = this.state
@@ -175,7 +175,7 @@ class DeviceInfo extends React.Component {
           <ul>
             <li>
               <p>订单记录:</p>
-              <Link to={{pathname:'/order',state:{path: 'fromDevice', id: data.residenceId, deviceType: deviceType}}} >查看详情</Link>
+              <a onClick={this.toOrderOfDevice} >查看详情</a>
             </li>
           </ul>
         </div>
@@ -190,4 +190,7 @@ class DeviceInfo extends React.Component {
   }
 }
 
-export default DeviceInfo
+
+export default withRouter(connect(null, {
+  changeOrder
+})(DeviceInfo))

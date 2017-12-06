@@ -19,6 +19,10 @@ const deviceName =CONSTANTS.DEVICETYPE
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
+
+/* state explanation */
+/* released: 活动是否发布，即是否在发挥作用(判断标准：1. 在有效期内；2. online为1) */
+/* online: 是否上线。默认新建时不论是否在有效期内，都置位true。编辑时如果在有效期内根据返回的字段置位 */
 class ActInfo extends React.Component {
   constructor (props) {
     super(props)
@@ -164,12 +168,11 @@ class ActInfo extends React.Component {
             newState.startTime = d.startTime
             newState.endTime = d.endTime
             let timeValid = Date.parse(new Date()) >= d.startTime && Date.parse(new Date()) <= d.endTime
+            newState.online = d.online === 1 ? true : false
             if(timeValid && d.online===1){
               newState.released = true
-              newState.online = true
             }else{
               newState.released = false
-              newState.online = false
             }
             d.gifts.map((g,i)=>{
               let gift = gifts.find((r,ind)=>(r.id===g.giftId))
@@ -269,7 +272,7 @@ class ActInfo extends React.Component {
   }
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
-    let {id, selectedSchool, name, type, amount, online, releaseMethod, inventory, usedInventory, endTime, code, released, fileList, imageError} = this.state
+    let {id, selectedSchool, name, type, amount, online, releaseMethod, inventory, usedInventory, startTime, endTime, code, released, fileList, imageError} = this.state
     if(selectedSchool==='0' || !selectedSchool){
       return this.setState({
         schoolError: true
@@ -327,7 +330,13 @@ class ActInfo extends React.Component {
     if(released&&online){
       return this.props.history.push('/gift/act')
     }
-    if (id && this.checkSame()) {
+    /* 如果是在编辑，没有改变学校和关键字段, 执行下线操作
+    (在以后的版本中，只有在有效期内才能操作online。为了兼容之前的版本，这里对是否在有效期内进行检测，只有在有效期内且是下线操作才不用查重-2017/12/6 v1.0.1)
+    ，不需要查重 */
+    let start = parseInt(moment(startTime).valueOf(), 10)
+    let end = parseInt(moment(endTime).valueOf(), 10)
+    let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
+    if (id && this.checkSame() && timeValid && !online) {
       this.postInfo()
     } else {
       this.checkExist(this.postInfo)

@@ -505,13 +505,12 @@ export default class Charts extends Component {
   }
   changeSchool = (v) => {
     this.setState({
-      selectedSchool: v,
-      endTime: Time.getNow()
+      selectedSchool: v
     })
 
     let body = {}, currentChart = this.state.currentChart
     body.startTime = this.state.startTime
-    body.endTime = Time.getNow()
+    body.endTime = this.state.endTime
     body.timeUnit = this.state.timeUnit
     if(v !== 'all'){
       body.schoolId = parseInt(v, 10)

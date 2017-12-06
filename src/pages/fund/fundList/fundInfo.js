@@ -47,7 +47,8 @@ class FundInfo extends React.Component {
       data: data,
       showCensor: false,
       failedReason: '',
-      reasonError: false
+      reasonError: false,
+      posting: false
     }
   }
   fetchData = (body) => {
@@ -109,6 +110,10 @@ class FundInfo extends React.Component {
     })
   }
   confirmCensor = () => {
+    if (this.state.posting) {
+      return
+    }
+
     let reason = this.state.failedReason.trim()
     if (!reason) {
       return this.setState({
@@ -126,6 +131,10 @@ class FundInfo extends React.Component {
     this.postCensor(censor)
   }
   postCensor = (censor) => {
+    this.setState({
+      posting: true
+    })
+
     let id = this.state.data.id
     let resource = '/api/work/sheet/censor'
     const body = {
@@ -137,8 +146,11 @@ class FundInfo extends React.Component {
       body.reason = censor.reason
     }
     const cb = (json) => {
+      const nextState = {
+        posting: false
+      }
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        this.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           const body = {
@@ -150,6 +162,7 @@ class FundInfo extends React.Component {
           Noti.hintAndClick('审核出错', reason, null)
         }
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -157,7 +170,6 @@ class FundInfo extends React.Component {
     let {operationType, schoolName, mobile, userId, remarks, thirdAccountType, thirdAccountName, 
       createTime, orderNo, status, amount} = this.state.data
     let {failedReason, showCensor, reasonError} = this.state
-    console.log(typeof operationType)
     let dStr = Time.getTimeStr(createTime)
 
     const censorBtn = (

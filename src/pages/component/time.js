@@ -285,4 +285,9 @@ Time.showDate = (t) => {
   let h = Format.adding0(time.getHours()), mm = Format.adding0(time.getMinutes())
   return `${y}-${m}-${d} ${h}:${mm}`
 }
+Time.get7DaysAgo = () => {
+  let t = Time.getNow()
+  let tt = t - 7 * 24 * 3600 * 1000
+  return tt
+}
 export default Time

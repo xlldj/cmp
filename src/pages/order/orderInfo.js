@@ -35,7 +35,8 @@ class OrderInfo extends React.Component {
         "schoolName": "",
         "status": 1,
         "waterUsage": 0,
-        consume: 0
+        consume: 0,
+        posting: false
     }
     this.state = {
       data: data
@@ -77,27 +78,33 @@ class OrderInfo extends React.Component {
     this.props.history.goBack()
   }
   confirmSettle = () => {
+    this.setState({
+      posting: true
+    })
     let resource = '/order/chargeback'
     const body = {
       id: this.state.id
     }
     const cb = (json) => {
-      if (json.data && json.data.result) {
-        Noti.hintSuccessWithoutSkip()
-        this.fetchData({
-          id: this.state.id
-        })
-      } else {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络请求出错'
-        }
+      const nextState = {
+        posting: false
       }
+      if (json.data && json.data.result) {
+        let data = JSON.parse(JSON.stringify(this.state.data))
+        data.status = 4
+        this.setState({
+          data: data
+        })
+        Noti.hintSuccessWithoutSkip()
+      } else {
+        Noti.hintServiceError(json.data.failReason)
+      }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
   render () {
-    let data = this.state.data
+    let {data, posting} = this.state
 
     const popTitle = (<p className='popTitle'>退单后该笔订单的预付金额和代金券都将返还给用户，确定要退单么?</p>)
 
@@ -127,10 +134,16 @@ class OrderInfo extends React.Component {
           <li><p>实际消费:</p><span className='shalowRed'>{data.status !== 1 ? `¥${data.consume}` : '待核算'}</span></li>
           {
             data.status !== 4 ?
-              <li><p></p>
-                <Popconfirm title={popTitle} onConfirm={this.confirmSettle} >
-                  <Button >退单</Button>
-                </Popconfirm>
+              <li>
+                <p></p>
+                {
+                  posting ?
+                    <Button>退单</Button>
+                  : 
+                  <Popconfirm title={popTitle} onConfirm={this.confirmSettle} >
+                    <Button >退单</Button>
+                  </Popconfirm>
+                }
               </li>
             : null
           }

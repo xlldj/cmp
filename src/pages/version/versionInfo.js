@@ -98,21 +98,18 @@ class VersionInfo extends React.Component {
     }
     const cb = (json) => {
       if (json.data && json.data.versions) {
-        let ios = json.data.versions[0].versionNo
-        let vs = ios.split('.')
-        let nextVersion = this.getDefaultVersion(vs)
-        let nextState = {
-          defaultIOS: nextVersion
+        let nextState = {}, defaultIOS = '1.0.0'
+        if (json.data.versions.length > 0) {
+          let ios = json.data.versions[0].versionNo
+          let vs = ios.split('.')
+          let nextVersion = this.getDefaultVersion(vs)
+          defaultIOS = nextVersion
         }
+        nextState.defaultIOS = defaultIOS
         if (this.state.system === '1') {
-          nextState.versionNo = nextVersion
+          nextState.versionNo = defaultIOS
         }
         this.setState(nextState)
-      } else {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络错误，请稍后重试'
-        }
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -126,21 +123,18 @@ class VersionInfo extends React.Component {
     }
     const cb = (json) => {
       if (json.data && json.data.versions) {
-        let android = json.data.versions[0].versionNo
-        let vs = android.split('.')
-        let nextVersion = this.getDefaultVersion(vs)
-        let nextState = {
-          defaultAndroid: nextVersion
+        let nextState = {}, defaultAndroid = '1.0.0'
+        if (json.data.versions.length > 0) {
+          let android = json.data.versions[0].versionNo
+          let vs = android.split('.')
+          let nextVersion = this.getDefaultVersion(vs)
+          defaultAndroid = nextVersion
         }
+        nextState.defaultAndroid = defaultAndroid
         if (this.state.system === '2') {
-          nextState.versionNo = nextVersion
+          nextState.versionNo = defaultAndroid
         }
         this.setState(nextState)
-      } else {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络错误，请稍后重试'
-        }
       }
     }
     AjaxHandler.ajax(resource, body, cb)
