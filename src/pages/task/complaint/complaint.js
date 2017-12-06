@@ -65,7 +65,8 @@ class ComplaintTable extends React.Component {
       loading: false,
       total: 0,
       settleStatus: 1,
-      searchingText: ''
+      searchingText: '',
+      confirmClickable: true
     }
     this.columns = [{
       title: '学校',
@@ -290,7 +291,19 @@ class ComplaintTable extends React.Component {
   }
   postMessage = (e) => {
     // post the message to server
-    let {message, orderId} = this.state, dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    let {message, messageEmpty, orderId, confirmClickable} = this.state 
+
+    /* if confirmClickable is false, do nothing */
+    if (!confirmClickable) {
+      return
+    }
+
+    if (messageEmpty || !message) {
+      return this.setState({
+        messageEmpty: true
+      })
+    }
+    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
     let order = dataSource.find((r) => (r.id === orderId))
     let resource = '/complaint/settle'
     const body = {
@@ -299,21 +312,29 @@ class ComplaintTable extends React.Component {
       settleType: 1
     }
     const cb = (json) => {
+      const nextState = {
+        confirmClickable: true
+      }
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error.message)
+        Noti.hintAndClick('回复出错', json.error.displayMessage || '请稍后重试', null)
       } else {
         if (json.data.result) {
           order.settleStatus = 2
-          this.setState({
-            messageVisible: false,
-            dataSource: dataSource
-          })
+          nextState.messageVisible = false
+          nextState.dataSource = dataSource
+          nextState.message = ''
+          Noti.hintOk('回复成功', '回复成功')
         } else {
           Noti.hintAndClick('回复出错', json.data.failReason || '请稍后重试', null)
         }
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
+    /* forbid repeatly send message */
+    this.setState({
+      confirmClickable: false
+    })
   }
   cancelPost = () => {
     this.setState({

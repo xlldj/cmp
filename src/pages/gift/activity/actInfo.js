@@ -399,7 +399,7 @@ class ActInfo extends React.Component {
       startTime: start,
       endTime: end,
       gifts:items,
-      online: online,
+      online: online
     }
     if(releaseMethod === '2'){
       body.amountRandom = parseInt(amountRandom)

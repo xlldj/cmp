@@ -93,7 +93,7 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
                                           // message = error.displayMessage
                                           message = '当前操作针对的信息已在别处被更改，请稍后重新查看其状态'
                                         } else {
-                                          message = error.message || error.displayMessage || '网络错误，请稍后重试'
+                                          message = error.message || error.displayMessage || '网络错误，请稍后刷新重试'
                                         }
                                         // 若为异地登录，提示重新登录，
                                         if (error.status === 401) {
@@ -133,7 +133,7 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
                                       } */
                                     })
 
-  setTimeout(() => { timeoutAction() }, 3000)
+  setTimeout(() => { timeoutAction() }, 5000)
 
   return abortable_promise
 }
@@ -143,9 +143,9 @@ AjaxHandler.ajax = (resource, body, cb, errorCb) => {
   if (resource.includes('/api')) {
     resource = resource.replace('/api', '')
   }
-  const url = 'http://116.62.236.67:5080' + resource
+  // const url = 'http://116.62.236.67:5080' + resource
   // const url = 'http://10.0.0.4:5080' + resource
-  // const url = 'https://api.xiaolian365.com/m' + resource
+  const url = 'https://api.xiaolian365.com/m' + resource
   // const url = resource
 
   const token = getToken()
