@@ -418,25 +418,25 @@ class ActInfo extends React.Component {
     }
     const cb = (json) => {
         if(json.error){
-          throw new Error(json.error || json.error)
-        }else{
-            if(json.data){
-              if(this.state.released&&!this.state.online){
-                // this.openNotificationWithIcon('info')
-                Noti.hintOk('当前活动已下线', '您可以对此活动继续编辑！')
-                this.setState({
-                  released: false
-                })
-              }else{
-                let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
-                if(this.state.online && timeValid){
-                   return Noti.hintAndRoute('当前活动已上线', '将返回活动列表！', this.props.history, '/gift/act')
-                }
-                Noti.hintSuccess(this.props.history,'/gift/act')
-              }
+          Noti.hintLock('请求出错', json.error.displayMessage || '请求出错, 请稍后刷新重试')
+        } else {
+          if(json.data){
+            if(this.state.released&&!this.state.online){
+              // this.openNotificationWithIcon('info')
+              Noti.hintOk('当前活动已下线', '您可以对此活动继续编辑！')
+              this.setState({
+                released: false
+              })
             }else{
-              throw new Error('网络出错，请稍后重试～')
+              let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
+              if(this.state.online && timeValid){
+                 return Noti.hintAndRoute('当前活动已上线', '将返回活动列表！', this.props.history, '/gift/act')
+              }
+              Noti.hintSuccess(this.props.history,'/gift/act')
             }
+          }else{
+            Noti.hintLock('请求出错', '网络出错, 请稍后刷新重试')
+          }
         }
     }
     AjaxHandler.ajax(resource, body, cb)   
@@ -679,7 +679,7 @@ class ActInfo extends React.Component {
     const selectRandomGift = (
         <span>
           {amount}个红包随机选择
-          <input disabled={released?true:false} type='number' min='0' max={amount} style={{width:'50px',marginLeft:'5px',marginRight:'5px'}} value={amountRandom} onChange={this.changeAmountRandom} onBlur={this.checkAmountRandom} />
+          <input disabled={released?true:false} className={released ? 'disabled' : ''} type='number' min='0' max={amount} style={{width:'50px',marginLeft:'5px',marginRight:'5px'}} value={amountRandom} onChange={this.changeAmountRandom} onBlur={this.checkAmountRandom} />
           个发放
         </span>
     )
@@ -735,7 +735,7 @@ class ActInfo extends React.Component {
           { type && type !== '0' ? 
             <li>
               <p>红包数量：</p>
-              <input disabled className='center' value={amount?`已选择${amount}个红包`:'未选择'} /> 
+              <input disabled className={released ? 'center disabled' : 'center'} value={amount?`已选择${amount}个红包`:'未选择'} /> 
               <a className='mgl10' disabled={released?true:false} href='' onClick={this.chooseGifts} >选择红包</a>
               {amountError?(<span className='checkInvalid'>未选择红包！</span>):null}
             </li>

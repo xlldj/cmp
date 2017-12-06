@@ -8,6 +8,9 @@ const CONSTANTS = {
   CHARTWIDTH: (window.document.body.clientWidth - 100) * 0.9,
   CHARTHEIGHT: 300,
 
+  ERRORALTMESSAGE: '请求出错，请稍后刷新重试',
+  NETWORKERRORMESSAGE: '网络出错，请稍后刷新重试',
+
   ACCOUNTTYPE: {1: '支付宝', 2: '微信'},
   BUSINESS: {1: '热水器', 2: '饮水机'},
 

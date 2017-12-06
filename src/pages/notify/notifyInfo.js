@@ -28,7 +28,10 @@ class NotifyInfo extends React.Component {
       showSchools: false,
       schools: [],
       all: false,
-      originalAll: false
+      originalAll: false,
+      posting: false,
+      checking: false,
+      mobileChecking: false
     }
   }
   fetchData =(body)=>{
@@ -92,6 +95,10 @@ class NotifyInfo extends React.Component {
     this.props.hide(true)
   }
   postInfo = () => {
+    if (this.state.posting) {
+      return
+    }
+
     let {schools, all, type, content, endTime} = this.state, mobiles=JSON.parse(JSON.stringify(this.state.mobiles))
     const body = {
       type: parseInt(type),
@@ -128,17 +135,26 @@ class NotifyInfo extends React.Component {
       resource = '/api/notify/add'
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+      const nextState = {
+        posting: false
+      }
+      if(json.error){
+        this.hintError(json.error.displayMessage)
+      }else{
+        /*--------redirect --------*/
+        if(json.data){
+          Noti.hintSuccess(this.props.history,'/notify/list')
         }else{
-          /*--------redirect --------*/
-          if(json.data){
-            Noti.hintSuccess(this.props.history,'/notify/list')
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+          this.hintError(CONSTANTS.NETWORKERRORMESSAGE)
+        }        
+      }
+      this.setState(nextState)
     }
+
+    this.setState({
+      posting: true
+    })
+    
     AjaxHandler.ajax(resource,body,cb)
   }
   comleteEdit = () => {
@@ -179,7 +195,7 @@ class NotifyInfo extends React.Component {
         this.checkNotifyExist(this.postInfo)
       }
     } else if (type === '3') {
-      this.checkExistPost()
+      this.checkMobileExistAndPost()
     } else {
       this.postInfo()
     }
@@ -188,6 +204,14 @@ class NotifyInfo extends React.Component {
     this.props.history.goBack()
   }
   checkNotifyExist = (callback, payload) => {
+    if (this.state.checking) {
+      return
+    }
+
+    this.setState({
+      checking: true
+    })
+
     let {schools, all} = this.state
     let resource = '/notify/check'
     let body = {}
@@ -202,11 +226,11 @@ class NotifyInfo extends React.Component {
       }
     }
     const cb = (json) => {
+      const nextState = {
+        checking: false
+      }
       if (json.error) {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage
-        }
+        this.hintError()
       } else {
         if (json.data.result) {
           Noti.hintLock('请求出错', '该学校已存在紧急公告，当前不能再添加')
@@ -215,15 +239,15 @@ class NotifyInfo extends React.Component {
           })
         } else {
           if (this.state.existError) {
-            this.setState({
-              existError: false
-            })
+            nextState.existError = false
           }
           if (callback) {
             callback()
           }
         }
+        this.setState(nextState)
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -294,50 +318,70 @@ class NotifyInfo extends React.Component {
     this.setState({
       mobiles: mobiles
     })
-    this.checkExist(mobiles[i].mobile, i)
+    this.checkSingleMobileExist(mobiles[i].mobile, i)
   }
-  checkExistPost = () => {
+  hintError = (message) => {
+    Noti.hintLock('请求出错', message || CONSTANTS.ERRORALTMESSAGE)
+  }
+  checkMobileExistAndPost = () => {
+    if (this.state.mobileChecking) {
+      return
+    }
+
+    this.setState({
+      mobileChecking: true
+    })
+
     let {checkCount, mobiles} = this.state
     let resource = '/api/user/mobile/check'
     const body = {
       mobile: parseInt(mobiles[checkCount].mobile)
     }
     const cb = (json) => {
+      const nextState = {
+        mobileChecking: false
+      }
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        this.hintError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           checkCount++
-          this.setState({
-            checkCount: checkCount
-          })
+          nextState.checkCount = checkCount
           if (checkCount === mobiles.length) {
             this.postInfo()
           } else {
-            this.checkExistPost()
+            this.checkMobileExistAndPost()
           }
         } else {
           // hint the mobile does not exist
           let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
           mobiles[checkCount].error = true
           mobiles[checkCount].errorMessage = '该手机号未注册！'
-          this.setState({
-            checkCount: 0,
-            mobiles: mobiles
-          })
+          nextState.checkCount = 0
+          nextState.mobiles = mobiles
         }
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
-  checkExist = (m, i) => {
+  checkSingleMobileExist = (m, i) => {
+    if (this.state.mobileChecking === true) {
+      return
+    }
+    this.setState({
+      mobileChecking: true
+    })
     let resource = '/api/user/mobile/check'
     const body = {
       mobile: parseInt(m)
     }
     const cb = (json) => {
+      const nextState = {
+        mobileChecking: false
+      }
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        this.hintError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           // nothing 
@@ -346,11 +390,10 @@ class NotifyInfo extends React.Component {
           let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
           mobiles[i].error = true
           mobiles[i].errorMessage = '该手机号未注册！'
-          this.setState({
-            mobiles: mobiles
-          })
+          nextState.mobiles = mobiles
         }
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
