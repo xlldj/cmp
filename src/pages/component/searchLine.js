@@ -58,7 +58,7 @@ const SearchLine = (props) => {
             <RangePicker
               allowClear={false}
               showTime
-              format='YYYY-MM-DD HH:mm:ss'
+              format='YYYY-MM-DD  HH:mm'
               placeholder={['开始时间', '结束时间']}
               value={props.startTime && props.endTime ? [moment(props.startTime), moment(props.endTime)] : [null, null]}
               className='searchLine-rangePicker'

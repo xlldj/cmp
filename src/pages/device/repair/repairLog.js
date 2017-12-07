@@ -69,20 +69,22 @@ class RepairLog extends React.Component {
               <span key={`repairStatus${index}`} className='padR20'>{REPAIRSTATUS[record.status]}</span>
               <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state:'fromRepairLog'}} >查看详情</Link>
             </li>
+            {record.status !== 5 && record.status !== 8?
             <li key={`person${index}`}>
               <p key={`pp${index}`}>维修人员:</p>{record.status===1?'未指派':record.assignName}
             </li>
-            {record.status===5?
-              (<li key={`finish${index}`}>
+            : null}
+            {record.status === 7?
+              <li key={`finish${index}`}>
                 <p key={`finishp${index}`}>维修完成时间</p>
-                {Time.getTimeStr(record.finishedTime)}
-              </li>)
+                {Time.getTimeStr(record.finishTime)}
+              </li>
               :
-            (<li key={`createtime${index}`}>
-              <p key={`creatp${index}`}>用户申请时间:</p>{Time.getTimeStr(record.createTime)}
-            </li>)
+              <li key={`createtime${index}`}>
+                <p key={`creatp${index}`}>用户申请时间:</p>{Time.getTimeStr(record.createTime)}
+              </li>
             }
-            {record.status===5?null:
+            {record.status === 7 || record.status === 8 ? null:
               (<li key={`waitingtime${index}`}>
                 <p key={`waitp${index}`}>用户等待时间:</p>{Time.getSpan(record.createTime)}
               </li>)

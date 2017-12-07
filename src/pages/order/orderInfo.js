@@ -129,9 +129,21 @@ class OrderInfo extends React.Component {
             : null
           }
           <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
-          <li><p>支付方式:</p>{PAYMENT[data.paymentType] || '暂无'}</li>
           <li><p>实际用水量:</p>{data.waterUsage||'待核算'}</li>
+          <li><p>预付金额:</p>{data.prepay || '未知'}</li>
           <li><p>实际消费:</p><span className='shalowRed'>{data.status !== 1 ? `¥${data.consume}` : '待核算'}</span></li>
+          {
+            data.bonusAmount ? 
+              <li><p>代金券抵扣:</p>{data.bonusAmount}</li> 
+            : null
+          }
+          {
+            data.actualDebit ?
+              <li><p>实际扣款:</p>{data.actualDebit}</li> 
+            : null
+          }
+          {data.status !== 1 ?<li><p>找零金额:</p><span>{`¥${data.unknown}`}</span></li> : null}
+          
           {
             data.status !== 4 ?
               <li>
@@ -140,7 +152,7 @@ class OrderInfo extends React.Component {
                   posting ?
                     <Button>退单</Button>
                   : 
-                  <Popconfirm title={popTitle} onConfirm={this.confirmSettle} >
+                  <Popconfirm title={popTitle} onConfirm={this.openChargeBackModal} >
                     <Button >退单</Button>
                   </Popconfirm>
                 }
@@ -158,6 +170,23 @@ class OrderInfo extends React.Component {
         <div className='btnArea'>
           <Button onClick={this.back}>返回</Button>
         </div>
+        
+        <Modal
+          title='退单'
+          visible={this.state.'modalVisible'}
+          onOk={this.'postMessage'}
+          onCancel={this.''}
+          maskClosable={''}
+          className='$(6: popupModal)'
+        >
+          <textarea
+            style={{width:'100%',height:'100px'}}
+            value={this.state.''}
+            onBlur={this.''}
+            onChange={this.''}
+          />
+          {this.state.'' ? <p className='checkInvalid'>消息不能为空！</p> : null }
+        </Modal>
       </div>
     )
   }

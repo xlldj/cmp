@@ -319,7 +319,20 @@ export default class Charts extends Component {
         throw new Error(json.error)
       }else{
         let firstPoints = json.data[data1Name[currentChart]], secondPoints = data2Name[currentChart]&&json.data[data2Name[currentChart]]
+        if (target === 2) {
+          if (currentChart === 1 || currentChart === 3 || currentChart === 4) {
+            firstPoints.forEach((f, i, arr) => {
+              arr[i].y = parseInt(f.y / 100)
+            })
+            secondPoints.forEach((s, i, arr) => {
+              arr[i].y = parseInt(s.y / 100)
+            })
+          }
+        }
+
         let newData = JSON.parse(JSON.stringify(this.state.data)),timeSpan=this.state.timeSpan
+
+
         //将过去的数据转为本日/周/月的数据，再将其插入data数组中
         if(timeSpan===1){
           newData.map((r,i)=>{

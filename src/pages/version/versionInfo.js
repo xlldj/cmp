@@ -232,8 +232,8 @@ class VersionInfo extends React.Component {
     nextState.contentError = false
     nextState.contentErrorMsg = ''
     this.setState(nextState)
-    // this.postInfo()
-    this.checkExist(this.postInfo)
+    this.postInfo()
+    // this.checkExist(this.postInfo)
   }
   cancel = () => {
     this.props.history.goBack()
@@ -380,6 +380,26 @@ class VersionInfo extends React.Component {
     if (this.state.methodError) {
       this.setState({
         methodError: false
+      })
+    }
+  }
+  changeUrl = (e) => {
+    this.setState({
+      url: e.target.value
+    })
+  }
+  checkUrl = (e) => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        urlError: true,
+        url: v
+      })
+    }
+    if (this.state.urlError) {
+      this.setState({
+        url: v,
+        urlError: false
       })
     }
   }
