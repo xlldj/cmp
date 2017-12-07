@@ -418,6 +418,7 @@ class VersionInfo extends React.Component {
             <p>选择系统:</p>
             <BasicSelectorWithoutAll
               width={'140px'}
+              disabled={id} 
               staticOpts={CONSTANTS.SYSTEMS}  
               selectedOpt={system.toString()} 
               changeOpt={this.changeSystem}
