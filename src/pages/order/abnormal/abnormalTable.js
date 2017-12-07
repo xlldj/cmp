@@ -2,19 +2,18 @@ import React from 'react'
 import { Link} from 'react-router-dom'
 
 import {Table, Badge, Button} from 'antd'
-import AjaxHandler from '../ajax'
-import Time from '../component/time'
-import CONSTANTS from '../component/constants'
-import SearchLine from '../component/searchLine'
-import DeviceSelector from '../component/deviceSelector'
-import SchoolSelector from '../component/schoolSelector'
-import BasicSelector from '../component/basicSelector'
+import AjaxHandler from '../../ajax'
+import Time from '../../component/time'
+import CONSTANTS from '../../component/constants'
+import SearchLine from '../../component/searchLine'
+import DeviceSelector from '../../component/deviceSelector'
+import SchoolSelector from '../../component/schoolSelector'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeOrder } from '../../actions'
-const subModule = 'orderList'
+import { changeOrder } from '../../../actions'
+const subModule = 'abnormal'
 
 const SIZE = CONSTANTS.PAGINATION
 
@@ -26,11 +25,10 @@ const BACKTITLE={
 /* state explanation */
 /* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
 /* subStartTime: 传给字组件searchLine的截止时间 */
-class OrderTable extends React.Component {
+class AbnormalTable extends React.Component {
   static propTypes = {
     schoolId: PropTypes.string.isRequired,
     deviceType: PropTypes.string.isRequired,
-    status: PropTypes.string.isRequired,
     selectKey: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired,
     startTime: PropTypes.number.isRequired,
@@ -113,7 +111,7 @@ class OrderTable extends React.Component {
       render: (text, record, index) => (
         <div className='editable-row-operations lastCol'>
           <span>
-            <Link to={`/order/list/orderInfo/:${record.id}`}  >详情</Link>
+            <Link to={`/order/abnormal/detail/:${record.id}`}  >详情</Link>
           </span>
         </div>
       )
@@ -148,13 +146,12 @@ class OrderTable extends React.Component {
 
   componentDidMount(){
     this.props.hide(false)
-    let {state}=this.props.location
-    // this.props.changeOrder('order', {startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
 
-    let {page, schoolId, deviceType, status, selectKey, startTime, endTime} = this.props
+    let {page, schoolId, deviceType, selectKey, startTime, endTime} = this.props
     const body={
       page: page,
-      size: SIZE
+      size: SIZE,
+      status: 5 // fetch abnormal order only
     }
     if (startTime) {
       body.startTime = startTime
@@ -167,19 +164,8 @@ class OrderTable extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if (status !== 'all') {
-      body.status = parseInt(status, 10)
-    }
     if (selectKey) {
       body.selectKey = selectKey
-    }
-    if (state) {
-      if (state.path === 'fromDevice') {
-        body.residenceId = state.id
-        body.deviceType = state.deviceType
-      } else if (state.path === 'fromUser') {
-        body.userId = state.id
-      }
     }
     this.fetchData(body)
   }
@@ -187,10 +173,11 @@ class OrderTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {schoolId, deviceType, status, selectKey, page, startTime, endTime} = nextProps
+    let {schoolId, deviceType, selectKey, page, startTime, endTime} = nextProps
     const body={
       page: page,
-      size: SIZE
+      size: SIZE,
+      status: 5
     }
 
     if (startTime) {
@@ -204,20 +191,8 @@ class OrderTable extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if (status !== 'all') {
-      body.status = parseInt(status, 10)
-    }
     if (selectKey) {
       body.selectKey = selectKey
-    }
-    let {state}=this.props.location
-    if (state) {
-      if (state.path === 'fromDevice') {
-        body.residenceId = state.id
-        body.deviceType = state.deviceType
-      } else if (state.path === 'fromUser') {
-        body.userId = state.id
-      }
     }
     this.fetchData(body)
   }
@@ -236,13 +211,6 @@ class OrderTable extends React.Component {
       return 
     }
     this.props.changeOrder(subModule, {deviceType: value, page: 1})
-  }
-  changeStatus = (value) => {
-    let {status} = this.props
-    if (value === status) {
-      return 
-    }
-    this.props.changeOrder(subModule, {status: value, page: 1})   
   }
   changeSearch = (e) => {
     this.setState({
@@ -292,7 +260,7 @@ class OrderTable extends React.Component {
     }
   }
   render () {
-    const {schoolId, deviceType, status} = this.props
+    const {schoolId, deviceType} = this.props
     const {dataSource, total, loading, subStartTime, subEndTime} = this.state
     const {state} = this.props.location
 
@@ -312,7 +280,6 @@ class OrderTable extends React.Component {
           changeSearch={this.changeSearch}
           selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
           selector2={<DeviceSelector selectedDevice={deviceType} changeDevice={this.changeDevice} />} 
-          selector3={<BasicSelector allTitle='所有使用状态' staticOpts={CONSTANTS.ORDERSTATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
         />
 
         <div className='tableList'>
@@ -340,7 +307,6 @@ const mapStateToProps = (state, ownProps) => {
   return {
     schoolId: state.changeOrder[subModule].schoolId,
     deviceType: state.changeOrder[subModule].deviceType,
-    status: state.changeOrder[subModule].status,
     selectKey: state.changeOrder[subModule].selectKey,
     page: state.changeOrder[subModule].page,
     startTime: state.changeOrder[subModule].startTime,
@@ -350,4 +316,4 @@ const mapStateToProps = (state, ownProps) => {
 
 export default withRouter(connect(mapStateToProps, {
   changeOrder
-})(OrderTable))
+})(AbnormalTable))

@@ -80,7 +80,7 @@ class SchoolList extends React.Component {
             <Link to={`/school/list/business/:${record.id}`}>功能入口管理</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要禁用此学校么?" onConfirm={(e) => {this.delete(e,record.id)}} onCancel={this.cancelDelete} okText="确认" cancelText="取消">
-              <a href="#">禁用</a>
+              <a href="">禁用</a>
             </Popconfirm>
           </span>
         </div>
@@ -193,7 +193,7 @@ class SchoolList extends React.Component {
     this.props.changeSchool(subModule, {schoolId: v, page: 1})
   }
   render () {
-    const {dataSource, total, loading, selectedSchool} = this.state
+    const {dataSource, total, loading} = this.state
     const {page, schoolId} = this.props
     return (
       <div className='contentArea'>

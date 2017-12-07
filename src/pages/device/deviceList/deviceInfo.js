@@ -14,7 +14,9 @@ import { changeOrder } from '../../../actions'
 
 const typeName = CONSTANTS.DEVICETYPE
 const REPAIRSTATUS = CONSTANTS.REPAIRSTATUS
-
+const BACKTITLE = {
+  fromRepair: '返回报修详情'
+}
 class DeviceInfo extends React.Component {
   constructor (props) {
     super(props)
@@ -113,20 +115,26 @@ class DeviceInfo extends React.Component {
               <span key={`repairStatus${index}`} className='padR20'>{REPAIRSTATUS[record.status]}</span>
               <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state:'fromDevice'}} >查看详情</Link>
             </li>
-            <li key={`person${index}`}>
-              <p key={`pp${index}`}>维修人员:</p>{record.status===1?'未指派':record.assignName}
-            </li>
+            {
+              record.status !== 1 ?
+                <li key={`person${index}`}>
+                  <p key={`pp${index}`}>维修人员:</p>
+                  <span>{record.assignName}</span>
+                </li>
+              : null
+            }
             {record.status === 7 ?
-              (<li key={`finish${index}`}>
+              <li key={`finish${index}`}>
                 <p key={`finishp${index}`}>维修完成时间</p>
                 {Time.getTimeStr(record.finishTime)}
-              </li>)
+              </li>
               :
-            (<li key={`createtime${index}`}>
-              <p key={`creatp${index}`}>用户申请时间:</p>{Time.getTimeStr(record.createTime)}
-            </li>)
+              <li key={`createtime${index}`}>
+                <p key={`creatp${index}`}>用户申请时间:</p>{Time.getTimeStr(record.createTime)}
+              </li>
             }
-            {record.status === 7 ? null:
+            {
+              record.status === 7 ? null:
               (<li key={`waitingtime${index}`}>
                 <p key={`waitp${index}`}>用户等待时间:</p>{Time.getSpan(record.createTime)}
               </li>)
@@ -175,7 +183,7 @@ class DeviceInfo extends React.Component {
         {repairs && repairs.length>0?repairsLog:null}
 
         <div className='btnArea'>
-          <Button onClick={this.back}>返回</Button>
+          <Button onClick={this.back}>{this.props.history.location.state ? BACKTITLE[this.props.history.location.state.path] : '返回'}</Button>
         </div>
       </div>
     )

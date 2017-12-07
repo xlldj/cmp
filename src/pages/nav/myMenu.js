@@ -1,18 +1,15 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Menu, Icon} from 'antd'
+import {Icon} from 'antd'
 import './style/index.css'
 import CONSTANTS from '../component/constants'
 import {getLocal, setLocal} from '../util/storage'
 import AjaxHandler from '../ajax'
-
+import Time from '../component/time'
 
 import { connect } from 'react-redux'
 import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion } from '../../actions'
 import { withRouter } from 'react-router-dom'
-
-
-const SubMenu = Menu.SubMenu
 
 const rootBlock = CONSTANTS.rootBlock
 
@@ -39,7 +36,7 @@ class MyMenu extends React.Component {
   }
   changeMenu = (pathname) => { // 只有在不是由导航栏点击改变url时，才会触发changemenu，因此只要打开就可以了，不用管关闭组标签
     let path = pathname || window.location.pathname, nextState = {}
-    let parentPath = path.split('/')[1] || '', onlyParent = path.split('/').length < 3
+    let parentPath = path.split('/')[1] || ''
     // console.log(path.split('/'))
     for (let i=0;i<rootBlock.length;i++) {
       if (parentPath === rootBlock[i].path) {
@@ -87,15 +84,16 @@ class MyMenu extends React.Component {
       this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
-      this.props.changeOrder('order', {schoolId: selectedSchool})
+      this.props.changeOrder('orderList', {schoolId: selectedSchool})
+      this.props.changeOrder('abnormal', {schoolId: selectedSchool})
       this.props.changeDevice('deviceList', {schoolId: selectedSchool})
       this.props.changeDevice('repair', {schoolId: selectedSchool})
       this.props.changeFund('fundList', {schoolId: selectedSchool})
+      this.props.changeFund('abnormal', {schoolId: selectedSchool})
       this.props.changeLost('lostList', {schoolId: selectedSchool})
       this.props.changeUser('userList', {schoolId: selectedSchool})
       this.props.changeTask('taskList', {schoolId: selectedSchool})
       this.props.changeTask('log', {schoolId: selectedSchool})
-      this.props.changeTask('abnormal', {schoolId: selectedSchool})
       this.props.changeTask('complaint', {schoolId: selectedSchool})
       this.props.changeTask('feedback', {schoolId: selectedSchool})
     }
@@ -114,11 +112,11 @@ class MyMenu extends React.Component {
         this.props.changeDevice('deviceList', {schoolId: selectedSchool})
         this.props.changeDevice('repair', {schoolId: selectedSchool})
         this.props.changeFund('fundList', {schoolId: selectedSchool})
+        this.props.changeFund('abnormal', {schoolId: selectedSchool})
         this.props.changeLost('lostList', {schoolId: selectedSchool})
         this.props.changeUser('userList', {schoolId: selectedSchool}) 
         this.props.changeTask('taskList', {schoolId: selectedSchool}) 
         this.props.changeTask('log', {schoolId: selectedSchool})
-        this.props.changeTask('abnormal', {schoolId: selectedSchool})
         this.props.changeTask('complaint', {schoolId: selectedSchool})
         this.props.changeTask('feedback', {schoolId: selectedSchool})
       } 
@@ -159,11 +157,21 @@ class MyMenu extends React.Component {
     this.getDefaultSchool()
     this.props.changeDevice('repair', {page: 1, deviceType: 'all', status: 'all'})
   }
+  clearStatus4deviceIIrateLimit = () => {
+    this.props.changeDevice('rateLimit', {page: 1})
+  }
 
 
   setStatusFororder = () => {
+    this.clearStatus4orderIIlist()
+  }
+  clearStatus4orderIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeOrder('order', {page: 1, deviceType: 'all', status: 'all', selectKey: ''})
+    this.props.changeOrder('orderList', {page: 1, deviceType: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
+  }
+  clearStatus4orderIIabnormal = () => {
+    this.getDefaultSchool()
+    this.props.changeOrder('abnormal', {page: 1, deviceType: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
   }
 
 
@@ -172,7 +180,7 @@ class MyMenu extends React.Component {
   }
   clearStatus4fundIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: ''})
+    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
   }
   clearStatus4fundIIcashtime = () => {
     this.props.changeFund('cashtime', {page: 1})
@@ -182,6 +190,10 @@ class MyMenu extends React.Component {
   }
   clearStatus4fundIIdeposit = () => {
     this.props.changeFund('deposit', {page: 1, schoolId: 'all'})
+  }
+  clearStatus4fundIIabnormal = () => {
+    this.getDefaultSchool()
+    this.props.changeFund('abnormal', {page: 1, selectKey: ''})
   }
 
 
@@ -275,7 +287,7 @@ class MyMenu extends React.Component {
     }
   }
   changeChild = (e, key) => {
-    let {currentRoot, currentChild} = this.state
+    let {currentRoot} = this.state
     let parent = rootBlock.find((module) => (module.key === currentRoot))
     let child = parent.children.find((son) => (son.key === key))
     let cb = this[`clearStatus4${parent.path}II${child.path}`]
@@ -333,9 +345,6 @@ class MyMenu extends React.Component {
   }
 }
 
-// export default MyMenu
-const mapStateToProps = (state, ownProps) => ({
-})
 export default withRouter(connect(null, {
   changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion
 })(MyMenu))

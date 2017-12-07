@@ -256,11 +256,13 @@ class RepairInfo extends React.Component {
             <li><p>学校名称:</p>{device.schoolName}</li>
             <li><p>设备类型:</p>{typeName[device.deviceType]}</li>
             <li><p>设备位置:</p>{device.location}</li>
-            <li><p>设备报修记录:</p>
-              <Link to={{pathname: '/device/repair/list'}}>设备报修记录</Link>
-            </li>
-            <li><p>设备订单记录:</p>
-              <Link to={{pathname: '/order', state:{path: 'fromRepair'}}}>设备订单记录</Link>
+            <li><p>查看设备详情:</p>
+              <Link 
+                to={{
+                  pathname: `/device/list/deviceInfo/:${device.id}`, 
+                  state: {id: device.id, deviceType: device.deviceType, residenceId: device.residenceId, path: 'fromRepair'}
+                }}
+              >设备详情</Link>
             </li>
           </ul>
         </div>

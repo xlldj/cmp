@@ -1,7 +1,7 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 
-import {Table} from 'antd'
+import {Table, Popconfirm} from 'antd'
 
 import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
@@ -12,11 +12,11 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../../actions'
-const subModule = 'prepay'
+const subModule = 'rateLimit'
 
 const SIZE = CONSTANTS.PAGINATION
 
-class PrepayTable extends React.Component {
+class RateLimitTable extends React.Component {
   static propTypes = {
     page: PropTypes.number.isRequired
   }
@@ -32,29 +32,28 @@ class PrepayTable extends React.Component {
       title: '学校',
       dataIndex: 'schoolName',
       className: 'firstCol',
-      width: '20%'
+      width: '25%'
     },{
       title: '设备类型',
       dataIndex: 'deviceType',
-      width: '20%',
+      width: '25%',
       render: (text,record) => (CONSTANTS.DEVICETYPE[record.deviceType])
     }, {
-      title: '预付金额',
-      dataIndex: 'prepay',
-      render: (text,record,index) => ('¥' + (record.prepay || '未知'))
-    }, {
-      title: '最低预付金额',
-      dataIndex: 'minPrepay',
-      width: '20%',
-      render: (text,record) => ('¥' + (text || '未知'))
+      title: '扣费速率',
+      dataIndex: 'money',
+      render: (text,record,index) => (`${record.time}秒/${record.money}`)
     }, {
       title: (<p className='lastCol'>操作</p>),
       dataIndex: 'operation',
-      width: '20%',
+      width: '25%',
       render: (text, record, index) => (
         <div className='editable-row-operations lastCol'>
           <span>
-            <Link to={`/device/prepay/editPrepay/:${record.id}`}>编辑</Link>
+            <Link to={`/device/rateLimit/editRateLimit/:${record.id}`}>编辑</Link>
+            <span className='ant-divider' />
+            <Popconfirm title="确定要删除么?" onConfirm={(e) => {this.delete(e,record.id)}} onCancel={this.cancelDelete} okText="确认" cancelText="取消">
+              <a href="">删除</a>
+            </Popconfirm>
           </span>
         </div>
       )
@@ -64,15 +63,14 @@ class PrepayTable extends React.Component {
     this.setState({
       loading: true
     })
-    let resource='/api/device/prepay/option/list'
+    let resource='/order/limit/list'
     const cb = (json) => {
       let nextState = {loading: false}
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
-        /*--------redirect --------*/
         if(json.data){
-          let data = JSON.parse(JSON.stringify(json.data.options))
+          let data = JSON.parse(JSON.stringify(json.data))
           nextState.dataSource = data
           nextState.total = json.data.total
         }else{
@@ -106,7 +104,7 @@ class PrepayTable extends React.Component {
   }
   delete = (e, id) => {
     e.preventDefault()
-    let resource='/api/device/prepay/option/delete'
+    let resource = ''
     const body = {
       id: id
     }
@@ -128,6 +126,9 @@ class PrepayTable extends React.Component {
     }
     AjaxHandler.ajax(resource,body,cb)
   }
+  cancelDelete = () => {
+    // nothing
+  }
   changePage = (pageObj) => {
     let page = pageObj.current
     this.props.changeDevice(subModule, {page: page})
@@ -139,7 +140,7 @@ class PrepayTable extends React.Component {
 
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='添加预付选项' addLink='/device/prepay/addPrepay' />
+        <SearchLine addTitle='添加扣费速率' addLink='/device/rateLimit/addRateLimit' />
 
           <div className='tableList'>
             <Table bordered loading={loading} rowKey={(record)=>(record.id)} pagination={{pageSize: SIZE, current: page, total: total}} onChange={this.changePage}  dataSource={this.state.dataSource} columns={this.columns} />
@@ -149,12 +150,10 @@ class PrepayTable extends React.Component {
   }
 }
 
-// export default PrepayTable
-
 const mapStateToProps = (state, ownProps) => ({
   page: state.changeDevice[subModule].page
 })
 
 export default withRouter(connect(mapStateToProps, {
   changeDevice
-})(PrepayTable))
+})(RateLimitTable))

@@ -60,6 +60,9 @@ const initialDeviceState = {
     deviceType: 'all',
     schoolId: 'all',
     status: 'all'
+  },
+  rateLimit: {
+    page: 1
   }
 }
 const changeDevice = (state = initialDeviceState, action) => {
@@ -73,11 +76,19 @@ const changeDevice = (state = initialDeviceState, action) => {
 }
 
 const initialOrderState = {
-  order: {
+  orderList: {
     page: 1,
     schoolId: selectedSchool,
     deviceType: 'all',
     status: 'all',
+    selectKey: '',
+    startTime: Time.get7DaysAgo(),
+    endTime: Time.getNow()
+  },
+  abnormal: {
+    page: 1,
+    schoolId: selectedSchool,
+    deviceType: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgo(),
     endTime: Time.getNow()
@@ -113,6 +124,11 @@ const initialFundState = {
   deposit: {
     page: 1,
     schoolId: 'all'
+  },
+  abnormal: {
+    schoolId: selectedSchool,
+    page: 1,
+    selectKey: ''
   }
 }
 const changeFund = (state = initialFundState, action) => {
@@ -193,11 +209,6 @@ const initialTaskState = {
     schoolId: selectedSchool,
     page: 1,
     all: '1'
-  },
-  abnormal: {
-    schoolId: selectedSchool,
-    page: 1,
-    selectKey: ''
   },
   complaint: {
     schoolId: selectedSchool,

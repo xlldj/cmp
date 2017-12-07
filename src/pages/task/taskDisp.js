@@ -15,7 +15,6 @@ const TaskLog = asyncComponent(()=>import(/* webpackChunkName: "taskLog" */ "./l
 const TaskList = asyncComponent(()=>import(/* webpackChunkName: "taskList" */ "./taskList"))
 const Complaint = asyncComponent(()=>import(/* webpackChunkName: "complaint" */ "./complaint/complaint"))
 const Feedback = asyncComponent(()=>import(/* webpackChunkName: "feedback" */ "./feedback/feedback"))
-const Abnormal = asyncComponent(()=>import(/* webpackChunkName: "abnormal" */ "./abnormal/abnormal"))
 
 const breadcrumbNameMap = {
   '/list': '工单列表',
@@ -23,8 +22,7 @@ const breadcrumbNameMap = {
   '/log/add': '创建工作记录',
   '/log/detail': '详情',
   '/complaint': '账单投诉',
-  '/feedback': '意见反馈',
-  '/abnormal': '异常订单'
+  '/feedback': '意见反馈'
 }
 
 class TaskDisp extends React.Component {
@@ -39,13 +37,9 @@ class TaskDisp extends React.Component {
     this.props.changeTask(taskList, {page: 1, assigned: false, sourceType: 'all', pending: 'all', all: '1'})
     */
   }
-  clearStatus4taskIIlog = () => {
+  clearStatus4IIlog = () => {
     this.getDefaultSchool()
     this.props.changeTask('log', {page: 1, all: '1'})
-  }
-  clearStatus4taskIIabnormal = () => {
-    this.getDefaultSchool()
-    this.props.changeTask('abnormal', {page: 1, selectKey: ''})
   }
   clearStatus4taskIIcomplaint = () => {
     this.getDefaultSchool()
@@ -72,7 +66,6 @@ class TaskDisp extends React.Component {
     if (selectedSchool !== 'all') {
       this.props.changeTask('taskList', {schoolId: selectedSchool})
       this.props.changeTask('log', {schoolId: selectedSchool})
-      this.props.changeTask('abnormal', {schoolId: selectedSchool})
       this.props.changeTask('complaint', {schoolId: selectedSchool})
       this.props.changeTask('feedback', {schoolId: selectedSchool})
     }
@@ -89,7 +82,6 @@ class TaskDisp extends React.Component {
         setLocal('defaultSchool', id)
         this.props.changeTask('taskList', {schoolId: id})
         this.props.changeTask('log', {schoolId: id})
-        this.props.changeTask('abnormal', {schoolId: id})
         this.props.changeTask('complaint', {schoolId: id})
         this.props.changeTask('feedback', {schoolId: id})
       } 
@@ -104,7 +96,6 @@ class TaskDisp extends React.Component {
             setStatusFortask={this.setStatusFortask}
             clearStatus4taskIIlist={this.clearStatus4taskIIlist}
             clearStatus4taskIIlog={this.clearStatus4taskIIlog}
-            clearStatus4taskIIabnormal={this.clearStatus4taskIIabnormal}
             clearStatus4taskIIcomplaint={this.clearStatus4taskIIcomplaint}
             clearStatus4taskIIfeedback={this.clearStatus4taskIIfeedback}
             parentName='客服工单' 
@@ -117,7 +108,6 @@ class TaskDisp extends React.Component {
             <Route path='/task/list' render={(props) => (<TaskList hide={this.props.hide} {...props} />)} />
             <Route path='/task/complaint' render={(props) => (<Complaint hide={this.props.hide} {...props} />)} />
             <Route path='/task/feedback' render={(props) => (<Feedback hide={this.props.hide} {...props} />)} />
-            <Route path='/task/abnormal' render={(props) => (<Abnormal hide={this.props.hide} {...props} />)} />
             <Route exact path='/task' render={(props) => (<Redirect to='/task/list' />)} />
           </Switch>
         </div>

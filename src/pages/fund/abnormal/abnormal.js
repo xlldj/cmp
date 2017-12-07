@@ -12,7 +12,7 @@ import SchoolSelector from '../../component/schoolSelector'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeTask } from '../../../actions'
+import { changeFund } from '../../../actions'
 const subModule = 'abnormal'
 
 const SIZE = CONSTANTS.PAGINATION
@@ -181,7 +181,7 @@ class AbnormalOrder extends React.Component {
   }
   changePage = (pageObj) => {
     let page = pageObj.current
-    this.props.changeTask(subModule, {page: page})
+    this.props.changeFund(subModule, {page: page})
   }
   pressEnter = () => {
     let v = this.state.searchingText.trim()
@@ -192,7 +192,7 @@ class AbnormalOrder extends React.Component {
     if (v === selectKey) {
       return
     }
-    this.props.changeTask(subModule, {page: 1, selectKey: v})
+    this.props.changeFund(subModule, {page: 1, selectKey: v})
   }
   changeSearch = (e) => {
     this.setState({
@@ -202,7 +202,7 @@ class AbnormalOrder extends React.Component {
   changeSchool = (v) => {
     let schoolId = this.props.schoolId
     if (v !== schoolId) {
-      this.props.changeTask(subModule, {schoolId: v})
+      this.props.changeFund(subModule, {schoolId: v})
     }
   }
   
@@ -245,12 +245,12 @@ class AbnormalOrder extends React.Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
-  selectKey: state.changeTask[subModule].selectKey,
-  page: state.changeTask[subModule].page,
-  schoolId: state.changeTask[subModule].schoolId
+  selectKey: state.changeFund[subModule].selectKey,
+  page: state.changeFund[subModule].page,
+  schoolId: state.changeFund[subModule].schoolId
 })
 
 export default withRouter(connect(mapStateToProps, {
- changeTask 
+ changeFund 
 })(AbnormalOrder))
 

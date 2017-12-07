@@ -6,12 +6,6 @@ import CONSTANTS from '../component/constants'
 import Time from '../component/time'
 import Noti from '../noti'
 
-const typeName ={
-  1: '热水器',
-  2: '饮水机',
-  3: '洗衣机',
-  4: '电吹风'
-}
 const STATUSCLASS = {
   1: 'warning',
   2: 'success',
@@ -166,7 +160,7 @@ class OrderInfo extends React.Component {
       <div className='infoList' >
         <ul>
           <li><p>订单号:</p>{data.orderNo || '暂无'}</li>
-          <li><p>设备类型:</p>{typeName[data.deviceType] || '暂无'}</li>
+          <li><p>设备类型:</p>{CONSTANTS.DEVICETYPE[data.deviceType] || '暂无'}</li>
           <li><p>设备ID:</p>{data.macAddress || '暂无'}</li>
           <li><p>设备位置:</p>{data.deviceLocation || '暂无'}</li>
           <li><p>所在学校:</p>{data.schoolName || '暂无'}</li>
@@ -183,11 +177,6 @@ class OrderInfo extends React.Component {
             : null
           }
           <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
-          {
-            data.status !== 1 ?
-              <li><p>实际用水量:</p>{data.waterUsage || '未知'}</li>
-            : null
-          }
           <li><p>预付金额:</p><span>{`¥${data.prepay}`}</span></li>
           {
             data.status !== 1 ?
@@ -215,17 +204,6 @@ class OrderInfo extends React.Component {
               </li>
             : null
           }
-          {
-            data.bonusAmount ? 
-              <li><p>代金券抵扣:</p>{data.bonusAmount}</li> 
-            : null
-          }
-          {
-            data.actualDebit ?
-              <li><p>实际扣款:</p>{data.actualDebit}</li> 
-            : null
-          }
-          {data.status !== 1 ?<li><p>找零金额:</p><span>{`¥${data.unknown}`}</span></li> : null}
           
           {
             data.status !== 4 ?
@@ -284,12 +262,15 @@ class OrderInfo extends React.Component {
           maskClosable={modalClosable}
           className='popupModal'
         >
-          <textarea
-            style={{width:'100%',height:'100px'}}
-            value={this.state.modalMessage}
-            onBlur={this.modalBlured}
-            onChange={this.modalMessageChange}
-          />
+          <span>
+            由于
+            <input 
+              value={this.state.modalMessage} 
+              onChange={this.modalMessageChange} 
+              onBlur={this.modalBlured}
+            />
+            ，此单已做退单处理，你可以前往消费记录中查看，有一笔免费的订单。
+          </span>
           {this.state.modalMessageError ? <p className='checkInvalid' style={{textAlign: 'left'}}>消息不能为空！</p> : null }
         </Modal>
       </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
 import {asyncComponent} from '../component/asyncComponent'
 //import OrderInfo from './orderInfo'
 //import OrderTable from './orderTable'
@@ -10,19 +10,32 @@ import AjaxHandler from '../ajax'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../actions'
+import Time from '../component/time'
 import './style/style.css'
 
 const OrderTable = asyncComponent(() => import(/* webpackChunkName: "orderTable" */ "./orderTable"))
 const OrderInfo = asyncComponent(() => import(/* webpackChunkName: "orderInfo" */ "./orderInfo"))
+const AbnormalOrder = asyncComponent(() => import(/* webpackChunkName: "abnormalOder" */ "./abnormal/abnormalContainer"))
 
 const breadcrumbNameMap = {
-  '/orderInfo': '订单详情'
+  '/list': '订单列表',
+  '/list/orderInfo': '详情',
+  '/abnormal': '异常订单',
+  '/abnormal/detail': '详情'
 }
 
 class OrderDisp extends React.Component {
   setStatusFororder = () => {
+    this.clearStatus4orderIIlist()
+  }
+  clearStatus4orderIIlist = () => {
+    console.log('clear')
     this.getDefaultSchool()
-    this.props.changeOrder('order', {page: 1, deviceType: 'all', status: 'all', selectKey: ''})
+    this.props.changeOrder('orderList', {page: 1, deviceType: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
+  }
+  clearStatus4orderIIabnormal = () => {
+    this.getDefaultSchool()
+    this.props.changeOrder('abnormal', {page: 1, deviceType: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
   }
   getDefaultSchool = () => {
     const recentSchools = getLocal('recentSchools')
@@ -38,7 +51,8 @@ class OrderDisp extends React.Component {
       this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
-      this.props.changeOrder('order', {schoolId: selectedSchool})
+      this.props.changeOrder('orderList', {schoolId: selectedSchool})
+      this.props.changeOrder('abnormal', {schoolId: selectedSchool})
     }
   }
   setDefaultSchool = () => {
@@ -51,7 +65,8 @@ class OrderDisp extends React.Component {
       if (json.data.schools) {
         let id = json.data.schools[0].id.toString()
         setLocal('defaultSchool', id)
-        this.props.changeOrder('order', {schoolId: id})
+        this.props.changeOrder('orderList', {schoolId: id})
+        this.props.changeOrder('abnormal', {schoolId: id})
       } 
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -60,12 +75,21 @@ class OrderDisp extends React.Component {
     return (
       <div>
         <div className='breadc'>
-          <Bread breadcrumbNameMap={breadcrumbNameMap} parent='order' setStatusFororder={this.setStatusFororder}  single={true} parentName='订单管理' />
+          <Bread 
+            breadcrumbNameMap={breadcrumbNameMap} 
+            parent='order' 
+            parentName='订单管理' 
+            setStatusFororder={this.setStatusFororder}  
+            clearStatus4orderIIlist={this.clearStatus4orderIIlist}
+            clearStatus4orderIIabnormal={this.clearStatus4orderIIabnormal}
+          />
         </div>
 
         <div className='disp'>
-          <Route exact path='/order' render={(props) => (<OrderTable hide={this.props.hide} {...props} />)} />
-          <Route path='/order/orderInfo/:id' render={(props) => (<OrderInfo hide={this.props.hide} {...props} />)} />
+          <Route exact path='/order' render={(props) => (<Redirect to='/order/list' />)}  />
+          <Route exact path='/order/list' render={(props) => (<OrderTable hide={this.props.hide} {...props} />)} />
+          <Route path='/order/list/orderInfo/:id' render={(props) => (<OrderInfo hide={this.props.hide} {...props} />)} />
+          <Route path='/order/abnormal' render={(props) => (<AbnormalOrder hide={this.props.hide} {...props} />)} />
         </div>
       </div>
     )

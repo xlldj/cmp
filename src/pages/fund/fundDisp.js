@@ -7,6 +7,7 @@ import Bread from '../bread'
 import './style/style.css'
 import {getLocal, setLocal} from '../util/storage'
 import AjaxHandler from '../ajax'
+import Time from '../component/time'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -16,6 +17,7 @@ const ChargeContainer = asyncComponent(()=>import(/* webpackChunkName: "chargeCo
 const FundContainer = asyncComponent(()=>import(/* webpackChunkName: "fundContainer" */ "./fundList/fundContainer"))
 const DepositContainer = asyncComponent(()=>import(/* webpackChunkName: "chargeList" */ "./deposit/depositContainer"))
 const CashtimeContainer = asyncComponent(()=>import(/* webpackChunkName: "cashtime" */ "./cashtime/cashtimeContainer"))
+const AbnormalContainer = asyncComponent(()=>import(/* webpackChunkName: "abnormalFund" */ "./abnormal/abnormal"))
 
 const breadcrumbNameMap = {
   '/list': '资金列表',
@@ -28,7 +30,8 @@ const breadcrumbNameMap = {
   '/cashtime/editCashtime': '编辑提现时间',
   '/deposit': '充值活动',
   '/deposit/depositInfo': '编辑充值活动',
-  '/deposit/addDeposit': '创建充值活动'
+  '/deposit/addDeposit': '创建充值活动',
+  '/abnormal': '异常资金'
 }
 
 class FundDisp extends React.Component {
@@ -37,7 +40,7 @@ class FundDisp extends React.Component {
   }
   clearStatus4fundIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: ''})
+    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
   }
   clearStatus4fundIIcashtime = () => {
     this.props.changeFund('cashtime', {page: 1})
@@ -47,6 +50,10 @@ class FundDisp extends React.Component {
   }
   clearStatus4fundIIdeposit = () => {
     this.props.changeFund('deposit', {page: 1, schoolId: 'all'})
+  }
+  clearStatus4fundIIabnormal = () => {
+    this.getDefaultSchool()
+    this.props.changeFund('abnormal', {page: 1, selectKey: ''})
   }
   getDefaultSchool = () => {
     const recentSchools = getLocal('recentSchools')
@@ -63,6 +70,7 @@ class FundDisp extends React.Component {
     }
     if (selectedSchool !== 'all') {
       this.props.changeFund('fundList', {schoolId: selectedSchool})
+      this.props.changeFund('abnormal', {schoolId: selectedSchool})
     }
   }
   setDefaultSchool = () => {
@@ -84,13 +92,14 @@ class FundDisp extends React.Component {
     return (
       <div>
         <div className='breadc'>
-          <Bread breadcrumbNameMap={breadcrumbNameMap} 
+          <Bread breadcrumbNameMap={breadcrumbNameMap}
             parent='fund'
             setStatusForfund={this.setStatusForfund}
-            clearStatus4fundIIlist={this.clearStatus4fundIIlist}  
+            clearStatus4fundIIlist={this.clearStatus4fundIIlist}
             clearStatus4fundIIcashtime={this.clearStatus4fundIIcashtime}  
             clearStatus4fundIIcharge={this.clearStatus4fundIIcharge} 
-            clearStatus4fundIIdeposit={this.clearStatus4fundIIdeposit}  
+            clearStatus4fundIIdeposit={this.clearStatus4fundIIdeposit}
+            clearStatus4fundIIabnormal={this.clearStatus4fundIIabnormal}
             parentName='资金管理' 
           />
         </div>
@@ -101,6 +110,7 @@ class FundDisp extends React.Component {
             <Route path='/fund/charge' render={(props) => (<ChargeContainer hide={this.props.hide} {...props} />)} />
             <Route path='/fund/cashtime' render={(props) => (<CashtimeContainer hide={this.props.hide} {...props} />)} />
             <Route path='/fund/list' render={(props) => (<FundContainer hide={this.props.hide} {...props} />)} />
+            <Route path='/fund/abnormal' render={(props) => (<AbnormalContainer hide={this.props.hide} {...props} />)} />
             <Route exact path='/fund' render={(props) => (<Redirect to='/fund/list' />)} />
           </Switch>
         </div>

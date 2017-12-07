@@ -4,7 +4,6 @@ import {Button} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
-import AddPlusAbs from '../../component/addPlusAbs'
 import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
@@ -69,7 +68,7 @@ class PrepayInfo extends React.Component {
     this.props.hide(false)
     if(this.props.match.params.id){
       const body={
-        id:parseInt(this.props.match.params.id.slice(1))
+        id:parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
@@ -111,7 +110,7 @@ class PrepayInfo extends React.Component {
     return true
   }
   completeEdit = () => {
-    let deviceType = parseInt(this.state.deviceType, 10), schoolId = parseInt(this.state.schoolId, 10), resource = '', result =[]
+    let deviceType = parseInt(this.state.deviceType, 10), schoolId = parseInt(this.state.schoolId, 10), resource = ''
     let minPrepay = parseInt(this.state.minPrepay, 10), prepay = parseInt(this.state.prepay, 10)
 
     const body = {
@@ -175,7 +174,7 @@ class PrepayInfo extends React.Component {
         minErrorMsg: '最低预付不能大于预付金额'
       })
     }
-    if (!(id && originalSchool === schoolId && originalDevice === originalDevice)) {
+    if (!(id && originalSchool === schoolId && originalDevice === deviceType)) {
       this.checkExist(this.completeEdit)
     } else {
       this.completeEdit()
@@ -190,8 +189,8 @@ class PrepayInfo extends React.Component {
         deviceTypeError: true
       })
     }
-    let {items, drinkItems, deviceTypeError} = this.state, nextState = {}
-    nextState.deviceType = parseInt(v)
+    let {deviceTypeError} = this.state, nextState = {}
+    nextState.deviceType = parseInt(v, 10)
     if (deviceTypeError) {
       nextState.deviceTypeError = false
     }
@@ -211,11 +210,11 @@ class PrepayInfo extends React.Component {
     this.setState({
       deviceTypeError: false
     })
-    let {id, schoolId, originalSchool, deviceType, originalDevice} = this.state
+    let {id, schoolId, originalSchool, originalDevice, deviceType} = this.state
     if (!schoolId) {
       return 
     }
-    if (!(id && originalSchool === schoolId && originalDevice === originalDevice)) {
+    if (!(id && originalSchool === schoolId && originalDevice === deviceType)) {
       this.checkExist(null)
     }
   }
@@ -232,11 +231,7 @@ class PrepayInfo extends React.Component {
         throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
-          // Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
-          throw {
-            title: '添加出错',
-            message: '当前设备已有预付选项，请返回该项编辑'
-          }
+          Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
         } else {
           if (callback) {
             callback()

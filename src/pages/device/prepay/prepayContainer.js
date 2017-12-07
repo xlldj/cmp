@@ -6,9 +6,6 @@ const PrepayTable = asyncComponent(() => import(/* webpackChunkName: "prepayTabl
 const PrepayInfo = asyncComponent(() => import(/* webpackChunkName: "prepayInfo" */ "./prepayInfo"))
 
 class PrepayContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

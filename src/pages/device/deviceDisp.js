@@ -18,6 +18,7 @@ const RateSet = asyncComponent(() => import(/* webpackChunkName: "rateSet" */ ".
 const Repair = asyncComponent(() => import(/* webpackChunkName: "repair" */ "./repair/repair"))
 const PrepayContainer = asyncComponent(() => import(/* webpackChunkName: "prepay" */ "./prepay/prepayContainer"))
 const TimesetContainer = asyncComponent(() => import(/* webpackChunkName: "timeset" */ "./timeset/timesetContainer"))
+const RateLimitContainer = asyncComponent(() => import(/* webpackChunkName: "rateLimit" */ "./rateLimit/rateLimitContainer"))
 
 const breadcrumbNameMap = {
   '/list': '设备列表',
@@ -46,7 +47,10 @@ const breadcrumbNameMap = {
   '/price': '水量单价',
   '/price/list': '价格列表',
   '/price/addPrice': '添加单价',
-  '/price/detail': '详情'
+  '/price/detail': '详情',
+  '/rateLimit': '扣费速率',
+  '/rateLimit/addRateLimit': '添加扣费速率',
+  '/rateLimit/editRateLimit': '编辑扣费速率'
 };
 
 class DeviceDisp extends React.Component{
@@ -87,6 +91,9 @@ class DeviceDisp extends React.Component{
   clearStatus4deviceIIrepair = () => {
     this.getDefaultSchool()
     this.props.changeDevice('repair', {page: 1, deviceType: 'all', status: 'all'})
+  }
+  clearStatus4deviceIIrateLimit = () => {
+    this.props.changeDevice('rateLimit', {page: 1})
   }
   getDefaultSchool = () => {
     const recentSchools = getLocal('recentSchools')
@@ -136,7 +143,8 @@ class DeviceDisp extends React.Component{
             clearStatus4deviceIItimeset={this.clearStatus4deviceIItimeset}  
             clearStatus4deviceIIsuppliers={this.clearStatus4deviceIIsuppliers}  
             clearStatus4deviceIIrateSet={this.clearStatus4deviceIIrateSet}   
-            clearStatus4deviceIIrepair={this.clearStatus4deviceIIrepair}   
+            clearStatus4deviceIIrepair={this.clearStatus4deviceIIrepair} 
+            clearStatus4deviceIIrateLimit={this.clearStatus4deviceIIrateLimit}
             parentName='设备管理' 
           />
         </div>
@@ -149,6 +157,7 @@ class DeviceDisp extends React.Component{
           <Route path='/device/components' render={(props) => (<ComponentContainer hide={this.props.hide} {...props} />)} />
           <Route path='/device/prepay' render={(props) => (<PrepayContainer hide={this.props.hide} {...props} />)} />
           <Route path='/device/timeset' render={(props) => (<TimesetContainer hide={this.props.hide} {...props} />)} />
+          <Route path='/device/rateLimit' render={(props) => (<RateLimitContainer hide={this.props.hide} {...props} />)} />
           <Route exact path='/device' render={(props) => (<Redirect to='/device/list' />)}  />
         </div>
       </div>

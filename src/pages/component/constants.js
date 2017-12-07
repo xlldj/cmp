@@ -128,6 +128,11 @@ const CONSTANTS = {
           key: 6
         },
         {
+          path: 'rateLimit',
+          name: '扣费速率',
+          key: 8
+        },
+        {
           path: 'repair',
           name: '报修管理',
           key: 7
@@ -138,7 +143,19 @@ const CONSTANTS = {
       name: '订单管理',
       path: 'order',
       key: 2,
-      icon: 'file-text'
+      icon: 'file-text',
+      children: [
+        {
+          name: '订单列表',
+          path: 'list',
+          key: 0
+        },
+        {
+          name: '异常订单',
+          path: 'abnormal',
+          key: 1
+        }
+      ]
     },
     {
       name: '充值提现',
@@ -165,6 +182,11 @@ const CONSTANTS = {
           name: '充值活动',
           path: 'deposit',
           key: 3
+        },
+        {
+          name: '异常资金',
+          path: 'abnormal',
+          key: 4
         }
       ]
     },

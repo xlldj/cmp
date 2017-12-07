@@ -29,7 +29,7 @@ const NotifyDisp = asyncComponent(() => import(/* webpackChunkName: "notify" */ 
 const AccountInfo = asyncComponent(() => import(/* webpackChunkName: "account" */ "./account/accountInfo"))
 const VersionDisp = asyncComponent(() => import(/* webpackChunkName: "version" */ "./version/versionDisp"))
 
-const { Content, Sider } = Layout;
+const { Content} = Layout;
 
 class Main extends React.Component {
   state = {
@@ -56,7 +56,8 @@ class Main extends React.Component {
       this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
-      this.props.changeOrder('order', {schoolId: selectedSchool})
+      this.props.changeOrder('orderList', {schoolId: selectedSchool})
+      this.props.changeOrder('abnormal', {schoolId: selectedSchool})
       this.props.changeDevice('deviceList', {schoolId: selectedSchool})
       this.props.changeDevice('repair', {schoolId: selectedSchool})
       this.props.changeFund('fundList', {schoolId: selectedSchool})

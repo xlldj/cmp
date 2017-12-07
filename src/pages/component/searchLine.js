@@ -42,13 +42,6 @@ const SearchLine = (props) => {
   const open = !!props.openTitle && (
     <Button onClick={props.openModal} type='primary'>{props.openTitle}</Button>
   )
-  const pressEnter = (e) => {
-    let v = e.target.value.trim()
-    if (!v) {
-      return
-    }
-    props.pressEnter(v)
-  }
   return (
     <div className='searchLine'>
       <div className='left'>
