@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Popconfirm, Button} from 'antd'
+import {Popconfirm, Button, Modal} from 'antd'
 import AjaxHandler from '../ajax'
 import CONSTANTS from '../component/constants'
 import Time from '../component/time'
@@ -17,7 +17,6 @@ const STATUSCLASS = {
   2: 'success',
   4: ''
 }
-const PAYMENT = CONSTANTS.PAYMENTTYPE
 
 class OrderInfo extends React.Component {
   constructor (props) {
@@ -39,7 +38,10 @@ class OrderInfo extends React.Component {
         posting: false
     }
     this.state = {
-      data: data
+      data: data,
+      modalClosable: true,
+      modalVisible: false,
+      modalMessage: ''
     }
   }
   fetchData = (body) => {
@@ -83,28 +85,80 @@ class OrderInfo extends React.Component {
     })
     let resource = '/order/chargeback'
     const body = {
-      id: this.state.id
+      id: this.state.id,
+      reason: this.state.modalMessage
     }
     const cb = (json) => {
-      const nextState = {
+      const nextState = ({
         posting: false
-      }
-      if (json.data && json.data.result) {
-        let data = JSON.parse(JSON.stringify(this.state.data))
-        data.status = 4
-        this.setState({
-          data: data
-        })
+      })
+      if (json.error) {
+        Noti.hintServiceError(json.error.displayMessage)
+      } else if (json.data && json.data.result) {
         Noti.hintSuccessWithoutSkip()
-      } else {
-        Noti.hintServiceError(json.data.failReason)
+        nextState.modalVisible = false
+        nextState.modalMessage = ''
+        this.fetchData({
+          id: this.state.id
+        })
       }
       this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
+
+  modalConfirmed = () => {
+    let {modalMessage, modalMessageError, posting} = this.state
+    if (posting) {
+      return
+    }
+
+    if (!modalMessage) {
+      return this.setState({
+        modalMessageError: true
+      })
+    }
+    if (modalMessageError) {
+      this.setState({
+        modalMessageError: false
+      })
+    }
+    this.confirmSettle()
+  }
+  modalCanceled = () => {
+    this.setState({
+      modalVisible: false,
+      modalMessage: '',
+      modalMessageError: false
+    })
+  }
+  modalBlured = (e) => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        modalMessageError: true
+      })
+    }
+    if (this.state.modalMessageError) {
+      this.setState({
+        modalMessageError: false,
+        modalMessage: v
+      })
+    }
+  }
+  openModal = () => {
+    this.setState({
+      modalVisible: true
+    })
+  }
+  modalMessageChange = (e) => {
+    let v = e.target.value
+    this.setState({
+      modalMessage: v
+    })
+  }
   render () {
-    let {data, posting} = this.state
+    let {data, modalClosable} = this.state
 
     const popTitle = (<p className='popTitle'>退单后该笔订单的预付金额和代金券都将返还给用户，确定要退单么?</p>)
 
@@ -129,9 +183,38 @@ class OrderInfo extends React.Component {
             : null
           }
           <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
-          <li><p>实际用水量:</p>{data.waterUsage||'待核算'}</li>
-          <li><p>预付金额:</p>{data.prepay || '未知'}</li>
-          <li><p>实际消费:</p><span className='shalowRed'>{data.status !== 1 ? `¥${data.consume}` : '待核算'}</span></li>
+          {
+            data.status !== 1 ?
+              <li><p>实际用水量:</p>{data.waterUsage || '未知'}</li>
+            : null
+          }
+          <li><p>预付金额:</p><span>{`¥${data.prepay}`}</span></li>
+          {
+            data.status !== 1 ?
+              <li><p>实际消费:</p><span className='shalowRed'>{`¥${data.consume}`}</span></li>
+            : null
+          }
+          {
+            data.bonusAmount ?
+              <li><p>代金券抵扣:</p>
+                <span>{data.bonusAmount}</span>
+              </li>
+            : null
+          }
+          {
+            data.actualDebit ?
+              <li><p>实际扣款</p>
+                <span>{data.actualDebit}</span>
+              </li>
+            : null
+          }
+          {
+            data.status !== 1 ?
+              <li><p>找零金额:</p>
+                <span>{data.odd ? data.odd : '未知'}</span>
+              </li>
+            : null
+          }
           {
             data.bonusAmount ? 
               <li><p>代金券抵扣:</p>{data.bonusAmount}</li> 
@@ -146,16 +229,38 @@ class OrderInfo extends React.Component {
           
           {
             data.status !== 4 ?
-              <li>
-                <p></p>
-                {
-                  posting ?
-                    <Button>退单</Button>
-                  : 
-                  <Popconfirm title={popTitle} onConfirm={this.openChargeBackModal} >
-                    <Button >退单</Button>
-                  </Popconfirm>
-                }
+              <li><p></p>
+                <Popconfirm title={popTitle} onConfirm={this.openModal} >
+                  <Button >退单</Button>
+                </Popconfirm>
+              </li>
+            : null
+          }
+          {
+            data.status === 4 ?
+              <li><p>退单操作人:</p>
+                <span>{data.chargebackExecutor}</span>
+              </li>
+            : null
+          }
+          {
+            data.status === 4 ?
+              <li><p>退单原因:</p>
+                <span>{data.chargebackReason}</span>
+              </li>
+            : null
+          }
+          {
+            data.status === 4 ?
+              <li><p>退还金额:</p>
+                <span>{data.chargebackMoney}</span>
+              </li>
+            : null
+          }
+          {
+            data.status === 4 ?
+              <li><p>退还代金券:</p>
+                <span>{data.chargebackBonus}</span>
               </li>
             : null
           }
@@ -170,22 +275,22 @@ class OrderInfo extends React.Component {
         <div className='btnArea'>
           <Button onClick={this.back}>返回</Button>
         </div>
-        
+
         <Modal
           title='退单'
-          visible={this.state.'modalVisible'}
-          onOk={this.'postMessage'}
-          onCancel={this.''}
-          maskClosable={''}
-          className='$(6: popupModal)'
+          visible={this.state.modalVisible}
+          onOk={this.modalConfirmed}
+          onCancel={this.modalCanceled}
+          maskClosable={modalClosable}
+          className='popupModal'
         >
           <textarea
             style={{width:'100%',height:'100px'}}
-            value={this.state.''}
-            onBlur={this.''}
-            onChange={this.''}
+            value={this.state.modalMessage}
+            onBlur={this.modalBlured}
+            onChange={this.modalMessageChange}
           />
-          {this.state.'' ? <p className='checkInvalid'>消息不能为空！</p> : null }
+          {this.state.modalMessageError ? <p className='checkInvalid' style={{textAlign: 'left'}}>消息不能为空！</p> : null }
         </Modal>
       </div>
     )

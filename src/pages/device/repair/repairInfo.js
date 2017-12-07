@@ -1,11 +1,10 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 import AjaxHandler from '../../ajax'
-import { Button, Modal, Table, Carousel, Input, Popconfirm } from 'antd'
+import { Button, Modal, Table, Carousel, Popconfirm } from 'antd'
 import Time from '../../component/time'
 import CONSTANTS from '../../component/constants'
 import Noti from '../../noti'
-const { TextArea } = Input;
 const typeName = CONSTANTS.DEVICETYPE
 const STATUS = CONSTANTS.REPAIRSTATUSFORSHOW
 const PRIORITY = CONSTANTS.PRIORITY
@@ -64,7 +63,7 @@ class RepairInfo extends React.Component {
   componentDidMount(){
     this.props.hide(false)
     const body = {
-      id: parseInt(this.props.match.params.id.slice(1))
+      id: parseInt(this.props.match.params.id.slice(1), 10)
     }
     this.fetchData(body)
   }
@@ -101,7 +100,7 @@ class RepairInfo extends React.Component {
       showModal: false
     })
     const body = {
-      id: parseInt(this.props.match.params.id.slice(1))
+      id: parseInt(this.props.match.params.id.slice(1), 10)
     }
     this.fetchData(body)
   }
@@ -114,7 +113,7 @@ class RepairInfo extends React.Component {
     let resource = '/api/work/sheet/censor'
     const body = {
       pass: 2,
-      sourceId: parseInt(this.props.match.params.id.slice(1)),
+      sourceId: parseInt(this.props.match.params.id.slice(1), 10),
       sourceType: 2,
       reason: this.state.failedReason
     }
@@ -124,7 +123,7 @@ class RepairInfo extends React.Component {
       } else {
         if (json.data.result) {
           const body = {
-            id: parseInt(this.props.match.params.id.slice(1))
+            id: parseInt(this.props.match.params.id.slice(1), 10)
           }
           this.fetchData(body)
         }
@@ -141,7 +140,7 @@ class RepairInfo extends React.Component {
     let resource = '/api/work/sheet/censor'
     const body = {
       pass: 1,
-      sourceId: parseInt(this.props.match.params.id.slice(1)),
+      sourceId: parseInt(this.props.match.params.id.slice(1), 10),
       sourceType: 2
     }
     const cb = (json) => {
@@ -150,7 +149,7 @@ class RepairInfo extends React.Component {
       } else {
         if (json.data.result) {
           const body = {
-            id: parseInt(this.props.match.params.id.slice(1))
+            id: parseInt(this.props.match.params.id.slice(1), 10)
           }
           this.fetchData(body)
           Noti.hintOk('操作成功', '该任务已通过审核')
@@ -177,14 +176,14 @@ class RepairInfo extends React.Component {
   }
   render () {
     const {device,content,status,repairman,repairRating} = this.state.data
-    let {showCensor, failedReason} = this.state.data
+    let {failedReason} = this.state.data
 
     const images = content.images.map((r,i) => {
-      return <img onClick={this.showImgs} value={i}  key={i} src={CONSTANTS.FILEADDR + r} className='repairImg' />
+      return <img onClick={this.showImgs} value={i}  key={i} src={CONSTANTS.FILEADDR + r} alt='' className='repairImg' />
     })
 
     const carouselItems = content.images.map((r,i) => {
-      return <img value={i}  key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
+      return <img value={i}  key={i} src={CONSTANTS.FILEADDR + r} alt='' className='carouselImg' />
     })
     const carousel = (<Carousel style={{backgroundColor:'red'}}  dots={true} accessibility={true}  className='carouselItem' autoplay={true} arrows={true} initialSlide={this.state.initialSlide}>
                         {carouselItems}
@@ -257,6 +256,12 @@ class RepairInfo extends React.Component {
             <li><p>学校名称:</p>{device.schoolName}</li>
             <li><p>设备类型:</p>{typeName[device.deviceType]}</li>
             <li><p>设备位置:</p>{device.location}</li>
+            <li><p>设备报修记录:</p>
+              <Link to={{pathname: '/device/repair/list'}}>设备报修记录</Link>
+            </li>
+            <li><p>设备订单记录:</p>
+              <Link to={{pathname: '/order', state:{path: 'fromRepair'}}}>设备订单记录</Link>
+            </li>
           </ul>
         </div>
 
@@ -314,7 +319,7 @@ class RepairInfo extends React.Component {
           : null 
         }
 
-        <RepairmanTable showModal={this.state.showModal} confirm={this.confirmPost} cancel={this.cancel} id={parseInt(this.props.match.params.id.slice(1))} schoolId={device.schoolId} schoolName={device.schoolName} />
+        <RepairmanTable showModal={this.state.showModal} confirm={this.confirmPost} cancel={this.cancel} id={parseInt(this.props.match.params.id.slice(1), 10)} schoolId={device.schoolId} schoolName={device.schoolName} />
 
         <Modal  visible={this.state.showImgs}  title='' closable={false} onCancel={this.closeImgs} width={800} className='carouselModal' okText='' footer={null} >
           <div className='carouselContainer' >{this.state.showImgs?carousel:null}</div>
@@ -419,7 +424,7 @@ class RepairmanTable extends React.Component{
   confirm = () => {
     const body = {
       id: this.props.id,
-      level: parseInt(this.state.priority),
+      level: parseInt(this.state.priority, 10),
       repairmanId: this.state.selectedRowKeys[0],
       remark: this.state.remark
     }

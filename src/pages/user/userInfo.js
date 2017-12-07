@@ -1,5 +1,4 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
 import {Button, Modal, Popconfirm} from 'antd'
 import Time from '../component/time'
 import Noti from '../noti'
@@ -7,7 +6,6 @@ import CONSTANTS from '../component/constants'
 import AjaxHandler from '../ajax'
 
 
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
@@ -21,7 +19,7 @@ const backTitle = {
   fromOrder: '返回订单详情',
   fromFund: '返回资金详情',
   fromRepair: '返回维修详情',
-  fromRepairLog: '返回用户维修记录'
+  fromRepairLog: '返回用户报修记录'
 }
 
 class UserInfo extends React.Component {
@@ -40,7 +38,7 @@ class UserInfo extends React.Component {
   }
   fetchData = () => {
     let resource = '/api/user/one'
-    let id = parseInt(this.props.match.params.id.slice(1))
+    let id = parseInt(this.props.match.params.id.slice(1), 10)
     const body = {
       id: id
     }
@@ -123,10 +121,7 @@ class UserInfo extends React.Component {
       if (json.data) {
         Noti.hintOk('操作成功', '该用户密码已被重置为手机号末6位！')
       } else {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络请求出错'
-        }
+        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -145,10 +140,7 @@ class UserInfo extends React.Component {
           Noti.hintLock('操作失败', json.data.failReason || '操作失败，请联系客服或相关人员')
         }
       } else {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络请求出错'
-        }
+        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -198,7 +190,7 @@ class UserInfo extends React.Component {
           <li>
             <p>重置密码:</p>
             <Popconfirm title="确定要重置么?" onConfirm={this.resetPwd} okText="确认" cancelText="取消">
-              <a href="#">重置</a>
+              <a href="">重置</a>
             </Popconfirm>
           </li> 
           {data.blacklistInfo ?
@@ -206,7 +198,7 @@ class UserInfo extends React.Component {
               <p></p>
               <span style={{marginRight: '20px'}}>{data.blacklistInfo}</span>
               <Popconfirm title="确定要取消拉黑么?" onConfirm={this.cancelDefriend} okText="确认" cancelText="取消">
-                <a href="#">取消拉黑</a>
+                <a href="">取消拉黑</a>
               </Popconfirm>
             </li>
             : null

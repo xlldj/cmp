@@ -1,36 +1,20 @@
 import React from 'react'
 import { Link} from 'react-router-dom'
 
-import {Table, Badge} from 'antd'
+import {Table} from 'antd'
 import AjaxHandler from '../../ajax'
 
 import SearchLine from '../../component/searchLine'
 import DeviceSelector from '../../component/deviceSelector'
 import SchoolSelector from '../../component/schoolSelector'
-import StatusSelector from '../../component/statusSelector'
 import CONSTANTS from '../../component/constants'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../../actions'
-const subModule = 'deviceList'
 
 const typeName =CONSTANTS.DEVICETYPE
-const STATUS = {
-  1: '正常',
-  2: '待维修',
-  3: '维修中'
-}
-const statusClass = {
-  1: 'greenfc',
-  2: 'red'
-}
-const badgeClass = {
-  1: 'success',
-  2: 'error',
-  3: 'warning'
-}
 const SIZE = CONSTANTS.PAGINATION
 
 class DevicesTable extends React.Component {  
@@ -206,7 +190,7 @@ class DevicesTable extends React.Component {
   }
 
   render () {
-    const {schools,dataSource, loading, total, searchingText} = this.state
+    const {dataSource, loading, total, searchingText} = this.state
     const {page, schoolId, deviceType} = this.props
 
     return (

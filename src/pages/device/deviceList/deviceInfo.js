@@ -2,23 +2,18 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 
 import {Button} from 'antd'
-import {asyncComponent} from '../../component/asyncComponent'
 
 import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
+import Noti from '../../noti'
 
-
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../../actions'
 
-
 const typeName = CONSTANTS.DEVICETYPE
-const STATUS = CONSTANTS.DEVICESTATUS
 const REPAIRSTATUS = CONSTANTS.REPAIRSTATUS
-const WATERTYPE = CONSTANTS.WATERTYPE
 
 class DeviceInfo extends React.Component {
   constructor (props) {
@@ -39,10 +34,7 @@ class DeviceInfo extends React.Component {
           repairs: json.data.repairDevices
         })
       } else {
-        throw {
-          title: '请求出错',
-          message: json.error&&json.error.displayMessage || '请稍后重试'
-        }
+        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
       } 
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -61,20 +53,12 @@ class DeviceInfo extends React.Component {
       body = {
         id: residenceId
       }
-      const data = {
-        residenceId: residenceId,
-        deviceType: 2
-      }
-      this.fetchRepairs(data)
     } else {
       resource = '/device/query/one'
       body = {
         id: id
       }
     }
-    /*const body = {
-      id: parseInt(this.props.match.params.id.slice(1))
-    }*/
     const cb=(json)=>{
       if(json.error){
         throw new Error(json.error)
@@ -85,6 +69,15 @@ class DeviceInfo extends React.Component {
       }
     }
     AjaxHandler.ajax(resource,body,cb)
+
+    /* fetch repair logs */
+
+    const data = {
+      residenceId: residenceId,
+      deviceType: 2,
+      status: [1, 2, 3, 4, 6, 7]
+    }
+    this.fetchRepairs(data)
   }
   componentWillUnmount () {
     this.props.hide(true)
@@ -103,7 +96,7 @@ class DeviceInfo extends React.Component {
     this.props.history.push({pathname:'/order',state:{path: 'fromDevice', id: data.residenceId, deviceType: deviceType}})
   }
   render () {
-    let {data, deviceType, residenceId, repairs} = this.state
+    let {data, deviceType, repairs} = this.state
     const rateItems = deviceType === 2 && data.water && Object.keys(data.water).map((key,i) => {
       let r = data.water[key]
       return(
@@ -112,8 +105,7 @@ class DeviceInfo extends React.Component {
           </div>
       )
     })
-    let repairData = deviceType === 2 ? repairs : (data.repairs ? data.repairs : [])
-    const repairItems = repairData.map((record,index) => (
+    const repairItems = repairs && repairs.map((record,index) => (
         <div className='repairSlot' key={`div${index}`}>
           <ul key={`ul${index}`}>
             <li key={index}>
@@ -124,17 +116,17 @@ class DeviceInfo extends React.Component {
             <li key={`person${index}`}>
               <p key={`pp${index}`}>维修人员:</p>{record.status===1?'未指派':record.assignName}
             </li>
-            {record.status===5?
+            {record.status === 7 ?
               (<li key={`finish${index}`}>
                 <p key={`finishp${index}`}>维修完成时间</p>
-                {Time.getTimeStr(record.finishedTime)}
+                {Time.getTimeStr(record.finishTime)}
               </li>)
               :
             (<li key={`createtime${index}`}>
               <p key={`creatp${index}`}>用户申请时间:</p>{Time.getTimeStr(record.createTime)}
             </li>)
             }
-            {record.status===5?null:
+            {record.status === 7 ? null:
               (<li key={`waitingtime${index}`}>
                 <p key={`waitp${index}`}>用户等待时间:</p>{Time.getSpan(record.createTime)}
               </li>)
@@ -153,7 +145,7 @@ class DeviceInfo extends React.Component {
     let waterMac = data.water ? Object.keys(data.water).map((key, i) => (<span key={`water${i}`} className='waterMacItem'>{data.water[key].macAddress}</span>)) : null
     return (
       <div 
-        className={repairData&&repairData.length>0 ? 'infoBlockList deviceInfo columnLayout' : 'infoBlockList deviceInfo'}
+        className={repairs && repairs.length>0 ? 'infoBlockList deviceInfo columnLayout' : 'infoBlockList deviceInfo'}
       >
         <div className={'infoBlock'}>
           <h3>设备信息</h3>
@@ -180,7 +172,7 @@ class DeviceInfo extends React.Component {
           </ul>
         </div>
 
-        {repairData&&repairData.length>0?repairsLog:null}
+        {repairs && repairs.length>0?repairsLog:null}
 
         <div className='btnArea'>
           <Button onClick={this.back}>返回</Button>

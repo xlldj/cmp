@@ -7,8 +7,6 @@ import Noti from '../noti'
 import CONSTANTS from '../component/constants'
 import PicturesWall from '../component/picturesWall'
 
-const VALUELENGTH = '150px'
-
 class VersionInfo extends React.Component {
   constructor (props) {
     super(props)
@@ -29,7 +27,6 @@ class VersionInfo extends React.Component {
       methodError: false,
       url: '',
       urlError: false,
-      method: '',
       apkError: false,
       fileList: []
     }
@@ -38,10 +35,7 @@ class VersionInfo extends React.Component {
     let resource='/version/one'
     const cb = (json) => {
       if (json.error) {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络错误，请稍后重试'
-        }
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data) {
           this.setState(json.data)
@@ -163,25 +157,19 @@ class VersionInfo extends React.Component {
     }
     const cb = (json) => {
       if (json.error) {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络错误，请稍后重试'
-        }
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         /*--------redirect --------*/
         if (json.data) {
           Noti.hintSuccess(this.props.history,'/version')
         } else {
-          throw {
-            title: '请求出错',
-            message: json.error.displayMessage || '网络错误，请稍后重试'
-          }
+          Noti.hintServiceError(json.error.displayMessage)
         }        
       }
     }
     AjaxHandler.ajax(resource,body,cb)
   }
-  comleteEdit = () => {
+  completeEdit = () => {
     let {system, versionNo, type, method, url, content, fileList} = this.state, nextState = {}
     if (!system) {
       nextState.systemError = true
@@ -275,10 +263,7 @@ class VersionInfo extends React.Component {
     }
     const cb = (json) => {
       if (json.error) {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络错误，请稍后重试'
-        }
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         let result = json.data.result
         if (result) {
@@ -487,7 +472,7 @@ class VersionInfo extends React.Component {
         </ul>
 
         <div className='btnArea'>
-          <Popconfirm title="确定要添加么?" onConfirm={this.comleteEdit} onCancel={this.cancelPost} okText="确认" cancelText="取消">
+          <Popconfirm title="确定要添加么?" onConfirm={this.completeEdit} onCancel={this.cancelPost} okText="确认" cancelText="取消">
             <Button type='primary' >确认</Button>
           </Popconfirm>
           <Button onClick={this.cancel} >返回</Button>

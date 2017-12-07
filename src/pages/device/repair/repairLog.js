@@ -2,16 +2,13 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 
 import {Button} from 'antd'
-import {asyncComponent} from '../../component/asyncComponent'
 
 import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
+import Noti from '../../noti'
 
-const typeName = CONSTANTS.DEVICETYPE
-const STATUS = CONSTANTS.DEVICESTATUS
 const REPAIRSTATUS = CONSTANTS.REPAIRSTATUS
-const WATERTYPE = CONSTANTS.WATERTYPE
 
 class RepairLog extends React.Component {
   constructor (props) {
@@ -26,7 +23,8 @@ class RepairLog extends React.Component {
   fetchRepairs = (id) => {
     let resource = '/repair/list'
     const body = {
-      userId: id || this.state.id
+      userId: id || this.state.id,
+      status: [1, 2, 3, 4, 6, 7]
     }
     const cb = (json) => {
       if (json.data) {
@@ -34,17 +32,14 @@ class RepairLog extends React.Component {
           repairs: json.data.repairDevices
         })
       } else {
-        throw {
-          title: '请求出错',
-          message: json.error&&json.error.displayMessage || '请稍后重试'
-        }
+        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
       } 
     }
     AjaxHandler.ajax(resource, body, cb)
   }
   componentDidMount(){
     this.props.hide(false)
-    let id = parseInt(this.props.match.params.id.slice(1))
+    let id = parseInt(this.props.match.params.id.slice(1), 10)
     let username = this.props.location.state.username
     this.setState({
       id: parseInt(id, 10),
@@ -60,7 +55,7 @@ class RepairLog extends React.Component {
     this.props.history.goBack()
   }
   render () {
-    let {id, data, repairs, username} = this.state
+    let {id, repairs, username} = this.state
     const repairItems = repairs.map((record,index) => (
         <div className='repairSlot' key={`div${index}`}>
           <ul key={`ul${index}`}>
@@ -69,22 +64,23 @@ class RepairLog extends React.Component {
               <span key={`repairStatus${index}`} className='padR20'>{REPAIRSTATUS[record.status]}</span>
               <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state:'fromRepairLog'}} >查看详情</Link>
             </li>
-            {record.status !== 5 && record.status !== 8?
-            <li key={`person${index}`}>
-              <p key={`pp${index}`}>维修人员:</p>{record.status===1?'未指派':record.assignName}
-            </li>
-            : null}
-            {record.status === 7?
-              <li key={`finish${index}`}>
+            {record.status !== 1 ?
+              <li key={`person${index}`}>
+                <p key={`pp${index}`}>维修人员:</p>{record.assignName}
+              </li>
+              : null
+            }
+            {record.status === 7 ?
+              (<li key={`finish${index}`}>
                 <p key={`finishp${index}`}>维修完成时间</p>
                 {Time.getTimeStr(record.finishTime)}
-              </li>
+              </li>)
               :
               <li key={`createtime${index}`}>
                 <p key={`creatp${index}`}>用户申请时间:</p>{Time.getTimeStr(record.createTime)}
               </li>
             }
-            {record.status === 7 || record.status === 8 ? null:
+            {record.status === 7 ? null:
               (<li key={`waitingtime${index}`}>
                 <p key={`waitp${index}`}>用户等待时间:</p>{Time.getSpan(record.createTime)}
               </li>)
