@@ -35,6 +35,13 @@ const options = [{
     value: '南昌',
     label: '南昌'
   }]
+}, {
+  value: '河南',
+  label: '河南',
+  children: [{
+    value: '郑州',
+    label: '郑州'
+  }]
 }]
 
 class Loc extends React.Component {
@@ -420,7 +427,7 @@ class SchoolInfoEdit extends React.Component {
 
           <li>
             <p>所在城市：</p>
-            <Cascader value={this.state.city} disabled={id ? true : false} className={id ? 'citySelect disabled' : 'citySelect'} options={options} onChange={this.changeCity} placeholder="请选择城市" /> 
+            <Cascader value={this.state.city} className='citySelect' options={options} onChange={this.changeCity} placeholder="请选择城市" /> 
           </li>        
 
           <li className='itemsWrapper'>
