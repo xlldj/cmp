@@ -1,7 +1,6 @@
 import React from 'react'
 
 import {Button, Popconfirm} from 'antd'
-
 import AjaxHandler from '../ajax'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
 import Noti from '../noti'
