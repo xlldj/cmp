@@ -231,8 +231,8 @@ class VersionInfo extends React.Component {
     nextState.contentError = false
     nextState.contentErrorMsg = ''
     this.setState(nextState)
-    this.postInfo()
-    // this.checkExist(this.postInfo)
+    // this.postInfo()
+    this.checkExist(this.postInfo)
   }
   cancel = () => {
     this.props.history.goBack()
