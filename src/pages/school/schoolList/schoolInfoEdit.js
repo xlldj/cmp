@@ -3,7 +3,6 @@ import React from 'react'
 import AjaxHandler from '../../ajax'
 import { Map, Marker } from 'react-amap';
 import Noti from '../../noti'
-import AddPlusAbs from '../../component/addPlusAbs'
 import PicturesWall from '../../component/picturesWall'
 
 import Cascader from 'antd/lib/cascader'
@@ -41,6 +40,13 @@ const options = [{
   children: [{
     value: '郑州',
     label: '郑州'
+  }]
+}, {
+  value: '山东',
+  label: '山东',
+  children: [{
+    value: '济南',
+    label: '济南'
   }]
 }]
 
@@ -108,16 +114,6 @@ class SchoolInfoEdit extends React.Component {
       nameErrorMessage: '',
       city: ['浙江','杭州'],
       cityError: false,
-      
-      tradeAccounts: [
-        {
-          name: '',
-          type: ''
-        }
-      ],
-      accountError: false,
-      accountErrorInfo: '请核查账号！',
-      typeErrorInfo: '请选择账号类型',
 
       location: '',
       searchAddr: '',
@@ -125,23 +121,70 @@ class SchoolInfoEdit extends React.Component {
       lnglat:{longitude: 120, latitude: 30},
       fileList: [],
       id: 0,
-      initialName: 0
+      initialName: 0,
+
+      accountName: '',
+      accountNameError: false,
+      accountNameErrorMsg: '',
+
+      accountType: 1,
+
+      appId: '',
+      appIdError: false,
+      appIdErrorMsg: 'app_id不能为空！',
+
+      pid: '',
+      pidError: false,
+      pidErrorMsg: 'pid不能为空！',
+
+      appPrivateKey: '',
+      appPrivateKeyError: false,
+      appPrivateKeyErrorMsg: 'app_private_key不能为空！',
+
+      appPublicKey: '',
+      appPublicKeyError: false,
+      appPublicKeyErrorMsg: 'app_public_key不能为空！',
+
+      alipayPublicKey: '',
+      alipayPublicKeyError: false,
+      alipayPublicKeyErrorMsg: 'alipay_public_key不能为空！',
+
+      accountComplete: false,
+      accountEditing: true,
+      validateSuccess: false,
+      validateFailure: false,
+
+      checking: false,
+
+      posting: false,
+      serverResponsed: false,
+      serverReloaded: false,
+      clientResponsed: false,
+      clientReloaded: false,
+
+      initialAccount: false // when edit a school info, show the account info has not been changed
     }
   }
   fetchData = (body) => {
     let resource = '/api/school/one'
     const cb = (json) => {
       if(json.error){
-        throw new Error(json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
-        let {name,city,tradeAccounts,location,lon,lat,logo} = json.data
+        let {name,city,location,lon,lat,logo, accountName, accountType} = json.data
         let nextState = {
           name: name,
           city: city.split('-'),
-          tradeAccounts: tradeAccounts,
           location: location,
           lnglat:{longitude: lon, latitude: lat},
-          initialName: name
+          initialName: name,
+          accountName: accountName || 1,
+          accountType: accountType || 1,
+          appId: '********',
+          pid: '********',
+          appPrivateKey: '********',
+          appPublicKey: '********',
+          alipayPublicKey: '********'
         }
         if(logo){
           nextState.fileList = [
@@ -152,6 +195,9 @@ class SchoolInfoEdit extends React.Component {
             }
           ]
         }
+        nextState.accountEditing = false
+        nextState.validateSuccess = true
+        nextState.initialAccount = true
         this.setState(nextState)
       }
     }
@@ -163,7 +209,7 @@ class SchoolInfoEdit extends React.Component {
     /*----------if params.id exists, this is a edit ,else is a add----------*/
     if(this.props.match.params.id){
       let body = {
-        id: this.props.match.params.id.slice(1)
+        id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
       this.setState({
@@ -175,57 +221,182 @@ class SchoolInfoEdit extends React.Component {
     this.props.hide(true)
   }
   postInfo = () => {
-    /*--------note need tell node.js is update or add,we can judge it from props.selectedSchoolId---------*/
-    let url = '/api/school/save'
-    const tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts))
-    const {location} = this.state
+    let {id, name,  city, lnglat, location, accountName, accountType, posting, 
+      appId, pid, appPrivateKey, appPublicKey, alipayPublicKey
+    } = this.state
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
+
+    let url = '/school/save'
     const body = {
-      tradeAccounts: tradeAccounts,
-      city: this.state.city.join('-'),
-      lat: this.state.lnglat.latitude,
-      lon: this.state.lnglat.longitude,
-      name: this.state.name,
-      location: location
+      name: name,
+      city: city.join('-'),
+      lat: lnglat.latitude,
+      lon: lnglat.longitude,
+      location: location,
+      accountName: accountName,
+      accountType: accountType,
+      appId: appId,
+      pid: pid,
+      appPrivateKey: appPrivateKey,
+      appPublicKey: appPublicKey,
+      alipayPublicKey: alipayPublicKey
     }
     if(this.state.fileList.length>0 && this.state.fileList[0].url){
       body.logo = this.state.fileList[0].url.replace(FILEADDR, '')
     }
-    if(this.state.id){
-      body.id = parseInt(this.state.id, 10)
+    if (id) {
+      body.id = parseInt(id, 10)
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            Noti.hintSuccess(this.props.history,'/school')
-          }          
+      if (json.error) {
+        Noti.hintServiceError(json.error.displayMessage)
+        this.setState({
+          posting: false
+        })
+      } else {
+        /* tell server to reload account */
+        if(json.data){
+          // Noti.hintSuccess(this.props.history,'/school')
+          this.tellServerReload()
+          this.tellClientReload()
+        } else {
+          Noti.hintServiceError()
+          this.setState({
+            posting: false
+          })
         }
+      }
     }
     AjaxHandler.ajax(url, body, cb)   
   }
 
+  clearReloadStatus = () => {
+    this.setState({
+      posting: false,
+      serverResponsed: false,
+      serverReloaded: false,
+      clientResponsed: false,
+      clientReloaded: false
+    })
+  }
+
+  tellServerReload = () => {
+    let resource = '/alipay/trade/client/reload'
+    const body = null
+    const cb = (json) => {
+      const nextState = {
+        serverResponsed: true
+      }
+      let {clientResponsed, clientReloaded} = this.state
+      if (json.data.result) {
+        nextState.serverReloaded = true
+        if (clientResponsed) {
+          nextState.posting = false
+          if (clientReloaded) {
+            this.hintSuccess()
+          } else {
+            this.clearReloadStatus()
+            Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
+          }
+        }
+      } else {
+        if (clientResponsed) {
+          this.clearReloadStatus()
+          Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
+        }
+      }
+      this.setState(nextState)
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
+
+  tellClientReload = () => {
+    let resource = '/alipay/trade/client/reload'
+    const body = null
+    const cb = (json) => {
+      const nextState = {
+        clientResponsed: true
+      }
+      let {serverResponsed, serverReloaded} = this.state
+      if (json.data.result) {
+        nextState.clientReloaded = true
+        if (serverResponsed) {
+          if (serverReloaded) {
+            this.hintSuccess()
+          } else {
+            this.clearReloadStatus()
+            Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
+          }
+        }
+      } else {
+        if (serverResponsed) {
+            this.clearReloadStatus()
+            Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
+        }
+      }
+      this.setState(nextState)
+    }
+    AjaxHandler.ajaxClient(resource, body, cb)
+  }
+  hintSuccess = () => {
+    this.clearReloadStatus()
+    Noti.hintSuccess(this.props.history,'/school')
+  }
+
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
-    let {id, name, initialName} = this.state, tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts)), nextState = {}
+    let {id, name, initialName, city, location, accountName, appId, pid, appPrivateKey, appPublicKey, alipayPublicKey, validateSuccess} = this.state, nextState = {}
     if(!name){
       nextState.nameError = true
       nextState.nameErrorMessage = '学校名字不能为空'
       return this.setState(nextState)
     }
-    for (let i=0;i<tradeAccounts.length;i++) {
-      let {name, type} = tradeAccounts[i]
-      if (!name) {
-        tradeAccounts[i].accountError = true
-        nextState.tradeAccounts = tradeAccounts
-        return this.setState(nextState)
-      }
-      if (!type) {
-        tradeAccounts[i].typeError = true
-        nextState.tradeAccounts = tradeAccounts
-        return this.setState(nextState)
-      }
+    if (!city) {
+      nextState.cityError = true
+      return this.setState(nextState)
+    }
+    if (!location) {
+      nextState.locationError = true
+      return this.setState(nextState)
+    }
+    if (!accountName) {
+      nextState.accountNameError = true
+      nextState.accountNameErrorMsg = '学校账号不能为空'
+      return this.setState(nextState)
+    }
+    if (!appId) {
+      nextState.appIdError = true
+      nextState.appIdErrorMsg = 'app_id不能为空！'
+      return this.setState(nextState)
+    }
+    if (!pid) {
+      nextState.pidError = true
+      nextState.pidErrorMsg = 'pid不能为空！'
+      return this.setState(nextState)
+    }
+    if (!appPrivateKey) {
+      nextState.appPrivateKeyError = true
+      nextState.appPrivateKeyErrorMsg = 'app_private_key不能为空！'
+      return this.setState(nextState)
+    }
+    if (!appPublicKey) {
+      nextState.appPublicKeyError = true
+      nextState.appPublicKeyErrorMsg = 'app_public_key不能为空！'
+      return this.setState(nextState)
+    }
+    if (!alipayPublicKey) {
+      nextState.alipayPublicKeyError = true
+      nextState.alipayPublicKeyErrorMsg = 'alipay_public_key不能为空！'
+      return this.setState(nextState)
+    }
+    /* 验证未通过，不予处理 */
+    if (!validateSuccess) {
+      return Noti.hintWarning('', '请先验证收款账号再提交！')
     }
 
     if (id && initialName === name ) {
@@ -266,7 +437,6 @@ class SchoolInfoEdit extends React.Component {
       name: this.state.name
     }
     const cb = (json) => {
-      console.log(json)
         if(json.error){
           throw new Error(json.error.displayMessage || json.error)
         }else{
@@ -290,40 +460,6 @@ class SchoolInfoEdit extends React.Component {
         }
     }
     AjaxHandler.ajax(url, body, cb)  
-  }
-  changeAccount = (e,index) => {
-    const tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts))
-    tradeAccounts[index].name = e.target.value
-    this.setState({
-      tradeAccounts: tradeAccounts
-    })
-  }
-  checkAccount = (e,index) => {
-    let v= e.target.value.trim(), tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts))
-    let account = tradeAccounts[index]
-    account.name = v
-    if(!v){
-      account.accountError = true
-      return this.setState({
-        tradeAccounts: tradeAccounts
-      })
-    }
-    if(account.accountError){
-      account.accountError = false
-    }
-    this.setState({
-      tradeAccounts: tradeAccounts
-    })
-  }
-  changeType = (e,index) => {
-    const tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts))
-    tradeAccounts[index].type = parseInt(e.target.value, 10)
-    let nextState = {}
-    nextState.tradeAccounts = tradeAccounts
-    if (tradeAccounts[index].typeError) {
-      tradeAccounts[index].typeError = false
-    }
-    this.setState(nextState)
   }
   setLocation = (e) => {
     this.setState({
@@ -382,33 +518,329 @@ class SchoolInfoEdit extends React.Component {
       fileList: JSON.parse(JSON.stringify(fileList))
     })
   }
-  render () {
-    const {id, tradeAccounts, fileList, accountErrorInfo, typeErrorInfo} = this.state
-
-    const accountItems = tradeAccounts&&tradeAccounts.map((record,index)=>{
-      return (
-        <div key={index}>
-          <input 
-            key={`input${index}`} 
-            onChange={(e)=>{this.changeAccount(e,index)}} 
-            onBlur={(e)=>{this.checkAccount(e,index)}} 
-            value={record.name}
-            className='longInput'
-          />
-          <RadioGroup 
-            key={`radio${index}`} 
-            onChange={(e)=>{this.changeType(e,index)}} 
-            value={record.type} 
-            className='accountType'
-          >
-            <Radio value={1}>支付宝</Radio>
-            <Radio value={2}>微信</Radio>
-          </RadioGroup> 
-          {record.accountError?(<span className='checkInvalid'>{accountErrorInfo}</span>):null}
-          {record.typeError?(<span className='checkInvalid'>{typeErrorInfo}</span>):null}
-        </div>
-      )
+  changeAccount = (e) => {
+    this.setState({
+      accountName: e.target.value
     })
+    let state = {
+      accountName: e.target.value
+    }
+    if (this.checkAccountComplete(state)) {
+      this.setState({
+        accountComplete: true
+      })
+    } else if (this.state.accountComplete) {
+      this.setState({
+        accountComplete: false
+      })
+    }
+    if (this.state.validateFailure) {
+      this.setState({
+        validateFailure: false
+      })
+    }
+  }
+  checkAccount = (e) => {
+    let v = e.target.value
+    if (!v) {
+      return this.setState({
+        accountNameError: true,
+        accountName: v,
+        accountNameErrorMsg: '学校账号不能为空'
+      })
+    }
+
+    let {accountNameError} = this.state
+    const nextState = {
+      accountName: v,
+      accountNameErrorMsg: ''
+    }
+    if (accountNameError) {
+      nextState.accountNameError = false
+    }
+    this.setState(nextState)
+  }
+  checkAccountComplete = (state) => {
+    let {accountName, pid, appId, appPrivateKey, appPublicKey, alipayPublicKey} = {...this.state, ...state}
+    if (accountName && pid && appId && appPrivateKey && appPublicKey && alipayPublicKey) {
+      return true
+    } else {
+      return false
+    }
+  }
+  changeAppId = (e) => {
+    this.setState({
+      appId: e.target.value
+    })
+    let state = {
+      appId: e.target.value
+    }
+    if (this.checkAccountComplete(state)) {
+      this.setState({
+        accountComplete: true
+      })
+    } else if (this.state.accountComplete) {
+      this.setState({
+        accountComplete: false
+      })
+    }
+    if (this.state.validateFailure) {
+      this.setState({
+        validateFailure: false
+      })
+    }
+  }
+  checkAppId = (e) => {
+    let v = e.target.value
+    if (!v) {
+      return this.setState({
+        appIdError: true,
+        appId: v,
+        appIdErrorMsg: 'appId不能为空'
+      })
+    }
+    let {appIdError} = this.state
+    const nextState = {
+      appId: v,
+      appIdErrorMsg: ''
+    }
+    if (appIdError) {
+      nextState.appIdError = false
+    }
+    this.setState(nextState)
+  }
+  changePid = (e) => {
+    this.setState({
+      pid: e.target.value
+    })
+    let state = {
+      pid: e.target.value
+    }
+    if (this.checkAccountComplete(state)) {
+      this.setState({
+        accountComplete: true
+      })
+    } else if (this.state.accountComplete) {
+      this.setState({
+        accountComplete: false
+      })
+    }
+    if (this.state.validateFailure) {
+      this.setState({
+        validateFailure: false
+      })
+    }
+  }
+  checkPid = (e) => {
+    let v = e.target.value
+    if (!v) {
+      return this.setState({
+        pidError: true,
+        pid: v,
+        pidErrorMsg: 'pid不能为空'
+      })
+    }
+    let {pidError} = this.state
+    const nextState = {
+      pid: v,
+      pidErrorMsg: ''
+    }
+    if (pidError) {
+      nextState.pidError = false
+    }
+    this.setState(nextState)
+  }
+  changePrivateKey = (e) => {
+    this.setState({
+      appPrivateKey: e.target.value
+    })
+    let state = {
+      appPrivateKey: e.target.value
+    }
+    if (this.checkAccountComplete(state)) {
+      this.setState({
+        accountComplete: true
+      })
+    } else if (this.state.accountComplete) {
+      this.setState({
+        accountComplete: false
+      })
+    }
+    if (this.state.validateFailure) {
+      this.setState({
+        validateFailure: false
+      })
+    }
+  }
+  checkPrivateKey = (e) => {
+    let v = e.target.value
+    if (!v) {
+      return this.setState({
+        appPrivateKeyError: true,
+        appPrivateKey: v,
+        appPrivateKeyErrorMsg: 'app_private_key不能为空'
+      })
+    }
+    let {appPrivateKeyError} = this.state
+    const nextState = {
+      appPrivateKey: v,
+      appPrivateKeyErrorMsg: ''
+    }
+    if (appPrivateKeyError) {
+      nextState.appPrivateKeyError = false
+    }
+    this.setState(nextState)
+  }
+  changePublicKey = (e) => {
+    this.setState({
+      appPublicKey: e.target.value
+    })
+    let state = {
+      appPublicKey: e.target.value
+    }
+    if (this.checkAccountComplete(state)) {
+      this.setState({
+        accountComplete: true
+      })
+    } else if (this.state.accountComplete) {
+      this.setState({
+        accountComplete: false
+      })
+    }
+    if (this.state.validateFailure) {
+      this.setState({
+        validateFailure: false
+      })
+    }
+  }
+  checkPublicKey = (e) => {
+    let v = e.target.value
+    if (!v) {
+      return this.setState({
+        appPublicKeyError: true,
+        appPublicKey: v,
+        appPublicKeyErrorMsg: 'app_public_key不能为空'
+      })
+    }
+    let {appPublicKeyError} = this.state
+    const nextState = {
+      appPublicKey: v,
+      appPublicKeyErrorMsg: ''
+    }
+    if (appPublicKeyError) {
+      nextState.appPublicKeyError = false
+    }
+    this.setState(nextState)
+  }
+  changeAlipayPublicKey = (e) => {
+    this.setState({
+      alipayPublicKey: e.target.value
+    })
+    let state = {
+      alipayPublicKey: e.target.value
+    }
+    if (this.checkAccountComplete(state)) {
+      this.setState({
+        accountComplete: true
+      })
+    } else if (this.state.accountComplete) {
+      this.setState({
+        accountComplete: false
+      })
+    }
+    if (this.state.validateFailure) {
+      this.setState({
+        validateFailure: false
+      })
+    }
+  }
+  checkAlipayPublicKey = (e) => {
+    let v = e.target.value
+    if (!v) {
+      return this.setState({
+        alipayPublicKeyError: true,
+        alipayPublicKey: v,
+        alipayPublicKeyMsg: 'alipay_public_key不能为空'
+      })
+    }
+    let {alipayPublicKeyError} = this.state
+    const nextState = {
+      alipayPublicKey: v,
+      alipayPublicKeyErrorMsg: ''
+    }
+    if (alipayPublicKeyError) {
+      nextState.alipayPublicKeyError = false
+    }
+    this.setState(nextState)
+  }
+  
+  validateAccount = () => {
+    let {accountEditing, accountComplete, appId, pid, appPrivateKey, appPublicKey, alipayPublicKey, checking} = this.state
+    if (!accountComplete || !accountEditing || checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
+
+    let resource = '/alipay/trade/verification'
+    const body = {
+      appId: appId,
+      pid: pid,
+      appPrivateKey: appPrivateKey,
+      appPublicKey: appPublicKey,
+      alipayPublicKey: alipayPublicKey
+    }
+    const cb = (json) => {
+      const nextState = {
+        checking: false
+      }
+      if (json.error) {
+        Noti.hintServiceError(json.error.displayMessage)
+      } else if (json.data) {
+        if (json.data.result) {
+          nextState.validateSuccess = true
+          nextState.accountEditing = false
+        } else {
+          nextState.validateFailure = true
+        }
+      }
+      this.setState(nextState)
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
+  editAccount = () => {
+    /* 置位validateSuccess, validateFailure, accountComplete, accountEditing, 以及账户相关信息 */
+    const nextState = {
+      accountEditing: true,
+      validateSuccess: false,
+      validateFailure: false,
+      accountComplete: false,
+      accountName: '',
+      pid: '',
+      appId: '',
+      appPrivateKey: '',
+      appPublicKey: '',
+      alipayPublicKey: ''
+    }
+    if (this.state.initialAccount) {
+      nextState.initialAccount = false
+    }
+    this.setState(nextState)
+  }
+  render () {
+    const {id, name, nameError, nameErrorMessage, fileList, city, cityError, location, locationError, searchAddr, lnglat,
+      accountName, accountNameError, accountNameErrorMsg, 
+      accountType, 
+      appId, appIdError, appIdErrorMsg,
+      pid, pidError, pidErrorMsg,
+      appPrivateKey, appPrivateKeyError, appPrivateKeyErrorMsg,
+      appPublicKey, appPublicKeyError, appPublicKeyErrorMsg,
+      alipayPublicKey, alipayPublicKeyError, alipayPublicKeyErrorMsg,
+      accountComplete, accountEditing, validateSuccess, validateFailure,
+      initialAccount
+   } = this.state
+
 
     return (
       <div className='infoList schoolInfoEdit'>
@@ -421,23 +853,16 @@ class SchoolInfoEdit extends React.Component {
           </li>
           <li>
             <p>学校名称：</p>
-            <input pattern={/\S+/} onChange={this.changeName} disabled={id ? true : false} className={id ? 'disabled' : ''} id='name' name='name' value={this.state.name} onBlur={this.checkName} />
-            {this.state.nameError?(<span className='checkInvalid'>{this.state.nameErrorMessage}</span>):null}
+            <input pattern={/\S+/} onChange={this.changeName} disabled={id ? true : false} className={id ? 'disabled' : ''} id='name' name='name' value={name} onBlur={this.checkName} />
+            {nameError?(<span className='checkInvalid'>{nameErrorMessage}</span>):null}
           </li>
 
           <li>
             <p>所在城市：</p>
-            <Cascader value={this.state.city} className='citySelect' options={options} onChange={this.changeCity} placeholder="请选择城市" /> 
+            <Cascader value={city} allowClear={false} className='citySelect' options={options} onChange={this.changeCity} placeholder="请选择城市" /> 
+            {cityError ? <span className='checkInvalid'>请选择所在城市</span> : null}
           </li>        
 
-          <li className='itemsWrapper'>
-            <p>收款账号：</p>
-            <div>
-              {accountItems}
-              {this.state.accountError?(<span className='checkInvalid'>{this.state.accountErrorInfo}</span>):null}
-              <AddPlusAbs count={tradeAccounts.length||1} add={this.add} abstract={this.abstract} />
-            </div>
-          </li>
           <li>
             <p>学校位置：</p>
             <input 
@@ -446,14 +871,118 @@ class SchoolInfoEdit extends React.Component {
               onChange={this.setLocation} 
               onBlur={this.checkLocation} 
               name='location' 
-              value={this.state.location} 
+              value={location} 
             />
             <Button type='primary' className='confirmSearch' onClick={this.changeLoc} >确认</Button>
+            {locationError ? <span className='checkInvalid'>学校位置不能为空</span> : null}
           </li>    
           <li className='imgWrapper'>
             <p></p>
-            <Loc setLngLat={this.setLngLat} searchAddr={this.state.searchAddr} lnglat={this.state.lnglat} />
+            <Loc setLngLat={this.setLngLat} searchAddr={searchAddr} lnglat={lnglat} />
           </li>
+
+          
+          <li>
+            <p>收款账号:</p>
+            <input 
+              disabled={accountEditing ? false : true}
+              className={accountEditing ? 'longInput' : 'longInput disabled'}
+              onChange={this.changeAccount} 
+              onBlur={this.checkAccount} 
+              value={accountName}
+            />
+            <RadioGroup 
+              value={accountType} 
+              className='accountType'
+            >
+              <Radio value={1}>支付宝</Radio>
+            </RadioGroup> 
+            {accountNameError?(<span className='checkInvalid'>{accountNameErrorMsg}</span>):null}
+          </li>
+
+          {
+            accountType === 1 ?
+              <li>
+                <p>app_id:</p>
+                <input
+                  disabled={accountEditing ? false : true}
+                  onChange={this.changeAppId} 
+                  onBlur={this.checkAppId} 
+                  value={appId}
+                  className={accountEditing ? 'longInput' : 'longInput disabled'}
+                />
+                {appIdError?(<span className='checkInvalid' >{appIdErrorMsg}</span>):null}
+              </li>
+            : null
+          }
+          {
+            accountType === 1 ?
+              <li>
+                <p>pid:</p>
+                <input 
+                  onChange={this.changePid} 
+                  onBlur={this.checkPid} 
+                  value={pid}
+                  disabled={accountEditing ? false : true}
+                  className={accountEditing ? 'longInput' : 'longInput disabled'}
+                />
+                {pidError?(<span className='checkInvalid'>{pidErrorMsg}</span>):null}
+              </li>
+            : null
+          }
+          {
+            accountType === 1 ?
+              <li >
+                <p >app_private_key:</p>
+                <input 
+                  onChange={this.changePrivateKey} 
+                  onBlur={this.checkPrivateKey} 
+                  value={appPrivateKey}
+                  disabled={accountEditing ? false : true}
+                  className={accountEditing ? 'longInput' : 'longInput disabled'}
+                />
+                {appPrivateKeyError ? (<span className='checkInvalid' >{appPrivateKeyErrorMsg}</span>) : null}
+              </li>
+            : null
+          }
+          {
+            accountType === 1 ?
+              <li>
+                <p >app_public_key:</p>
+                <input 
+                  onChange={this.changePublicKey} 
+                  onBlur={this.checkPublicKey} 
+                  value={appPublicKey}
+                  disabled={accountEditing ? false : true}
+                  className={accountEditing ? 'longInput' : 'longInput disabled'}
+                />
+                {appPublicKeyError? (<span className='checkInvalid'>{appPublicKeyErrorMsg}</span>) : null}
+              </li>
+            : null
+          }
+          {
+            accountType === 1 ?
+              <li >
+                <p >alipay_public_key:</p>
+                <input 
+                  onChange={this.changeAlipayPublicKey} 
+                  onBlur={this.checkAlipayPublicKey} 
+                  value={alipayPublicKey}
+                  disabled={accountEditing ? false : true}
+                  className={accountEditing ? 'longInput' : 'longInput disabled'}
+                />
+                {alipayPublicKeyError ? (<span className='checkInvalid' >{alipayPublicKeyErrorMsg}</span>) : null}
+              </li>
+            : null
+          }
+          <li>
+            <p></p>
+              <Button type='primary' className={accountComplete && accountEditing ? '' : 'disabled'} onClick={this.validateAccount}>验证支付宝账号</Button>
+              <Button type='primary' className={validateSuccess ? '' : 'disabled'} onClick={this.editAccount} >编辑支付宝账号</Button>
+              {validateSuccess && !initialAccount ? <span className='checkInvalid'>验证通过，该支付宝账号可用</span> : null}
+              {validateFailure ? <span className='checkInvalid'>验证失败，该支付宝账号不可用</span> : null}
+          </li>
+
         </ul>
 
         <div className='btnArea'>

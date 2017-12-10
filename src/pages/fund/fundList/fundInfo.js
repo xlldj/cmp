@@ -120,10 +120,11 @@ class FundInfo extends React.Component {
         reasonError: true
       })
     }
-    this.setState({
-      reasonError: false,
-      showCensor: false
-    })
+    if (this.state.reasonError) {
+      this.setState({
+        reasonError: false
+      })
+    }
     const censor = {
       pass: 2,
       reason: this.state.failedReason
@@ -131,6 +132,9 @@ class FundInfo extends React.Component {
     this.postCensor(censor)
   }
   postCensor = (censor) => {
+    if (this.state.posting) {
+      return
+    }
     this.setState({
       posting: true
     })
@@ -153,6 +157,9 @@ class FundInfo extends React.Component {
         this.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
+          if (this.state.showCensor) {
+            nextState.showCensor = false
+          }
           const body = {
             id: id
           }

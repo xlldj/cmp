@@ -30,7 +30,8 @@ class AbnormalOrder extends React.Component {
       dataSource: dataSource,
       searchingText: '',
       loading: false,
-      total: 0
+      total: 0,
+      settling: false
     }
     this.columns = [{
       title: '账单类型',
@@ -74,23 +75,38 @@ class AbnormalOrder extends React.Component {
         let title = `确定要为用户(${record.mobile})账户${operation}${record.amount}元么？`
         return (
           <div className='editable-row-operations lastCol operationCol'>
-            <Popconfirm title={title} onConfirm={(e) => {this.settleAmount(e,record.id, record.operationType)}} okText="确认" cancelText="取消">
-              <a href="">{operation}余额</a>
-            </Popconfirm>
+            {
+                this.state.settling ?
+                 <a href=''>{operation}余额</a>
+                :
+                <Popconfirm title={title} onConfirm={(e) => {this.settleAmount(e,record.id, record.operationType)}} okText="确认" cancelText="取消">
+                <a href="">{operation}余额</a>
+                </Popconfirm>
+            }
           </div>
         )
       }
     }]
   }
   settleAmount = (e, id, type) => {
+    if (this.state.settling) {
+      return
+    }
+    this.setState({
+      settling: true
+    })
+
     let resource = '/funds/abnormal/settle'
     const body = {
       fundsId: id,
       type: type
     }
     const cb = (json) => {
+      this.setState({
+          settling: false
+      })
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error.message)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           const body = {

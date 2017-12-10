@@ -19,7 +19,9 @@ class LostInfo extends React.Component {
       showImgs: false,
       initialSlide: 0,
       showDefriendDate: false,
-      defriendError: false
+      defriendError: false,
+      defriending: false,
+      blocking: false
     }
   }
   fetchData = (body) => {
@@ -66,11 +68,20 @@ class LostInfo extends React.Component {
     })
   }
   blockMessage = () => {
+    if (this.state.blocking) {
+      return
+    }
+    this.setState({
+      blocking: true
+    })
     let resource = '/lost/delete'
     const body = {
       id: this.state.data.id
     }
     const cb = (json) => {
+      this.setState({
+        blocking: false
+      })
       if (json.data) {
         if (json.data.result) {
           Noti.hintSuccess(this.props.history, '/lost')
@@ -78,10 +89,7 @@ class LostInfo extends React.Component {
           Noti.hintLock('操作失败', json.data.failReason)
         }
       } else {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络请求出错'
-        }
+        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -97,35 +105,41 @@ class LostInfo extends React.Component {
     })
   }
   postLevel = () => {
-    let {defriendLevel, data} = this.state
+    let {defriendLevel, data, defriending} = this.state
+    if (defriending) {
+      return
+    }
     if (!defriendLevel) {
       return this.setState({
         defriendError: true
       })
     }
+
+    this.setState({
+      defriending: true
+    })
     let resource = '/lost/defriend'
     const body = {
       id: data.id,
       userId: data.userId,
-      level: parseInt(defriendLevel)
+      level: parseInt(defriendLevel, 10)
     }
     const cb = (json) => {
+      const nextState = {
+        defriending: false
+      }
       if (json.data) {
         if (json.data.result) {
           Noti.hintOk('操作成功', '该用户已被拉入黑名单')
-          this.setState({
-            showDefriendDate: false,
-            level: ''
-          })
+          nextState.showDefriendDate = false
+          nextState.level = ''
         } else {
-          Noti.hintLock('操作失败', json.data.failReason || '请求出错,请联系客服或相关人员')
+          Noti.hintWaring('操作失败', json.data.failReason || '请求出错,请联系客服或相关人员')
         }
       } else {
-        throw {
-          title: '请求失败',
-          message: json.error.displayMessage || '网络请求出错'
-        }
+        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -136,16 +150,16 @@ class LostInfo extends React.Component {
     })
   }
   render () {
-    let {data, showImgs, initialSlide, showDefriendDate, defriendLevel, defriendError} = this.state
+    let {data, showImgs, initialSlide, showDefriendDate, defriendLevel, defriendError, blocking} = this.state
 
     let createTimeStr = Time.getTimeStr(data.createTime), lostStr = Time.getTimeStr(data.lostTime)
 
     const imgs = (data.images&&data.images.length>0)&&(data.images.map((s,i)=>(
-      <img key={i} src={CONSTANTS.FILEADDR + s} className='thumbnail' onClick={(e)=>{this.showImgs(e,i)}} />
+      <img alt='' key={i} src={CONSTANTS.FILEADDR + s} className='thumbnail' onClick={(e)=>{this.showImgs(e,i)}} />
     )))
 
     const carouselItems = (data.images&&data.images.length>0)&&(data.images.map((r,i) => {
-      return <img key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
+      return <img alt='' key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
     }))
     const carousel = (
       <Carousel dots={true} accessibility={true}  className='carouselItem' autoplay={true} arrows={true} initialSlide={initialSlide} >
@@ -162,7 +176,7 @@ class LostInfo extends React.Component {
             {data.user}
             <div className='defriendWrapper'>
               <Popconfirm title="确定要拉入黑名单么?" onConfirm={this.defriend} okText="确认" cancelText="取消">
-                <a href='#'>拉入黑名单</a>
+                <a href=''>拉入黑名单</a>
               </Popconfirm>
               {showDefriendDate ?
                 <span className='selectWrapper'>
@@ -202,9 +216,13 @@ class LostInfo extends React.Component {
           <li><p>发布时间:</p>{createTimeStr}</li>
         </ul>
         <div className='btnArea'>
-          <Popconfirm title="确定要屏蔽显示么?" onConfirm={this.blockMessage} okText="确认" cancelText="取消">
+          { blocking ? 
             <Button type='primary'>屏蔽显示</Button>
-          </Popconfirm>
+            :
+            <Popconfirm title="确定要屏蔽显示么?" onConfirm={this.blockMessage} okText="确认" cancelText="取消">
+              <Button type='primary'>屏蔽显示</Button>
+            </Popconfirm>
+          }
           <Button onClick={this.back}>返回</Button>
         </div>
 

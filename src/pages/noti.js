@@ -26,6 +26,13 @@ Noti.hintLock = (message, description) => {
     duration: 2
   })
 }
+Noti.hintWarning = (message, description) => {
+  notification['warning']({
+    message: message || '操作出错',
+    description: description,
+    duration: 2
+  })
+}
 /* 通用网络错误 */
 Noti.hintNetworkError = (description) => {
   notification['error']({

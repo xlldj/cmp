@@ -29,7 +29,10 @@ class UserInfo extends React.Component {
       data: {},
       addingName: '',
       empty: false,
-      visible: false
+      visible: false,
+      cancelDefriending: false,
+      messagePosting: false,
+      reseting: false
     }
   }
   componentDidMount(){
@@ -90,6 +93,12 @@ class UserInfo extends React.Component {
         empty: true
       })
     }
+    if (this.state.messagePosting) {
+      return
+    }
+    this.setState({
+      messagePosting: true
+    })
     let resource = '/api/notify/add', mobile = this.state.data.mobile
     const body = {
       content: this.state.addingName,
@@ -97,27 +106,38 @@ class UserInfo extends React.Component {
       mobiles: [mobile]
     }
     const cb = (json) => {
+      const nextState = {
+        messagePosting: false
+      }
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.id) {
           Noti.hintSuccessWithoutSkip('发送成功')
-          this.setState({
-            visible: false
-          })
+          nextState.visible = false
         } else {
-          throw new Error('数据出错')
+          Noti.hintWarning('数据出错')
         }
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
   resetPwd = () => {
+    if (this.state.reseting) {
+      return
+    }
+    this.setState({
+      reseting: true
+    })
     let resource = '/user/password/reset'
     const body = {
       id: this.state.data.id
     }
     const cb = (json) => {
+      this.setState({
+        reseting: false
+      })
       if (json.data) {
         Noti.hintOk('操作成功', '该用户密码已被重置为手机号末6位！')
       } else {
@@ -127,11 +147,20 @@ class UserInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   cancelDefriend = () => {
+    if (this.state.cancelDefriending) {
+      return
+    }
+    this.setState({
+      cancelDefriending: true
+    })
     let resource = '/lost/defriend/cancel'
     const body = {
       userId: this.state.data.id
     }
     const cb = (json) => {
+      this.setState({
+        cancelDefriending: false
+      })
       if (json.data) {
         if (json.data.result) {
           Noti.hintOk('操作成功', '该用户已被取消拉黑！')
@@ -166,7 +195,7 @@ class UserInfo extends React.Component {
     this.props.history.push({pathname:'/fund/list',state:{path: 'fromUser', mobile: mobile}})
   }
   render () {
-    let data = this.state.data
+    let {data, cancelDefriending, reseting} = this.state
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
     return (
       <div className='infoList'>
@@ -189,17 +218,25 @@ class UserInfo extends React.Component {
           <li><p>充值提现记录:</p><a onClick={this.toFundOfUser}>查看详情</a></li>
           <li>
             <p>重置密码:</p>
-            <Popconfirm title="确定要重置么?" onConfirm={this.resetPwd} okText="确认" cancelText="取消">
-              <a href="">重置</a>
-            </Popconfirm>
+            { reseting ?
+              <a href=''>重置</a>
+              :
+              <Popconfirm title="确定要重置么?" onConfirm={this.resetPwd} okText="确认" cancelText="取消">
+                <a href="">重置</a>
+              </Popconfirm>
+            }
           </li> 
           {data.blacklistInfo ?
             <li>
               <p></p>
               <span style={{marginRight: '20px'}}>{data.blacklistInfo}</span>
-              <Popconfirm title="确定要取消拉黑么?" onConfirm={this.cancelDefriend} okText="确认" cancelText="取消">
-                <a href="">取消拉黑</a>
-              </Popconfirm>
+              { cancelDefriending ?
+                <a href=''>取消拉黑</a>
+                : 
+                <Popconfirm title="确定要取消拉黑么?" onConfirm={this.cancelDefriend} okText="确认" cancelText="取消">
+                  <a href="">取消拉黑</a>
+                </Popconfirm>
+              }
             </li>
             : null
           }

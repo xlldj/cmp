@@ -76,6 +76,12 @@ class VersionInfo extends React.Component {
         if (i < 9) {
           r = i + 1
           current[index] = r
+          // if not the last number change, all later numbers clear to 0
+          if (index > 0) {
+            for (let j=0;j<index;j++) {
+              current[j] = 0
+            }
+          }
           over = true
         }
       }
@@ -136,7 +142,13 @@ class VersionInfo extends React.Component {
     this.props.hide(true)
   }
   postInfo = () => {
-    let {system, versionNo, type, method, url, content, id, fileList} = this.state
+    let {system, versionNo, type, method, url, content, id, fileList, posting} = this.state
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
     const body = {
       system: system,
       versionNo: versionNo,
@@ -156,6 +168,9 @@ class VersionInfo extends React.Component {
       resource = '/version/add'
     }
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
       } else {
@@ -170,7 +185,7 @@ class VersionInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   completeEdit = () => {
-    let {system, versionNo, type, method, url, content, fileList} = this.state, nextState = {}
+    let {system, versionNo, type, method, url, content, fileList, checking, posting} = this.state, nextState = {}
     if (!system) {
       nextState.systemError = true
       return this.setState(nextState)
@@ -219,6 +234,9 @@ class VersionInfo extends React.Component {
     nextState.contentError = false
     nextState.contentErrorMsg = ''
     this.setState(nextState)
+    if (checking || posting) {
+      return
+    }
     // this.postInfo()
     this.checkExist(this.postInfo)
   }
@@ -252,30 +270,38 @@ class VersionInfo extends React.Component {
     this.checkExist(null)
   }
   checkExist = (callback) => {
-    let {versionNo, id, originalVersion} = this.state
+    let {versionNo, id, originalVersion, checking} = this.state
     if (id && versionNo.trim() === originalVersion) {
       callback && callback()
       return
     }
+    if (checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let resource = '/version/check'
     const body = {
       versionNo: versionNo.trim() 
     }
     const cb = (json) => {
+      const nextState = {
+        checking: false
+      }
       if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
       } else {
         let result = json.data.result
         if (result) {
           Noti.hintLock('添加出错', '该版本号已存在于系统中，请勿重复添加')
-          this.setState({
-            codeError: true,
-            codeErrorMsg: '该版本号已存在于系统中，请勿重复添加'
-          })
+          nextState.codeError = true
+          nextState.codeErrorMsg = '该版本号已存在于系统中，请勿重复添加'
         } else {
           callback && callback()
         }
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -392,7 +418,7 @@ class VersionInfo extends React.Component {
     let {id, type, typeError, versionNo, codeError, codeErrorMsg, 
       content, contentError, contentErrorMsg,
       system, systemError, method, methodError,
-      url, urlError, apkError, fileList
+      url, urlError, apkError, fileList, posting
     } = this.state
 
     return (
@@ -403,6 +429,7 @@ class VersionInfo extends React.Component {
             <BasicSelectorWithoutAll
               width={'140px'}
               disabled={id} 
+              className={id ? 'disabled' : ''}
               staticOpts={CONSTANTS.SYSTEMS}  
               selectedOpt={system.toString()} 
               changeOpt={this.changeSystem}
@@ -472,9 +499,13 @@ class VersionInfo extends React.Component {
         </ul>
 
         <div className='btnArea'>
-          <Popconfirm title="确定要添加么?" onConfirm={this.completeEdit} onCancel={this.cancelPost} okText="确认" cancelText="取消">
-            <Button type='primary' >确认</Button>
-          </Popconfirm>
+          { posting ?
+            <Button type='primary'>确认</Button>
+            : 
+            <Popconfirm title="确定要添加么?" onConfirm={this.completeEdit} onCancel={this.cancelPost} okText="确认" cancelText="取消">
+              <Button type='primary' >确认</Button>
+            </Popconfirm>
+          }
           <Button onClick={this.cancel} >返回</Button>
         </div>
       </div>

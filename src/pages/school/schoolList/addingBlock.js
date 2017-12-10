@@ -1,6 +1,6 @@
 import React from 'react'
 
-import {Button, Popconfirm, notification, Tag} from 'antd'
+import {Button, Popconfirm, Tag} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
@@ -18,12 +18,18 @@ class AddingBlock extends React.Component {
     // blockInfo may need handle to fit the format
     let blockName = '', floorCount = '', blockInfo = [],showFloor = true, id = 0, schoolName = '', schoolId = 0, initialName = ''
     let blockNameError= false,floorCountError = false,blockError=false,type='0',typeError=false, blockErrorMessage = '', floorErrorMsg = '', loading = false
-    this.state = { blockName, floorCount, blockInfo, showFloor, blockNameError, floorCountError, blockError, type, typeError, id, schoolName, schoolId, initialName, floorErrorMsg, loading}
+    this.state = { blockName, floorCount, blockInfo, showFloor, blockNameError, 
+      floorCountError, blockError, type, typeError, id, schoolName, schoolId, initialName,
+      floorErrorMsg, loading,
+      posting: false,
+      checking: false,
+      blockErrorMessage
+    }
   }
   componentDidMount(){
     this.props.hide(false)
     if (this.props.match.params.id) {
-      let id = parseInt(this.props.match.params.id.slice(1))
+      let id = parseInt(this.props.match.params.id.slice(1), 10)
         this.setState({
           id: id
         })
@@ -92,7 +98,6 @@ class AddingBlock extends React.Component {
             fullName: name
           })
         }
-        let l = floors[i].children.length
         newBlock.push({
           floorID: `${i}floor`,
           showRooms: true,
@@ -106,7 +111,7 @@ class AddingBlock extends React.Component {
         })
       }
     }else{
-      floors.map((floor,index)=>{
+      floors.forEach((floor,index)=>{
         newBlock.push({
           name:floor.residence.name,
           id:floor.residence.id
@@ -153,7 +158,7 @@ class AddingBlock extends React.Component {
     }
   }
   changeFloorCount = (e) => {
-    let v = parseInt(e.target.value)
+    let v = parseInt(e.target.value, 10)
     this.setState({
       floorCount: v 
     })
@@ -201,7 +206,7 @@ class AddingBlock extends React.Component {
     })
   }
   changeFloorStart = (e, floorID) => {
-    let value = parseInt(e.target.value)
+    let value = parseInt(e.target.value, 10)
     const newBlockInfo = JSON.parse(JSON.stringify(this.state.blockInfo))
     let floorIndex = newBlockInfo.findIndex((item,index) => {return item.floorID === floorID})
     newBlockInfo[floorIndex].start = value
@@ -368,7 +373,13 @@ class AddingBlock extends React.Component {
   }
   postInfo = () => {
     let url = '/api/residence/save', blockInfo=JSON.parse(JSON.stringify(this.state.blockInfo))
-    let {type} = this.state
+    let {type, posting} = this.state
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
     const floorInfo = blockInfo.map((r,i) => {
       if(type==='1'){
         let rooms = r.roomIDs.map((record,index)=>({name:record.fullName}))
@@ -400,46 +411,55 @@ class AddingBlock extends React.Component {
       body.id = this.state.id
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            Noti.hintSuccess(this.props.history,'/school/list/blockManage')
-          }          
-        }
+      this.setState({
+        posting: false
+      })
+      if(json.error){
+        Noti.hintServiceError(json.error.displayMessage)
+      }else{
+        /*--------redirect --------*/
+        if(json.data){
+          Noti.hintSuccess(this.props.history,'/school/list/blockManage')
+        }          
+      }
     }
     AjaxHandler.ajax(url, body, cb) 
   }
 
   checkExist = (callback) => {
+    if (this.state.checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let url='/residence/check'
     const body = {
       name: this.state.blockName,
       schoolId: this.state.schoolId
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+      const nextState = {
+        checking: false
+      }
+      if(json.error){
+        Noti.hintServiceError(json.error.displayMessage)
+      }else{
+        if(json.data.result){
+          Noti.hintOccupied()
+          nextState.blockNameError = true
+          nextState.blockErrorMessage = '楼栋名称已被占用'
         }else{
-          if(json.data.result){
-            Noti.hintOccupied()
-            this.setState({
-              blockNameError: true,
-              blockErrorMessage: '楼栋名称已被占用'
-            })
-          }else{
-            if(this.state.blockNameError){
-              this.setState({
-                blockNameError: false,
-                blockErrorMessage: ''
-              })
-            }
-            if (callback) {
-              callback()
-            }
+          if(this.state.blockNameError){
+            nextState.blockNameError = false
+            nextState.blockErrorMessage = ''
+          }
+          if (callback) {
+            callback()
           }
         }
+      }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(url, body, cb) 
   }
@@ -689,14 +709,15 @@ class AddingBlock extends React.Component {
   }
   deleteFloor = (e, id) => {
     let blockInfo = JSON.parse(JSON.stringify(this.state.blockInfo))
-    let floor = blockInfo.find((r) => (r.floorID === id)), floorIndex = blockInfo.findIndex((r) => (r.floorID === id))
+    // let floor = blockInfo.find((r) => (r.floorID === id))
+    let floorIndex = blockInfo.findIndex((r) => (r.floorID === id))
     blockInfo.splice(floorIndex, 1)
     this.setState({
       blockInfo: blockInfo
     })
   }
   render () {
-    const {blockInfo ,type,typeError, schoolName, id, floorErrorMsg, showFloor, loading, showCustomBtn, customFloorName, customFloorNameError, customFloorNameErrorMsg} = this.state
+    const {blockInfo ,type,typeError, schoolName, id, floorErrorMsg, showFloor, loading, showCustomBtn, customFloorName, customFloorNameError, customFloorNameErrorMsg, posting} = this.state
     let blockItems = null
     if(type&&type==='1'){
       blockItems = blockInfo&&blockInfo.map((item,index) => {
@@ -827,9 +848,14 @@ class AddingBlock extends React.Component {
         </ul>
 
         <div className='btnArea'>
-          <Popconfirm title="确定要添加么?" onConfirm={this.handleSubmit} onCancel={this.cancel} okText="确认" cancelText="取消">
-            <Button type='primary'>确认</Button> 
-          </Popconfirm>
+          {
+            posting ?
+              <Button type='primary'>确认</Button>
+            :
+              <Popconfirm title="确定要添加么?" onConfirm={this.handleSubmit} onCancel={this.cancel} okText="确认" cancelText="取消">
+                <Button type='primary'>确认</Button> 
+              </Popconfirm>
+          }
           <Button onClick={this.cancelSubmit} >返回</Button>
         </div>  
 

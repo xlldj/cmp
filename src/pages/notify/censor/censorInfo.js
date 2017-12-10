@@ -1,20 +1,13 @@
 import React from 'react'
 import moment from 'moment';
-import TimePicker from 'rc-time-picker';
 import 'rc-time-picker/assets/index.css';
 
-import {Button, DatePicker, Table, Modal} from 'antd'
+import {Button, DatePicker, Modal} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
-import AddPlusAbs from '../../component/addPlusAbs'
-import SchoolSelector from '../../component/schoolSelector'
-import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import CONSTANTS from '../../component/constants'
 
-const VALUELENGTH = '150px'
-
-const RangePicker = DatePicker.RangePicker
 
 class NotifyInfo extends React.Component {
   constructor (props) {
@@ -42,12 +35,6 @@ class NotifyInfo extends React.Component {
         throw new Error(json.error.displayMessage || json.error)
       }else{
         if(json.data){
-          let mobiles = json.data.mobiles && json.data.mobiles.map((r,i)=>{
-            return {
-              mobile: r,
-              error: false
-            }
-          })
           let {type, schoolIds, content, schoolRange, endTime, schoolNames, status, creatorName, note} = json.data, nextState = {}
           let schools = schoolIds && schoolIds.map((id, i) => ({id: id, name: schoolNames[i]}))
           nextState.type = type
@@ -89,13 +76,16 @@ class NotifyInfo extends React.Component {
     this.props.hide(true)
   }
   postInfo = () => {
+    this.setState({
+      posting: true
+    })
     let {id, content, endTime, note, pass} = this.state
     let resource = '/notify/censor'
     let passed = pass ? 1 : 2
     const body = {
       id: id,
       content: content,
-      endTime: parseInt(moment(endTime).valueOf()),
+      endTime: parseInt(moment(endTime).valueOf(), 10),
       pass: passed,
       note: note.trim()
     }
@@ -172,16 +162,18 @@ class NotifyInfo extends React.Component {
   }
   confirm = () => {
     let note = this.state.note.trim()
-    let pass = this.state.pass
+    let {pass, checking, posting} = this.state
     if (!note && !pass) {
       return this.setState({
         noteError: true
       })
     }
     this.setState({
-      showModal: false,
       noteError: false
     })
+    if (checking || posting) {
+      return
+    }
     if (pass) {
       this.checkExist(this.postInfo)
     } else {
@@ -189,7 +181,13 @@ class NotifyInfo extends React.Component {
     }
   }
   checkExist = (callback) => {
-    let {schools} = this.state
+    let {schools, checking} = this.state
+    if (checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let resource = '/notify/check'
     let body = {}
 
@@ -198,10 +196,7 @@ class NotifyInfo extends React.Component {
 
     const cb = (json) => {
       if (json.error) {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage
-        }
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           Noti.hintLock('请求出错', '该学校已存在紧急公告，当前不能再添加')
@@ -234,10 +229,10 @@ class NotifyInfo extends React.Component {
   }
 
   render () {
-    let {id, type, content, contentError, 
-      endTime, endTimeError, schools, all,
+    let {type, content, contentError, 
+      endTime, schools, all,
       status, creatorName,
-      showModal, note, pass, noteError
+      showModal, note, pass
     } = this.state
 
     const schoolItems = schools.map((s, i) => (<span className='puncSeperated' key={i}>{s.name}</span>))
@@ -263,7 +258,7 @@ class NotifyInfo extends React.Component {
           <li >
             <p>公告截至时间:</p>
               <DatePicker
-                className='end'
+                style={{height: '30px', width: 'auto'}}
                 showTime
                 allowClear={false}
                 value={moment(endTime)}

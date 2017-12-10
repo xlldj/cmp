@@ -110,6 +110,12 @@ class RepairInfo extends React.Component {
     })
   }
   postFail = () => {
+    if (this.state.censoring) {
+      return
+    }
+    this.setState({
+      censoring: true
+    })
     let resource = '/api/work/sheet/censor'
     const body = {
       pass: 2,
@@ -118,16 +124,21 @@ class RepairInfo extends React.Component {
       reason: this.state.failedReason
     }
     const cb = (json) => {
+      const nextState = {
+        censoring: false
+      }
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
+          nextState.showCensor = false
           const body = {
             id: parseInt(this.props.match.params.id.slice(1), 10)
           }
           this.fetchData(body)
         }
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -137,6 +148,14 @@ class RepairInfo extends React.Component {
     })
   }
   censorSuccess = () => {
+    let {censoring} = this.state
+    if (censoring) {
+      return
+    }
+    this.setState({
+      censoring: true
+    })
+
     let resource = '/api/work/sheet/censor'
     const body = {
       pass: 1,
@@ -144,8 +163,11 @@ class RepairInfo extends React.Component {
       sourceType: 2
     }
     const cb = (json) => {
+      this.setState({
+        censoring: false
+      })
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           const body = {
@@ -169,9 +191,6 @@ class RepairInfo extends React.Component {
     })
   }
   confirmCensor = () => {
-    this.setState({
-      showCensor: false
-    })
     this.postFail()
   }
   render () {
@@ -256,14 +275,17 @@ class RepairInfo extends React.Component {
             <li><p>学校名称:</p>{device.schoolName}</li>
             <li><p>设备类型:</p>{typeName[device.deviceType]}</li>
             <li><p>设备位置:</p>{device.location}</li>
-            <li><p>查看设备详情:</p>
-              <Link 
-                to={{
-                  pathname: `/device/list/deviceInfo/:${device.id}`, 
-                  state: {id: device.id, deviceType: device.deviceType, residenceId: device.residenceId, path: 'fromRepair'}
-                }}
-              >设备详情</Link>
-            </li>
+            { device.exist === 1 ?
+              <li><p>查看设备详情:</p>
+                <Link 
+                  to={{
+                    pathname: `/device/list/deviceInfo/:${device.id}`, 
+                    state: {id: device.id, deviceType: device.deviceType, residenceId: device.residenceId, path: 'fromRepair'}
+                  }}
+                >设备详情</Link>
+              </li>
+              : null
+            }
           </ul>
         </div>
 
@@ -346,7 +368,8 @@ class RepairmanTable extends React.Component{
       selectedRowKeys: '',
       priority: '1',
       remark: '',
-      schoolId: 0
+      schoolId: 0,
+      posting: false
     }
   }
   fetchData = (body) => {
@@ -410,20 +433,29 @@ class RepairmanTable extends React.Component{
   postData = (body) => {
     let resource='/api/repair/assign'
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+      this.setState({
+        posting: false
+      })
+      if(json.error){
+        Noti.hintServiceError(json.error.displayMessage)
+      }else{
+        /*--------redirect --------*/
+        if(json.data){
+          this.props.confirm()
         }else{
-          /*--------redirect --------*/
-          if(json.data){
-            this.props.confirm()
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+          throw new Error('网络出错，请稍后重试～')
+        }        
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   }
   confirm = () => {
+    if (this.state.posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
     const body = {
       id: this.props.id,
       level: parseInt(this.state.priority, 10),

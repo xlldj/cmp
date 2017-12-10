@@ -15,7 +15,7 @@ class EmployeeInfo extends React.Component {
     super(props)
     let id='',mobile='',nickName='',type='0',mobileError=false,nameError=false,nameErrorMessage='',schools=[],showSchools=false,typeError=false
     let mobileErrorMessage = '手机号格式不正确', originalMobile = 0, schoolError = false
-    this.state = {id,mobile,nickName,type,mobileError,mobileErrorMessage, nameError,nameErrorMessage,schools,showSchools, typeError, schoolError}
+    this.state = {id,mobile,nickName,type,mobileError,mobileErrorMessage, nameError,nameErrorMessage, originalMobile, schools,showSchools, typeError, schoolError}
   }
   fetchData = (body) => {
     let resource='/api/employee/one'
@@ -46,7 +46,7 @@ class EmployeeInfo extends React.Component {
     if(this.props.match.params.id){
       let id = this.props.match.params.id.slice(1) 
       const body={
-        id: parseInt(id)
+        id: parseInt(id, 10)
       }
       this.fetchData(body)
     }
@@ -58,12 +58,18 @@ class EmployeeInfo extends React.Component {
     this.props.history.push('/employee')
   }
   postData = () => {
-    let {mobile,nickName,type,id,schools} = this.state
+    let {mobile,nickName,type,id,schools, posting} = this.state
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
     let resource
     const body={
       mobile: mobile,
       nickName: nickName,
-      type: parseInt(type)
+      type: parseInt(type, 10)
     }
     if(type.toString()==='2'){
       let newschools = schools.map((r,i)=>{
@@ -78,8 +84,11 @@ class EmployeeInfo extends React.Component {
       resource = '/api/employee/add'
     }
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         /*--------redirect --------*/
         if(json.data){
@@ -130,10 +139,14 @@ class EmployeeInfo extends React.Component {
         })
       }
     }
-    if (this.state.id && parseInt(m) === this.state.originalMobile) {
+    let {checking, posting} = this.state
+    if (checking || posting) {
+      return
+    }
+    if (this.state.id && parseInt(m, 10) === this.state.originalMobile) {
       this.postData()
     } else {
-      this.checkExistPost()
+      this.checkExist(this.postData)
     }
   }
   changeMobile = (e) => {
@@ -158,51 +171,40 @@ class EmployeeInfo extends React.Component {
         mobileError: false
       })
     }
-    if (id && parseInt(m) === this.state.originalMobile) {
+    if (id && parseInt(m, 10) === this.state.originalMobile) {
       return
     }
     this.checkExist()
   }
-  checkExist = () => {
-    let {mobile} = this.state
+  checkExist = (callback) => {
+    let {mobile, checking} = this.state
+    if (checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let resource = '/api/user/mobile/check'
     const body = {
-      mobile: parseInt(mobile)
+      mobile: parseInt(mobile, 10)
     }
     const cb = (json) => {
+      const nextState = {
+        checking: false
+      }
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
-          let nextState = {}
           nextState.mobileError = true
           nextState.mobileErrorMessage = '该手机号已注册！'
-          this.setState(nextState)
         } else {
+          if (callback) {
+            callback()
+          }
         }
       }
-    }
-    AjaxHandler.ajax(resource, body, cb)
-  }
-  checkExistPost = () => {
-    let {mobile} = this.state
-    let resource = '/api/user/mobile/check'
-    const body = {
-      mobile: parseInt(mobile)
-    }
-    const cb = (json) => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
-        if (json.data.result) {
-          let nextState = {}
-          nextState.mobileError = true
-          nextState.mobileErrorMessage = '该手机号已注册！'
-          this.setState(nextState)
-        } else {
-          this.postData()
-        }
-      }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -239,7 +241,7 @@ class EmployeeInfo extends React.Component {
   }
   setSchools = (data) => {
     let schools = []
-    data.map((r,i)=>{
+    data.forEach((r,i)=>{
       if(r.selected){
         schools.push({
           id: r.id,
@@ -353,11 +355,11 @@ class RepairmanTable extends React.Component{
           /*--------redirect --------*/
           if(json.data){
             let schoolLists = json.data.schools, schools = this.props.schools
-            schools.map((r,i)=>{
+            schools.forEach((r,i)=>{
               let s = schoolLists.find((e,ind)=>(e.id === r.id))
               s.selected = true
             })
-            schoolLists.map((r,i)=>{
+            schoolLists.forEach((r,i)=>{
               if(!r.selected){
                 r.selected = false
               }

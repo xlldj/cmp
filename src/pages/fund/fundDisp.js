@@ -84,6 +84,7 @@ class FundDisp extends React.Component {
         let selectedSchool = json.data.schools[0].id.toString()
         setLocal('defaultSchool', selectedSchool)
         this.props.changeFund('fundList', {schoolId: selectedSchool})
+        this.props.changeFund('abnormal', {schoolId: selectedSchool})
       } 
     }
     AjaxHandler.ajax(resource, body, cb)

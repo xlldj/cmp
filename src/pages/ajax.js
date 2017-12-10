@@ -139,14 +139,16 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
   return abortable_promise
 }
 
-AjaxHandler.ajax = (resource, body, cb, errorCb) => {
+AjaxHandler.ajax = (resource, body, cb, errorCb, domain) => {
   /* ----handle the 'api' ----- */
   if (resource.includes('/api')) {
     resource = resource.replace('/api', '')
   }
-  const url = 'http://116.62.236.67:5080' + resource
-  // const url = 'http://10.0.0.4:5080' + resource
-  // const url = 'https://api.xiaolian365.com/m' + resource
+  // 默认使用管理端账户，除非用domain字段传入
+  // debugger
+  const url = (domain ? domain : 'http://116.62.236.67:5080') + resource
+  // const url = domain ? domain : 'http://10.0.0.4:5080' + resource
+  // const url = domain ? domain : 'https://api.xiaolian365.com/m' + resource
   // const url = resource
 
   const token = getToken()
@@ -160,6 +162,12 @@ AjaxHandler.ajax = (resource, body, cb, errorCb) => {
   let fetch_promise = fetch(url, {method: 'POST', body: JSON.stringify(body), headers: hdrs})
 
   return abortablePromise(fetch_promise, cb, errorCb)
+}
+AjaxHandler.ajaxClient = (resource, body, cb) => {
+  const domain = 'http://116.62.236.67:5081'
+  // const domain = 'http://10.0.0.4:5081'
+  // const domain = 'https://api.xiaolian365.com/c'
+  AjaxHandler.ajax(resource, body, cb, null, domain)
 }
 
 AjaxHandler.uploadFile = (body, cb) => {

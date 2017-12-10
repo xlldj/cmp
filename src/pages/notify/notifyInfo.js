@@ -6,13 +6,11 @@ import {Button, DatePicker, Table, Modal} from 'antd'
 import AjaxHandler from '../ajax'
 import Noti from '../noti'
 import AddPlusAbs from '../component/addPlusAbs'
-import SchoolSelector from '../component/schoolSelector'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
 import CONSTANTS from '../component/constants'
 
 const VALUELENGTH = '150px'
 
-const RangePicker = DatePicker.RangePicker
 
 class NotifyInfo extends React.Component {
   constructor (props) {
@@ -22,7 +20,7 @@ class NotifyInfo extends React.Component {
     let existError = false
 
     this.state = { 
-      type, typeError, schoolError, content, contentError, endTime, endTimeError, mobiles, mobilesError, checkCount, 
+      type, typeError, schoolError, content, contentError, endTime, endTimeError, mobiles, mobilesError, checkCount, existError,
       originalSchoolIds: [],
       id: 0,
       showSchools: false,
@@ -101,12 +99,12 @@ class NotifyInfo extends React.Component {
 
     let {schools, all, type, content, endTime} = this.state, mobiles=JSON.parse(JSON.stringify(this.state.mobiles))
     const body = {
-      type: parseInt(type),
+      type: parseInt(type, 10),
       content: content
     }
     if (type === '3') {
       for (let i=0;i<mobiles.length;i++) {
-        if (!mobiles[i].mobile || !/^1[3|4|5|7|8][0-9]{9}$/.test(parseInt(mobiles[i].mobile))) {
+        if (!mobiles[i].mobile || !/^1[3|4|5|7|8][0-9]{9}$/.test(parseInt(mobiles[i].mobile, 10))) {
           mobiles[i].error = true
           mobiles[i].errorMessage = '手机号出错，请重新核对！'
           return this.setState({
@@ -114,7 +112,7 @@ class NotifyInfo extends React.Component {
           })
         }
       }
-      let ms = mobiles.map((r, i)=>(parseInt(r.mobile)))
+      let ms = mobiles.map((r, i)=>(parseInt(r.mobile, 10)))
       body.mobiles = ms
     } else {
       if (all) {
@@ -124,12 +122,12 @@ class NotifyInfo extends React.Component {
         body.schoolIds = schools.map((s) => (s.id))
       }
       if (type === '1') {
-        body.endTime = parseInt(moment(endTime).valueOf())
+        body.endTime = parseInt(moment(endTime).valueOf(), 10)
       }
     }
     let resource
     if(this.props.match.params.id){
-      body.id = parseInt(this.props.match.params.id.slice(1))
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
       resource = '/api/notify/update'
     } else {
       resource = '/api/notify/add'
@@ -158,7 +156,7 @@ class NotifyInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   comleteEdit = () => {
-    let {id, type, content, schools, all, originalSchoolIds, originalAll} = this.state
+    let {id, type, content, schools, originalSchoolIds, originalAll, checking, posting} = this.state
     if (!type || type === '0') {
       return this.setState({
         typeError: true
@@ -173,6 +171,9 @@ class NotifyInfo extends React.Component {
       return this.setState({
         schoolError: true
       })
+    }
+    if (checking || posting) {
+      return
     }
     if (type === '1') {
       if (id && originalAll) { // 若原来就是全部学校, 不需要查重
@@ -257,7 +258,6 @@ class NotifyInfo extends React.Component {
     this.setState(nextState)
   }
   checkType = (v) => {
-    let {schoolId, originalSchoolId} = this.state
     if (!v || v==='0') {
       return this.setState({
         typeError: true
@@ -305,7 +305,7 @@ class NotifyInfo extends React.Component {
   }
   checkMobile = (e, i) => {
     let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
-    if (!mobiles[i].mobile || !/^1[3|4|5|7|8][0-9]{9}$/.test(parseInt(mobiles[i].mobile))) {
+    if (!mobiles[i].mobile || !/^1[3|4|5|7|8][0-9]{9}$/.test(parseInt(mobiles[i].mobile, 10))) {
       mobiles[i].error = true
       mobiles[i].errorMessage = '手机号格式不正确！'
       return  this.setState({
@@ -335,7 +335,7 @@ class NotifyInfo extends React.Component {
     let {checkCount, mobiles} = this.state
     let resource = '/api/user/mobile/check'
     const body = {
-      mobile: parseInt(mobiles[checkCount].mobile)
+      mobile: parseInt(mobiles[checkCount].mobile, 10)
     }
     const cb = (json) => {
       const nextState = {
@@ -374,7 +374,7 @@ class NotifyInfo extends React.Component {
     })
     let resource = '/api/user/mobile/check'
     const body = {
-      mobile: parseInt(m)
+      mobile: parseInt(m, 10)
     }
     const cb = (json) => {
       const nextState = {
@@ -494,7 +494,7 @@ class NotifyInfo extends React.Component {
   }
 
   render () {
-    let {id, type, typeError, schoolId, schoolError, content, contentError, endTime, endTimeError, mobiles, mobilesError, existError, showSchools, schools, all} = this.state
+    let {id, type, typeError, schoolError, content, contentError, endTime, mobiles, showSchools, schools, all} = this.state
     const contentInput = (
       <li className='itemsWrapper high'>
         <p>公告内容:</p>

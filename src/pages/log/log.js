@@ -24,7 +24,8 @@ class Log extends React.Component{
     mobileErrorMsg: '',
     password: '',
     pwdError: false,
-    pwdErrorMsg: ''
+    pwdErrorMsg: '',
+    posting: false
   }
   componentDidMount () {
     let mobile = getLocal('xl_mobile') || '', password = getLocal('xl_pwd') || '', nextState = {}
@@ -103,7 +104,7 @@ class Log extends React.Component{
     } */
   }  
   handleSubmit = () => {
-    let {mobile, password, remember} = this.state
+    let {mobile, password, remember, posting} = this.state
     /* if (!remember) {
       this.refs.pwd.type = 'text'
       console.log(this.refs.pwd)
@@ -131,13 +132,23 @@ class Log extends React.Component{
       return
     }
 
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
+
     const resource = '/login'
     const body = {
       mobile: parseInt(mobile, 10),
       password: password
     }
     const cb = (json) => {
-      if(json.error){
+      this.setState({
+        posting: false
+      })
+      if (json.error) {
         // throw new Error(json.error.displayMessage||json.error.debugMessage)
         this.handleLogError(json.error)
       }else{
@@ -179,7 +190,7 @@ class Log extends React.Component{
         pwdErrorMsg: displayMessage
       })
     } else {
-      throw new Error(error.displayMessage || error.debugMessage)
+      Noti.hintServiceError(error.displayMessage)
     }
   }
   render(){

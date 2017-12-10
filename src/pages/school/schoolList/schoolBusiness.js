@@ -12,7 +12,8 @@ class SchoolBusiness extends React.Component{
       businesses:[],
       id: 0,
       schoolName: '',
-      clearError: false
+      clearError: false,
+      posting: false
     }
   }
   fetchData = (body) => {
@@ -76,20 +77,30 @@ class SchoolBusiness extends React.Component{
     this.setState(nextState)
   }
   confirm=()=>{
-    let {id, businesses, clearError} = this.state
+    let {businesses, posting} = this.state
+    if (posting) {
+      return
+    }
+
     if (businesses.length === 0) {
       return this.setState({
         clearError: true
       })
     }
+    this.setState({
+      posting: true
+    })
     let resource='/api/school/business/save'
     const body={
       schoolId: this.state.id,
       businesses: JSON.parse(JSON.stringify(this.state.businesses))
     }
     const cb=(json)=>{
+      this.setState({
+        posting: false
+      })
       if(json.error){
-        throw new Error(json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         // 确认
         if (this.props.location.state && this.props.location.state.path) {
@@ -106,7 +117,8 @@ class SchoolBusiness extends React.Component{
   }
 
   render(){
-    let {businesses, schoolName, clearError} = this.state
+    let {businesses, schoolName, clearError, posting} = this.state
+    console.log(posting)
     return (
       <div className='infoList'>
         <ul>
@@ -126,9 +138,13 @@ class SchoolBusiness extends React.Component{
           </li>
         </ul>
         <div className='btnArea'>
+          { posting ?
+              <Button type='primary'>确认</Button>
+            :
               <Popconfirm title="确定要添加么?" onConfirm={this.confirm} onCancel={this.cancel} okText="确认" cancelText="取消">
                 <Button type='primary'>确认</Button>
               </Popconfirm>
+          }
           <Button onClick={this.back}>{(this.props.location.state && this.props.location.state.path === 'fromInfoSet') ? '返回学校信息设置' : '返回'}</Button>
         </div>
       </div>

@@ -237,11 +237,6 @@ const CONSTANTS = {
           key: 1
         },
         {
-          name: '异常订单',
-          path: 'abnormal',
-          key: 2
-        },
-        {
           name: '账单投诉',
           path: 'complaint',
           key: 3
