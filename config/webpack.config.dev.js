@@ -140,8 +140,7 @@ module.exports = {
       },
       {
         test: /\.less$/,
-        use: ['style-loader', 'css-loader', 'less-loader']
-        /* use: [
+        use: [
           {loader: 'style-loader'},
           {loader: 'css-loader'},
           {loader: 'less-loader',
@@ -149,7 +148,7 @@ module.exports = {
               modifyVars: themeVariables
             }
           }
-        ] */
+        ]
       },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
