@@ -38,7 +38,6 @@ class RateLimitInfo extends React.Component {
         id: id
       }
       this.fetchData(body)
-      console.log(id)
     }
   }
   componentWillUnmount () {
@@ -62,6 +61,7 @@ class RateLimitInfo extends React.Component {
             money: money
           }
           this.setState(nextState)
+          this.fetchDeviceTypes(schoolId)
         }      
       }
     }

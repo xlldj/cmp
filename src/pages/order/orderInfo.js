@@ -78,9 +78,10 @@ class OrderInfo extends React.Component {
       posting: true
     })
     let resource = '/order/chargeback'
+    let reason = `由于${this.state.modalMessage}，此单已做退单处理，你可以前往消费记录中查看，有一笔免费的订单。`
     const body = {
       id: this.state.id,
-      reason: this.state.modalMessage
+      reason: reason
     }
     const cb = (json) => {
       const nextState = ({
@@ -198,7 +199,7 @@ class OrderInfo extends React.Component {
             : null
           }
           {
-            data.status !== 1 ?
+            (data.status !== 1 && data.odd) ?
               <li><p>找零金额:</p>
                 <span>{data.odd ? data.odd : '未知'}</span>
               </li>
@@ -229,14 +230,14 @@ class OrderInfo extends React.Component {
             : null
           }
           {
-            data.status === 4 ?
+            (data.status === 4 && data.chargebackMoney) ?
               <li><p>退还金额:</p>
                 <span>{data.chargebackMoney}</span>
               </li>
             : null
           }
           {
-            data.status === 4 ?
+            (data.status === 4 && data.chargebackBonus) ?
               <li><p>退还代金券:</p>
                 <span>{data.chargebackBonus}</span>
               </li>

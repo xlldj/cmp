@@ -41,7 +41,7 @@ class RateLimitTable extends React.Component {
     }, {
       title: '扣费速率',
       dataIndex: 'money',
-      render: (text,record,index) => (`${record.time}秒/${record.money}`)
+      render: (text,record,index) => (`${record.time}秒/${record.money}元`)
     }, {
       title: (<p className='lastCol'>操作</p>),
       dataIndex: 'operation',
