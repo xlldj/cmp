@@ -177,10 +177,10 @@ class OrderInfo extends React.Component {
             : null
           }
           <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
-          <li><p>预付金额:</p><span>{`¥${data.prepay}`}</span></li>
+          <li><p>预付金额:</p><span>{`${data.prepay}`}</span></li>
           {
             data.status !== 1 ?
-              <li><p>实际消费:</p><span className='shalowRed'>{`¥${data.consume}`}</span></li>
+              <li><p>实际消费:</p><span className='shalowRed'>{`${data.consume}`}</span></li>
             : null
           }
           {

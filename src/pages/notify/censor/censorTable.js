@@ -1,15 +1,12 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
 
-import {Table, Popconfirm} from 'antd'
+import {Table} from 'antd'
 
 import Noti from '../../noti'
 import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
-import SearchLine from '../../component/searchLine'
-import BasicSelector from '../../component/basicSelector'
 import CONSTANTS from '../../component/constants'
-import Format from '../../component/format'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -18,7 +15,6 @@ import { changeNotify } from '../../../actions'
 const subModule = 'censor'
 
 const SIZE = CONSTANTS.PAGINATION
-const NOTIFYTYPES = CONSTANTS.NOTIFYTYPES
 
 //const Table = asyncComponent(() => import(/* webpackChunkName: "table" */ "antd/lib/table"))
 //const Button = asyncComponent(() => import(/* webpackChunkName: "button" */ "antd/lib/button"))

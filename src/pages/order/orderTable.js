@@ -91,7 +91,7 @@ class OrderTable extends React.Component {
           case 4:
             return <Badge status='default' text='已退单' />
           default:
-            return <Badge status='warning' text='使用结束' />
+            return <Badge status='warning' text='异常' />
         }
       }
     }, {
@@ -101,9 +101,9 @@ class OrderTable extends React.Component {
       className:'shalowRed',
       render: (text,record,index) => {
         if (record.status !== 1) {
-          return `¥${record.consume}` || '暂无'
+          return `${record.consume}` || '暂无'
         } else if (record.prepay) {
-          return `预付¥${record.prepay}`
+          return `${record.prepay}`
         }
       }
     }, {

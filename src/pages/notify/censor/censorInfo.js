@@ -258,6 +258,7 @@ class NotifyInfo extends React.Component {
           <li >
             <p>公告截至时间:</p>
               <DatePicker
+                className='datePicker'
                 style={{height: '30px', width: 'auto'}}
                 showTime
                 allowClear={false}
