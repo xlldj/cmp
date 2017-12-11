@@ -150,7 +150,7 @@ class VersionInfo extends React.Component {
       posting: true
     })
     const body = {
-      system: system,
+      system: parseInt(system, 10),
       versionNo: versionNo,
       type: parseInt(type, 10),
       content: content
@@ -217,7 +217,7 @@ class VersionInfo extends React.Component {
     }
     nextState.urlError = false
     if (method === '2' && fileList.length === 0) {
-      nextState.methodError = true
+      nextState.apkError = true
       return this.setState(nextState)
     }
     nextState.methodError = false
@@ -270,7 +270,7 @@ class VersionInfo extends React.Component {
     this.checkExist(null)
   }
   checkExist = (callback) => {
-    let {versionNo, id, originalVersion, checking} = this.state
+    let {versionNo, id, system, originalVersion, checking} = this.state
     if (id && versionNo.trim() === originalVersion) {
       callback && callback()
       return
@@ -283,6 +283,7 @@ class VersionInfo extends React.Component {
     })
     let resource = '/version/check'
     const body = {
+      system: parseInt(system, 10),
       versionNo: versionNo.trim() 
     }
     const cb = (json) => {
@@ -466,7 +467,8 @@ class VersionInfo extends React.Component {
               checkOpt={this.checkMethod}
               invalidTitle='选择方式'
             />
-            {methodError ? <span className='checkInvalid'>更新方式不能为空！</span>:null}        
+            {methodError ? <span className='checkInvalid'>更新方式不能为空！</span>:null} 
+            {apkError ? <span className='checkInvalid'>请上传安装包！</span>:null}        
           </li>
 
           {
@@ -474,7 +476,7 @@ class VersionInfo extends React.Component {
               <li>
                 <p>地址:</p>
                 <input className='long' type='url' value={url} onChange={this.changeUrl} onBlur={this.checkUrl} placeholder='' />
-                {urlError ? <span className='checkInvalid'>地址不能为空！</span>:null}        
+                {urlError ? <span className='checkInvalid'>地址不能为空！</span>:null}  
               </li>
             : null
           }
@@ -483,8 +485,7 @@ class VersionInfo extends React.Component {
             method === '2' ?
               <li className='itemsWrapper'>
                 <p>安装包上传:</p>
-                <PicturesWall accept='*' limit={1} setImages={this.setImages} fileList={fileList} dir='version-apk' /> 
-                {apkError ? <span className='checkInvalid'>请上传安装包！</span>:null}        
+                <PicturesWall accept='*' limit={1} setImages={this.setImages} fileList={fileList} dir='version-apk' />         
               </li>
             : null
           }

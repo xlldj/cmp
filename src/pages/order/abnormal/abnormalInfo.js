@@ -93,9 +93,8 @@ class AbnormalInfo extends React.Component {
           </li>
           <li><p>开始时间:</p>{Time.getTimeStr(data.createTime)}</li>
           <li><p>结束时间:</p>{data.finishTime ? Time.getTimeStr(data.finishTime) : ''}</li>
-          <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
-          <li><p>预付金额:</p><span>{`¥${data.prepay}`}</span></li>
-          <li><p>实际消费:</p><span className='shalowRed'>{`¥${data.consume}`}</span></li>
+          <li><p>预付金额:</p><span>{`${data.prepay}`}</span></li>
+          <li><p>实际消费:</p><span className='shalowRed'>{`${data.consume}`}</span></li>
           {
             data.bonusAmount ?
               <li><p>代金券抵扣:</p>

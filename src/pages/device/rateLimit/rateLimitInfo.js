@@ -11,7 +11,7 @@ import BasicSelector from '../../component/basicSelectorWithoutAll'
 class RateLimitInfo extends React.Component {
   constructor (props) {
     super(props)
-    let deviceType = '', id = 0
+    let deviceType = '', id = ''
     let deviceTypeError = false
     this.state = { 
       id, 
@@ -33,10 +33,12 @@ class RateLimitInfo extends React.Component {
   componentDidMount () {
     this.props.hide(false)
     if(this.props.match.params.id){
+      let id = parseInt(this.props.match.params.id.slice(1), 10)
       const body={
-        id:parseInt(this.props.match.params.id.slice(1), 10)
+        id: id
       }
       this.fetchData(body)
+      console.log(id)
     }
   }
   componentWillUnmount () {
@@ -88,8 +90,8 @@ class RateLimitInfo extends React.Component {
   }
 
   confirm = () => {
-    let {id, schoolId, originalSchool, deviceType, originalDevice, time, money, posting} = this.state
-    if (posting) {
+    let {id, schoolId, originalSchool, deviceType, originalDevice, time, money, checking, posting} = this.state
+    if (checking || posting) {
       return
     }
 
@@ -121,6 +123,9 @@ class RateLimitInfo extends React.Component {
   }
   
   postInfo = () => {
+    if (this.state.posting) {
+      return
+    }
     this.setState({
       posting: true
     })
@@ -133,11 +138,11 @@ class RateLimitInfo extends React.Component {
       time: time,
       money: money  
     }
-    if (this.props.match.params.id){
+    if (this.state.id){
       body.id = this.state.id
-      resource = '/order/limit/add'
-    } else {
       resource = '/order/limit/update'
+    } else {
+      resource = '/order/limit/add'
     }
     const cb = (json) => {
       this.setState({
@@ -154,6 +159,9 @@ class RateLimitInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   checkExist = (callback) => {
+    if (this.state.checking) {
+      return
+    }
     this.setState({
       checking: true
     })

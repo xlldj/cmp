@@ -1,12 +1,8 @@
 import React, { Component } from 'react'
-import {Link } from 'react-router-dom'
 import Table from 'antd/lib/table'
 import AjaxHandler from '../ajax'
-import CONSTANTS from '../component/constants'
 import Time from '../component/time'
-import SearchLine from '../component/searchLine'
 import SchoolSelector from '../component/schoolSelector'
-import BasicSelector from '../component/basicSelectorWithoutAll'
 
 const NOW = Date.parse(new Date())
 /*----------timespan: 1-今日,2-本周,3-本月-----*/
@@ -338,12 +334,6 @@ export default class RankPanel extends Component {
 
   render() {
     const { dataSource, timeSpan, titleValue, titleValue2, currentRank, loading, selectedSchool, total, page} = this.state;
-
-    const selector1 = <BasicSelector
-                        staticOpts={CONSTANTS.TIMESPANS}
-                        selectedOpt={timeSpan}
-                        changeOpt={this.changeTP}
-                      />
 
     return (
       <div className='ranksWrapper'>

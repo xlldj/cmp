@@ -7,17 +7,6 @@ import RankPanel from './rankPanel'
 
 const NOW = Date.parse(new Date())
 
-const DAY = {
-  1:'本日',
-  2:'本周',
-  3:'本月'
-}
-const LASTDAY = {
-  1:'昨日',
-  2:'上周',
-  3:'上月'
-}
-
 /*----------timeUnit:1-hour,2-day------------*/
 /*----------target:1-订单数量，2-订单收益--------*/
 /*----------timespan: 1-今日，2-本周,3-本月-----*/

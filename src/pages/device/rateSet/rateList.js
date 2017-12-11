@@ -1,8 +1,7 @@
 import React from 'react'
-import {  Route, Switch , Link} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
+import { Link} from 'react-router-dom'
 
-import {Table, Button, Popconfirm} from 'antd'
+import {Table, Popconfirm} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
@@ -18,8 +17,6 @@ const subModule = 'rateSet'
 
 
 const SIZE = CONSTANTS.PAGINATION
-
-const RateInfo = asyncComponent(() => import(/* webpackChunkName: "rateInfo" */ "./rateInfo"))
 
 const typeName =CONSTANTS.DEVICETYPE
 
@@ -74,7 +71,7 @@ class RateList extends React.Component {
             <Link to={`/device/rateSet/rateInfo/:${record.id}`}>编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => { this.delete(e, record.id) }} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>

@@ -8,7 +8,6 @@ import Noti from '../../noti'
 import Time from '../../component/time'
 const RadioGroup = Radio.Group
 const Option = Select.Option
-const typeName = CONSTANTS.DEPOSITACTTYPE
 const deviceName = CONSTANTS.DEVICETYPE
 
 class DepositInfo extends React.Component {
@@ -34,7 +33,9 @@ class DepositInfo extends React.Component {
       gifts: [],
       released: false,
       showGifts: false,
-      editingDenomination: ''
+      editingDenomination: '',
+      checking: false,
+      posting: false
     }
   }
   fetchGifts = () => {
@@ -238,39 +239,45 @@ class DepositInfo extends React.Component {
         schoolErrorMessage: ''
       })
     }
-    if (this.state.id && this.state.initialSchool === parseInt(this.state.selectedSchool)) {
+    if (this.state.id && this.state.initialSchool === parseInt(this.state.selectedSchool, 10)) {
       this.fetchDenominations()
     } else {
       this.checkExist(v, null)
     }
   }
   checkExist = (schoolId, callback) => {
+    if (this.state.checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let resource = '/deposit/activity/check'
     const body = {
       schoolId: parseInt(schoolId, 10)
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+      const nextState = {
+        checking: false
+      }
+      if(json.error){
+        Noti.hintServiceError(json.error.displayMessage)
+      }else{
+        if(json.data.result){
+          Noti.hintLock('请求出错', '当前学校已有充值活动，请勿重复添加')
+          nextState.schoolError = true
+          nextState.schoolErrorMessage = '该学校已有充值活动，请勿重复添加！'
         }else{
-          if(json.data.result){
-            Noti.hintLock('请求出错', '当前学校已有充值活动，请勿重复添加')
-            this.setState({
-              schoolError: true,
-              schoolErrorMessage: '该学校已有充值活动，请勿重复添加！'
-            })
-          }else{
-            if(this.state.schoolError){
-              this.setState({
-                schoolError: false,
-                schoolErrorMessage: ''
-              })
-            }
-            if (callback) {
-              callback()
-            }
+          if(this.state.schoolError){
+            nextState.schoolError = false
+            nextState.schoolErrorMessage = ''
+          }
+          if (callback) {
+            callback()
           }
         }
+      }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb) 
   }
@@ -330,7 +337,7 @@ class DepositInfo extends React.Component {
   }
   checkCoupons = () => {
     let d = this.state.denominations,count=0
-    d.map((r,i) => {
+    d.forEach((r,i) => {
       if(r.coupon){
         count++
       }
@@ -342,7 +349,7 @@ class DepositInfo extends React.Component {
   }
   checkGifts = () => {
     let d = this.state.denominations,count=0
-    d.map((r,i) => {
+    d.forEach((r,i) => {
       count+=r.giftCount
     })
     if(!count){
@@ -352,7 +359,7 @@ class DepositInfo extends React.Component {
   }
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
-    if(!parseInt(this.state.selectedSchool)){
+    if(!parseInt(this.state.selectedSchool, 10)){
       return this.setState({
         schoolError: true,
         schoolErrorMessage: '学校不能为空！'
@@ -394,7 +401,10 @@ class DepositInfo extends React.Component {
         onlineError: true
       })
     }
-    if (this.state.id && this.state.initialSchool === parseInt(this.state.selectedSchool)) {
+    if (this.state.checking || this.state.posting) {
+      return
+    }
+    if (this.state.id && this.state.initialSchool === parseInt(this.state.selectedSchool, 10)) {
       this.postInfo()
     } else {
       this.checkExist(this.state.selectedSchool, this.postInfo)
@@ -404,6 +414,12 @@ class DepositInfo extends React.Component {
     if(this.state.released&&this.state.online){
       return this.props.history.push('/fund/deposit')
     }
+    if (this.state.posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
     let url = '/api/deposit/activity/save'
     let denos = this.state.denominations,type=this.state.type,items=[]
     denos.forEach((r,i)=>{
@@ -418,7 +434,7 @@ class DepositInfo extends React.Component {
         //check if needs to set realAmount
         if(r.giftCount){
           let gifts = []
-          r.gifts.map((g,i)=>{
+          r.gifts.forEach((g,i)=>{
             if(g.count){
               gifts.push({
                 giftId: g.id,
@@ -444,29 +460,31 @@ class DepositInfo extends React.Component {
       type: parseInt(this.state.type, 10)
     }
     if(this.props.match.params.id){
-      body.id = parseInt(this.props.match.params.id.slice(1))
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-            if(json.data){
-              if(this.state.released&&!this.state.online){
-                this.openNotificationWithIcon('info')
-                this.setState({
-                  released: false
-                })
-              }else{
-                if(this.state.online){
-                   this.openNotification()
-                }else{
-                   this.props.history.push('/fund/deposit')
-                }
-              }
+      const nextState = {
+        posting: false
+      }
+      if(json.error){
+        Noti.hintServiceError(json.error.displayMessage)
+      }else{
+          if(json.data){
+            if(this.state.released&&!this.state.online){
+              this.openNotificationWithIcon('info')
+              nextState.released = false
             }else{
-              throw new Error('网络出错，请稍后重试～')
+              if(this.state.online){
+                  this.openNotification()
+              }else{
+                  this.props.history.push('/fund/deposit')
+              }
             }
-        }
+          }else{
+            Noti.hintServiceError()
+          }
+      }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(url, body, cb)   
   }
@@ -516,7 +534,7 @@ class DepositInfo extends React.Component {
   setGift = (gifts,total) => {
     let denos = JSON.parse(JSON.stringify(this.state.denominations)), deno = denos[this.state.editingDenomination]
     deno.giftCount = total
-    gifts.map((g,i) => {
+    gifts.forEach((g,i) => {
       if(g.count){
         let editGift = deno.gifts.find((r,i) => (r.id === g.id))
         editGift.count = g.count
@@ -549,7 +567,7 @@ class DepositInfo extends React.Component {
     this.props.history.push('/fund/deposit')
   }
   render () {
-    let {id, schools, selectedSchool,name,type,nameError,typeError,schoolError,denominations,gifts, editingDenomination, endTime,online,onlineError,couponError,endTimeError,giftError,released, schoolErrorMessage} = this.state
+    let {id, selectedSchool,name,type,nameError,typeError,schoolError,denominations,gifts, editingDenomination, endTime,online,onlineError,couponError,endTimeError,giftError,released, schoolErrorMessage} = this.state
     let endTimeStr = Time.getDayFormat(endTime)
     let hasDenomination = denominations && denominations.length > 0
 
@@ -675,7 +693,7 @@ class GiftTable extends React.Component{
     if(JSON.stringify(nextProps.gifts)!==JSON.stringify(this.props.gifts)){
       let data = JSON.parse(JSON.stringify(nextProps.gifts))
       if(data.length>0){
-        data.map((r,i)=> {
+        data.forEach((r,i)=> {
           if(!r.count){
             r.count = 0
           }
@@ -735,7 +753,7 @@ class GiftTable extends React.Component{
   cancel = () => {
     //clear all the data
     let all = JSON.parse(JSON.stringify(this.state.allTypeData))
-    all.map((r,i)=>{
+    all.forEach((r,i)=>{
       r.count = 0
     })
     this.setState({
@@ -746,7 +764,7 @@ class GiftTable extends React.Component{
     this.props.closeModal()
   }
   render(){
-    const {dataSource,total} = this.state
+    const {dataSource} = this.state
 
     let ds = Object.keys(deviceName)
     const deviceOptions = ds.map((d,i) => (

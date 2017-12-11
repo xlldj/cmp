@@ -274,8 +274,8 @@ class RepairInfo extends React.Component {
           <ul>
             <li><p>学校名称:</p>{device.schoolName}</li>
             <li><p>设备类型:</p>{typeName[device.deviceType]}</li>
-            <li><p>设备位置:</p>{device.location}</li>
-            { device.exist === 1 ?
+            <li><p>设备位置:</p>{device.location}{ (device && (device.exist === 2)) ? ' (设备已解绑)' : '' }</li>
+            { (device && (device.exist === 1)) ?
               <li><p>查看设备详情:</p>
                 <Link 
                   to={{

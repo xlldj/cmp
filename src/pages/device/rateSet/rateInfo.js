@@ -13,7 +13,6 @@ import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
-const typeName = CONSTANTS.DEVICETYPE
 
 class RateInfo extends React.Component {
   constructor (props) {
@@ -22,7 +21,9 @@ class RateInfo extends React.Component {
     let rateGroups = [{}], deviceTypeError=false, schoolError=false, billError=false, closeTapGroups = [{}]
     this.state = { 
       id, deviceType, billingMethod, schoolId, schoolError, rateGroups,deviceTypeError, billError, closeTapGroups, 
-      originalDT, originalSchool
+      originalDT, originalSchool,
+      posting: false,
+      checking: false
     }
   }
   /*
@@ -127,7 +128,7 @@ class RateInfo extends React.Component {
     if (!schoolId) { // 如果没有供应商选项，不去查重
       return
     }
-    if (!(id && parseInt(deviceType) === originalDT && parseInt(schoolId) === originalSchool)) {
+    if (!(id && parseInt(deviceType, 10) === originalDT && parseInt(schoolId, 10) === originalSchool)) {
       this.checkExist(null)
     }
   }
@@ -149,11 +150,17 @@ class RateInfo extends React.Component {
     if (!deviceType) { // 如果没有供应商选项，不去查重
       return
     }
-    if (!(id && parseInt(deviceType) === originalDT && parseInt(schoolId) === originalSchool)) {
+    if (!(id && parseInt(deviceType, 10) === originalDT && parseInt(schoolId, 10) === originalSchool)) {
       this.checkExist(null)
     }
   }
   checkExist = (callback) => {
+    if (this.state.checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let resource = '/rate/check'
     const {deviceType, schoolId} = this.state
     const body = {
@@ -161,8 +168,11 @@ class RateInfo extends React.Component {
       schoolId: parseInt(schoolId, 10)
     }
     const cb = (json) => {
+      this.setState({
+        checking: false
+      })
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           Noti.hintLock('添加出错', '当前学校的该类型设备已有费率选项，请勿重复添加')
@@ -177,7 +187,7 @@ class RateInfo extends React.Component {
   }
   changePrice = (e,i) => {
     const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
-    rateGroups[i].price = parseInt(e.target.value)
+    rateGroups[i].price = parseInt(e.target.value, 10)
     this.setState({
       rateGroups: rateGroups
     })
@@ -197,7 +207,7 @@ class RateInfo extends React.Component {
   }
   changePulse = (e,i) => {
     const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
-    rateGroups[i].pulse = parseInt(e.target.value)
+    rateGroups[i].pulse = parseInt(e.target.value, 10)
     this.setState({
       rateGroups: rateGroups
     }) 
@@ -266,14 +276,23 @@ class RateInfo extends React.Component {
       return 
     }
 
-    let {id, deviceType, originalDT, schoolId, originalSchool} = this.state
-    if (!(id && parseInt(deviceType) === originalDT && parseInt(schoolId) === originalSchool)) {
+    let {id, deviceType, originalDT, schoolId, originalSchool, checking, posting} = this.state
+    if (checking || posting) {
+      return
+    }
+    if (!(id && parseInt(deviceType, 10) === originalDT && parseInt(schoolId, 10) === originalSchool)) {
       this.checkExist(this.postInfo)
     } else {
       this.postInfo()
     }
   }
   postInfo = () => {
+    if (this.state.posting) {
+      return 
+    }
+    this.setState({
+      posting: true
+    })
     const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
     const taps = this.state.closeTapGroups.map((r) => (r.value))
     let {id, deviceType, billingMethod, schoolId} = this.state
@@ -282,24 +301,27 @@ class RateInfo extends React.Component {
     })
     const body = {
       rates: rateGroups,
-      billingMethod: parseInt(billingMethod),
-      deviceType: parseInt(deviceType),
-      schoolId: parseInt(schoolId),
+      billingMethod: parseInt(billingMethod, 10),
+      deviceType: parseInt(deviceType, 10),
+      schoolId: parseInt(schoolId, 10),
       timeLimit: taps
     }
     if(id){
-      body.id = parseInt(id)
+      body.id = parseInt(id, 10)
     }
     let resource='/api/rate/save'
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if(json.error){
-        throw new Error(json.error || json.error.displayMessage)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         /*--------redirect --------*/
         if(json.data){
           Noti.hintSuccess(this.props.history,'/device/rateSet')
         }else{
-          throw new Error('网络出错，请稍后重试～')
+          Noti.hintServiceError()
         }        
       }
     }
@@ -373,7 +395,8 @@ class RateInfo extends React.Component {
   }
 
   render () {
-    let {id, schoolId, schoolError, deviceType, deviceTypeError, billingMethod, billError, rateGroups, closeTapGroups, tapError} = this.state
+    let {id, schoolId, schoolError, deviceType, deviceTypeError, billingMethod, 
+      billError, rateGroups, closeTapGroups} = this.state
 
     const rateItems = rateGroups&&rateGroups.map((r,i) => {
       return(

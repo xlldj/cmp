@@ -5,7 +5,6 @@ import {Button} from 'antd'
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import AddPlusAbs from '../../component/addPlusAbs'
-import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
@@ -19,7 +18,9 @@ class ChargeInfo extends React.Component {
       originalSchool: 0,
       schoolError: false,
       items: [{value: ''}],
-      itemsError: false
+      itemsError: false,
+      checking: false,
+      posting: false
     }
   }
   fetchData =(body)=>{
@@ -50,7 +51,7 @@ class ChargeInfo extends React.Component {
     this.props.hide(false)
     if(this.props.match.params.id){
       const body={
-        id:parseInt(this.props.match.params.id.slice(1))
+        id:parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
@@ -59,7 +60,13 @@ class ChargeInfo extends React.Component {
     this.props.hide(true)
   }
   postInfo = () => {
-    let {id, schoolId, items} = this.state, resource
+    let {id, schoolId, items, posting} = this.state, resource
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
 
     const body = {
       schoolId: schoolId
@@ -70,10 +77,13 @@ class ChargeInfo extends React.Component {
     } else {
       resource = '/recharge/denomination/add'
     }
-    body.items = items.map((r) => (parseInt(r.value)))
+    body.items = items.map((r) => (parseInt(r.value, 10)))
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         /*--------redirect --------*/
         if(json.data){
@@ -86,30 +96,34 @@ class ChargeInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   confirm = () => {
-    let {id, schoolId, originalSchool} = this.state, nextState = {}
+    let {id, schoolId, originalSchool, checking, posting} = this.state
     const items = JSON.parse(JSON.stringify(this.state.items))
     if (!schoolId) {
       return this.setState({
         schoolError: true
       })
     }
-    items.forEach((r, i) => {
-      if (!r.hasOwnProperty('value') || !(r.value)) {
+    for (let i = 0; i < items.length ; i++) {
+      let r = items[i]
+      if (!r.hasOwnProperty('value') || !r.value) {
         r.error = true
         r.errorMsg = '面额不能为空'
+        return this.setState({
+          items: items
+        })
       }
-      return this.setState({
-        items: items
-      })
-      let same = items.some((rec, ind) => (rec.value === r.value && ind !== i))
+      let same = items.some((rec, ind) => (parseInt(rec.value, 10) === parseInt(r.value, 10) && ind !== i))
       if (same) {
         r.error = true
         r.errorMsg = '面额重复，请勿重复添加'
+        return this.setState({
+          items: items
+        })
       }
-      return this.setState({
-        items: items
-      })
-    })
+    }
+    if (checking || posting) {
+      return
+    }
     if (!(id && originalSchool === schoolId)) {
       this.checkExist(this.postInfo)
     } else {
@@ -120,21 +134,26 @@ class ChargeInfo extends React.Component {
     this.props.history.goBack()
   }
   checkExist = (callback) => {
+    if (this.state.checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let schoolId = parseInt(this.state.schoolId, 10)
     let resource = '/recharge/denomination/check'
     const body = {
       schoolId: schoolId
     }
     const cb = (json) => {
+      this.setState({
+        checking: false
+      })
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
-          // Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
-          throw {
-            title: '添加出错',
-            message: '当前学校已有充值面额设置，请返回该项编辑'
-          }
+          Noti.hintWarning('添加出错', '当前设备已有预付选项，请返回该项编辑')
         } else {
           if (callback) {
             callback()
@@ -154,7 +173,8 @@ class ChargeInfo extends React.Component {
   }
   checkAmount = (e, index) => {
     const items = JSON.parse(JSON.stringify(this.state.items))
-    let v = e.target.value
+    let v = parseInt(e.target.value.trim(), 10)
+    items[index].value = v
     if (!v) {
       items[index].error = true
       items[index].error = '面额不能为空'
@@ -162,7 +182,7 @@ class ChargeInfo extends React.Component {
         items: items
       })
     }
-    let same = items.some((r, i) => (i !== index && r.value === v))
+    let same = items.some((r, i) => (i !== index && parseInt(r.value, 10) === v))
     if (same) {
       items[index].error = true
       items[index].errorMsg = '当前面额已被添加，请勿重复添加～'
@@ -212,7 +232,7 @@ class ChargeInfo extends React.Component {
   }
 
   render () {
-    let {id, items, schoolId, schoolError, itemsError} = this.state
+    let {id, items, schoolId, schoolError} = this.state
     let l = items.length
     const itemsGroup = items && items.map((record,index)=>{
       return (

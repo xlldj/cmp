@@ -8,7 +8,6 @@ import {Button, DatePicker} from 'antd'
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import Time from '../../component/time'
-import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import CONSTANTS from '../../component/constants'
@@ -35,7 +34,8 @@ class CashtimeInfo extends React.Component {
     }
     let timeValueError = false
     this.state = { 
-      schoolId, schoolError, type, specificTime, fixedTime, typeError, initialSchool, id, timeValueError
+      schoolId, schoolError, type, specificTime, fixedTime, typeError, initialSchool, id, timeValueError,
+      posting: false
     }
   }
   fetchData =(body)=>{
@@ -68,7 +68,7 @@ class CashtimeInfo extends React.Component {
     this.props.hide(false)
     if(this.props.match.params.id){
       const body={
-        id:parseInt(this.props.match.params.id.slice(1))
+        id:parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
@@ -82,7 +82,7 @@ class CashtimeInfo extends React.Component {
         schoolError: true
       })
     }
-    if (!parseInt(this.state.type)) {
+    if (!parseInt(this.state.type, 10)) {
       return this.setState({
         typeError: true
       })
@@ -90,10 +90,10 @@ class CashtimeInfo extends React.Component {
     if (this.state.timeValueError) {
       return
     }
-    let {fixedTime, specificTime, type, schoolId} = this.state
+    let {fixedTime, specificTime, type, schoolId, posting} = this.state
     const body = {
-      type: parseInt(type),
-      schoolId: parseInt(schoolId)
+      type: parseInt(type, 10),
+      schoolId: parseInt(schoolId, 10)
     }
     if (this.state.type === 1) {
       let start = moment(fixedTime.startTime.time).valueOf(), end = moment(fixedTime.endTime.time).valueOf()
@@ -106,44 +106,53 @@ class CashtimeInfo extends React.Component {
       body.fixedTime = {
         startTime: {
           time: {
-            hour: parseInt(moment(fixedTime.startTime.time).hour()),
-            minute: parseInt(moment(fixedTime.startTime.time).minute())
+            hour: parseInt(moment(fixedTime.startTime.time).hour(), 10),
+            minute: parseInt(moment(fixedTime.startTime.time).minute(), 10)
           },
-          weekday: parseInt(fixedTime.startTime.weekday),
+          weekday: parseInt(fixedTime.startTime.weekday, 10),
         }, 
         endTime: {
           time: {
-            hour: parseInt(moment(fixedTime.endTime.time).hour()),
-            minute: parseInt(moment(fixedTime.endTime.time).minute())
+            hour: parseInt(moment(fixedTime.endTime.time).hour(), 10),
+            minute: parseInt(moment(fixedTime.endTime.time).minute(), 10)
           },
-          weekday: parseInt(fixedTime.endTime.weekday),
+          weekday: parseInt(fixedTime.endTime.weekday, 10),
         }
       }
     } else {
       body.specificTime = {
-        startTime: parseInt(moment(specificTime.startTime).valueOf()),
-        endTime: parseInt(moment(specificTime.endTime).valueOf())
+        startTime: parseInt(moment(specificTime.startTime).valueOf(), 10),
+        endTime: parseInt(moment(specificTime.endTime).valueOf(), 10)
       }
     }
     let resource
     if(this.props.match.params.id){
-      body.id = parseInt(this.props.match.params.id.slice(1))
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
       resource = '/api/time/range/withdraw/update'
     } else {
       resource = '/api/time/range/withdraw/add'
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+      this.setState({
+        posting: false
+      })
+      if(json.error){
+        Noti.hintServiceError(json.error.displayMessage)
+      }else{
+        /*--------redirect --------*/
+        if(json.data){
+          Noti.hintSuccess(this.props.history,'/fund/cashtime')
         }else{
-          /*--------redirect --------*/
-          if(json.data){
-            Noti.hintSuccess(this.props.history,'/fund/cashtime')
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+          throw new Error('网络出错，请稍后重试～')
+        }        
+      }
     }
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
     AjaxHandler.ajax(resource,body,cb)
   }
   cancel = () => {
@@ -163,7 +172,7 @@ class CashtimeInfo extends React.Component {
     this.setState(nextState)
   }
   checkSchool = (v) => {
-    if (!parseInt(this.state.schoolId)) {
+    if (!parseInt(this.state.schoolId, 10)) {
       return this.setState({
         schoolError: true
       })
@@ -174,24 +183,38 @@ class CashtimeInfo extends React.Component {
     this.checkExist(null)
   }
   confirm = () => {
+    let {checking, posting} = this.state
+    if (checking || posting) {
+      return
+    }
     this.checkExist(this.completeEdit)
   }
 
   checkExist = (callback) => {
-    let {schoolId, id, initialSchool} = this.state
-    if (id && (parseInt(schoolId) === initialSchool) ) {
+    let {schoolId, id, initialSchool, checking} = this.state
+
+    if (id && (parseInt(schoolId, 10) === initialSchool) ) {
       if (callback) {
         callback()
       }
       return
     }
+    if (checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
     let resource = '/time/range/withdraw/check'
     const body = {
-      schoolId: parseInt(schoolId)
+      schoolId: parseInt(schoolId, 10)
     }
     const cb = (json) => {
+      this.setState({
+        checking: false
+      })
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           Noti.hintLock('操作出错', '当前学校已有提现时间设置，请勿重复添加')
@@ -215,7 +238,7 @@ class CashtimeInfo extends React.Component {
     if (this.state.typeError) {
       nextState.typeError = false
     }
-    nextState.type = parseInt(v)
+    nextState.type = parseInt(v, 10)
     this.setState(nextState)
   }
   changeStartDay = (v) => {

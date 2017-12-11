@@ -90,6 +90,8 @@ class OrderTable extends React.Component {
             return <Badge status='success' text='使用结束' />
           case 4:
             return <Badge status='default' text='已退单' />
+          case 3:
+            return <Badge status='warning' text='异常' />
           default:
             return <Badge status='warning' text='异常' />
         }

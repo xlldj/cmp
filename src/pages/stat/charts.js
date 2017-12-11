@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
-import { LineChart, Line, XAxis, YAxis,Tooltip, CartesianGrid, Legend, Label, LabelList, AreaChart, Area } from 'recharts';
-import { scalePow, scaleLog } from 'd3-scale';
+import { LineChart, Line, XAxis, YAxis,Tooltip, CartesianGrid, Legend, AreaChart, Area } from 'recharts';
 import SchoolSelector from '../component/schoolSelector'
-import Select from 'antd/lib/select'
 import Switch from 'antd/lib/switch'
-import Icon from 'antd/lib/icon'
 import DatePicker from 'antd/lib/date-picker'
 import AjaxHandler from '../ajax'
 import Format from '../component/format'
@@ -12,7 +9,7 @@ import CONSTANTS from '../component/constants'
 import Time from '../component/time'
 import Noti from '../noti'
 import moment from 'moment'
-const {RangePicker, MonthPicker} = DatePicker
+const {MonthPicker} = DatePicker
 
 const NOW = Date.parse(new Date())
 
@@ -122,45 +119,45 @@ export default class Charts extends Component {
       loading: true
     })
     /* in case: 1. change chart index, 2. change target. The state won't change immediately when fetchDate, so need to pass newState through parameters */
-    let {currentChart, target} = {...this.state, ...newState}
+    let {currentChart, target, startTime, endTime, timeUnit, compare} = {...this.state, ...newState}
     let resource = `/statistics/${CHARTTYPES[currentChart]}/polyline`
     const cb = (json)=>{
       let nextState = {
         loading: false
       }
-      if(json.error){
-        throw new Error(json.error)
-      }else{
+      if (json.error) {
+        Noti.hintServiceError(json.error.displayMessage)
+      } else {
         let firstPoints = json.data[data1Name[currentChart]], secondPoints = json.data[data2Name[currentChart]] || null
         /* change the denomination when the result is about money */
         if (target === 2) {
           if (currentChart === 1 || currentChart === 3 || currentChart === 4) {
             firstPoints.forEach((f, i, arr) => {
-              arr[i].y = parseInt(f.y / 100)
+              arr[i].y = parseInt(f.y / 100, 10)
             })
             secondPoints.forEach((s, i, arr) => {
-              arr[i].y = parseInt(s.y / 100)
+              arr[i].y = parseInt(s.y / 100, 10)
             })
           }
         }
-        let {startTime,endTime,timeUnit} = this.state,data
+        let data
         if (timeUnit===2) {
           data =Time.getDateArray(startTime,endTime)
-          data.map((r,i)=>{
+          data.forEach((r,i)=>{
             let t = Date.parse(new Date(r.x))
             if(t<NOW){
               r.y = 0
               r.y2 = 0
             }
           })
-          firstPoints&&firstPoints.map((r,i)=>{
+          firstPoints&&firstPoints.forEach((r,i)=>{
             let x = Format.dayFormat(r.x)
             let xInData = data.find((r,i)=>(r.x===x))
             if(xInData){
               xInData.y = r.y//push first array data into data array
             }
           })
-          secondPoints&&secondPoints.map((r,i)=>{
+          secondPoints&&secondPoints.forEach((r,i)=>{
             let x = Format.dayFormat(r.x)
             let xInData = data.find((r,i)=>(r.x===x))
             if(xInData){
@@ -169,21 +166,21 @@ export default class Charts extends Component {
           })
         } else {
           data = Time.getHourArray(startTime,endTime)
-          data.map((r,i)=>{
+          data.forEach((r,i)=>{
             let t = Date.parse(new Date(r.x))
             if(t<NOW){
               r.y = 0
               r.y2 = 0
             }
           })
-          firstPoints&&firstPoints.map((r,i)=>{
+          firstPoints&&firstPoints.forEach((r,i)=>{
             let x = Format.hourFormat(r.x)
             let xInData = data.find((r,i)=>(r.x===x))
             if(xInData){
               xInData.y = r.y//push shower points into data array
             }
           })
-          secondPoints&&secondPoints.map((r,i)=>{
+          secondPoints&&secondPoints.forEach((r,i)=>{
             let x = Format.hourFormat(r.x)
             let xInData = data.find((r,i)=>(r.x===x))
             if(xInData){
@@ -193,7 +190,7 @@ export default class Charts extends Component {
         }
         nextState.data = data
       }
-      if(this.state.compare){
+      if(compare){
         this.fetchCompareData()
         nextState.loading = true
       }
@@ -222,7 +219,7 @@ export default class Charts extends Component {
             x:`第${i+1}周`,
             num:startWeekNum+i
           }
-          //如果周一的0点已经过去，就将所有的值值为0
+          //如果周一的0点已经过去，就将所有的值置为0
           if(monday<NOW){
             item.assign= 0
             item.repair=0
@@ -232,15 +229,21 @@ export default class Charts extends Component {
         }
         acceptTime&&acceptTime.forEach((r,i)=>{
           let item = data.find((record,ind)=>(record.num===Format.getWeekNum(r.x)))
-          item&&(item.y = r.y)
+          if (item) {
+            item.y = r.y
+          }
         })
         assignTime&&assignTime.forEach((r,i)=>{
           let item = data.find((record,ind)=>(record.num===Format.getWeekNum(r.x)))
-          item&&(item.assign = r.y)
+          if (item) {
+            item.assign = r.y
+          }
         })
         repairTime&&repairTime.forEach((r,i)=>{
           let item = data.find((record,ind)=>(record.num===Format.getWeekNum(r.x)))
-          item&&(item.repair = r.y)
+          if (item) {
+            item.repair = r.y
+          }
         })
         nextState.areaData = data
       }
@@ -261,8 +264,8 @@ export default class Charts extends Component {
 
   changeTarget = (e) => {
     e.preventDefault()
-    let v = parseInt(e.target.getAttribute('data-value'))
-    let {target,startTime,endTime,timeUnit,selectedSchool,compare} = this.state
+    let v = parseInt(e.target.getAttribute('data-value'), 10)
+    let {target,startTime,endTime,timeUnit,selectedSchool} = this.state
     if(v===target){
       return
     }
@@ -273,7 +276,7 @@ export default class Charts extends Component {
       target: v
     }
     if(selectedSchool!=='all'){
-      body.schoolId = parseInt(selectedSchool)
+      body.schoolId = parseInt(selectedSchool, 10)
     }
     this.fetchData(body, {target: v})
 
@@ -309,7 +312,7 @@ export default class Charts extends Component {
       timeUnit: timeUnit
     }
     if(selectedSchool!=='all'){
-      body.schoolId = parseInt(selectedSchool)
+      body.schoolId = parseInt(selectedSchool, 10)
     }
     const cb = (json)=>{
       let nextState = {
@@ -322,10 +325,10 @@ export default class Charts extends Component {
         if (target === 2) {
           if (currentChart === 1 || currentChart === 3 || currentChart === 4) {
             firstPoints.forEach((f, i, arr) => {
-              arr[i].y = parseInt(f.y / 100)
+              arr[i].y = parseInt(f.y / 100, 10)
             })
             secondPoints.forEach((s, i, arr) => {
-              arr[i].y = parseInt(s.y / 100)
+              arr[i].y = parseInt(s.y / 100, 10)
             })
           }
         }
@@ -335,38 +338,38 @@ export default class Charts extends Component {
 
         //将过去的数据转为本日/周/月的数据，再将其插入data数组中
         if(timeSpan===1){
-          newData.map((r,i)=>{
+          newData.forEach((r,i)=>{
             r.lasty = 0
             r.lasty2 =0
             let lastX = Time.ago24Hour(r.x)//取得24小时之前的时间
             r.lastX = lastX
           })
-          firstPoints&&firstPoints.map((r,i)=>{
+          firstPoints&&firstPoints.forEach((r,i)=>{
             let item = newData.find((record,ind)=>(Format.hourFormat(r.x)===record.lastX))
             if(item){
               item.lasty = r.y
             }
           })
-          secondPoints&&secondPoints.map((r,i)=>{
+          secondPoints&&secondPoints.forEach((r,i)=>{
             let item = newData.find((record,ind)=>(Format.hourFormat(r.x)===record.lastX))
             if(item){
               item.lasty2 = r.y
             }
           })
         }else if(timeSpan===2){
-          newData.map((r,i)=>{
+          newData.forEach((r,i)=>{
             r.lasty = 0
             r.lasty2 =0
             let lastX = Time.weekAgo(r.x)//取得24小时之前的时间
             r.lastX = lastX
           })
-          firstPoints&&firstPoints.map((r,i)=>{
+          firstPoints&&firstPoints.forEach((r,i)=>{
             let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
             if(item){
               item.lasty = r.y
             }
           })
-          secondPoints&&secondPoints.map((r,i)=>{
+          secondPoints&&secondPoints.forEach((r,i)=>{
             let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
             if(item){
               item.lasty2 = r.y
@@ -374,7 +377,7 @@ export default class Charts extends Component {
           })
         }else{
           let lastMonthArray = Time.getDateArray(Time.getLastMonthStart(),Time.getLastMonthEnd())
-          lastMonthArray.map((r,i)=>{
+          lastMonthArray.forEach((r,i)=>{
             if(i<newData.length){
               newData[i].lasty = 0
               newData[i].lasty2 =0
@@ -387,13 +390,13 @@ export default class Charts extends Component {
               })
             }
           })
-          firstPoints&&firstPoints.map((r,i)=>{
+          firstPoints&&firstPoints.forEach((r,i)=>{
             let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
             if(item){
               item.lasty = r.y
             }
           })
-          secondPoints&&secondPoints.map((r,i)=>{
+          secondPoints&&secondPoints.forEach((r,i)=>{
             let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
             if(item){
               item.lasty2 = r.y
@@ -409,8 +412,8 @@ export default class Charts extends Component {
 
   removeCompareData = () => {
     /*-----------后续查看是否需要重新拉取数据，因为可能比较两月时，当前月的数据比上月少，删除上月后当前数据中有无效长度，重新拉取会呈现地更好-------------*/
-    let {data,compare} = this.state, newData = JSON.parse(JSON.stringify(data))
-    newData&&newData.map((r,i)=>{
+    let {data} = this.state, newData = JSON.parse(JSON.stringify(data))
+    newData&&newData.forEach((r,i)=>{
       delete r.lasty
       delete r.lasty2
     })
@@ -458,7 +461,7 @@ export default class Charts extends Component {
       body.timeUnit = timeUnit
       body.target = 1
       if(selectedSchool!=='all'){
-        body.schoolId = parseInt(selectedSchool)
+        body.schoolId = parseInt(selectedSchool, 10)
       }
       this.setState(nextState)
       this.fetchData(body, {currentChart: i})
@@ -539,7 +542,7 @@ export default class Charts extends Component {
     /*-----------if compared,clean it-----------*/
     e.preventDefault()
     let nextState = {}, timeUnit = 2
-    let v = parseInt(e.target.getAttribute('data-value')), timeSpan=this.state.timeSpan, newStartTime, newEndTime, body = {}
+    let v = parseInt(e.target.getAttribute('data-value'), 10), timeSpan=this.state.timeSpan, newStartTime, newEndTime, body = {}
     if(v === timeSpan){
       return
     }
@@ -568,17 +571,16 @@ export default class Charts extends Component {
     body.target = this.state.target
 
     if(this.state.selectedSchool!=='all'){
-      body.schoolId = parseInt(this.state.selectedSchool)
+      body.schoolId = parseInt(this.state.selectedSchool, 10)
     }
-    this.fetchData(body)
+    this.fetchData(body, {startTime: newStartTime, endTime: newEndTime, timeSpan: v, timeUnit: timeUnit})
 
     this.setState(nextState)
   }
 
   compareLast = (checked)=>{
     let nextState = {
-      compare: checked,
-      endTime: Time.getNow()
+      compare: checked
     }
     this.setState(nextState)
 
@@ -590,7 +592,7 @@ export default class Charts extends Component {
   }
 
   render() {
-    const { data, selectedSchool,startTime, endTime, timeUnit,loading,target,timeSpan,compare, currentChart, currentMonth, monthStr, areaData } = this.state;
+    const { data, selectedSchool, timeUnit, target,timeSpan,compare, currentChart, currentMonth, monthStr, areaData } = this.state;
     
     return (
       <div className='chart'>
@@ -720,7 +722,7 @@ export default class Charts extends Component {
 
 const CustomizedTooltip = React.createClass({
   render () {
-    const {type, payload, label, active,timeUnit} = this.props;
+    const {payload, label, active} = this.props;
     const ys = !!payload&&payload.filter((r,i)=>{
       return r.dataKey === 'y'
     })
@@ -818,7 +820,7 @@ const CustomizedTooltip = React.createClass({
 
 const CustomizedXAxisTick = React.createClass({
   render () {
-    const {x, y, stroke, payload,timeUnit} = this.props;
+    const {x, y, payload,timeUnit} = this.props;
     
     return (
       <g transform={`translate(${x},${y})`}>
@@ -830,7 +832,7 @@ const CustomizedXAxisTick = React.createClass({
 
 const CustomizedAxisTick = React.createClass({
   render () {
-    const {x, y, stroke, payload} = this.props;
+    const {x, y, payload} = this.props;
     
     return (
       <g transform={`translate(${x},${y})`}>

@@ -43,14 +43,19 @@ class DeviceInfo extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    let {deviceType, id, residenceId} = this.props.location.state
+    let {deviceType, id, residenceId, path} = this.props.location.state
     this.setState({
       deviceType: deviceType,
       id: id,
       residenceId: residenceId
     })
     let resource, body
-    if (deviceType === 2) {
+    if (path && path === 'fromRepair') {
+      resource = '/device/group/one'
+      body = {
+        id: id
+      }
+    } else if (deviceType === 2) {
       resource = '/device/water/one'
       body = {
         id: residenceId
@@ -63,7 +68,7 @@ class DeviceInfo extends React.Component {
     }
     const cb=(json)=>{
       if(json.error){
-        throw new Error(json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         this.setState({
           data: json.data
@@ -151,6 +156,7 @@ class DeviceInfo extends React.Component {
     )
     let time = Time.getTimeStr(data.bindingTime)
     let waterMac = data.water ? Object.keys(data.water).map((key, i) => (<span key={`water${i}`} className='waterMacItem'>{data.water[key].macAddress}</span>)) : null
+    let propState = this.props.history.location.state
     return (
       <div 
         className={repairs && repairs.length>0 ? 'infoBlockList deviceInfo columnLayout' : 'infoBlockList deviceInfo'}
@@ -183,7 +189,7 @@ class DeviceInfo extends React.Component {
         {repairs && repairs.length>0?repairsLog:null}
 
         <div className='btnArea'>
-          <Button onClick={this.back}>{this.props.history.location.state ? BACKTITLE[this.props.history.location.state.path] : '返回'}</Button>
+          <Button onClick={this.back}>{(propState && propState.path) ? BACKTITLE[propState.path] : '返回'}</Button>
         </div>
       </div>
     )

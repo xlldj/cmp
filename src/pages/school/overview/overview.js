@@ -1,13 +1,12 @@
 import React from 'react'
-import {Table, Input, Icon} from 'antd'
+import {Table, Icon} from 'antd'
 import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
 import Time from '../../component/time'
 import Format from '../../component/format'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
-const TextArea = Input.TextArea
+import Noti from '../../noti'
 const SIZE = 4
 
 class EditableCell extends React.Component {
@@ -241,7 +240,7 @@ class Overview extends React.Component {
             )
           })
           return (
-            <div key='bonusAct-${index}' className='bonusActs pad10'>
+            <div key={`bonusAct-${index}`} className='bonusActs pad10'>
               {bonus}
             </div>
           )
@@ -352,10 +351,7 @@ class Overview extends React.Component {
     }
     const cb = (json) => {
       if (json.error) {
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络错误，请稍后重试'
-        }
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.id) {
           const dataSource = JSON.parse(JSON.stringify(this.state.dataSource));
@@ -365,10 +361,7 @@ class Overview extends React.Component {
             dataSource: dataSource
           })
         } else {
-          throw {
-            title: '请求出错',
-            message: '网络错误，请稍后重试'
-          }
+          Noti.hintServiceError()
         }
       }
     }

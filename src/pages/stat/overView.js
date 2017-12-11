@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import SchoolSelector from '../component/schoolSelector'
-import CONSTANTS from '../component/constants'
 import OVDetail from './ovdetail'
 import Time from '../component/time'
 import AjaxHandler from '../ajax'

@@ -70,8 +70,7 @@ class RateLimitTable extends React.Component {
         Noti.hintServiceError(json.error.displayMessage)
       }else{
         if(json.data){
-          let data = JSON.parse(JSON.stringify(json.data))
-          nextState.dataSource = data
+          nextState.dataSource = json.data.orderLimits
           nextState.total = json.data.total
         }else{
           this.setState(nextState)
@@ -104,13 +103,13 @@ class RateLimitTable extends React.Component {
   }
   delete = (e, id) => {
     e.preventDefault()
-    let resource = ''
+    let resource = '/order/limit/delete'
     const body = {
       id: id
     }
     const cb = (json) => {
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         /*--------redirect --------*/
         if(json.data){

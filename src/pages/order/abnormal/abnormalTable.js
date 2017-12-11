@@ -99,9 +99,9 @@ class AbnormalTable extends React.Component {
       className:'shalowRed',
       render: (text,record,index) => {
         if (record.status !== 1) {
-          return `¥${record.consume}` || '暂无'
+          return `${record.consume}` || '暂无'
         } else if (record.prepay) {
-          return `预付¥${record.prepay}`
+          return `${record.prepay}`
         }
       }
     }, {
