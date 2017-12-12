@@ -1,3 +1,10 @@
+export const SET_SCHOOL_LIST = 'SET_SCHOOL_LIST'
+export const setSchoolList = (value) => {
+  return {
+    type: SET_SCHOOL_LIST,
+    value
+  }
+}
 
 export const CHANGE_SCHOOL = 'CHANGE_SCHOOL'
 export const changeSchool = (subModule, keyValuePair) => {

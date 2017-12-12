@@ -3,20 +3,28 @@ import AjaxHandler from '../ajax'
 import {getStore, getLocal, setLocal} from '../util/storage'
 import CONSTANTS from './constants'
 import Select from './select'
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setSchoolList } from '../../actions'
+
 const {Option, OptGroup} = Select
 
 const forbidden = getStore('forbidden')
 
 class SchoolSelector extends React.Component{
-  constructor(props){
-    super(props)
-    this.state = {
-      schools: [],
-      recent: []
-    }
+  static propTypes = {
+    recent: PropTypes.array.isRequired,
+    schools: PropTypes.array.isRequired,
+    schoolSet: PropTypes.bool.isRequired
   }
   componentDidMount(){
-    this.fetchSchools()
+    // this.fetchSchools()
+    let {schoolSet} = this.props
+    if (!schoolSet) {
+      this.fetchSchools()
+    }
   }
   fetchSchools = () => {
     let resource='/school/list'
@@ -30,14 +38,20 @@ class SchoolSelector extends React.Component{
       }else{
         /*--------redirect --------*/
         if(json.data){
+          /* 
           let nextState = {}
           nextState.schools = json.data.schools
-          let recentSchools = getLocal('recentSchools')
+          */
+          let recentSchools = getLocal('recentSchools'), recent = []
           if (recentSchools) {
-            let recent = recentSchools.split(',')
-            nextState.recent = recent
+            // let recent = recentSchools.split(',')
+            recent = recentSchools.split(',').filter((r) => {
+              return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
+            })
+            // nextState.recent = recent
           }
-          this.setState(nextState)
+          // this.setState(nextState)
+          this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
         }else{
           throw new Error('网络出错，请稍后重试～')
         }        
@@ -45,8 +59,8 @@ class SchoolSelector extends React.Component{
     }
     AjaxHandler.ajax(resource,body,cb)
   }
-  setRecentSchools = (recent) => {
-    let schools = this.state.schools
+  setRecentSchools = () => {
+    let {schools, recent} = this.props
     let recentItems = recent.map((r, i) => {
       let item = schools.find(s=>s.id===parseInt(r, 10))
       return (
@@ -63,7 +77,7 @@ class SchoolSelector extends React.Component{
     /* if v is not 'all', store it in the lcoal */
     let name = ''
     if (v !== 'all') {
-      name = this.state.schools.find(r=>r.id===parseInt(v, 10)).name
+      name = this.props.schools.find(r=>r.id===parseInt(v, 10)).name
       let recentSchools = getLocal('recentSchools'), recentArr = []
       if (recentSchools) {
         recentArr = recentSchools.split(',')
@@ -83,9 +97,12 @@ class SchoolSelector extends React.Component{
       }
       let recentStr = recentArr.join(',')
       setLocal('recentSchools', recentStr)
+      this.props.setSchoolList({recent: recentArr})
+      /*
       this.setState({
         recent: recentArr
       })
+      */
     }
     this.props.changeSchool(v, name)
   }
@@ -95,11 +112,13 @@ class SchoolSelector extends React.Component{
     }
   }
   render(){
-    const {schools, recent} = this.state
+    const {schools, recent} = this.props
+
     const schNameOptions = schools.map((s,i) => (
       <Option value={s.id.toString()} key={s.id}>{s.name}</Option>
     ))
-    const recentItems = this.setRecentSchools(recent)
+
+    const recentItems = this.setRecentSchools()
     return (
       <Select 
         disabled={this.props.disabled?this.props.disabled:false}
@@ -119,4 +138,16 @@ class SchoolSelector extends React.Component{
   }
 }
 
-export default SchoolSelector
+// export default SchoolSelector
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    schools: state.setSchoolList.schools,
+    schoolSet: state.setSchoolList.schoolSet,
+    recent: state.setSchoolList.recent
+  }
+}
+
+export default withRouter(connect(mapStateToProps, {
+  setSchoolList 
+})(SchoolSelector))

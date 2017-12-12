@@ -17,6 +17,20 @@ if (recentSchools) {
   }
 }
 
+const initialSchools = {
+  recent: [],
+  schools: [],
+  schoolSet: false
+}
+const setSchoolList = (state = initialSchools, action) => {
+  const {type} = action
+  if (type === ActionTypes.SET_SCHOOL_LIST) {
+    const value = action.value
+    return merge({}, state, value)
+  }
+  return state
+}
+
 const initialSchoolState = {
   schoolList: {
     page: 1,
@@ -292,7 +306,8 @@ const rootReducer = combineReducers({
   changeTask,
   changeEmployee,
   changeNotify,
-  changeVersion
+  changeVersion,
+  setSchoolList
 })
 
 export default rootReducer
