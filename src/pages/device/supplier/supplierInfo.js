@@ -4,15 +4,8 @@ import {Button} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
-import AddPlusAbs from '../../component/addPlusAbs'
 import CONSTANTS from '../../component/constants'
-import SchoolSelector from '../../component/schoolSelectorWithoutAll'
-import DeviceWithouAll from '../../component/deviceWithoutAll'
-const BACKTITLE = {
-  fromInfoSet: '返回学校信息设置'
-}
-const initialItems = [{prepay: ''}]
-const initialDrinkItems =[[{prepay: '', usefor: 1}],[{prepay: '', usefor: 2}],[{prepay: '', usefor: 3}]]
+import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 
 class SupplierInfo extends React.Component {
   constructor (props) {
@@ -23,25 +16,31 @@ class SupplierInfo extends React.Component {
       nameError: false,
       alias: '',
       aliasError: false,
-      version: '',
-      versionError: false
+      agreement: '',
+      agreementError: false,
+      notify: '',
+      notifyError: false,
+      write: '',
+      writeError: false,
+      service: '',
+      serviceError: false
     }
   }
   fetchData =(body)=>{
     let resource='/supplier/query/one'
     const cb=(json)=>{
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         if(json.data){
-          let {id, name, alias, version} = json.data
+          let {id, name, alias, agreement} = json.data
           let nextState={
             id: id,
             name: name,
             alias: alias
           }
-          if (version) {
-            nextState.version = version
+          if (agreement) {
+            nextState.agreement = agreement
           }
           this.setState(nextState)
         }else{
@@ -56,7 +55,7 @@ class SupplierInfo extends React.Component {
     this.props.hide(false)
     if(this.props.match.params.id){
       const body={
-        id:parseInt(this.props.match.params.id.slice(1))
+        id:parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
@@ -65,14 +64,15 @@ class SupplierInfo extends React.Component {
     this.props.hide(true)
   }
   completeEdit = () => {
-    let {id, name, alias, version} = this.state
+    let {id, name, alias, agreement, write, notify, service} = this.state
 
     const body = {
       name: name,
-      alias: alias
-    }
-    if (version) {
-      body.version = version
+      alias: alias,
+      agreement: parseInt(agreement, 10),
+      notify: notify,
+      write: write,
+      service: service
     }
     const resource = '/supplier/save'
     if (id){
@@ -93,7 +93,7 @@ class SupplierInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   confirm = () => {
-    let {id, name, alias, version} = this.state
+    let {name, agreement, write, notify, service} = this.state
     if (!name) {
       return this.setState({
         nameError: true
@@ -104,12 +104,27 @@ class SupplierInfo extends React.Component {
       return this.setState({
         aliasError: true
       })
-    }
-    if (!version) {
+    } */
+    if (!agreement) {
       return this.setState({
-        versionError: true
+        agreementError: true
       })
-    }*/
+    }
+    if (!write) {
+      return this.setState({
+        writeError: true
+      })
+    }
+    if (!notify) {
+      return this.setState({
+        notifyError: true
+      })
+    }
+    if (!service) {
+      return this.setState({
+        serviceError: true
+      })
+    }
     /*
     if (!(id && originalSchool === schoolId && originalDevice === originalDevice)) {
       this.checkExist(this.completeEdit)
@@ -136,11 +151,7 @@ class SupplierInfo extends React.Component {
         throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
-          // Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
-          throw {
-            title: '添加出错',
-            message: '当前设备已有预付选项，请返回该项编辑'
-          }
+          Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
         } else {
           if (callback) {
             callback()
@@ -192,14 +203,82 @@ class SupplierInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeVersion = (e) => {
+  changeAgreement = (v) => {
     this.setState({
-      version: e.target.value
+      agreement: v
     })
+  }
+  changeNotify = (e) => {
+    this.setState({
+      notify: e.target.value
+    })
+  }
+  checkNotify = (e) => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        notifyError: true,
+        notify: v
+      })
+    }
+    const nextState = {
+      notify: v
+    }
+    if (this.state.notifyError) {
+      nextState.notifyError = false
+    }
+    this.setState(nextState)
+  }
+
+  changeWrite = (e) => {
+    this.setState({
+      write: e.target.value
+    })
+  }
+  checkWrite = (e) => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        writeError: true,
+        write: v
+      })
+    }
+    const nextState = {
+      write: v
+    }
+    if (this.state.writeError) {
+      nextState.writeError = false
+    }
+    this.setState(nextState)
+  }
+
+  changeService = (e) => {
+    this.setState({
+      service: e.target.value
+    })
+  }
+  checkService = (e) => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        serviceError: true,
+        service: v
+      })
+    }
+    const nextState = {
+      service: v
+    }
+    nextState.service = v
+    if (this.state.serviceError) {
+      nextState.serviceError = false
+    }
+    this.setState(nextState)
   }
 
   render () {
-    let {id, name, nameError, alias, aliasError, version, versionError} = this.state
+    let {name, nameError, alias, aliasError, agreement, agreementError, notify, notifyError, 
+      write, writeError, service, serviceError
+    } = this.state
 
     return (
       <div className='infoList '>
@@ -215,10 +294,31 @@ class SupplierInfo extends React.Component {
             {aliasError ? <span className='checkInvalid'>别名不能为空！</span> : null}
           </li> 
           <li>
-            <p>版本号:</p>
-            <input value={version} onChange={this.changeVersion} />
-            {versionError ? <span className='checkInvalid'>别名不能为空！</span> : null}
-          </li>   
+            <p>协议:</p>
+            <BasicSelectorWithoutAll 
+              invalidTitle='选择设备协议' 
+              staticOpts={CONSTANTS.DEVICEPROTOCOL} 
+              width={CONSTANTS.SELECTWIDTH} 
+              selectedOpt={agreement}  
+              changeOpt={this.changeAgreement}
+            />
+            {agreementError ? <span className='checkInvalid'>协议不能为空！</span> : null}
+          </li>
+          <li>
+            <p>notify_uuid:</p>
+            <input value={notify} onChange={this.changeNotify} onBlur={this.checkNotify} />
+            {notifyError ? <span className='checkInvalid'>notify_uuid不能为空！</span> : null}
+          </li> 
+          <li>
+            <p>write_uuid:</p>
+            <input value={write} onChange={this.changeWrite} onBlur={this.checkWrite} />
+            {writeError ? <span className='checkInvalid'>write_uuid不能为空！</span> : null}
+          </li> 
+          <li>
+            <p>service_uuid:</p>
+            <input value={service} onChange={this.changeService} onBlur={this.checkService} />
+            {serviceError ? <span className='checkInvalid'>service_uuid不能为空！</span> : null}
+          </li> 
         </ul>
 
         <div className='btnArea'>
