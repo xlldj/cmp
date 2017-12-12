@@ -153,14 +153,14 @@ class Log extends React.Component{
         // throw new Error(json.error.displayMessage||json.error.debugMessage)
         this.handleLogError(json.error)
       }else{
-        let {nickName, id, pictureUrl, forbidden} = json.data.user
+        let {nickName, id, pictureUrl} = json.data.user
         let user = {
           name: nickName,
           id: id,
           portrait: pictureUrl,
         }
         setToken(json.data.token)
-        if (forbidden) {
+        if (json.data.forbidden) {
           setStore('forbidden', 1)
         }
         setStore('username', nickName)
