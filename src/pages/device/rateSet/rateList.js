@@ -8,6 +8,7 @@ import Noti from '../../noti'
 import Time from '../../component/time'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
+import {mul} from '../../util/numberHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -48,7 +49,7 @@ class RateList extends React.Component {
       render: (text, record, index) => {
         const items = record.rateGroups.map((r, i) => (
         <li key={i}>
-          <span key={i}>扣费：{r.price * 100}分钱 脉冲数：{r.pulse}个</span>
+          <span key={i}>扣费：{mul(r.price, 100)}分钱 脉冲数：{r.pulse}个</span>
         </li>
           )
         )

@@ -283,7 +283,7 @@ class FundTable extends React.Component {
   }  
   render () {
     const {searchingText,dataSource, total, loading, subStartTime, subEndTime} = this.state
-    let {page, schoolId, type, status, startTime, endTime} = this.props
+    let {page, schoolId, type, status} = this.props
 
     return (
       <div className='contentArea'>

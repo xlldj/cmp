@@ -9,6 +9,7 @@ import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
+import {mul} from '../../util/numberHandle'
 
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
@@ -63,7 +64,7 @@ class RateInfo extends React.Component {
           let r=json.data
           const taps = r.timeLimit&&r.timeLimit.map((r) => ({value: r}))
           const rateGroups = r.rateGroups&&r.rateGroups.map((rate) => ({
-            price: rate.price * 100,
+            price: mul(rate.price, 100),
             pulse: rate.pulse
           }))
           let nextState = {

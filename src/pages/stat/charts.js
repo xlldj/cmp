@@ -9,6 +9,7 @@ import CONSTANTS from '../component/constants'
 import Time from '../component/time'
 import Noti from '../noti'
 import moment from 'moment'
+import {div} from '../util/numberHandle'
 const {MonthPicker} = DatePicker
 
 const NOW = Date.parse(new Date())
@@ -133,10 +134,12 @@ export default class Charts extends Component {
         if (target === 2) {
           if (currentChart === 1 || currentChart === 3 || currentChart === 4) {
             firstPoints.forEach((f, i, arr) => {
-              arr[i].y = parseInt(f.y / 100, 10)
+              let v = div(f.y, 100)
+              arr[i].y = parseInt(v, 10)
             })
             secondPoints.forEach((s, i, arr) => {
-              arr[i].y = parseInt(s.y / 100, 10)
+              let v = div(s.y, 100)
+              arr[i].y = parseInt(v, 10)
             })
           }
         }
@@ -325,10 +328,12 @@ export default class Charts extends Component {
         if (target === 2) {
           if (currentChart === 1 || currentChart === 3 || currentChart === 4) {
             firstPoints.forEach((f, i, arr) => {
-              arr[i].y = parseInt(f.y / 100, 10)
+              let v = div(f.y, 100)
+              arr[i].y = parseInt(v, 10)
             })
             secondPoints.forEach((s, i, arr) => {
-              arr[i].y = parseInt(s.y / 100, 10)
+              let v = div(s.y, 100)
+              arr[i].y = parseInt(v, 10)
             })
           }
         }

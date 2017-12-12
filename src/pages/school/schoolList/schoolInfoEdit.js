@@ -263,7 +263,7 @@ class SchoolInfoEdit extends React.Component {
         if(json.data){
           // Noti.hintSuccess(this.props.history,'/school')
           this.tellServerReload()
-          // this.tellClientReload()
+          this.tellClientReload()
         } else {
           Noti.hintServiceError()
           this.setState({
@@ -290,12 +290,12 @@ class SchoolInfoEdit extends React.Component {
     const body = null
     const cb = (json) => {
       const nextState = {
-        posting: false 
+        serverResponsed: true
       }
-      // let {clientResponsed, clientReloaded} = this.state
+      let {clientResponsed, clientReloaded} = this.state
       if (json.data.result) {
         nextState.serverReloaded = true
-        /* if (clientResponsed) {
+        if (clientResponsed) {
           nextState.posting = false
           if (clientReloaded) {
             this.hintSuccess()
@@ -303,14 +303,12 @@ class SchoolInfoEdit extends React.Component {
             this.clearReloadStatus()
             Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
           }
-        }*/
-        this.hintSuccess()
+        }
       } else {
-        /* if (clientResponsed) {
+        if (clientResponsed) {
           this.clearReloadStatus()
           Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
-        }*/
-        Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
+        }
       }
       this.setState(nextState)
     }
