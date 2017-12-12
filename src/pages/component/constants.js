@@ -405,24 +405,6 @@ const CONSTANTS = {
       ]
     },
     {
-      name: '红包管理',
-      path: 'gift',
-      key: 4,
-      icon: 'red-envelope',
-      children: [
-        {
-          name: '红包列表',
-          path: 'list',
-          key: 0
-        },
-        {
-          name: '红包活动',
-          path: 'act',
-          key: 1
-        }
-      ]
-    },
-    {
       name: '失物招领',
       path: 'lost',
       key: 5,
@@ -467,24 +449,6 @@ const CONSTANTS = {
       path: 'stat',
       key: 9,
       icon: 'line-chart'
-    },
-    {
-      name: '公告管理',
-      path: 'notify',
-      key: 10,
-      icon: 'sound',
-      children: [
-        {
-          name: '公告列表',
-          path: 'list',
-          key: 0
-        },
-        {
-          name: '公告审核',
-          path: 'censor',
-          key: 1
-        }
-      ]
     }
   ]
 }
