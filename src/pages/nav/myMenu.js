@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom'
 import {Icon} from 'antd'
 import './style/index.css'
 import CONSTANTS from '../component/constants'
-import {getLocal, setLocal} from '../util/storage'
+import {getStore, getLocal, setLocal} from '../util/storage'
 import AjaxHandler from '../ajax'
 import Time from '../component/time'
 
@@ -11,15 +11,24 @@ import { connect } from 'react-redux'
 import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion } from '../../actions'
 import { withRouter } from 'react-router-dom'
 
-const rootBlock = CONSTANTS.rootBlock
+// const this.rootBlock = CONSTANTS.this.rootBlock
 
 class MyMenu extends React.Component {
-  state = {
-    current: '',
-    openKeys: [],
-    pathname: '',
-    currentRoot: '',
-    currentChild: ''
+  constructor (props) {
+    super(props)
+    let forbidden = getStore('forbidden')
+    if (forbidden) {
+      this.rootBlock = CONSTANTS.forbiddenRootBlock
+    } else {
+      this.rootBlock = CONSTANTS.rootBlock
+    }
+    this.state = {
+      current: '',
+      openKeys: [],
+      pathname: '',
+      currentRoot: '',
+      currentChild: ''
+    }
   }
   componentDidMount () {
     let pathname = window.location.pathname
@@ -38,12 +47,12 @@ class MyMenu extends React.Component {
     let path = pathname || window.location.pathname, nextState = {}
     let parentPath = path.split('/')[1] || ''
     // console.log(path.split('/'))
-    for (let i=0;i<rootBlock.length;i++) {
-      if (parentPath === rootBlock[i].path) {
+    for (let i=0;i<this.rootBlock.length;i++) {
+      if (parentPath === this.rootBlock[i].path) {
 
-        nextState.currentRoot = rootBlock[i].key
+        nextState.currentRoot = this.rootBlock[i].key
 
-        let children = rootBlock[i].children, currentChild = 0
+        let children = this.rootBlock[i].children, currentChild = 0
 
         if (children) {
           for (let j=0;j<children.length;j++) {
@@ -58,7 +67,7 @@ class MyMenu extends React.Component {
         nextState.pathname = path
         this.setState(nextState)
 
-        this.props.changeWidth(!!rootBlock[i].children)
+        this.props.changeWidth(!!this.rootBlock[i].children)
         return 
       } 
     }
@@ -268,8 +277,8 @@ class MyMenu extends React.Component {
     let {currentRoot} = this.state
     let nextState = {}
     nextState.currentRoot = key
-    let currentModule = rootBlock.find((module) => (module.key === currentRoot))
-    let nextModule = rootBlock.find((module) => (module.key === key))
+    let currentModule = this.rootBlock.find((module) => (module.key === currentRoot))
+    let nextModule = this.rootBlock.find((module) => (module.key === key))
 
     let setStatusCbName = `setStatusFor${nextModule.path}`
     let cb = this[setStatusCbName]
@@ -288,7 +297,7 @@ class MyMenu extends React.Component {
   }
   changeChild = (e, key) => {
     let {currentRoot} = this.state
-    let parent = rootBlock.find((module) => (module.key === currentRoot))
+    let parent = this.rootBlock.find((module) => (module.key === currentRoot))
     let child = parent.children.find((son) => (son.key === key))
     let cb = this[`clearStatus4${parent.path}II${child.path}`]
     if (cb) {
@@ -300,7 +309,7 @@ class MyMenu extends React.Component {
   }
   render () {
     const {currentRoot, currentChild} = this.state
-    const rootItems = rootBlock.map((r, i) => {
+    const rootItems = this.rootBlock && this.rootBlock.map((r, i) => {
       const route = r.children ? `/${r.path}/${r.children[0].path}` : `/${r.path}`
       return (
         <li key={i} className={currentRoot === r.key ? 'activeRootItem' : ''} onClick={() => {this.chooseRoot(r.key)}}>
@@ -311,7 +320,7 @@ class MyMenu extends React.Component {
         </li>
       )
     })
-    const currentRoute = rootBlock.find((r) => (r.key === currentRoot))
+    const currentRoute = this.rootBlock.find((r) => (r.key === currentRoot))
     const secondItems = currentRoute&&currentRoute.children&&currentRoute.children.map((r, i) => {
       return (
         <li key={i} className={currentChild === r.key ? 'activeSecondItem' : ''}  onClick={(e) => {this.changeChild(e, r.key)}}>

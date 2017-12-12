@@ -61,8 +61,13 @@ class Main extends React.Component {
       this.props.changeDevice('deviceList', {schoolId: selectedSchool})
       this.props.changeDevice('repair', {schoolId: selectedSchool})
       this.props.changeFund('fundList', {schoolId: selectedSchool})
+      this.props.changeFund('abnormal', {schoolId: selectedSchool})
       this.props.changeLost('lostList', {schoolId: selectedSchool})
       this.props.changeUser('userList', {schoolId: selectedSchool})
+      this.props.changeTask('taskList', {schoolId: selectedSchool})
+      this.props.changeTask('log', {schoolId: selectedSchool})
+      this.props.changeTask('complaint', {schoolId: selectedSchool})
+      this.props.changeTask('feedback', {schoolId: selectedSchool})
     }
   }
   setDefaultSchool = () => {
@@ -79,8 +84,13 @@ class Main extends React.Component {
         this.props.changeDevice('deviceList', {schoolId: selectedSchool})
         this.props.changeDevice('repair', {schoolId: selectedSchool})
         this.props.changeFund('fundList', {schoolId: selectedSchool})
+        this.props.changeFund('abnormal', {schoolId: selectedSchool})
         this.props.changeLost('lostList', {schoolId: selectedSchool})
-        this.props.changeUser('userList', {schoolId: selectedSchool})
+        this.props.changeUser('userList', {schoolId: selectedSchool}) 
+        this.props.changeTask('taskList', {schoolId: selectedSchool}) 
+        this.props.changeTask('log', {schoolId: selectedSchool})
+        this.props.changeTask('complaint', {schoolId: selectedSchool})
+        this.props.changeTask('feedback', {schoolId: selectedSchool})
       } 
     }
     AjaxHandler.ajax(resource, body, cb)

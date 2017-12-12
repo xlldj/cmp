@@ -53,8 +53,6 @@ class Layouts extends React.Component {
   changeCurrentName = (nickName) => {
     let user = JSON.parse(JSON.stringify(this.state.user))
     user.name = nickName
-    console.log(user)
-    console.log(nickName)
     this.setState({
       user: user
     })
@@ -83,7 +81,7 @@ class Layouts extends React.Component {
           <Route render={()=>(component)} />
         </Switch>
       </div>
-    );
+    )
   }
 }
 

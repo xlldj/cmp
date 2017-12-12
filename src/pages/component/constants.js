@@ -284,6 +284,208 @@ const CONSTANTS = {
       key: 11,
       icon: 'down-square-o'
     }
+  ],
+
+  forbiddenRootBlock: [
+    {
+      name: '学校管理',
+      path: 'school',
+      key: 0,
+      icon: 'home',
+      children: [
+        {
+          path: 'list',
+          name: '学校列表',
+          key: 0
+        },
+        {
+          path: 'overview',
+          name: '信息总览',
+          key: 1
+        }
+      ]
+    },
+    {
+      name: '设备管理',
+      path: 'device',
+      key: 1,
+      icon: 'database',
+      children: [
+        {
+          path: 'list',
+          name: '设备列表',
+          key: 0
+        },
+        {
+          path: 'components',
+          name: '设备配件',
+          key: 1
+        },
+        {
+          path: 'prepay',
+          name: '设备预付',
+          key: 3
+        },
+        {
+          path: 'timeset',
+          name: '供水时段',
+          key: 4
+        },
+        {
+          path: 'suppliers',
+          name: '供应商',
+          key: 5
+        },
+        {
+          path: 'rateSet',
+          name: '费率设置',
+          key: 6
+        },
+        {
+          path: 'rateLimit',
+          name: '扣费速率',
+          key: 8
+        },
+        {
+          path: 'repair',
+          name: '报修管理',
+          key: 7
+        }
+      ]
+    },
+    {
+      name: '订单管理',
+      path: 'order',
+      key: 2,
+      icon: 'file-text',
+      children: [
+        {
+          name: '订单列表',
+          path: 'list',
+          key: 0
+        },
+        {
+          name: '异常订单',
+          path: 'abnormal',
+          key: 1
+        }
+      ]
+    },
+    {
+      name: '充值提现',
+      path: 'fund',
+      key: 3,
+      icon: 'pay-circle-o',
+      children: [
+        {
+          name: '资金列表',
+          path: 'list',
+          key: 0
+        },
+        {
+          name: '提现时间',
+          path: 'cashtime',
+          key: 1
+        },
+        {
+          name: '充值面额',
+          path: 'charge',
+          key: 2
+        },
+        {
+          name: '充值活动',
+          path: 'deposit',
+          key: 3
+        },
+        {
+          name: '异常资金',
+          path: 'abnormal',
+          key: 4
+        }
+      ]
+    },
+    {
+      name: '红包管理',
+      path: 'gift',
+      key: 4,
+      icon: 'red-envelope',
+      children: [
+        {
+          name: '红包列表',
+          path: 'list',
+          key: 0
+        },
+        {
+          name: '红包活动',
+          path: 'act',
+          key: 1
+        }
+      ]
+    },
+    {
+      name: '失物招领',
+      path: 'lost',
+      key: 5,
+      icon: 'switcher'
+    },
+    {
+      name: '用户管理',
+      path: 'user',
+      key: 6,
+      icon: 'team'
+    },
+    {
+      name: '客服工单',
+      path: 'task',
+      key: 7,
+      icon: 'customer-service',
+      children: [
+        {
+          name: '工单列表',
+          path: 'list',
+          key: 0
+        },
+        {
+          name: '工作记录',
+          path: 'log',
+          key: 1
+        },
+        {
+          name: '账单投诉',
+          path: 'complaint',
+          key: 3
+        },
+        {
+          name: '意见反馈',
+          path: 'feedback',
+          key: 4
+        }
+      ]
+    },
+    {
+      name: '统计分析',
+      path: 'stat',
+      key: 9,
+      icon: 'line-chart'
+    },
+    {
+      name: '公告管理',
+      path: 'notify',
+      key: 10,
+      icon: 'sound',
+      children: [
+        {
+          name: '公告列表',
+          path: 'list',
+          key: 0
+        },
+        {
+          name: '公告审核',
+          path: 'censor',
+          key: 1
+        }
+      ]
+    }
   ]
 }
 

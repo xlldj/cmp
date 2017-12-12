@@ -171,6 +171,8 @@ class OrderTable extends React.Component {
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
+    } else {
+      body.statusList = [1, 2, 4]
     }
     if (selectKey) {
       body.selectKey = selectKey
@@ -210,6 +212,8 @@ class OrderTable extends React.Component {
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
+    } else {
+      body.statusList = [1, 2, 4]
     }
     if (selectKey) {
       body.selectKey = selectKey

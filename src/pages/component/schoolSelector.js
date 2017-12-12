@@ -1,9 +1,11 @@
 import React from 'react'
 import AjaxHandler from '../ajax'
-import {getLocal, setLocal} from '../util/storage'
+import {getStore, getLocal, setLocal} from '../util/storage'
 import CONSTANTS from './constants'
 import Select from './select'
 const {Option, OptGroup} = Select
+
+const forbidden = getStore('forbidden')
 
 class SchoolSelector extends React.Component{
   constructor(props){
@@ -17,38 +19,38 @@ class SchoolSelector extends React.Component{
     this.fetchSchools()
   }
   fetchSchools = () => {
-    let resource='/api/school/list'
+    let resource='/school/list'
     const body={
       page: 1,
       size: 100
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+      if(json.error){
+        throw new Error(json.error.displayMessage || json.error)
+      }else{
+        /*--------redirect --------*/
+        if(json.data){
+          let nextState = {}
+          nextState.schools = json.data.schools
+          let recentSchools = getLocal('recentSchools')
+          if (recentSchools) {
+            let recent = recentSchools.split(',')
+            nextState.recent = recent
+          }
+          this.setState(nextState)
         }else{
-          /*--------redirect --------*/
-          if(json.data){
-            let nextState = {}
-            nextState.schools = json.data.schools
-            let recentSchools = getLocal('recentSchools')
-            if (recentSchools) {
-              let recent = recentSchools.split(',')
-              nextState.recent = recent
-            }
-            this.setState(nextState)
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+          throw new Error('网络出错，请稍后重试～')
+        }        
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   }
   setRecentSchools = (recent) => {
     let schools = this.state.schools
     let recentItems = recent.map((r, i) => {
-      let item = schools.find(s=>s.id===parseInt(r))
+      let item = schools.find(s=>s.id===parseInt(r, 10))
       return (
-        <Option value={r.toString()} key={`recent-${r}`}>{item&&item.name || ''}</Option>
+        <Option value={r.toString()} key={`recent-${r}`}>{(item && item.name) ? item.name : ''}</Option>
       )
     })
     return (
@@ -101,7 +103,7 @@ class SchoolSelector extends React.Component{
     return (
       <Select 
         disabled={this.props.disabled?this.props.disabled:false}
-        all
+        all={forbidden ? false : true}
         allTitle="全部学校"
         search
         value={this.props.selectedSchool}

@@ -4,10 +4,9 @@ import {Button} from 'antd'
 import AjaxHandler from '../ajax'
 import Noti from '../noti'
 import {setToken} from '../util/handleToken'
-import {setStore, setLocal, getLocal, removeLocal} from '../util/storage'
+import {setStore, getLocal} from '../util/storage'
+import {clientDetect} from '../util/clientDetect'
 import logLogo from '../assets/log_logo.png'
-import forget from '../assets/forget.png'
-import rememberImg from '../assets/remember.png'
 import './style/style.css'
 
 //const Form = asyncComponent(() => import(/* webpackChunkName: "form" */ "antd/lib/form"))
@@ -44,9 +43,6 @@ class Log extends React.Component{
     this.setState({
       mobile: e.target.value
     })
-  }
-  testValid = (v) => {
-
   }
   checkMobile = (e) => {
     let v = e.target.value.trim()
@@ -104,7 +100,7 @@ class Log extends React.Component{
     } */
   }  
   handleSubmit = () => {
-    let {mobile, password, remember, posting} = this.state
+    let {mobile, password, posting} = this.state
     /* if (!remember) {
       this.refs.pwd.type = 'text'
       console.log(this.refs.pwd)
@@ -139,10 +135,15 @@ class Log extends React.Component{
       posting: true
     })
 
+    const {brand, model} = clientDetect()
+
     const resource = '/login'
     const body = {
       mobile: parseInt(mobile, 10),
-      password: password
+      password: password,
+      system: 3, // from cmp
+      brand: brand, // operating system
+      model: model // browser type
     }
     const cb = (json) => {
       this.setState({
@@ -152,13 +153,16 @@ class Log extends React.Component{
         // throw new Error(json.error.displayMessage||json.error.debugMessage)
         this.handleLogError(json.error)
       }else{
-        let {nickName, id, pictureUrl} = json.data.user
+        let {nickName, id, pictureUrl, forbidden} = json.data.user
         let user = {
           name: nickName,
           id: id,
           portrait: pictureUrl,
         }
         setToken(json.data.token)
+        if (forbidden) {
+          setStore('forbidden', 1)
+        }
         setStore('username', nickName)
         setStore('userId', id)
         this.props.login(user)
@@ -167,6 +171,7 @@ class Log extends React.Component{
     }
     AjaxHandler.ajax(resource,body,cb)
   }
+
   pressEnter = (e) => {
     let key = e.key
     if (key.toLowerCase() === 'enter') {
@@ -194,7 +199,7 @@ class Log extends React.Component{
     }
   }
   render(){
-    let {mobile, mobileError, mobileErrorMsg, remember, password, pwdError, pwdErrorMsg} = this.state
+    let {mobile, mobileError, mobileErrorMsg, password, pwdError, pwdErrorMsg} = this.state
     /* 
       <div className='remember'>
         <p onClick={this.changeRemember}>
