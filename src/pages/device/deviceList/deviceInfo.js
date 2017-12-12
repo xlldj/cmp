@@ -93,14 +93,14 @@ class DeviceInfo extends React.Component {
     this.props.history.goBack()
   }
   toOrderOfDevice = () => {
-    this.props.changeOrder('order', 
+    this.props.changeOrder('orderList', 
       {
         page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
         selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()
       }
     )
     let {data, deviceType} = this.state
-    this.props.history.push({pathname:'/order',state:{path: 'fromDevice', id: data.residenceId, deviceType: deviceType}})
+    this.props.history.push({pathname:'/order/list',state:{path: 'fromDevice', id: data.residenceId, deviceType: deviceType}})
   }
   render () {
     let {data, deviceType, repairs} = this.state

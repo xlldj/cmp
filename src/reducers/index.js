@@ -96,6 +96,8 @@ const initialOrderState = {
 }
 const changeOrder = (state = initialOrderState, action) => {
   const {type} = action
+  console.log(state)
+  console.log(action)
 
   if (type === ActionTypes.CHANGE_ORDER) {
     const {subModule, keyValuePair} = action

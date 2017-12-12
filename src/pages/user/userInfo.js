@@ -175,14 +175,14 @@ class UserInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   toOrderOfUser = () => {
-    this.props.changeOrder('order', 
+    this.props.changeOrder('orderList', 
       {
         page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
         selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()
       }
     )
     let id = this.state.data.id
-    this.props.history.push({pathname: '/order', state: {path: 'fromUser', id: id}})
+    this.props.history.push({pathname: '/order/list', state: {path: 'fromUser', id: id}})
   }
   toFundOfUser = () => {
     let {mobile} = this.state.data

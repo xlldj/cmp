@@ -150,7 +150,7 @@ class OrderTable extends React.Component {
 
   componentDidMount(){
     this.props.hide(false)
-    let {state}=this.props.location
+    let {state}=this.props.history.location
     // this.props.changeOrder('order', {startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
 
     let {page, schoolId, deviceType, status, selectKey, startTime, endTime} = this.props
@@ -176,12 +176,14 @@ class OrderTable extends React.Component {
       body.selectKey = selectKey
     }
     if (state) {
+      // this.props.changeOrder('order', {schoolId: 'all'})
       if (state.path === 'fromDevice') {
         body.residenceId = state.id
         body.deviceType = state.deviceType
       } else if (state.path === 'fromUser') {
         body.userId = state.id
       }
+      delete body.schoolId
     }
     this.fetchData(body)
   }
@@ -212,7 +214,7 @@ class OrderTable extends React.Component {
     if (selectKey) {
       body.selectKey = selectKey
     }
-    let {state}=this.props.location
+    let {state}=this.props.history.location
     if (state) {
       if (state.path === 'fromDevice') {
         body.residenceId = state.id
@@ -220,6 +222,7 @@ class OrderTable extends React.Component {
       } else if (state.path === 'fromUser') {
         body.userId = state.id
       }
+      delete body.schoolId
     }
     this.fetchData(body)
   }
