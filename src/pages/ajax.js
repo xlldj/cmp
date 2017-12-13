@@ -9,7 +9,7 @@ const AjaxHandler = {
 const hintExpire = () => {
   // alert('expire')
   const logout = () => {
-    removeStore()
+    removeStore('logged')
     window.location.assign('/')
   }
   Noti.hintAndClick('您的账户已在别的地方登录', '您将被强制退出，请重新登录', logout)
@@ -146,9 +146,9 @@ AjaxHandler.ajax = (resource, body, cb, errorCb, domain) => {
   }
   // 默认使用管理端账户，除非用domain字段传入
   // debugger
-  const url = (domain ? domain : 'http://116.62.236.67:5080') + resource
+  // const url = (domain ? domain : 'http://116.62.236.67:5080') + resource
   // const url = (domain ? domain : 'http://10.0.0.4:5080') + resource
-  // const url = (domain ? domain : 'https://api.xiaolian365.com/m') + resource
+  const url = (domain ? domain : 'https://api.xiaolian365.com/m') + resource
   // const url = resource
 
   const token = getToken()
@@ -164,9 +164,9 @@ AjaxHandler.ajax = (resource, body, cb, errorCb, domain) => {
   return abortablePromise(fetch_promise, cb, errorCb)
 }
 AjaxHandler.ajaxClient = (resource, body, cb) => {
-  const domain = 'http://116.62.236.67:5081'
+  // const domain = 'http://116.62.236.67:5081'
   // const domain = 'http://10.0.0.4:5081'
-  // const domain = 'https://api.xiaolian365.com/c'
+  const domain = 'https://api.xiaolian365.com/c'
   AjaxHandler.ajax(resource, body, cb, null, domain)
 }
 

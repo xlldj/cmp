@@ -2,7 +2,6 @@ import React from 'react'
 import { Link} from 'react-router-dom'
 
 import Table from 'antd/lib/table'
-import Select from 'antd/lib/select'
 import Badge from 'antd/lib/badge'
 import Popconfirm from 'antd/lib/popconfirm'
 
@@ -20,7 +19,6 @@ import { withRouter } from 'react-router-dom'
 import { changeGift } from '../../../actions'
 const subModule = 'act'
 
-const Option = Select.Option
 const typeName = CONSTANTS.GIFTACTTYPE
 const STATUS ={
   3:'已过期',
@@ -107,7 +105,7 @@ class ActTable extends React.Component {
             <Link to={`/gift/act/actInfo/:${record.id}`} >编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此任务么?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
         </div>
       ),
@@ -144,6 +142,7 @@ class ActTable extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)  
+    console.log(this.props.schoolId)
 
     let {page, schoolId} = this.props
     const body = {

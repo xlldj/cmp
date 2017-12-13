@@ -2,7 +2,15 @@ import React, { Component } from 'react'
 import Table from 'antd/lib/table'
 import AjaxHandler from '../ajax'
 import Time from '../component/time'
+import Noti from '../noti'
+import {getLocal} from '../util/storage'
 import SchoolSelector from '../component/schoolSelector'
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeStat, setSchoolList } from '../../actions'
+const subModule = 'rank'
 
 const NOW = Date.parse(new Date())
 /*----------timespan: 1-今日,2-本周,3-本月-----*/
@@ -188,19 +196,23 @@ const initilaState = {
   startTime:Time.getTodayStart(NOW),
   endTime: Time.getNow(),
   dataSource: [],
-  timeSpan: 1,
   searchingText: '',
-  currentRank: 0,
   titleValue: 0,
   titleValue2: 0,
   loading: false,
-  page: 1,
-  selectedSchool: 'all', 
   total: 0
 };
 const COLUMNS = [orderColumns, userColumns, bonusColumns, fundsColumns, repairColumns]
 
-export default class RankPanel extends Component {
+class RankPanel extends Component {
+  static propTypes = {
+    schoolId: PropTypes.string.isRequired,
+    timeSpan: PropTypes.number.isRequired,
+    currentRank: PropTypes.number.isRequired,
+    page: PropTypes.number.isRequired,
+    schools: PropTypes.array.isRequired,
+    schoolSet: PropTypes.bool.isRequired
+  }
 
   state = initilaState;
 
@@ -213,9 +225,9 @@ export default class RankPanel extends Component {
     const cb = (json)=>{
       let nextState = {loading: false}
       if(json.error){
-        throw new Error(json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
-        json.data.rows&&json.data.rows.forEach((r, i) => {
+        json.data.rows && json.data.rows.forEach((r, i) => {
           r.ranking = i + 1
         })
         nextState.dataSource = json.data.rows
@@ -228,112 +240,133 @@ export default class RankPanel extends Component {
     AjaxHandler.ajax(resource,body,cb)
   }
 
-  componentDidMount(){
+  fetchSchools = () => {
+    console.log('fetch')
+    let resource='/school/list'
     const body={
-      startTime: Time.getTodayStart(NOW),
-      endTime: Time.getNow(),
       page: 1,
-      size: SIZE
+      size: 100
     }
-    this.fetchData(body, 0)
+    const cb = (json) => {
+      if(json.error){
+        throw new Error(json.error.displayMessage || json.error)
+      }else{
+        if(json.data){
+          let recentSchools = getLocal('recentSchools'), recent = []
+          if (recentSchools) {
+            recent = recentSchools.split(',').filter((r) => {
+              return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
+            })
+          }
+          this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
+        }else{
+          throw new Error('网络出错，请稍后重试～')
+        }        
+      }
+    }
+    AjaxHandler.ajax(resource,body,cb)
   }
 
-  changeTimeSpan = (e) => {
-    let i = e.target.getAttribute('data-value')
-    let v = parseInt(i, 10)
-    if (v === this.state.timeSpan) {
-      return
-    }
-    let nextState = {
-      timeSpan:  v
-    }
-    let {selectedSchool, schoolName, currentRank} = this.state
+  componentDidMount(){
+    let {schoolId, schools, schoolSet, page, timeSpan, currentRank} = this.props
     const body={
       endTime: Time.getNow(),
-      page: 1,
+      page: page,
       size: SIZE
     }
-    if (selectedSchool !== 'all') {
-      body.schoolName = schoolName
+    if (schoolId !== 'all') {
+      if (!schoolSet) {
+        this.fetchSchools()
+        return
+      }
+      let school = schools.find((r) => (r.id === parseInt(schoolId, 10)))
+      if (school && school.name) {
+        body.schoolName = school.name
+      }
     }
     let newStartTime
-    if(v===1){//today
+    if (timeSpan === 1) {//today
       newStartTime = Time.getTodayStart(NOW)
-    }else if(v===2){
+    } else if (timeSpan === 2) {
       newStartTime = Time.getWeekStart(NOW)
-    }else{
+    } else {
       newStartTime = Time.getMonthStart(NOW)
     }
     body.startTime = newStartTime
     this.fetchData(body, currentRank)
+  }
 
-    nextState.page = 1
-    nextState.endTime=Time.getNow()
-    nextState.startTime=newStartTime
-    this.setState(nextState)
+  componentWillReceiveProps (nextProps) {
+    let {schoolId, schools, schoolSet, page, timeSpan, currentRank} = nextProps
+    if (schoolId === this.props.schoolId && JSON.stringify(schools) === JSON.stringify(this.props.schools) && 
+      schoolSet === this.props.schoolSet && page === this.props.page && 
+      timeSpan === this.props.timeSpan && currentRank === this.props.currentRank
+    ) {
+      return
+    }
+    const body={
+      endTime: Time.getNow(),
+      page: page,
+      size: SIZE
+    }
+    if (schoolId !== 'all') {
+      if (!schoolSet) {
+        this.fetchSchools()
+        return
+      }
+      let school = schools.find((r) => (r.id === parseInt(schoolId, 10)))
+      if (school && school.name) {
+        body.schoolName = school.name
+      }
+    }
+    let newStartTime
+    if (timeSpan === 1) {//today
+      newStartTime = Time.getTodayStart(NOW)
+    } else if (timeSpan === 2) {
+      newStartTime = Time.getWeekStart(NOW)
+    } else {
+      newStartTime = Time.getMonthStart(NOW)
+    }
+    body.startTime = newStartTime
+    this.fetchData(body, currentRank)
+  }
+  
+  changeTimeSpan = (e) => {
+    let i = e.target.getAttribute('data-value')
+    let v = parseInt(i, 10)
+    if (v === this.props.timeSpan) {
+      return
+    }
+    this.props.changeStat(subModule, {timeSpan: v})
   }
 
   chooseChart = (e) => {
     let i = parseInt(e.target.getAttribute('data-index'), 10)
-    let {currentRank} = this.state
+    
+    let {currentRank} = this.props
     if (i === currentRank) {
       return
     }
-    let nextState = {
-      currentRank: i,
-      page: 1,
-      endTime: Time.getNow()
-    }
-    let {startTime, selectedSchool, schoolName} = this.state
-    let body = {
-      startTime: startTime,
-      endTime: Time.getNow(),
-      page: 1,
-      size: SIZE
-    }
-    if (selectedSchool !== 'all') {
-      body.schoolName = schoolName
-    }
-    this.setState(nextState)
-    this.fetchData(body, i)
+    this.props.changeStat(subModule, {currentRank: i, page: 1})
   }
 
   changeSchool = (v, name) => {
-    let nextState = {selectedSchool: v, page: 1, endTime: Time.getNow()}
-    let {currentRank, startTime} = this.state, body = {}
-    body.startTime = startTime
-    body.endTime = Time.getNow()
-    body.page = 1
-    body.size = SIZE
-    if(v !== 'all'){
-      body.schoolName = name
-      nextState.schoolName = name
+    let {schoolId} = this.props
+    if (schoolId !== v) {
+      this.props.changeStat(subModule, {schoolId: v, schoolName: name, page: 1})
     }
-    this.setState(nextState)
-    this.fetchData(body, currentRank)
   }
   changePage = (pageObj) => {
-    let page = pageObj.current
-    let {currentRank, startTime, selectedSchool, schoolName} = this.state
-    this.setState({
-      page: page,
-      loading: true,
-      endTime: Time.getNow()
-    })
-    const body ={
-      startTime: startTime,
-      endTime: Time.getNow(),
-      page: page,
-      size: SIZE
+    let {page} = this.props
+    if (page === pageObj.current) {
+      return
     }
-    if (selectedSchool !== 'all') {
-      body.schoolName = schoolName
-    }
-    this.fetchData(body, currentRank)
+    this.props.changeStat(subModule, {page: pageObj.current})
   }
 
   render() {
-    const { dataSource, timeSpan, titleValue, titleValue2, currentRank, loading, selectedSchool, total, page} = this.state;
+    const { dataSource, titleValue, titleValue2, loading, total} = this.state;
+    const {schoolId, timeSpan, currentRank, page} = this.props
 
     return (
       <div className='ranksWrapper'>
@@ -343,7 +376,7 @@ export default class RankPanel extends Component {
 
           <div className='selectBox'>
             <SchoolSelector
-              selectedSchool={selectedSchool}
+              selectedSchool={schoolId}
               changeSchool={this.changeSchool}
             />
           </div>
@@ -398,3 +431,19 @@ export default class RankPanel extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    schoolId: state.changeStat[subModule].schoolId,
+    timeSpan: state.changeStat[subModule].timeSpan,
+    page: state.changeStat[subModule].page,
+    currentRank: state.changeStat[subModule].currentRank,
+    schools: state.setSchoolList.schools,
+    schoolSet: state.setSchoolList.schoolSet
+  }
+}
+
+export default withRouter(connect(mapStateToProps, {
+  changeStat,
+  setSchoolList
+})(RankPanel))

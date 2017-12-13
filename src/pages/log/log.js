@@ -4,7 +4,7 @@ import {Button} from 'antd'
 import AjaxHandler from '../ajax'
 import Noti from '../noti'
 import {setToken} from '../util/handleToken'
-import {setStore, getLocal} from '../util/storage'
+import {setStore, getLocal, removeStore} from '../util/storage'
 import {clientDetect} from '../util/clientDetect'
 import logLogo from '../assets/log_logo.png'
 import './style/style.css'
@@ -162,6 +162,8 @@ class Log extends React.Component{
         setToken(json.data.token)
         if (json.data.forbidden) {
           setStore('forbidden', 1)
+        } else {
+          removeStore('forbidden')
         }
         setStore('username', nickName)
         setStore('userId', id)

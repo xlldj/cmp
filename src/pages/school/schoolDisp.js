@@ -59,7 +59,7 @@ class SchoolDisp extends React.Component{
     this.clearStatus4schoolIIlist()
   }
   clearStatus4schoolIIlist = () => {
-    this.props.changeSchool('schoolList', {page: 1, schoolId: 'all'})
+    this.props.changeSchool('schoolList', {page: 1})
   }
   render(){
     return(

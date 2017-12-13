@@ -25,9 +25,14 @@ class SchoolSelector extends React.Component{
     if (!schoolSet) {
       this.fetchSchools()
     }
+    console.log(this.props.schools)
+  }
+  componentWillReceiveProps (nextProps) {
+    console.log('school selector update prop')
+    console.log(nextProps)
   }
   fetchSchools = () => {
-    let resource='/school/list'
+    let resource='/school/list' 
     const body={
       page: 1,
       size: 100
@@ -38,19 +43,12 @@ class SchoolSelector extends React.Component{
       }else{
         /*--------redirect --------*/
         if(json.data){
-          /* 
-          let nextState = {}
-          nextState.schools = json.data.schools
-          */
           let recentSchools = getLocal('recentSchools'), recent = []
           if (recentSchools) {
-            // let recent = recentSchools.split(',')
             recent = recentSchools.split(',').filter((r) => {
               return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
             })
-            // nextState.recent = recent
           }
-          // this.setState(nextState)
           this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
         }else{
           throw new Error('网络出错，请稍后重试～')

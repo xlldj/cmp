@@ -5,13 +5,13 @@ import Layout from 'antd/lib/layout'
 import MyMenu from './nav/myMenu'
 import userImg from './assets/user.png'
 import logo from './assets/logo.png'
-import {getLocal, setLocal} from './util/storage'
+import {getLocal, setLocal, removeLocal} from './util/storage'
 import AjaxHandler from './ajax'
 
-
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion } from '../actions'
+import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat, setSchoolList } from '../actions'
 
 
 const Welcome = asyncComponent(() => import(/* webpackChunkName: "welcome" */ "./welcome/welcome"))
@@ -32,69 +32,86 @@ const VersionDisp = asyncComponent(() => import(/* webpackChunkName: "version" *
 const { Content} = Layout;
 
 class Main extends React.Component {
+  static propTypes = {
+    schools: PropTypes.array.isRequired,
+    recent: PropTypes.array.isRequired,
+    schoolSet: PropTypes.bool.isRequired
+  }
+
   state = {
     hasChildren: true
   }
   componentDidMount () {
-    this.getDefaultSchool()
+    // this.getDefaultSchool()
+    /*
+    let {schoolSet} = this.props
+    if (!schoolSet) {
+      this.fetchSchools()
+    }
+    */
+    this.props.setSchoolList({
+      schoolSet: false,
+      schools: [],
+      recent: []
+    })
+    this.fetchSchools()
     this.props.hide(false)
   }
   componentWillUnmount () {
     this.props.hide(true)
   }
-  getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools')
-    var selectedSchool = 'all'
-    if (recentSchools) {
-      let recent = recentSchools.split(',')
-      let schoolId = recent[0]
-      selectedSchool = schoolId
-    } else if (getLocal('defaultSchool')) {
-      let defaultSchool = getLocal('defaultSchool')
-      selectedSchool = defaultSchool
-    } else {
-      this.setDefaultSchool()
-    }
-    if (selectedSchool !== 'all') {
-      this.props.changeOrder('orderList', {schoolId: selectedSchool})
-      this.props.changeOrder('abnormal', {schoolId: selectedSchool})
-      this.props.changeDevice('deviceList', {schoolId: selectedSchool})
-      this.props.changeDevice('repair', {schoolId: selectedSchool})
-      this.props.changeFund('fundList', {schoolId: selectedSchool})
-      this.props.changeFund('abnormal', {schoolId: selectedSchool})
-      this.props.changeLost('lostList', {schoolId: selectedSchool})
-      this.props.changeUser('userList', {schoolId: selectedSchool})
-      this.props.changeTask('taskList', {schoolId: selectedSchool})
-      this.props.changeTask('log', {schoolId: selectedSchool})
-      this.props.changeTask('complaint', {schoolId: selectedSchool})
-      this.props.changeTask('feedback', {schoolId: selectedSchool})
-    }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
+
+  fetchSchools = () => {
+    let resource='/school/list'
+    const body={
       page: 1,
-      size: 1
+      size: 100
     }
     const cb = (json) => {
-      if (json.data.schools) {
-        let selectedSchool = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', selectedSchool)
-        this.props.changeOrder('order', {schoolId: selectedSchool})
-        this.props.changeDevice('deviceList', {schoolId: selectedSchool})
-        this.props.changeDevice('repair', {schoolId: selectedSchool})
-        this.props.changeFund('fundList', {schoolId: selectedSchool})
-        this.props.changeFund('abnormal', {schoolId: selectedSchool})
-        this.props.changeLost('lostList', {schoolId: selectedSchool})
-        this.props.changeUser('userList', {schoolId: selectedSchool}) 
-        this.props.changeTask('taskList', {schoolId: selectedSchool}) 
-        this.props.changeTask('log', {schoolId: selectedSchool})
-        this.props.changeTask('complaint', {schoolId: selectedSchool})
-        this.props.changeTask('feedback', {schoolId: selectedSchool})
-      } 
+      if(json.error){
+        throw new Error(json.error.displayMessage || json.error)
+      }else{
+        if(json.data){
+          let recentSchools = getLocal('recentSchools'), recent = []
+          if (recentSchools) {
+            recent = recentSchools.split(',').filter((r) => {
+              return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
+            })
+            let recentIds = recent && recent.map((r) => (r.id))
+            setLocal('recentSchools', recentIds.join(','))
+          } 
+          if (recent.length === 0) {
+            removeLocal('recentSchools')
+            console.log('here')
+            let selectedSchool = json.data.schools[0].id.toString()
+            console.log(selectedSchool)
+            this.props.changeSchool('schoolList', {schoolId: selectedSchool})
+            this.props.changeDevice('deviceList', {schoolId: selectedSchool})
+            this.props.changeDevice('repair', {schoolId: selectedSchool})
+            this.props.changeOrder('orderList', {schoolId: selectedSchool})
+            this.props.changeOrder('abnormal', {schoolId: selectedSchool})
+            this.props.changeFund('fundList', {schoolId: selectedSchool})
+            this.props.changeFund('abnormal', {schoolId: selectedSchool})
+            this.props.changeGift('act', {schoolId: selectedSchool})
+            this.props.changeLost('lostList', {schoolId: selectedSchool})
+            this.props.changeUser('userList', {schoolId: selectedSchool}) 
+            this.props.changeTask('taskList', {schoolId: selectedSchool}) 
+            this.props.changeTask('log', {schoolId: selectedSchool})
+            this.props.changeTask('complaint', {schoolId: selectedSchool})
+            this.props.changeTask('feedback', {schoolId: selectedSchool})
+            this.props.changeStat('overview', {schoolId: selectedSchool})
+            this.props.changeStat('charts', {schoolId: selectedSchool})
+            this.props.changeStat('rank', {schoolId: selectedSchool})
+          }
+          this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
+        }else{
+          throw new Error('网络出错，请稍后重试～')
+        }        
+      }
     }
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.ajax(resource,body,cb)
   }
+
   logout = () => {
     this.props.logout()
   }
@@ -162,7 +179,15 @@ class Main extends React.Component {
     );
   }
 }
-
-export default withRouter(connect(null, {
-  changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion
+const mapStateToProps = (state, ownProps) => {
+  return {
+    schools: state.setSchoolList.schools,
+    recent: state.setSchoolList.recent,
+    schoolSet: state.setSchoolList.schoolSet
+  }
+}
+export default withRouter(connect(mapStateToProps, {
+  changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion,
+  setSchoolList,
+  changeStat
 })(Main))

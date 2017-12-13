@@ -10,6 +10,13 @@ import Time from '../component/time'
 import Noti from '../noti'
 import moment from 'moment'
 import {div} from '../util/numberHandle'
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeStat, setSchoolList } from '../../actions'
+const subModule = 'charts'
+
 const {MonthPicker} = DatePicker
 
 const NOW = Date.parse(new Date())
@@ -97,7 +104,7 @@ const CURMONTHSTR = Time.getMonthFormat(NOW)
 const initilaState = {
   data: [],
   loading: false,
-  selectedSchool: 'all',
+  schoolId: 'all',
   target: 1,
   timeUnit: 2,
   startTime: Time.getWeekStart(NOW),
@@ -111,7 +118,18 @@ const initilaState = {
   areaStartTime: Time.getFirstWeekStart(Time.getMonthStart(NOW))
 }
 
-export default class Charts extends Component {
+class Charts extends Component {
+  static propTypes = {
+    schoolId: PropTypes.string.isRequired,
+    timeSpan: PropTypes.number.isRequired,
+    currentChart: PropTypes.number.isRequired,
+    target: PropTypes.number.isRequired,
+    compare: PropTypes.bool.isRequired,
+    currentMonth: PropTypes.bool.isRequired,
+    monthStr: PropTypes.string.isRequired,
+    schools: PropTypes.array.isRequired,
+    schoolSet: PropTypes.bool.isRequired
+  }
 
   state = initilaState;
 
@@ -120,7 +138,7 @@ export default class Charts extends Component {
       loading: true
     })
     /* in case: 1. change chart index, 2. change target. The state won't change immediately when fetchDate, so need to pass newState through parameters */
-    let {currentChart, target, startTime, endTime, timeUnit, compare} = {...this.state, ...newState}
+    let {currentChart, target, startTime, endTime, timeUnit, compare} = {...body, ...newState}
     let resource = `/statistics/${CHARTTYPES[currentChart]}/polyline`
     const cb = (json)=>{
       let nextState = {
@@ -212,12 +230,12 @@ export default class Charts extends Component {
         throw new Error(json.error)
       }else{
         let {acceptTime,assignTime,repairTime}= json.data,data=[]
-        let {areaStartTime}=this.state
+        let {startTime} = body
         //starttime是第一个周一的0点，用它减去该年第一天0点，除以7*24*3600*1000，就得到了中间有多少周
 
-        let startWeekNum = Time.getFirstWeekNum(areaStartTime)
+        let startWeekNum = Time.getFirstWeekNum(startTime)
         for(let i=0;i<4;i++){
-          let monday = areaStartTime + i*7*24*3600*1000
+          let monday = startTime + i*7*24*3600*1000
           let item={
             x:`第${i+1}周`,
             num:startWeekNum+i
@@ -256,48 +274,160 @@ export default class Charts extends Component {
   }
 
   componentDidMount(){
-    const body={
-      "endTime": Time.getWeekEnd(NOW),
-      "startTime": Time.getWeekStart(NOW),
-      "target": 1,
-      "timeUnit": 2
+    let {schoolId, target, timeSpan, currentChart, currentMonth, monthStr, compare} = this.props
+  
+    /* if click repair/time chart, fetch the repair/time areaData */
+    if (currentChart === 6) {
+      if (currentMonth) {
+        let areaStartTime = Time.getFirstWeekStart(Time.getMonthStart(NOW))
+        let areaEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
+        const body={
+          "endTime": areaEndTime,
+          "startTime": areaStartTime,
+          timeUnit: AREATIMEUNIT
+        }
+        if(schoolId!=='all'){
+          body.schoolId = parseInt(schoolId, 10)
+        }
+        this.fetchAreaData(body)
+      } else {
+        let newStartTime = Time.getFirstWeekStart(Time.getMonthStart(monthStr+'-1')),newEndTime=Time.getTheLastWeekEnd(Time.getMonthEnd(monthStr+'-1'))
+        const body = {
+          timeUnit: AREATIMEUNIT,
+          startTime: newStartTime,
+          endTime: newEndTime
+        }
+        if(schoolId !== 'all'){
+          body.schoolId = parseInt(schoolId, 10)
+        }
+        this.fetchAreaData(body)
+      }
+      return
     }
-    this.fetchData(body)
+
+    /* else fetch the line data */
+    let timeUnit = 2
+    let newStartTime, newEndTime, body = {}
+
+    if (timeSpan === 1) {//today
+      newStartTime = Time.getDayStart(NOW)
+      newEndTime = Time.getDayEnd(NOW)
+      timeUnit = 1
+    } else if (timeSpan === 2) {
+      newStartTime = Time.getWeekStart(NOW)
+      newEndTime = Time.getWeekEnd(NOW)
+    } else {
+      newStartTime = Time.getMonthStart(NOW)
+      newEndTime = Time.getMonthEnd(NOW)
+    }
+
+    body.startTime = newStartTime
+    body.endTime = newEndTime
+    body.timeUnit = timeUnit
+    body.target = target
+
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+    this.fetchData(body, {currentChart: currentChart, compare: compare})
+  }
+  
+  componentWillReceiveProps (nextProps) {
+    let {schoolId, target, timeSpan, currentChart, currentMonth, monthStr, compare} = nextProps
+
+    if (schoolId === this.props.schoolId && target === this.props.target && 
+      timeSpan === this.props.timeSpan && currentChart === this.props.currentChart && 
+      currentMonth === this.props.currentMonth &&
+      monthStr === this.props.monthStr && compare === this.props.compare
+    ) {
+      return
+    }
+  
+    /* if click repair/time chart, fetch the repair/time areaData */
+    if (currentChart === 6) {
+      if (currentMonth) {
+        let areaStartTime = Time.getFirstWeekStart(Time.getMonthStart(NOW))
+        let areaEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
+        const body={
+          "endTime": areaEndTime,
+          "startTime": areaStartTime,
+          timeUnit: AREATIMEUNIT
+        }
+        if(schoolId!=='all'){
+          body.schoolId = parseInt(schoolId, 10)
+        }
+        this.fetchAreaData(body)
+      } else {
+        let newStartTime = Time.getFirstWeekStart(Time.getMonthStart(monthStr+'-1')),newEndTime=Time.getTheLastWeekEnd(Time.getMonthEnd(monthStr+'-1'))
+        const body = {
+          timeUnit: AREATIMEUNIT,
+          startTime: newStartTime,
+          endTime: newEndTime
+        }
+        if(schoolId !== 'all'){
+          body.schoolId = parseInt(schoolId, 10)
+        }
+        this.fetchAreaData(body)
+      }
+      return
+    }
+
+    /* if remove compare, only remove compare data */
+    if (this.props.compare === true && compare === false) {
+      this.removeCompareData()
+      return
+    }
+
+    /* else fetch the line data */
+    let timeUnit = 2
+    let newStartTime, newEndTime, body = {}
+
+    if (timeSpan === 1) {//today
+      newStartTime = Time.getDayStart(NOW)
+      newEndTime = Time.getDayEnd(NOW)
+      timeUnit = 1
+    } else if (timeSpan === 2) {
+      newStartTime = Time.getWeekStart(NOW)
+      newEndTime = Time.getWeekEnd(NOW)
+    } else {
+      newStartTime = Time.getMonthStart(NOW)
+      newEndTime = Time.getMonthEnd(NOW)
+    }
+
+    body.startTime = newStartTime
+    body.endTime = newEndTime
+    body.timeUnit = timeUnit
+    body.target = target
+
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+    this.fetchData(body, {currentChart: currentChart, compare: compare})
   }
 
   changeTarget = (e) => {
     e.preventDefault()
     let v = parseInt(e.target.getAttribute('data-value'), 10)
-    let {target,startTime,endTime,timeUnit,selectedSchool} = this.state
-    if(v===target){
+    let {target} = this.props
+    if (v === target) {
       return
     }
-    const body = {
-      startTime: startTime,
-      endTime: endTime,
-      timeUnit: timeUnit,
-      target: v
-    }
-    if(selectedSchool!=='all'){
-      body.schoolId = parseInt(selectedSchool, 10)
-    }
-    this.fetchData(body, {target: v})
-
-    let nextState = {
-      target: v
-    }
-    this.setState(nextState)
+    this.props.changeStat(subModule, {target: v})
   }
 
   fetchCompareData = () => {
     this.setState({
       loading: true
     })
-    let {target,timeUnit,selectedSchool,timeSpan, currentChart} = this.state
+    let {schoolId, target, timeSpan, currentChart} = this.props
+
+    let timeUnit = 2
+
     let newStartTime,newEndTime  /*----------------------------------------------*/
     if(timeSpan===1){
       newStartTime = Time.getYestodayStart()
       newEndTime = Time.getYestodayEnd()
+      timeUnit = 1
     }else if(timeSpan===2){
       newStartTime = Time.getLastWeekStart()
       newEndTime = Time.getLastWeekEnd()
@@ -314,8 +444,8 @@ export default class Charts extends Component {
       target: target,
       timeUnit: timeUnit
     }
-    if(selectedSchool!=='all'){
-      body.schoolId = parseInt(selectedSchool, 10)
+    if(schoolId!=='all'){
+      body.schoolId = parseInt(schoolId, 10)
     }
     const cb = (json)=>{
       let nextState = {
@@ -338,7 +468,7 @@ export default class Charts extends Component {
           }
         }
 
-        let newData = JSON.parse(JSON.stringify(this.state.data)),timeSpan=this.state.timeSpan
+        let newData = JSON.parse(JSON.stringify(this.state.data))
 
 
         //将过去的数据转为本日/周/月的数据，再将其插入data数组中
@@ -429,175 +559,59 @@ export default class Charts extends Component {
 
   chooseChart = (e) => {
     let i = parseInt(e.target.getAttribute('data-index'), 10)
-    let {currentChart} = this.state
+    let {currentChart} = this.props
     if (i === currentChart) {
       return
     }
-    if (i) {
-      let nextState = {
-        nextState: Time.getNow(),
-        currentChart: i,
-        target: 1 // remember to set target to 1
-      }
-      /* if click repair/time chart, fetch the repair/time areaData */
-      if (i === 6) {
-        let areaStartTime = Time.getFirstWeekStart(Time.getMonthStart(NOW))
-        let areaEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
-        const body={
-          "endTime": areaEndTime,
-          "startTime": areaStartTime,
-          timeUnit: AREATIMEUNIT
-        }
-        this.fetchAreaData(body)
-
-        let monthStr = Time.getMonthFormat(areaStartTime)
-        nextState.monthStr = monthStr
-        nextState.areaStartTime = areaStartTime
-        nextState.areaEndTime = areaEndTime
-        this.setState(nextState)
-        return
-      }
-
-      /* else fetch the line data */
-      let body = {}
-      let {startTime, timeUnit, selectedSchool} = this.state
-      body.startTime = startTime
-      body.endTime = Time.getNow()
-      body.timeUnit = timeUnit
-      body.target = 1
-      if(selectedSchool!=='all'){
-        body.schoolId = parseInt(selectedSchool, 10)
-      }
-      this.setState(nextState)
-      this.fetchData(body, {currentChart: i})
-    }
+    this.props.changeStat(subModule, {currentChart: i, target: 1})
   }  
   changeCurrent = (e) =>{
     e.preventDefault()
-    let {currentMonth, selectedSchool}=this.state
-    if(currentMonth){
+    let {currentMonth} = this.props
+    if (currentMonth) {
       return
     }
-    let newStartTime=Time.getFirstWeekStart(Time.getMonthStart(NOW)),newEndTime=Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
-    const body={
-      startTime:newStartTime,
-      endTime:newEndTime,
-      timeUnit:AREATIMEUNIT
-    }
-    if(selectedSchool!=='all'){
-      body.schoolId=selectedSchool
-    }
-    this.fetchAreaData(body)
-    this.setState({
-      areaStartTime: newStartTime,
-      areaEndTime:newEndTime,
-      currentMonth: true,
-      loading: true,
-      monthStr:CURMONTHSTR
-    })
+    this.props.changeStat(subModule, {currentMonth: true, monthStr: CURMONTHSTR})
   }
   selectRange = (date,dateString)=>{
-    let {monthStr,selectedSchool}=this.state
-    if(dateString===monthStr){
+    let {monthStr} = this.props, currentMonth = true
+    if (dateString === monthStr) {
       return
     }
-    let newStartTime = Time.getFirstWeekStart(Time.getMonthStart(dateString+'-1')),newEndTime=Time.getTheLastWeekEnd(Time.getMonthEnd(dateString+'-1'))
-    let nextState = {
-      monthStr:dateString,
-      loading: true,
-      areaStartTime: newStartTime,
-      areaEndTime:newEndTime
+    if(dateString !== CURMONTHSTR){
+      currentMonth = false
     }
-    const body = {
-      timeUnit: AREATIMEUNIT,
-      startTime: newStartTime,
-      endTime: newEndTime
-    }
-    if(selectedSchool!=='all'){
-      body.schoolId = parseInt(selectedSchool, 10)
-    }
-    if(dateString===CURMONTHSTR){
-      nextState.currentMonth=true
-    }else{
-      nextState.currentMonth=false
-    }
-    this.setState(nextState)
-    this.fetchAreaData(body)
+    this.props.changeStat(subModule, {monthStr: dateString, currentMonth: currentMonth})
   }
   changeSchool = (v) => {
-    this.setState({
-      selectedSchool: v
-    })
-
-    let body = {}, currentChart = this.state.currentChart
-    body.startTime = this.state.startTime
-    body.endTime = this.state.endTime
-    body.timeUnit = this.state.timeUnit
-    if(v !== 'all'){
-      body.schoolId = parseInt(v, 10)
+    let {schoolId} = this.props
+    if (schoolId === v) {
+      return
     }
-    if (currentChart === 6) {
-      this.fetchAreaData(body)
-    } else {
-      body.target = this.state.target
-      this.fetchData(body)
-    }
+    this.props.changeStat(subModule, {schoolId: v})
   }
   changeTimeSpan = (e) => {
     /*-----------if compared,clean it-----------*/
     e.preventDefault()
-    let nextState = {}, timeUnit = 2
-    let v = parseInt(e.target.getAttribute('data-value'), 10), timeSpan=this.state.timeSpan, newStartTime, newEndTime, body = {}
-    if(v === timeSpan){
+    let v = parseInt(e.target.getAttribute('data-value'), 10)
+    let {timeSpan} = this.props
+    if (timeSpan === v) {
       return
     }
-    nextState.timeSpan = v
-    nextState.compareLock = false
-
-    if(v===1){//today
-      newStartTime = Time.getDayStart(NOW)
-      newEndTime = Time.getDayEnd(NOW)
-      timeUnit = 1
-    }else if(v===2){
-      newStartTime = Time.getWeekStart(NOW)
-      newEndTime = Time.getWeekEnd(NOW)
-    }else{
-      newStartTime = Time.getMonthStart(NOW)
-      newEndTime = Time.getMonthEnd(NOW)
-    }
-
-    nextState.startTime = newStartTime
-    nextState.endTime = newEndTime
-    nextState.timeUnit = timeUnit
-
-    body.startTime = newStartTime
-    body.endTime = newEndTime
-    body.timeUnit = timeUnit
-    body.target = this.state.target
-
-    if(this.state.selectedSchool!=='all'){
-      body.schoolId = parseInt(this.state.selectedSchool, 10)
-    }
-    this.fetchData(body, {startTime: newStartTime, endTime: newEndTime, timeSpan: v, timeUnit: timeUnit})
-
-    this.setState(nextState)
+    this.props.changeStat(subModule, {timeSpan: v})
   }
 
   compareLast = (checked)=>{
-    let nextState = {
-      compare: checked
+    let {compare} = this.props
+    if (compare === checked) {
+      return
     }
-    this.setState(nextState)
-
-    if (checked) {
-      this.fetchCompareData()
-    } else {
-      this.removeCompareData()
-    }
+    this.props.changeStat(subModule, {compare: checked})
   }
 
   render() {
-    const { data, selectedSchool, timeUnit, target,timeSpan,compare, currentChart, currentMonth, monthStr, areaData } = this.state;
+    const { data, timeUnit, areaData } = this.state;
+    const {schoolId, target, currentChart, timeSpan, compare, currentMonth, monthStr} = this.props
     
     return (
       <div className='chart'>
@@ -607,7 +621,7 @@ export default class Charts extends Component {
 
           <div className='selectBox'>
             <SchoolSelector
-              selectedSchool={selectedSchool}
+              selectedSchool={schoolId}
               changeSchool={this.changeSchool}
             />
           </div>
@@ -724,6 +738,25 @@ export default class Charts extends Component {
     );
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    schoolId: state.changeStat[subModule].schoolId,
+    timeSpan: state.changeStat[subModule].timeSpan,
+    currentChart: state.changeStat[subModule].currentChart,
+    target: state.changeStat[subModule].target,
+    compare: state.changeStat[subModule].compare,
+    currentMonth: state.changeStat[subModule].currentMonth,
+    monthStr: state.changeStat[subModule].monthStr,
+    schools: state.setSchoolList.schools,
+    schoolSet: state.setSchoolList.schoolSet
+  }
+}
+
+export default withRouter(connect(mapStateToProps, {
+  changeStat,
+  setSchoolList
+})(Charts))
 
 const CustomizedTooltip = React.createClass({
   render () {

@@ -29,7 +29,7 @@ class GiftDisp extends React.Component {
     this.props.changeGift('giftList', {page: 1, deviceType: 'all'})
   }
   clearStatus4giftIIact = () => {
-    this.props.changeGift('act', {page: 1, schoolId: 'all'})
+    this.props.changeGift('act', {page: 1})
   }
   render () {
     return (

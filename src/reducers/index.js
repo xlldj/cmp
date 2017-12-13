@@ -10,12 +10,14 @@ if (recentSchools) {
   let recent = recentSchools.split(',')
   let schoolId = recent[0]
   selectedSchool = schoolId
-} else {
+}
+/* else {
   let defaultSchool = getLocal('defaultSchool')
   if (defaultSchool) {
     selectedSchool = defaultSchool
   }
 }
+*/
 
 const initialSchools = {
   recent: [],
@@ -25,8 +27,12 @@ const initialSchools = {
 const setSchoolList = (state = initialSchools, action) => {
   const {type} = action
   if (type === ActionTypes.SET_SCHOOL_LIST) {
+    if (selectedSchool === 'all' && action.value.schools.length > 0) {
+      selectedSchool = action.value.schools[0].id.toString()
+    }
     const value = action.value
-    return merge({}, state, value)
+    // console.log({...state, ...value})
+    return {...state, ...value}
   }
   return state
 }
@@ -34,7 +40,11 @@ const setSchoolList = (state = initialSchools, action) => {
 const initialSchoolState = {
   schoolList: {
     page: 1,
-    schoolId: 'all'
+    schoolId: selectedSchool
+  },
+  overview: {
+    page: 1,
+    schoolId: selectedSchool
   }
 }
 const changeSchool = (state = initialSchoolState, action) => {
@@ -50,7 +60,7 @@ const changeSchool = (state = initialSchoolState, action) => {
 const initialDeviceState = {
   deviceList: {
     page: 1,
-    schoolId: 'all',
+    schoolId: selectedSchool,
     deviceType: 'all',
     selectKey: ''
   },
@@ -72,7 +82,7 @@ const initialDeviceState = {
   repair: {
     page: 1,
     deviceType: 'all',
-    schoolId: 'all',
+    schoolId: selectedSchool,
     status: 'all'
   },
   rateLimit: {
@@ -163,7 +173,7 @@ const initialGiftState = {
   },
   act: {
     page: 1,
-    schoolId: 'all'
+    schoolId: selectedSchool
   }
 }
 const changeGift = (state = initialGiftState, action) => {
@@ -176,10 +186,11 @@ const changeGift = (state = initialGiftState, action) => {
   return state
 }
 
+// 失物招领
 const initialLostState = {
   lostList: {
     page: 1,
-    schoolId: 'all',
+    schoolId: selectedSchool,
     type: 'all'
   }
 }
@@ -193,6 +204,7 @@ const changeLost = (state = initialLostState, action) => {
   return state
 }
 
+// 用户管理
 const initialUserState = {
   userList: {
     page: 1,
@@ -210,6 +222,7 @@ const changeUser = (state = initialUserState, action) => {
   return state
 }
 
+// 客服工单
 const initialTaskState = {
   taskList: {
     page: 1,
@@ -246,6 +259,7 @@ const changeTask = (state = initialTaskState, action) => {
   return state
 }
 
+// 员工管理
 const initialEmployeeState = {
   employeeList: {
     page: 1,
@@ -262,6 +276,7 @@ const changeEmployee = (state = initialEmployeeState, action) => {
   return state
 }
 
+// 公告管理
 const initialNotifyState = {
   notify: {
     page: 1,
@@ -280,6 +295,8 @@ const changeNotify = (state = initialNotifyState, action) => {
   }
   return state
 }
+
+// 版本管理
 const initialVersionState = {
   version: {
     page: 1
@@ -289,6 +306,38 @@ const changeVersion = (state = initialVersionState, action) => {
   const {type} = action
 
   if (type === ActionTypes.CHANGE_VERSION) {
+    const {subModule, keyValuePair} = action
+    return merge({}, state, {[subModule]: keyValuePair})
+  }
+  return state
+}
+
+/* 统计分析模块 */
+const initialStatState = {
+  overview: {
+    schoolId: selectedSchool
+  },
+  charts: {
+    schoolId: selectedSchool,
+    timeSpan: 2,
+    currentChart: 1,
+    target: 1,
+    compare: false,
+    currentMonth: true,
+    monthStr: Time.getMonthFormat(Date.parse(new Date()))
+  },
+  rank: {
+    schoolId: selectedSchool,
+    page: 1,
+    currentRank: 1,
+    timeSpan: 1,
+    schoolName: ''
+  }
+}
+const changeStat = (state = initialStatState, action) => {
+  const {type} = action
+
+  if (type === ActionTypes.CHANGE_STAT) {
     const {subModule, keyValuePair} = action
     return merge({}, state, {[subModule]: keyValuePair})
   }
@@ -307,7 +356,8 @@ const rootReducer = combineReducers({
   changeEmployee,
   changeNotify,
   changeVersion,
-  setSchoolList
+  setSchoolList,
+  changeStat
 })
 
 export default rootReducer

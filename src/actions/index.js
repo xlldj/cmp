@@ -104,3 +104,12 @@ export const changeVersion = (subModule, keyValuePair) => {
     keyValuePair
   }
 }
+
+export const CHANGE_STAT = 'CHANGE_STAT'
+export const changeStat = (subModule, keyValuePair) => {
+  return {
+    type: CHANGE_STAT,
+    subModule,
+    keyValuePair
+  }
+}

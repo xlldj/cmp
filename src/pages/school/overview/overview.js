@@ -7,6 +7,13 @@ import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 import Noti from '../../noti'
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeSchool } from '../../../actions'
+const subModule = 'overview'
+
 const SIZE = 4
 
 class EditableCell extends React.Component {
@@ -93,17 +100,21 @@ class EditableCell extends React.Component {
 
 
 class Overview extends React.Component {
+  static propTypes = {
+    schools: PropTypes.array.isRequired,
+    schoolId: PropTypes.string.isRequired,
+    page: PropTypes.number.isRequired
+  }
+
   constructor (props) {
     super(props)
     // request for schools list
     const dataSource = []
-    let page = 1, total = 0, loading = true, selectedSchool = 'all'
+    let total = 0, loading = true
     this.state = {
       dataSource,
-      page,
       total,
       loading,
-      selectedSchool,
       namePrefix: ''
     }
 
@@ -393,49 +404,59 @@ class Overview extends React.Component {
   componentDidMount(){
     this.props.hide(false)
     /*-----------fetch data-----------*/
+    let {schoolId, page, schools} = this.props
     const body = {
-      page: 1,
+      page: page,
       size: SIZE
     }
+    if (schoolId !== 'all') {
+      let school = schools.find((r) => (r.id === parseInt(schoolId, 10)))
+      if (school) {
+        body.namePrefix = school.name
+      }
+    }
     this.fetchData(body)
+  }
+  componentWillReceiveProps (nextProps) {
+    let {schoolId, page, schools} = nextProps
+    const body = {
+      page: page,
+      size: SIZE
+    }
+    if (schoolId !== 'all') {
+      let school = schools.find((r) => (r.id === parseInt(schoolId, 10)))
+      if (school) {
+        body.namePrefix = school.name
+      }
+    }
+    this.fetchData(body) 
   }
   componentWillUnmount () {
     this.props.hide(true)
   }
   changeTable = (pageObj) => {
-    let page = pageObj.current
-    this.setState({
-      page: page,
-      loading: true
-    })
-    const body = {
-      page: page,
-      size: SIZE
+    let {page} = this.props
+    if (page === pageObj.page) {
+      return
     }
-    this.fetchData(body)
+    this.props.changeSchool(subModule, {page: pageObj.page})
   }
   changeSchool = (v, name) => {
-    let nextState = {selectedSchool: v, page: 1, loading: true, namePrefix: ''}
-
-    const body ={
-      page: 1,
-      size: SIZE
+    let {schoolId} = this.props
+    if (schoolId === v) {
+      return
     }
-
-    if(v !== 'all'){
-      body.namePrefix = name
-    }
-    this.fetchData(body)
-    this.setState(nextState)
+    this.props.changeSchool(subModule, {schoolId: v})
   }
 
   render () {
-    const {dataSource, loading, total, page, selectedSchool} = this.state
+    const {dataSource, loading, total} = this.state
+    const {schoolId, page} = this.props
     
     return (
       <div className='contentArea'>
         <SearchLine 
-          selector1={<SchoolSelector selectedSchool={selectedSchool} changeSchool={this.changeSchool} />}
+          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />}
         />
 
         <div className='tableList'>
@@ -456,4 +477,14 @@ class Overview extends React.Component {
   }
 }
 
-export default Overview
+// export default Overview
+
+const mapStateToProps = (state, ownProps) => ({
+  schoolId: state.changeSchool[subModule].schoolId,
+  page: state.changeSchool[subModule].page,
+  schools: state.setSchoolList.schools
+})
+
+export default withRouter(connect(mapStateToProps, {
+  changeSchool
+})(Overview))
