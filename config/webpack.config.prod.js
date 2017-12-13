@@ -64,8 +64,8 @@ module.exports = {
   output: {
     path: paths.appBuild,
     pathinfo: true,
-    filename: 'static/js/[name].bundle.js',
-    chunkFilename: 'static/js/[name].chunk.js',
+    filename: 'static/js/[name].[chunkhash:8].bundle.js',
+    chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
     publicPath: publicPath,
     devtoolModuleFilenameTemplate: info =>
       path.resolve(info.absoluteResourcePath)
@@ -307,8 +307,9 @@ module.exports = {
         if (message.indexOf('Skipping static resource') === 0) {
           // This message obscures real errors so we ignore it.
           // https://github.com/facebookincubator/create-react-app/issues/2612
-
+          return
         }
+        console.log(message)
       },
       minify: true,
       // For unknown URLs, fallback to the index page

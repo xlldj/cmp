@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom'
 import {Icon} from 'antd'
 import './style/index.css'
 import CONSTANTS from '../component/constants'
-import {getStore, getLocal, setLocal} from '../util/storage'
+import {getStore, setLocal} from '../util/storage'
 import AjaxHandler from '../ajax'
 import Time from '../component/time'
 

@@ -39,7 +39,8 @@ class Main extends React.Component {
   }
 
   state = {
-    hasChildren: true
+    hasChildren: true,
+    ti: null
   }
   componentDidMount () {
     // this.getDefaultSchool()
@@ -82,9 +83,7 @@ class Main extends React.Component {
           } 
           if (recent.length === 0) {
             removeLocal('recentSchools')
-            console.log('here')
             let selectedSchool = json.data.schools[0].id.toString()
-            console.log(selectedSchool)
             this.props.changeSchool('schoolList', {schoolId: selectedSchool})
             this.props.changeDevice('deviceList', {schoolId: selectedSchool})
             this.props.changeDevice('repair', {schoolId: selectedSchool})
@@ -119,9 +118,25 @@ class Main extends React.Component {
     let loading = this.refs.loading
     if (v) { // loading , need to show the loading div
       loading&&loading.classList.remove('hide')
+      let nextState = {
+      }
+      // if wait for more than 5s, refresh the web
+      nextState.ti = setTimeout(this.refresh, 5000)
+      this.setState(nextState)
     } else { // add 'hide' to not display loading
       loading&&loading.classList.add('hide')
+      let {ti} = this.state
+      if (ti) {
+        clearTimeout(ti)
+        this.setState({
+          ti: null
+        })
+      }
     }
+  }
+  refresh = () => {
+    let {pathname} = this.props.history.location
+    window.location.assign(pathname)
   }
   changeWidth = (hasChildren) => {
     this.setState({

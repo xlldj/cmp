@@ -25,11 +25,6 @@ class SchoolSelector extends React.Component{
     if (!schoolSet) {
       this.fetchSchools()
     }
-    console.log(this.props.schools)
-  }
-  componentWillReceiveProps (nextProps) {
-    console.log('school selector update prop')
-    console.log(nextProps)
   }
   fetchSchools = () => {
     let resource='/school/list' 
