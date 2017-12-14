@@ -46,7 +46,6 @@ class MyMenu extends React.Component {
   changeMenu = (pathname) => { // 只有在不是由导航栏点击改变url时，才会触发changemenu，因此只要打开就可以了，不用管关闭组标签
     let path = pathname || window.location.pathname, nextState = {}
     let parentPath = path.split('/')[1] || ''
-    // console.log(path.split('/'))
     for (let i=0;i<this.rootBlock.length;i++) {
       if (parentPath === this.rootBlock[i].path) {
 
@@ -93,11 +92,13 @@ class MyMenu extends React.Component {
     }
     if (selectedSchool !== 'all') {
       this.props.changeSchool('schoolList', {schoolId: selectedSchool})
+      this.props.changeSchool('overview', {schoolId: selectedSchool})
       this.props.changeDevice('deviceList', {schoolId: selectedSchool})
       this.props.changeDevice('repair', {schoolId: selectedSchool})
       this.props.changeOrder('orderList', {schoolId: selectedSchool})
       this.props.changeOrder('abnormal', {schoolId: selectedSchool})
       this.props.changeFund('fundList', {schoolId: selectedSchool})
+      this.props.changeFund('deposit', {schoolId: selectedSchool})
       this.props.changeFund('abnormal', {schoolId: selectedSchool})
       this.props.changeGift('act', {schoolId: selectedSchool})
       this.props.changeLost('lostList', {schoolId: selectedSchool})
@@ -120,7 +121,7 @@ class MyMenu extends React.Component {
     const cb = (json) => {
       if (json.data.schools) {
         let selectedSchool = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', selectedSchool)
+        // setLocal('defaultSchool', selectedSchool)
 
         this.props.changeSchool('schoolList', {schoolId: selectedSchool})
         this.props.changeDevice('deviceList', {schoolId: selectedSchool})
@@ -214,7 +215,7 @@ class MyMenu extends React.Component {
     this.props.changeFund('charge', {page: 1})
   }
   clearStatus4fundIIdeposit = () => {
-    this.props.changeFund('deposit', {page: 1, schoolId: 'all'})
+    this.props.changeFund('deposit', {page: 1})
   }
   clearStatus4fundIIabnormal = () => {
     this.getDefaultSchool()

@@ -147,7 +147,7 @@ const initialFundState = {
   },
   deposit: {
     page: 1,
-    schoolId: 'all'
+    schoolId: selectedSchool
   },
   abnormal: {
     schoolId: selectedSchool,

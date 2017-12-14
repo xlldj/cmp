@@ -69,7 +69,7 @@ class Layouts extends React.Component {
     const {logged, user} = this.state
     //const main = (<Route render={(props) => (<Main user={user} {...props} />)}  />)
 
-    const log = <Log login={this.login} hide={this.hide} />
+    const log = <Log login={this.login} />
     const main = <Main user={user} logout={this.logout} changeCurrentName={this.changeCurrentName} hide={this.hide} />
 
     const component = logged ? main : log

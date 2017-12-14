@@ -52,7 +52,7 @@ class AccountInfo extends React.Component{
     this.fetchData(body)
   }
   componentWillUnmount () {
-    this.props.hide(true)
+    // this.props.hide(true)
   }
 
   changePwd = (e)=>{

@@ -14,6 +14,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../actions'
+import {checkObject} from '../util/checkSame'
 const subModule = 'orderList'
 
 const SIZE = CONSTANTS.PAGINATION
@@ -193,7 +194,12 @@ class OrderTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['schoolId', 'deviceType', 'status', 'selectKey', 'page', 'startTime', 'endTime'])) {
+      return
+    }
     let {schoolId, deviceType, status, selectKey, page, startTime, endTime} = nextProps
+    console.log(this.props)
+    console.log(nextProps)
     const body={
       page: page,
       size: SIZE

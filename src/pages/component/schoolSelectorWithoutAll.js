@@ -11,6 +11,8 @@ import { setSchoolList } from '../../actions'
 
 const {Option, OptGroup} = Select
 
+const forbidden = getStore('forbidden')
+
 class SchoolSelector extends React.Component{
   static propTypes = {
     recent: PropTypes.array.isRequired,
@@ -25,7 +27,7 @@ class SchoolSelector extends React.Component{
     }
   }
   fetchSchools = () => {
-    let resource='/school/list'
+    let resource='/school/list' 
     const body={
       page: 1,
       size: 100
@@ -36,19 +38,12 @@ class SchoolSelector extends React.Component{
       }else{
         /*--------redirect --------*/
         if(json.data){
-          /* 
-          let nextState = {}
-          nextState.schools = json.data.schools
-          */
           let recentSchools = getLocal('recentSchools'), recent = []
           if (recentSchools) {
-            // let recent = recentSchools.split(',')
             recent = recentSchools.split(',').filter((r) => {
               return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
             })
-            // nextState.recent = recent
           }
-          // this.setState(nextState)
           this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
         }else{
           throw new Error('网络出错，请稍后重试～')
@@ -58,12 +53,16 @@ class SchoolSelector extends React.Component{
     AjaxHandler.ajax(resource,body,cb)
   }
   setRecentSchools = () => {
-    let {schools, recent} = this.props
-    let recentItems = recent.map((r, i) => {
-      let item = schools.find(s=>s.id===parseInt(r, 10))
-      return (
-        <Option value={r.toString()} key={`recent-${r}`}>{(item && item.name) ? item.name : ''}</Option>
-      )
+    let {recent} = this.props
+    let recentItems = recent && recent.map((r, i) => {
+      // let item = schools.find(s=>s.id===parseInt(r, 10))
+      try {
+        return (
+          <Option value={r.id.toString()} key={`recent-${r.id}`}>{(r && r.name) ? r.name : ''}</Option>
+        )
+      } catch (e) {
+        console.log(e)
+      }
     })
     return (
       <OptGroup title='最近的选择'>
@@ -75,32 +74,30 @@ class SchoolSelector extends React.Component{
     /* if v is not 'all', store it in the lcoal */
     let name = ''
     if (v !== 'all') {
-      name = this.props.schools.find(r=>r.id===parseInt(v, 10)).name
-      let recentSchools = getLocal('recentSchools'), recentArr = []
-      if (recentSchools) {
-        recentArr = recentSchools.split(',')
+      let {schools, recent} = this.props
+      let school = schools.find(r => r.id===parseInt(v, 10)) // school是肯定存在的
+      try {
+        name = school.name
+        let i = -1
+        if (recent.length > 0) {
+          i = recent.findIndex(r => r.id === parseInt(v, 10))
+        }
+        if (i !== -1) { // 如果已经存在于recent中，将其位置提到最上
+          recent.splice(i, 1)
+          recent.unshift(school)
+        } else if (recent.length >= CONSTANTS.RECENTCOUNT) { // 如果已满，删除最后一个
+          recent.pop()
+          recent.unshift(school)
+        } else { // 直接添加进recent中
+          recent.unshift(school)
+        }
+
+        let recentStr = recent.map((r => r.id)).join(',')
+        setLocal('recentSchools', recentStr)
+        this.props.setSchoolList({recent: recent})
+      } catch (e) {
+        console.log(e)
       }
-      let i = -1
-      if (recentArr.length) {
-        i = recentArr.findIndex(r=>r===v)
-      }
-      if (i !== -1) {
-        recentArr.splice(i, 1)
-        recentArr.unshift(v)
-      } else if (recentArr.length >= CONSTANTS.RECENTCOUNT) {
-        recentArr.pop()
-        recentArr.unshift(v)
-      } else {
-        recentArr.unshift(v)
-      }
-      let recentStr = recentArr.join(',')
-      setLocal('recentSchools', recentStr)
-      this.props.setSchoolList({recent: recentArr})
-      /*
-      this.setState({
-        recent: recentArr
-      })
-      */
     }
     this.props.changeSchool(v, name)
   }
@@ -110,13 +107,12 @@ class SchoolSelector extends React.Component{
     }
   }
   render(){
-    const {schools, recent} = this.props
+    const {schools} = this.props
 
     const schNameOptions = schools.map((s,i) => (
       <Option value={s.id.toString()} key={s.id}>{s.name}</Option>
     ))
 
-    const recentItems = this.setRecentSchools()
     return (
       <Select 
         disabled={this.props.disabled ? this.props.disabled : false}
@@ -128,7 +124,6 @@ class SchoolSelector extends React.Component{
         onChange={this.changeSchool} 
         onBlur={this.checkSchool} 
       >
-        {recent.length > 0 ? recentItems : null }
         {schNameOptions}
       </Select>
     )

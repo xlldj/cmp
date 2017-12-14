@@ -43,13 +43,6 @@ class Main extends React.Component {
     ti: null
   }
   componentDidMount () {
-    // this.getDefaultSchool()
-    /*
-    let {schoolSet} = this.props
-    if (!schoolSet) {
-      this.fetchSchools()
-    }
-    */
     this.props.setSchoolList({
       schoolSet: false,
       schools: [],
@@ -60,6 +53,11 @@ class Main extends React.Component {
   }
   componentWillUnmount () {
     this.props.hide(true)
+    console.log('unmount')
+    console.log(this.state.ti)
+    if (this.state.ti) {
+      clearTimeout(this.state.ti)
+    }
   }
 
   fetchSchools = () => {
@@ -75,8 +73,9 @@ class Main extends React.Component {
         if(json.data){
           let recentSchools = getLocal('recentSchools'), recent = []
           if (recentSchools) {
-            recent = recentSchools.split(',').filter((r) => {
-              return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
+            let localRecentArray = recentSchools.split(',')
+            recent = json.data.schools.filter((r) => {
+              return localRecentArray.some((s) => (r.id === parseInt(s, 10)))
             })
             let recentIds = recent && recent.map((r) => (r.id))
             setLocal('recentSchools', recentIds.join(','))
@@ -85,11 +84,13 @@ class Main extends React.Component {
             removeLocal('recentSchools')
             let selectedSchool = json.data.schools[0].id.toString()
             this.props.changeSchool('schoolList', {schoolId: selectedSchool})
+            this.props.changeSchool('overview', {schoolId: selectedSchool})
             this.props.changeDevice('deviceList', {schoolId: selectedSchool})
             this.props.changeDevice('repair', {schoolId: selectedSchool})
             this.props.changeOrder('orderList', {schoolId: selectedSchool})
             this.props.changeOrder('abnormal', {schoolId: selectedSchool})
             this.props.changeFund('fundList', {schoolId: selectedSchool})
+            this.props.changeFund('deposit', {schoolId: selectedSchool})
             this.props.changeFund('abnormal', {schoolId: selectedSchool})
             this.props.changeGift('act', {schoolId: selectedSchool})
             this.props.changeLost('lostList', {schoolId: selectedSchool})
@@ -115,11 +116,10 @@ class Main extends React.Component {
     this.props.logout()
   }
   hide = (v) => { // hide means if to hide the main content or not
-    let loading = this.refs.loading
+    let loading = this.refs.contentLoading
     if (v) { // loading , need to show the loading div
       loading&&loading.classList.remove('hide')
-      let nextState = {
-      }
+      let nextState = {}
       // if wait for more than 5s, refresh the web
       nextState.ti = setTimeout(this.refresh, 5000)
       this.setState(nextState)
@@ -170,7 +170,7 @@ class Main extends React.Component {
                 <span>{this.props.user.name}</span>
                 <img src={userImg} alt='' />
               </Link>
-              <div className='loading' ref='loading'>加载中...</div>
+              <div className='loading' ref='contentLoading'>加载中...</div>
               <div className='main'>
                 <Route path='/welcome' render={(props)=>(<Welcome hide={this.hide} {...props} />)} />
                 <Route path='/school' render={(props)=>(<SchoolDisp hide={this.hide} {...props} />)} />
@@ -186,7 +186,7 @@ class Main extends React.Component {
                 <Route path='/notify' render={(props)=>(<NotifyDisp hide={this.hide} {...props} />)} />
                 <Route path='/version' render={(props)=>(<VersionDisp hide={this.hide} {...props} />)} />
                 <Route path='/account' render={(props)=>(<AccountInfo hide={this.hide} user={this.props.user} logout={this.logout} {...props} />)} />
-                <Route exact path='/' render={()=>(<Redirect hide={this.hide} to='/welcome' />)} />
+                <Route exact path='/' render={()=>(<Redirect  to='/welcome' />)} />
               </div>
             </Content>
           </Layout>
