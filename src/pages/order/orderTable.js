@@ -201,8 +201,6 @@ class OrderTable extends React.Component {
       return
     }
     let {schoolId, deviceType, status, selectKey, page, startTime, endTime} = nextProps
-    console.log(this.props)
-    console.log(nextProps)
     const body={
       page: page,
       size: SIZE

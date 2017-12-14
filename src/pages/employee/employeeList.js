@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link} from 'react-router-dom'
-import { Table, Button } from 'antd'
+import { Table, Button, Popconfirm } from 'antd'
 import Noti from '../noti'
 import AjaxHandler from '../ajax'
 import SearchLine from '../component/searchLine'
@@ -56,7 +56,11 @@ class EmployeeList extends React.Component {
       className: 'lastCol',
       render: (text, record, index) => (
         <div style={{textAlign:'right'}} key={index} className='editable-row-operations'>
-            <Link to={`/employee/userInfo/:${record.id}`} >编辑</Link>
+          <Link to={`/employee/userInfo/:${record.id}`} >编辑</Link>
+          <span className='ant-divider' />
+        <Popconfirm title="确定要删除此员工?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
+          <a href="">删除</a>
+        </Popconfirm>
         </div>
       )
     }]
@@ -132,13 +136,13 @@ class EmployeeList extends React.Component {
     const cb = (json) => {
         if(json.error){
           throw new Error(json.error.displayMessage || json.error)
-        }else{
+        } else {
           /*--------redirect --------*/
           if(json.data){
             const body={
               page: this.props.page,
-              selectKey: '',
-              size: 100
+              selectKey: this.props.selectKey,
+              size: SIZE
             }
             this.fetchData(body)
           }else{

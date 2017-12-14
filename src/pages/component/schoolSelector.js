@@ -119,7 +119,6 @@ class SchoolSelector extends React.Component{
 
     const recentItems = this.setRecentSchools()
     let forbidden = getStore('forbidden')
-    console.log(forbidden)
     return (
       <Select 
         disabled={this.props.disabled?this.props.disabled:false}
