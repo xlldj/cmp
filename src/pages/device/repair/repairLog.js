@@ -62,7 +62,7 @@ class RepairLog extends React.Component {
             <li key={index}>
               <p key={`status${index}`}>维修状态:</p>
               <span key={`repairStatus${index}`} className='padR20'>{REPAIRSTATUS[record.status]}</span>
-              <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state:'fromRepairLog'}} >查看详情</Link>
+              <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state: {path: 'fromRepairLog'}}} >查看详情</Link>
             </li>
             {record.status !== 1 ?
               <li key={`person${index}`}>

@@ -12,6 +12,9 @@ const STATUSCLASS = {
   4: ''
 }
 
+const backTitle = {
+  fromComplaint: '返回账单投诉'
+}
 class OrderInfo extends React.Component {
   constructor (props) {
     super(props)
@@ -177,6 +180,11 @@ class OrderInfo extends React.Component {
               <li><p>结束时间:</p>{data.finishTime ? Time.getTimeStr(data.finishTime) : ''}</li>
             : null
           }
+          {
+            data.status !== 1 ?
+              <li><p>结账方式:</p>{data.checkoutByOther ? '代结账' : '自结账'}</li>
+            : null
+          }
           <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
           <li><p>预付金额:</p><span>{`${data.prepay}`}</span></li>
           {
@@ -252,7 +260,7 @@ class OrderInfo extends React.Component {
           : null
         }
         <div className='btnArea'>
-          <Button onClick={this.back}>返回</Button>
+          <Button onClick={this.back}>{this.props.location.state?(backTitle[this.props.location.state.path]):'返回'}</Button>
         </div>
 
         <Modal

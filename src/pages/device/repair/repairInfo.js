@@ -239,7 +239,7 @@ class RepairInfo extends React.Component {
         </Popconfirm>
         { this.props.location.state ? <span className='divider'></span> : null }
         { this.props.location.state ? 
-            <Button onClick={this.back}>{BACKTITLE[this.props.location.state]}</Button>
+            <Button onClick={this.back}>{BACKTITLE[this.props.location.state.path]}</Button>
           : null 
         }
       </div>
@@ -250,7 +250,7 @@ class RepairInfo extends React.Component {
         {status.status===6?<Button type='primary' onClick={this.showAllocate}>重新指派维修员</Button>:null}
         { this.props.location.state ? <span className='divider'></span> : null }
         { this.props.location.state ? 
-            <Button onClick={this.back}>{BACKTITLE[this.props.location.state]}</Button>
+            <Button onClick={this.back}>{BACKTITLE[this.props.location.state.path]}</Button>
           : null 
         }
       </div>
@@ -338,7 +338,7 @@ class RepairInfo extends React.Component {
 
         { status.status === 3 || status.status === 4 || status.status === 5 || status.status === 7 ? 
           <div className='btnArea'>
-            <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state]:'返回'}</Button>
+            <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
           </div> 
           : null 
         }

@@ -1,14 +1,11 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
 
-import {Table, Popconfirm, Modal, Carousel} from 'antd'
+import {Table, Modal, Carousel} from 'antd'
 
-import Noti from '../../noti'
 import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
-import Format from '../../component/format'
 import SchoolSelector from '../../component/schoolSelector'
 import SearchLine from '../../component/searchLine'
 
@@ -17,10 +14,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask } from '../../../actions'
 
-const HANDLESTATUS = {
-  1: '已回复',
-  2: '未回复'
-}
 const whr = window.screen.height / window.screen.width
 const SIZE = CONSTANTS.PAGINATION
 //const Table = asyncComponent(() => import(/* webpackChunkName: "table" */ "antd/lib/table"))
@@ -61,7 +54,9 @@ class Feedback extends React.Component {
       title: '反馈用户',
       dataIndex: 'mobile',
       width: '15%',
-      render: (text) => (text || '暂无')
+      render: (text, record) => (
+        <Link className='outLink' to={{pathname:`/user/userInfo/:${record.userId}`,state:{path: 'fromFeedback'}}} >{text}</Link>
+      )
     },{
       title: '反馈类型',
       dataIndex: 'option',
@@ -147,8 +142,8 @@ class Feedback extends React.Component {
   }
   setWH = (e) => {
     let img = e.target
-    let w = parseInt(window.getComputedStyle(img).width)
-    let h = parseInt(window.getComputedStyle(img).height)
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
     if (w < h) {
       img.style.width = '100%'
     } else {
@@ -157,8 +152,8 @@ class Feedback extends React.Component {
   }
   loadImgDetail = (e) => {
     let img = e.target
-    let w = parseInt(window.getComputedStyle(img).width)
-    let h = parseInt(window.getComputedStyle(img).height)
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
     let imgWhr = h / w
     if (imgWhr < whr) {
       img.style.width = '100%'
@@ -193,7 +188,7 @@ class Feedback extends React.Component {
     const {page, schoolId} = this.props
 
     const carouselItems = (dataSource&&dataSource[editing]&&dataSource[editing].images&&dataSource[editing].images.length>0)&&(dataSource[editing].images.map((r,i) => {
-      return <img key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
+      return <img alt='' key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
     }))
 
     const carousel = (
@@ -239,6 +234,6 @@ const mapStateToProps = (state, ownProps) => ({
   schoolId: state.changeTask[subModule].schoolId
 })
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   changeTask
-})(Feedback)
+})(Feedback))

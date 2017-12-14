@@ -82,11 +82,25 @@ class ComplaintTable extends React.Component {
     }, {
       title: '订单/流水号',
       dataIndex: 'orderNo',
-      width: '10%'
+      width: '10%',
+      render: (text, record) => {
+        if (record.orderType === 1 || record.orderType === 2) {
+          return (
+            <Link className='outLink' to={{pathname:`/order/list/orderInfo/:${record.orderId}`,state:{path: 'fromComplaint'}}} >{text}</Link> 
+          )
+        } else {
+          return (
+            <Link className='outLink' to={{pathname:`/fund/list/fundInfo/:${record.orderId}`,state:{path: 'fromComplaint'}}} >{text}</Link>
+          )
+        }
+      }
     }, {
       title: '投诉用户',
       dataIndex: 'mobile',
-      width: '10%'
+      width: '10%',
+      render: (text, record) => (
+        <Link className='outLink' to={{pathname:`/user/userInfo/:${record.userId}`,state:{path: 'fromComplaint'}}} >{text}</Link>
+      )
     },{
       title: '投诉内容',
       dataIndex: 'content',

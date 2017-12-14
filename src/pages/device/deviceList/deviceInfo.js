@@ -118,7 +118,7 @@ class DeviceInfo extends React.Component {
             <li key={index}>
               <p key={`status${index}`}>维修状态:</p>
               <span key={`repairStatus${index}`} className='padR20'>{REPAIRSTATUS[record.status]}</span>
-              <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state:'fromDevice'}} >查看详情</Link>
+              <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state: {path: 'fromDevice'}}} >查看详情</Link>
             </li>
             {
               record.status !== 1 ?

@@ -8,6 +8,7 @@ import SearchLine from '../../component/searchLine'
 import DeviceSelector from '../../component/deviceSelector'
 import SchoolSelector from '../../component/schoolSelector'
 import CONSTANTS from '../../component/constants'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -141,6 +142,9 @@ class DevicesTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'deviceType', 'selectKey'])) {
+      return
+    }
     let {page, schoolId, deviceType, selectKey} = nextProps
     const body = {
       page: page,

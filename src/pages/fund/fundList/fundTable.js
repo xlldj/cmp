@@ -15,6 +15,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../../actions'
+import { checkObject } from '../../util/checkSame'
 const subModule = 'fundList'
 
 const typeName = CONSTANTS.FUNDTYPE
@@ -178,6 +179,9 @@ class FundTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'type', 'status', 'selectKey', 'startTime', 'endTime'])) {
+      return
+    }
     let {page, schoolId, type, status, selectKey, startTime, endTime} = nextProps
     const body = {
       page: page,

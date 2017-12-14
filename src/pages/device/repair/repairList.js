@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link} from 'react-router-dom'
 
-import {Table, Select, Badge, Button} from 'antd'
+import {Table, Badge, Button} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import SearchLine from '../../component/searchLine'
@@ -10,6 +10,7 @@ import BasicSelector from '../../component/basicSelector'
 import DeviceSelector from '../../component/deviceSelector'
 import Time from '../../component/time'
 import CONSTANTS from '../../component/constants'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -19,7 +20,6 @@ const subModule = 'repair'
 
 const SIZE = CONSTANTS.PAGINATION
 
-const Option = Select.Option
 const typeName = CONSTANTS.DEVICETYPE
 
 const STATUS = CONSTANTS.REPAIRSTATUS
@@ -73,24 +73,18 @@ class RepairList extends React.Component {
         switch(record.status){
           case '7':
             return <Badge status='success' text='维修完成' />
-            break;
           case '3':
             return <Badge status='warning' text={STATUS[record.status]+`(${record.assignName})`} />
-            break;
           case '4':
             return <Badge status='warning' text={STATUS[record.status]} />
-            break;
           case '1':
           case '2':
           case '5':
             return <Badge status='error' text={STATUS[record.status]} />
-            break;
           case '6':
             return <Badge status='error' text={STATUSFORSHOW[record.status]+`(${record.assignName})`} />
-            break;
           default:
             return '已取消'
-            break
         }
       }
     }, {
@@ -143,7 +137,7 @@ class RepairList extends React.Component {
       }else{
         /*--------redirect --------*/
         if(json.data){
-          json.data.repairDevices&&json.data.repairDevices.map((r,i)=>{
+          json.data.repairDevices&&json.data.repairDevices.forEach((r,i)=>{
             r.status = r.status.toString()
           })
           nextState.dataSource = json.data.repairDevices
@@ -191,6 +185,9 @@ class RepairList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'deviceType', 'status'])) {
+      return
+    }
     let {page, schoolId, deviceType, status} = nextProps
     const body = {
       page: page,
@@ -235,7 +232,7 @@ class RepairList extends React.Component {
     this.props.changeDevice(subModule, {page: page})
   }
   render () {
-    const {schools,dataSource, loading, total} = this.state
+    const {dataSource, loading, total} = this.state
     const {schoolId, deviceType, status, page} = this.props
 
     return (

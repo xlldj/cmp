@@ -10,7 +10,8 @@ import AjaxHandler from '../../ajax'
 
 const BACKTITLE = {
   fromTask:'返回客服工单',
-  fromDevice:'返回设备详情'
+  fromDevice:'返回设备详情',
+  fromComplaint: '返回账单投诉'
 }
 const classOfType = {
   1: 'shalowRed',
@@ -186,12 +187,12 @@ class FundInfo extends React.Component {
           <Button type='primary'>审核通过</Button>
         </Popconfirm>        
         <span className='divider'></span>
-        <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state]:'返回'}</Button>
+        <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
       </div>
     )
     const backBtn = (
       <div className='btnArea'>
-        <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state]:'返回'}</Button>
+        <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
       </div>
     )
 

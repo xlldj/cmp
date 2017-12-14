@@ -57,29 +57,33 @@ class AbnormalTable extends React.Component {
     }, {
       title: '使用设备',
       dataIndex: 'deviceType',
-      width: '8%',
+      width: '7%',
       render: (text,record,index) => (typeName[record.deviceType])
     }, {
       title: '所在学校',
       dataIndex: 'schoolName'
     }, {
+      title: '设备地址',
+      dataIndex: 'location',
+      width: '10%'
+    }, {
       title: '开始时间',
       dataIndex: 'createTime',
-      width: '11%',
+      width: '10%',
       render: (text,record,index) => {
         return Time.getTimeStr(record.createTime)
       }
     }, {
       title: '结束时间',
       dataIndex: 'finishTime',
-      width: '11%',
+      width: '10%',
       render: (text,record,index) => {
         return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
       }
     }, {
       title: '使用状态',
       dataIndex: 'status',
-      width: '12%',
+      width: '10%',
       render: (text,record,index)=> {
         switch(record.status){
           case 1:
@@ -107,7 +111,6 @@ class AbnormalTable extends React.Component {
     }, {
       title: (<p className='lastCol'>操作</p>),
       dataIndex: 'operation',
-      width: '10%',
       render: (text, record, index) => (
         <div className='editable-row-operations lastCol'>
           <span>

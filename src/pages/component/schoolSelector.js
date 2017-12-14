@@ -53,22 +53,21 @@ class SchoolSelector extends React.Component{
     AjaxHandler.ajax(resource,body,cb)
   }
   setRecentSchools = () => {
-    let {recent} = this.props
-    let recentItems = recent && recent.map((r, i) => {
-      // let item = schools.find(s=>s.id===parseInt(r, 10))
-      try {
+    try {
+      let {recent} = this.props, recentItems     
+      recentItems = recent && recent.map((r, i) => {
         return (
           <Option value={r.id.toString()} key={`recent-${r.id}`}>{(r && r.name) ? r.name : ''}</Option>
         )
-      } catch (e) {
-        console.log(e)
-      }
-    })
-    return (
-      <OptGroup title='最近的选择'>
-        {recentItems}
-      </OptGroup>
-    )
+      })
+      return (
+        <OptGroup title='最近的选择'>
+          {recentItems}
+        </OptGroup>
+      )
+    } catch (e) {
+      console.log(e)
+    }
   }
   changeSchool = (v) => {
     /* if v is not 'all', store it in the lcoal */

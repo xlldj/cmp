@@ -7,6 +7,7 @@ import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 import Noti from '../../noti'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -418,6 +419,9 @@ class Overview extends React.Component {
     this.fetchData(body)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
     let {schoolId, page, schools} = nextProps
     const body = {
       page: page,
