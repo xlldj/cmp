@@ -29,11 +29,11 @@ class OrderDisp extends React.Component {
   }
   clearStatus4orderIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeOrder('orderList', {page: 1, deviceType: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
+    this.props.changeOrder('orderList', {page: 1, deviceType: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow(), userType: 'all'})
   }
   clearStatus4orderIIabnormal = () => {
     this.getDefaultSchool()
-    this.props.changeOrder('abnormal', {page: 1, deviceType: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
+    this.props.changeOrder('abnormal', {page: 1, deviceType: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow(), userType: 'all'})
   }
   getDefaultSchool = () => {
     const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')

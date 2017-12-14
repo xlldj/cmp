@@ -129,13 +129,13 @@ class EmployeeList extends React.Component {
   }
   delete = (e,id) => {
     e.preventDefault()
-    let resource='/api/user/delete'
+    let resource='/employee/delete'
     const body={
       id: id
     }
     const cb = (json) => {
         if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+          Noti.hintServiceError(json.error.displayMessage)
         } else {
           /*--------redirect --------*/
           if(json.data){

@@ -27,6 +27,7 @@ const CONSTANTS = {
   DEVICEPROTOCOL: {1: '协议A', 2: '协议B'},
 
   ORDERSTATUS: {1: '使用中', 2: '使用结束', 4: '已退单'},
+  ORDERUSERTYPES: {1: '学生', 2: '员工'},
 
   FUNDTYPE: {2: '提现', 1: '充值'},
   WITHDRAWSTATUS: {1: '待审核', 2: '审核未通过', 3: '等待到账', 4: '成功', 5: '失败', 6: '已取消'},

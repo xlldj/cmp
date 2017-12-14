@@ -39,7 +39,7 @@ class FundDisp extends React.Component {
   }
   clearStatus4fundIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
+    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow(), userType: 'all'})
   }
   clearStatus4fundIIcashtime = () => {
     this.getDefaultSchool()
@@ -55,7 +55,7 @@ class FundDisp extends React.Component {
   }
   clearStatus4fundIIabnormal = () => {
     this.getDefaultSchool()
-    this.props.changeFund('abnormal', {page: 1, selectKey: ''})
+    this.props.changeFund('abnormal', {page: 1, selectKey: '', userType: 'all'})
   }
   getDefaultSchool = () => {
     const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')

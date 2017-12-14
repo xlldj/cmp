@@ -137,7 +137,7 @@ class Log extends React.Component{
 
     const {brand, model} = clientDetect()
 
-    const resource = '/login'
+    const resource = '/cmp/login'
     const body = {
       mobile: parseInt(mobile, 10),
       password: password,

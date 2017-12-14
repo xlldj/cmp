@@ -111,7 +111,8 @@ const initialOrderState = {
     status: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow()
+    endTime: Time.getNow(),
+    userType: 'all'
   },
   abnormal: {
     page: 1,
@@ -119,7 +120,8 @@ const initialOrderState = {
     deviceType: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow()
+    endTime: Time.getNow(),
+    userType: 'all'
   }
 }
 const changeOrder = (state = initialOrderState, action) => {
@@ -141,7 +143,8 @@ const initialFundState = {
     status: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow()
+    endTime: Time.getNow(),
+    userType: 'all'
   },
   cashtime: {
     page: 1,
@@ -158,7 +161,8 @@ const initialFundState = {
   abnormal: {
     schoolId: selectedSchool,
     page: 1,
-    selectKey: ''
+    selectKey: '',
+    userType: 'all'
   }
 }
 const changeFund = (state = initialFundState, action) => {
