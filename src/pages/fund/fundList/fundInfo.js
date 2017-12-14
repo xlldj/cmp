@@ -88,7 +88,6 @@ class FundInfo extends React.Component {
   censorPass = (e) => {
     /*---------post data to change status-----*/
     e.preventDefault()
-    let id = this.props.match.params.id.slice(1)
     const censor = {
       pass: 1
     }

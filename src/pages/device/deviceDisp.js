@@ -4,8 +4,7 @@ import {asyncComponent} from '../component/asyncComponent'
 import './style/style.css'
 
 import Bread from '../bread'
-import {getLocal, setLocal} from '../util/storage'
-import AjaxHandler from '../ajax'
+import {getLocal} from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -77,15 +76,18 @@ class DeviceDisp extends React.Component{
     this.props.changeDevice('components', {page: 1})
   }
   clearStatus4deviceIIprepay = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('prepay', {page: 1})
   }
   clearStatus4deviceIItimeset = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('timeset', {page: 1})
   }
   clearStatus4deviceIIsuppliers = () => {
     this.props.changeDevice('suppliers', {page: 1})
   }
   clearStatus4deviceIIrateSet = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('rateSet', {page: 1})
   }
   clearStatus4deviceIIrepair = () => {
@@ -93,41 +95,27 @@ class DeviceDisp extends React.Component{
     this.props.changeDevice('repair', {page: 1, deviceType: 'all', status: 'all'})
   }
   clearStatus4deviceIIrateLimit = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('rateLimit', {page: 1})
   }
   getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools')
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
       let schoolId = recent[0]
       selectedSchool = schoolId
-    } else if (getLocal('defaultSchool')) {
-      let defaultSchool = getLocal('defaultSchool')
+    } else if (defaultSchool) {
       selectedSchool = defaultSchool
-    } else {
-      this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
       this.props.changeDevice('deviceList', {schoolId: selectedSchool})
+      this.props.changeDevice('prepay', {schoolId: selectedSchool})
+      this.props.changeDevice('timeset', {schoolId: selectedSchool})
+      this.props.changeDevice('rateSet', {schoolId: selectedSchool})
+      this.props.changeDevice('rateLimit', {schoolId: selectedSchool})
       this.props.changeDevice('repair', {schoolId: selectedSchool})
     }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
-      page: 1,
-      size: 1
-    }
-    const cb = (json) => {
-      if (json.data.schools) {
-        let selectedSchool = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', selectedSchool)
-        this.props.changeDevice('deviceList', {schoolId: selectedSchool})
-        this.props.changeDevice('repair', {schoolId: selectedSchool})
-      } 
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
   render(){
     return(

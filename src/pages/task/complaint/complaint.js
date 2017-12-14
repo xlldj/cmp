@@ -1,6 +1,5 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
 
 import {Table, Popconfirm, Modal, Carousel, Badge} from 'antd'
 
@@ -8,10 +7,10 @@ import Noti from '../../noti'
 import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
-import Format from '../../component/format'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 import BasicSelector from '../../component/basicSelector'
+import {checkObject} from '../../util/checkSame'
 
 
 import PropTypes from 'prop-types'
@@ -130,7 +129,7 @@ class ComplaintTable extends React.Component {
       title: '客服操作状态',
       dataIndex: 'status',
       width: '10%',
-      render: (text, record) => (<Badge text={record.settleStatus&&HANDLESTATUS[record.settleStatus] || '暂无'} status={record.settleStatus&&STATUSCLASS[record.settleStatus]} />)
+      render: (text, record) => (<Badge text={(record.settleStatus && HANDLESTATUS[record.settleStatus]) || '暂无'} status={record.settleStatus&&STATUSCLASS[record.settleStatus]} />)
     },{
       title: (<p className='lastCol'>操作</p>),
       dataIndex: 'operation',
@@ -139,7 +138,7 @@ class ComplaintTable extends React.Component {
           <a onClick={() => {this.replyMessage(record.id)}} className={record.settleStatus === 2 ? 'inactive' : ''}>消息回复</a>
           <span className='ant-divider' />
           <Popconfirm title="确定已回复么?" onConfirm={(e) => {this.setReply(e,record.id)}} okText="确认" cancelText="取消">
-            <a href="#"  className={record.settleStatus === 2 ? 'inactive' : ''}>电话回复</a>
+            <a href=""  className={record.settleStatus === 2 ? 'inactive' : ''}>电话回复</a>
           </Popconfirm>
         </div>
       )
@@ -237,6 +236,9 @@ class ComplaintTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'status', 'type', 'selectKey', 'schoolId'])) {
+      return
+    }
     let {page, status, type, selectKey, schoolId} = nextProps
     const body = {
       page: page,
@@ -258,8 +260,8 @@ class ComplaintTable extends React.Component {
   }
   setWH = (e) => {
     let img = e.target
-    let w = parseInt(window.getComputedStyle(img).width)
-    let h = parseInt(window.getComputedStyle(img).height)
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
     if (w < h) {
       img.style.width = '100%'
     } else {
@@ -268,8 +270,8 @@ class ComplaintTable extends React.Component {
   }
   loadImgDetail = (e) => {
     let img = e.target
-    let w = parseInt(window.getComputedStyle(img).width)
-    let h = parseInt(window.getComputedStyle(img).height)
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
     let imgWhr = h / w
     if (imgWhr < whr) {
       img.style.width = '100%'
@@ -295,7 +297,6 @@ class ComplaintTable extends React.Component {
     })
   }
   checkMessage = (e) => {
-    let {messageEmpty} = this.state
     let v = e.target.value.trim()
     if (!v) {
       this.setState({
@@ -404,7 +405,7 @@ class ComplaintTable extends React.Component {
     let {page, type, status, schoolId} = this.props
 
     const carouselItems = (dataSource[editing]&&dataSource[editing].images&&dataSource[editing].images.length>0)&&(dataSource[editing].images.map((r,i) => {
-      return <img key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
+      return <img key={i} alt='' src={CONSTANTS.FILEADDR + r} className='carouselImg' />
     }))
 
     const carousel = (
@@ -475,6 +476,6 @@ const mapStateToProps = (state, ownProps) => ({
   schoolId: state.changeTask[subModule].schoolId
 })
 
-export default connect(mapStateToProps, {
+export default withRouter(connect(mapStateToProps, {
   changeTask
-})(ComplaintTable)
+})(ComplaintTable))

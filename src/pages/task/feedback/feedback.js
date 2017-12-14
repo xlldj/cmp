@@ -8,6 +8,7 @@ import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelector'
 import SearchLine from '../../component/searchLine'
+import {checkObject} from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -131,6 +132,9 @@ class Feedback extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
     let {page, schoolId} = nextProps
     const body = {
       page: page

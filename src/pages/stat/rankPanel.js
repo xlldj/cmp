@@ -6,6 +6,7 @@ import Noti from '../noti'
 import {getLocal} from '../util/storage'
 import SchoolSelector from '../component/schoolSelector'
 
+import {checkObject} from '../util/checkSame'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -297,6 +298,9 @@ class RankPanel extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'timespan', 'currentRank'])) {
+      return
+    }
     let {schoolId, schools, schoolSet, page, timeSpan, currentRank} = nextProps
     if (schoolId === this.props.schoolId && JSON.stringify(schools) === JSON.stringify(this.props.schools) && 
       schoolSet === this.props.schoolSet && page === this.props.page && 

@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Popconfirm, Table, Badge} from 'antd'
+import {Table, Badge} from 'antd'
 import AjaxHandler from '../../ajax'
 import Time from '../../component/time'
 import Noti from '../../noti'
@@ -8,6 +8,7 @@ import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
+import {checkObject} from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -146,6 +147,9 @@ class TaskLogList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'all', 'schoolId'])) {
+      return
+    }
     let {page, all, schoolId} = nextProps
     const body = {
       page: page,

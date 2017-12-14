@@ -11,7 +11,7 @@ import { setSchoolList } from '../../actions'
 
 const {Option, OptGroup} = Select
 
-const forbidden = getStore('forbidden')
+// const forbidden = getStore('forbidden')
 
 class SchoolSelector extends React.Component{
   static propTypes = {
@@ -39,11 +39,16 @@ class SchoolSelector extends React.Component{
         /*--------redirect --------*/
         if(json.data){
           let recentSchools = getLocal('recentSchools'), recent = []
+
           if (recentSchools) {
-            recent = recentSchools.split(',').filter((r) => {
-              return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
+            let localRecentArray = recentSchools.split(',')
+            localRecentArray.forEach((r) => {
+              let index = json.data.schools.findIndex((s) => (s.id === parseInt(r, 10)))
+              if (index !== -1) {
+                recent.push(json.data.schools[index])
+              }
             })
-          }
+          } 
           this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
         }else{
           throw new Error('网络出错，请稍后重试～')
@@ -113,6 +118,8 @@ class SchoolSelector extends React.Component{
     ))
 
     const recentItems = this.setRecentSchools()
+    let forbidden = getStore('forbidden')
+    console.log(forbidden)
     return (
       <Select 
         disabled={this.props.disabled?this.props.disabled:false}

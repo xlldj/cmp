@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, Select, Badge, Popconfirm, notification } from 'antd'
+import { Table, Badge, Popconfirm, notification } from 'antd'
 import { Link} from 'react-router-dom'
 import AjaxHandler from '../../ajax'
 import Time from '../../component/time'
@@ -7,13 +7,14 @@ import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 
+import { checkObject } from '../../util/checkSame'
+
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../../actions'
 const subModule = 'deposit'
 
-const Option = Select.Option
 const typeName ={
   1: '充值优惠',
   2: '赠送红包'
@@ -87,7 +88,7 @@ class DepositTable extends React.Component {
             <Link to={`/fund/deposit/depositInfo/:${record.id}`} >编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此任务么?" onConfirm={(e) => {this.delete(e,record.id)}} onCancel={this.cancelDelete} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
         </div>
       )
@@ -137,6 +138,9 @@ class DepositTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
     let {page, schoolId} = nextProps
     const body = {
       page: page,

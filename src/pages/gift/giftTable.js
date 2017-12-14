@@ -15,6 +15,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeGift } from '../../actions'
+import {checkObject} from '../util/checkSame'
 const subModule = 'giftList'
 
 
@@ -122,6 +123,9 @@ class GiftTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'deviceType'])) {
+      return
+    }
     let {page, deviceType} = nextProps
     const body = {
       page: page,

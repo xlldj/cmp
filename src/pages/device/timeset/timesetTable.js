@@ -1,14 +1,15 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
 
 import {Table, Popconfirm} from 'antd'
 
 import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
 import SearchLine from '../../component/searchLine'
+import SchoolSelector from '../../component/schoolSelector'
 import CONSTANTS from '../../component/constants'
 import Format from '../../component/format'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -25,6 +26,7 @@ const SIZE = CONSTANTS.PAGINATION
 
 class TimesetTable extends React.Component {
   static propTypes = {
+    schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
   constructor (props) {
@@ -63,7 +65,7 @@ class TimesetTable extends React.Component {
             <Link to={`/device/timeset/editTimeset/:${record.id}`}>编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e, record.id)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>
@@ -84,7 +86,7 @@ class TimesetTable extends React.Component {
         if(json.data){
           const data = json.data.waterTimeRanges.map((s,i) => {
             s.key = s.id
-            s.items.map((record,index)=>{
+            s.items.forEach((record,index)=>{
               record.startTime.minute = Format.minuteFormat(record.startTime.minute)
               record.endTime.minute = Format.minuteFormat(record.endTime.minute)
             })
@@ -103,9 +105,13 @@ class TimesetTable extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    const body={
-      page: this.props.page,
+    let {page, schoolId} = this.props
+    const body = {
+      page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
   }
@@ -113,10 +119,16 @@ class TimesetTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page} = nextProps
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
+    let {page, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
   }
@@ -148,13 +160,24 @@ class TimesetTable extends React.Component {
     let page = pageObj.current
     this.props.changeDevice(subModule, {page: page})
   }
+  changeSchool = (value) => {
+    let {schoolId} = this.props
+    if (schoolId === value) {
+      return
+    }
+    this.props.changeDevice(subModule, {page: 1, schoolId: value})
+  }
   render () {
     let {loading, total} = this.state
-    let {page} = this.props
+    let {page, schoolId} = this.props
 
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='添加供水时段' addLink='/device/timeset/addTimeset' />
+        <SearchLine 
+          addTitle='添加供水时段' 
+          addLink='/device/timeset/addTimeset' 
+          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
+         />
 
         <div className='tableList'>
           <Table bordered loading={loading} rowKey={(record)=>(record.id)} pagination={{pageSize: SIZE, current: page, total: total}} onChange={this.changePage}  dataSource={this.state.dataSource} columns={this.columns} />
@@ -167,7 +190,8 @@ class TimesetTable extends React.Component {
 // export default TimesetTable
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.changeDevice[subModule].page
+  page: state.changeDevice[subModule].page,
+  schoolId: state.changeDevice[subModule].schoolId
 })
 
 export default withRouter(connect(mapStateToProps, {

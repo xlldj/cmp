@@ -68,15 +68,18 @@ const initialDeviceState = {
     page: 1
   },
   prepay: {
-    page: 1
+    page: 1,
+    schoolId: selectedSchool
   },
   timeset: {
+    schoolId: selectedSchool,
     page: 1
   },
   suppliers: {
     page: 1
   },
   rateSet: {
+    schoolId: selectedSchool,
     page: 1
   },
   repair: {
@@ -86,6 +89,7 @@ const initialDeviceState = {
     status: 'all'
   },
   rateLimit: {
+    schoolId: selectedSchool,
     page: 1
   }
 }
@@ -140,9 +144,11 @@ const initialFundState = {
     endTime: Time.getNow()
   },
   cashtime: {
-    page: 1
+    page: 1,
+    schoolId: selectedSchool
   },
   charge: {
+    schoolId: selectedSchool,
     page: 1
   },
   deposit: {

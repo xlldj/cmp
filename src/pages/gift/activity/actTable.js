@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeGift } from '../../../actions'
+import {checkObject} from '../../util/checkSame'
 const subModule = 'act'
 
 const typeName = CONSTANTS.GIFTACTTYPE
@@ -158,6 +159,9 @@ class ActTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
     let {page, schoolId} = nextProps
     const body = {
       page: page,

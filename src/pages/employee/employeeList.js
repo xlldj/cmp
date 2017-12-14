@@ -1,12 +1,12 @@
 import React from 'react'
 import { Link} from 'react-router-dom'
 import { Table, Button } from 'antd'
-import Popconfirm from 'antd/lib/popconfirm'
 import Noti from '../noti'
 import AjaxHandler from '../ajax'
 import SearchLine from '../component/searchLine'
 import CONSTANTS from '../component/constants'
 
+import {checkObject} from '../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -107,6 +107,9 @@ class EmployeeList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'selectKey'])) {
+      return
+    }
     let {page, selectKey} = nextProps
     const body = {
       page: page,

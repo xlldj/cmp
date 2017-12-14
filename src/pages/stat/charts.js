@@ -10,6 +10,7 @@ import Time from '../component/time'
 import Noti from '../noti'
 import moment from 'moment'
 import {div} from '../util/numberHandle'
+import {checkObject} from '../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -333,6 +334,9 @@ class Charts extends Component {
   }
   
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'target', 'schoolId', 'timespan', 'currentChart', 'currentMonth', 'monthStr', 'compare'])) {
+      return
+    }
     let {schoolId, target, timeSpan, currentChart, currentMonth, monthStr, compare} = nextProps
 
     if (schoolId === this.props.schoolId && target === this.props.target && 
@@ -902,7 +906,7 @@ const AreaTooltip = React.createClass({
   render () {
     const {payload, label, active,monthStr} = this.props;
 
-    const payloads = payload&&payload.map((r,i)=>{
+    const payloads = payload&&payload.reverse().map((r,i)=>{
         return (
           <li key={i}>
             <svg key={`svg${i}`} className='rectIcon' >

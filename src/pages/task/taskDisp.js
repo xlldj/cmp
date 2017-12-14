@@ -9,8 +9,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask } from '../../actions'
 
-import {getLocal, setLocal} from '../util/storage'
-import AjaxHandler from '../ajax'
+import {getLocal} from '../util/storage'
 const TaskLog = asyncComponent(()=>import(/* webpackChunkName: "taskLog" */ "./log/taskLog"))
 const TaskList = asyncComponent(()=>import(/* webpackChunkName: "taskList" */ "./taskList"))
 const Complaint = asyncComponent(()=>import(/* webpackChunkName: "complaint" */ "./complaint/complaint"))
@@ -50,43 +49,21 @@ class TaskDisp extends React.Component {
     this.props.changeTask('feedback', {page: 1})
   }
   getDefaultSchool = () => {
-    debugger
-    const recentSchools = getLocal('recentSchools')
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
       let schoolId = recent[0]
       selectedSchool = schoolId
-    } else if (getLocal('defaultSchool')) {
-      let defaultSchool = getLocal('defaultSchool')
+    } else if (defaultSchool) {
       selectedSchool = defaultSchool
-    } else {
-      this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
-      this.props.changeTask('taskList', {schoolId: selectedSchool})
+      // this.props.changeTask('taskList', {schoolId: selectedSchool})
       this.props.changeTask('log', {schoolId: selectedSchool})
       this.props.changeTask('complaint', {schoolId: selectedSchool})
       this.props.changeTask('feedback', {schoolId: selectedSchool})
     }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
-      page: 1,
-      size: 1
-    }
-    const cb = (json) => {
-      if (json.data.schools) {
-        let id = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', id)
-        this.props.changeTask('taskList', {schoolId: id})
-        this.props.changeTask('log', {schoolId: id})
-        this.props.changeTask('complaint', {schoolId: id})
-        this.props.changeTask('feedback', {schoolId: id})
-      } 
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
   render () {
     return (

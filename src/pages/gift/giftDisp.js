@@ -4,6 +4,7 @@ import {asyncComponent} from '../component/asyncComponent'
 import './style/style.css'
 
 import Bread from '../bread'
+import {getLocal} from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -29,7 +30,22 @@ class GiftDisp extends React.Component {
     this.props.changeGift('giftList', {page: 1, deviceType: 'all'})
   }
   clearStatus4giftIIact = () => {
+    this.getDefaultSchool()
     this.props.changeGift('act', {page: 1})
+  }
+  getDefaultSchool = () => {
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
+    var selectedSchool = 'all'
+    if (recentSchools) {
+      let recent = recentSchools.split(',')
+      let schoolId = recent[0]
+      selectedSchool = schoolId
+    } else if (defaultSchool) {
+      selectedSchool = defaultSchool
+    }
+    if (selectedSchool !== 'all') {
+      this.props.changeGift('act', {schoolId: selectedSchool})
+    }
   }
   render () {
     return (

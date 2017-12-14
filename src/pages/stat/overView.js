@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeStat } from '../../actions'
+import {checkObject} from '../util/checkSame'
 const subModule = 'overview'
 
 const initilaState = {
@@ -49,6 +50,9 @@ class OverView extends Component {
 	}
 
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['schoolId'])) {
+      return
+    }
 		let {schoolId} = nextProps
 		if (schoolId === this.props.schoolId) {
 			return

@@ -53,8 +53,6 @@ class Main extends React.Component {
   }
   componentWillUnmount () {
     this.props.hide(true)
-    console.log('unmount')
-    console.log(this.state.ti)
     if (this.state.ti) {
       clearTimeout(this.state.ti)
     }
@@ -71,38 +69,58 @@ class Main extends React.Component {
         throw new Error(json.error.displayMessage || json.error)
       }else{
         if(json.data){
-          let recentSchools = getLocal('recentSchools'), recent = []
+          let recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool'), selectedSchool = 'all', recent = []
           if (recentSchools) {
             let localRecentArray = recentSchools.split(',')
-            recent = json.data.schools.filter((r) => {
-              return localRecentArray.some((s) => (r.id === parseInt(s, 10)))
+            localRecentArray.forEach((r) => {
+              let index = json.data.schools.findIndex((s) => (s.id === parseInt(r, 10)))
+              if (index !== -1) {
+                recent.push(json.data.schools[index])
+              }
             })
-            let recentIds = recent && recent.map((r) => (r.id))
-            setLocal('recentSchools', recentIds.join(','))
-          } 
-          if (recent.length === 0) {
-            removeLocal('recentSchools')
-            let selectedSchool = json.data.schools[0].id.toString()
-            this.props.changeSchool('schoolList', {schoolId: selectedSchool})
-            this.props.changeSchool('overview', {schoolId: selectedSchool})
-            this.props.changeDevice('deviceList', {schoolId: selectedSchool})
-            this.props.changeDevice('repair', {schoolId: selectedSchool})
-            this.props.changeOrder('orderList', {schoolId: selectedSchool})
-            this.props.changeOrder('abnormal', {schoolId: selectedSchool})
-            this.props.changeFund('fundList', {schoolId: selectedSchool})
-            this.props.changeFund('deposit', {schoolId: selectedSchool})
-            this.props.changeFund('abnormal', {schoolId: selectedSchool})
-            this.props.changeGift('act', {schoolId: selectedSchool})
-            this.props.changeLost('lostList', {schoolId: selectedSchool})
-            this.props.changeUser('userList', {schoolId: selectedSchool}) 
-            this.props.changeTask('taskList', {schoolId: selectedSchool}) 
-            this.props.changeTask('log', {schoolId: selectedSchool})
-            this.props.changeTask('complaint', {schoolId: selectedSchool})
-            this.props.changeTask('feedback', {schoolId: selectedSchool})
-            this.props.changeStat('overview', {schoolId: selectedSchool})
-            this.props.changeStat('charts', {schoolId: selectedSchool})
-            this.props.changeStat('rank', {schoolId: selectedSchool})
+            if (recent.length > 0) {
+              selectedSchool = recent[0].id.toString()
+              let recentIds = recent && recent.map((r) => (r.id))
+              setLocal('recentSchools', recentIds.join(','))
+            }
+          } else if (defaultSchool) {
+            let school = json.data.schools.find((s) => (s.id === parseInt(defaultSchool, 10)))
+            if (school) {
+              selectedSchool = school.id.toString()
+            }
           }
+          if (selectedSchool === 'all') {
+            removeLocal('recentSchools')
+            selectedSchool = json.data.schools[0].id.toString()
+            setLocal('defaultSchool', selectedSchool)
+          }
+          
+          this.props.changeSchool('schoolList', {schoolId: selectedSchool})
+          this.props.changeSchool('overview', {schoolId: selectedSchool})
+          this.props.changeDevice('deviceList', {schoolId: selectedSchool})
+          this.props.changeDevice('prepay', {schoolId: selectedSchool})
+          this.props.changeDevice('timeset', {schoolId: selectedSchool})
+          this.props.changeDevice('rateSet', {schoolId: selectedSchool})
+          this.props.changeDevice('rateLimit', {schoolId: selectedSchool})
+          this.props.changeDevice('repair', {schoolId: selectedSchool})
+          this.props.changeOrder('orderList', {schoolId: selectedSchool})
+          this.props.changeOrder('abnormal', {schoolId: selectedSchool})
+          this.props.changeFund('fundList', {schoolId: selectedSchool})
+          this.props.changeFund('cashtime', {schoolId: selectedSchool})
+          this.props.changeFund('charge', {schoolId: selectedSchool})
+          this.props.changeFund('deposit', {schoolId: selectedSchool})
+          this.props.changeFund('abnormal', {schoolId: selectedSchool})
+          this.props.changeGift('act', {schoolId: selectedSchool})
+          this.props.changeLost('lostList', {schoolId: selectedSchool})
+          this.props.changeUser('userList', {schoolId: selectedSchool}) 
+          this.props.changeTask('taskList', {schoolId: selectedSchool}) 
+          this.props.changeTask('log', {schoolId: selectedSchool})
+          this.props.changeTask('complaint', {schoolId: selectedSchool})
+          this.props.changeTask('feedback', {schoolId: selectedSchool})
+          this.props.changeStat('overview', {schoolId: selectedSchool})
+          this.props.changeStat('charts', {schoolId: selectedSchool})
+          this.props.changeStat('rank', {schoolId: selectedSchool})
+
           this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
         }else{
           throw new Error('网络出错，请稍后重试～')

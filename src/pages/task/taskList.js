@@ -9,6 +9,7 @@ import SearchLine from '../component/searchLine'
 import SchoolSelector from '../component/schoolSelector'
 import BasicSelector from '../component/basicSelector'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
+import {checkObject} from '../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -243,6 +244,9 @@ class TaskList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'all', 'assigned', 'sourceType', 'pending', 'schoolId'])) {
+      return
+    }
     let {all, assigned, sourceType, pending, page, schoolId} = nextProps
     const body = {
       page: page,

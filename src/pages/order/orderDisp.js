@@ -4,8 +4,7 @@ import {asyncComponent} from '../component/asyncComponent'
 //import OrderInfo from './orderInfo'
 //import OrderTable from './orderTable'
 import Bread from '../bread'
-import {getLocal, setLocal} from '../util/storage'
-import AjaxHandler from '../ajax'
+import {getLocal} from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -29,7 +28,6 @@ class OrderDisp extends React.Component {
     this.clearStatus4orderIIlist()
   }
   clearStatus4orderIIlist = () => {
-    console.log('clear')
     this.getDefaultSchool()
     this.props.changeOrder('orderList', {page: 1, deviceType: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
   }
@@ -38,38 +36,19 @@ class OrderDisp extends React.Component {
     this.props.changeOrder('abnormal', {page: 1, deviceType: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
   }
   getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools')
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
       let schoolId = recent[0]
       selectedSchool = schoolId
-    } else if (getLocal('defaultSchool')) {
-      let defaultSchool = getLocal('defaultSchool')
+    } else if (defaultSchool) {
       selectedSchool = defaultSchool
-    } else {
-      this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
       this.props.changeOrder('orderList', {schoolId: selectedSchool})
       this.props.changeOrder('abnormal', {schoolId: selectedSchool})
     }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
-      page: 1,
-      size: 1
-    }
-    const cb = (json) => {
-      if (json.data.schools) {
-        let id = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', id)
-        this.props.changeOrder('orderList', {schoolId: id})
-        this.props.changeOrder('abnormal', {schoolId: id})
-      } 
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
   render () {
     return (

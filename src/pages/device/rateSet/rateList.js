@@ -7,8 +7,10 @@ import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import Time from '../../component/time'
 import SearchLine from '../../component/searchLine'
+import SchoolSelector from '../../component/schoolSelector'
 import CONSTANTS from '../../component/constants'
 import {mul} from '../../util/numberHandle'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -23,6 +25,7 @@ const typeName =CONSTANTS.DEVICETYPE
 
 class RateList extends React.Component {
   static propTypes = {
+    schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
   constructor (props) {
@@ -79,23 +82,32 @@ class RateList extends React.Component {
         )
     }]
   }
-  componentDidMount () {
+  componentDidMount(){
     this.props.hide(false)
-    const body={
-      page: this.props.page,
+    let {page, schoolId} = this.props
+    const body = {
+      page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
   }
-
   componentWillUnmount () {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page} = nextProps
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
+    let {page, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
   }
@@ -150,12 +162,23 @@ class RateList extends React.Component {
     let page = pageObj.current
     this.props.changeDevice(subModule, {page: page})
   }
+  changeSchool = (value) => {
+    let {schoolId} = this.props
+    if (schoolId === value) {
+      return
+    }
+    this.props.changeDevice(subModule, {page: 1, schoolId: value})
+  }
   render () {
     let {dataSource, loading, total} = this.state
-    let {page} = this.props
+    let {page, schoolId} = this.props
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='创建费率' addLink='/device/rateSet/addRate' />
+        <SearchLine 
+          addTitle='创建费率' 
+          addLink='/device/rateSet/addRate' 
+          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
+        />
         <div className='tableList'>
           <Table bordered loading={loading} rowKey={(record)=>(record.id)} pagination={{pageSize: SIZE, current: page, total: total}} onChange={this.changePage} dataSource={dataSource} columns={this.columns} />
         </div>
@@ -166,7 +189,8 @@ class RateList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.changeDevice[subModule].page
+  page: state.changeDevice[subModule].page,
+  schoolId: state.changeDevice[subModule].schoolId
 })
 
 export default withRouter(connect(mapStateToProps, {

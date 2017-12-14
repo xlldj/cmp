@@ -3,8 +3,7 @@ import {Link} from 'react-router-dom'
 import {Icon} from 'antd'
 import './style/index.css'
 import CONSTANTS from '../component/constants'
-import {getStore} from '../util/storage'
-import AjaxHandler from '../ajax'
+import {getStore, setLocal, getLocal} from '../util/storage'
 import Time from '../component/time'
 
 import { connect } from 'react-redux'
@@ -83,27 +82,35 @@ class MyMenu extends React.Component {
     if (!schoolSet) {
       return this.setDefaultSchool()
     }
-    var selectedSchool = 'all'
+    var selectedSchool = 'all', defaultSchool = getLocal('defaultSchool')
     if (recent.length > 0) {
       selectedSchool = recent[0].id.toString()
+    } else if (defaultSchool) {
+      selectedSchool = defaultSchool
     } else {
+      setLocal('defaultSchool', schools[0].id.toString())
       selectedSchool = schools[0].id.toString()
-      // this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
       this.props.changeSchool('schoolList', {schoolId: selectedSchool})
       this.props.changeSchool('overview', {schoolId: selectedSchool})
       this.props.changeDevice('deviceList', {schoolId: selectedSchool})
+      this.props.changeDevice('prepay', {schoolId: selectedSchool})
+      this.props.changeDevice('timeset', {schoolId: selectedSchool})
+      this.props.changeDevice('rateSet', {schoolId: selectedSchool})
+      this.props.changeDevice('rateLimit', {schoolId: selectedSchool})
       this.props.changeDevice('repair', {schoolId: selectedSchool})
       this.props.changeOrder('orderList', {schoolId: selectedSchool})
       this.props.changeOrder('abnormal', {schoolId: selectedSchool})
       this.props.changeFund('fundList', {schoolId: selectedSchool})
+      this.props.changeFund('cashtime', {schoolId: selectedSchool})
+      this.props.changeFund('charge', {schoolId: selectedSchool})
       this.props.changeFund('deposit', {schoolId: selectedSchool})
       this.props.changeFund('abnormal', {schoolId: selectedSchool})
       this.props.changeGift('act', {schoolId: selectedSchool})
       this.props.changeLost('lostList', {schoolId: selectedSchool})
       this.props.changeUser('userList', {schoolId: selectedSchool}) 
-      this.props.changeTask('taskList', {schoolId: selectedSchool}) 
+      // this.props.changeTask('taskList', {schoolId: selectedSchool}) 
       this.props.changeTask('log', {schoolId: selectedSchool})
       this.props.changeTask('complaint', {schoolId: selectedSchool})
       this.props.changeTask('feedback', {schoolId: selectedSchool})
@@ -111,38 +118,6 @@ class MyMenu extends React.Component {
       this.props.changeStat('charts', {schoolId: selectedSchool})
       this.props.changeStat('rank', {schoolId: selectedSchool})
     }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
-      page: 1,
-      size: 1
-    }
-    const cb = (json) => {
-      if (json.data.schools) {
-        let selectedSchool = json.data.schools[0].id.toString()
-        // setLocal('defaultSchool', selectedSchool)
-
-        this.props.changeSchool('schoolList', {schoolId: selectedSchool})
-        this.props.changeDevice('deviceList', {schoolId: selectedSchool})
-        this.props.changeDevice('repair', {schoolId: selectedSchool})
-        this.props.changeOrder('orderList', {schoolId: selectedSchool})
-        this.props.changeOrder('abnormal', {schoolId: selectedSchool})
-        this.props.changeFund('fundList', {schoolId: selectedSchool})
-        this.props.changeFund('abnormal', {schoolId: selectedSchool})
-        this.props.changeGift('act', {schoolId: selectedSchool})
-        this.props.changeLost('lostList', {schoolId: selectedSchool})
-        this.props.changeUser('userList', {schoolId: selectedSchool}) 
-        this.props.changeTask('taskList', {schoolId: selectedSchool}) 
-        this.props.changeTask('log', {schoolId: selectedSchool})
-        this.props.changeTask('complaint', {schoolId: selectedSchool})
-        this.props.changeTask('feedback', {schoolId: selectedSchool})
-        this.props.changeStat('overview', {schoolId: selectedSchool})
-        this.props.changeStat('charts', {schoolId: selectedSchool})
-        this.props.changeStat('rank', {schoolId: selectedSchool})
-      } 
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
 
   setStatusForschool = () => {
@@ -168,15 +143,18 @@ class MyMenu extends React.Component {
     this.props.changeDevice('components', {page: 1})
   }
   clearStatus4deviceIIprepay = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('prepay', {page: 1})
   }
   clearStatus4deviceIItimeset = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('timeset', {page: 1})
   }
   clearStatus4deviceIIsuppliers = () => {
     this.props.changeDevice('suppliers', {page: 1})
   }
   clearStatus4deviceIIrateSet = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('rateSet', {page: 1})
   }
   clearStatus4deviceIIrepair = () => {
@@ -184,6 +162,7 @@ class MyMenu extends React.Component {
     this.props.changeDevice('repair', {page: 1, deviceType: 'all', status: 'all'})
   }
   clearStatus4deviceIIrateLimit = () => {
+    this.getDefaultSchool()
     this.props.changeDevice('rateLimit', {page: 1})
   }
 
@@ -209,12 +188,15 @@ class MyMenu extends React.Component {
     this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
   }
   clearStatus4fundIIcashtime = () => {
+    this.getDefaultSchool()
     this.props.changeFund('cashtime', {page: 1})
   }
   clearStatus4fundIIcharge = () => {
+    this.getDefaultSchool()
     this.props.changeFund('charge', {page: 1})
   }
   clearStatus4fundIIdeposit = () => {
+    this.getDefaultSchool()
     this.props.changeFund('deposit', {page: 1})
   }
   clearStatus4fundIIabnormal = () => {
@@ -275,6 +257,9 @@ class MyMenu extends React.Component {
     this.props.changeTask('feedback', {page: 1})
   }
 
+  setStatusForstat = () => {
+    this.getDefaultSchool()
+  }
 
 
   setStatusForemployee = () => {
@@ -381,5 +366,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 export default withRouter(connect(mapStateToProps, {
-  changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat
+  changeSchool, changeDevice, changeOrder, changeFund, changeGift, 
+  changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat
 })(MyMenu))

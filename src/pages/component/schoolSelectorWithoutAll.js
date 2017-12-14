@@ -37,11 +37,16 @@ class SchoolSelector extends React.Component{
         /*--------redirect --------*/
         if(json.data){
           let recentSchools = getLocal('recentSchools'), recent = []
+
           if (recentSchools) {
-            recent = recentSchools.split(',').filter((r) => {
-              return json.data.schools.some((s) => (s.id === parseInt(r, 10)))
+            let localRecentArray = recentSchools.split(',')
+            localRecentArray.forEach((r) => {
+              let index = json.data.schools.findIndex((s) => (s.id === parseInt(r, 10)))
+              if (index !== -1) {
+                recent.push(json.data.schools[index])
+              }
             })
-          }
+          } 
           this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
         }else{
           throw new Error('网络出错，请稍后重试～')
