@@ -10,6 +10,8 @@ import DeviceSelector from '../component/deviceSelector'
 import SchoolSelector from '../component/schoolSelector'
 import BasicSelector from '../component/basicSelector'
 
+import './style/style.less'
+
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -330,6 +332,10 @@ class OrderTable extends React.Component {
           selector2={<DeviceSelector selectedDevice={deviceType} changeDevice={this.changeDevice} />} 
           selector3={<BasicSelector allTitle='所有使用状态' staticOpts={CONSTANTS.ORDERSTATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
         />
+
+        <p className='overview' style={{marginBottom: '10px', marginTop: '-10px'}}>
+          总收益: {total}
+        </p>
 
         <div className='tableList'>
           <Table 
