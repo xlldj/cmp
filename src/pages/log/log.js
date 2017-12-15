@@ -171,9 +171,16 @@ class Log extends React.Component{
         Noti.hintLog()
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource,body,cb, this.networkErrorHandler)
   }
 
+  networkErrorHandler = (error) => {
+    console.log(error)
+    this.setState({
+      posting: false
+    })
+    Noti.hintServiceError()
+  }
   pressEnter = (e) => {
     let key = e.key
     if (key.toLowerCase() === 'enter') {

@@ -67,7 +67,7 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
                                       console.log(error)
                                       let title, message
                                       if (errorCb) {
-                                        errorCb()
+                                        return errorCb(error)
                                       }
                                       if (error === 'timeout') {
                                         title = '请求超时'

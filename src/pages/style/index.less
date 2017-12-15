@@ -444,6 +444,7 @@ button.grayBackColor:linked{
       line-height: @liHeight;
       height: @liHeight;
       color: #222;
+      word-break: keep-all;
 
       .flex;
 
@@ -455,6 +456,11 @@ button.grayBackColor:linked{
       }
       button,span{
         margin-right: 5px;
+      }
+      .longItem{
+        // max-width: 140px;
+        width: calc(~ '100% - 130px');
+        line-height: 20px;
       }
     }
     .imgWrapper{
@@ -840,7 +846,7 @@ button.grayBackColor:linked{
         overflow-y: scroll;
         .breadc{
           background-color: #fff;
-          position: fixed;
+          position: absolute;
           top: 0;
           height: 50px;
           width: 100%;
