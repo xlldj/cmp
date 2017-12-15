@@ -6,12 +6,6 @@ import CONSTANTS from '../../component/constants'
 import Time from '../../component/time'
 import Noti from '../../noti'
 
-const STATUSCLASS = {
-  1: 'warning',
-  2: 'success',
-  4: ''
-}
-
 class AbnormalInfo extends React.Component {
   constructor (props) {
     super(props)

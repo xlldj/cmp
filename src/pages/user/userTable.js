@@ -49,7 +49,7 @@ class UserTable extends React.Component {
           result += record.mobileBrand
         }
         if (record.mobileModel) {
-          result += record.mobileModel
+          result += `(${record.mobileModel})`
         }
         result = result ? result : '----'
         return result

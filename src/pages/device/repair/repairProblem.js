@@ -1,7 +1,6 @@
 import React from 'react'
-import {asyncComponent} from '../../component/asyncComponent'
 
-import {Table, Button, Popconfirm, Modal} from 'antd'
+import {Table, Popconfirm, Modal} from 'antd'
 
 import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
@@ -59,7 +58,7 @@ class RepairProblem extends React.Component {
             <a href='' onClick={(e) => {this.edit(e,index)}}>编辑</a>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e,index)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>

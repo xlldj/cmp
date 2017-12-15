@@ -1,5 +1,5 @@
 import React from 'react'
-import {Button, Popconfirm, Checkbox, Radio} from 'antd'
+import {Button, Popconfirm, Radio} from 'antd'
 import {Link} from 'react-router-dom'
 import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
@@ -7,7 +7,6 @@ import Format from '../../component/format'
 import CONSTANTS from '../../component/constants'
 
 const RadioGroup = Radio.Group
-const CheckboxGroup = Checkbox.Group;
 const BUSINESS = CONSTANTS.BUSINESS
 
 class InfoSet extends React.Component{
@@ -163,10 +162,7 @@ class InfoSet extends React.Component{
     }
     const cb=(json)=>{
       if(json.error){
-        throw {
-          title: '请求出错',
-          message: json.error.displayMessage || '网络错误'
-        }
+        Noti.hintServiceError(json.error.displayMessage)
       }else{
         if (json.data.result) {
           Noti.hintSuccess(this.props.history,'/school/list')
@@ -228,8 +224,8 @@ class InfoSet extends React.Component{
   render(){
     let {schoolId, schoolName, buildingNames, buildingNamesSet, 
         businesses, businessSet, 
-        prepayFunction, prepayFunctionSet, prepayOptions, prepayOptionsSet,
-        waterTimeRanges, waterTimeRangeSet, repairCauses, repairCausesSet, rechargeAmount,
+        prepayOptions, prepayOptionsSet,
+        waterTimeRanges, waterTimeRangeSet, rechargeAmount,
         rechargeAmountsSet, bonusActivity, bonusActivitySet, repairmans, repairmansSet, 
         finished, finishError, onlineChanged, status, rateDetails, rateDetailsSet, prepayNotMatchBusiness, rateNotMatchBusiness} = this.state
 
@@ -375,7 +371,7 @@ class InfoSet extends React.Component{
           </li>
           <li>
             <p>维修员:</p>
-            {repairmansSet ? <span>{repairmansContent}</span> : 
+            {repairmansSet ? <span className='longItem'>{repairmansContent}</span> : 
               <Button type='primary' onClick={this.toRepairmanSet}>前往添加</Button>
             }
           </li>

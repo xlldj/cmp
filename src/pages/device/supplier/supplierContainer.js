@@ -6,9 +6,6 @@ const SupplierTable = asyncComponent(() => import(/* webpackChunkName: "supplier
 const SupplierInfo = asyncComponent(() => import(/* webpackChunkName: "supplierInfo" */ "./supplierInfo"))
 
 class SupplierContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

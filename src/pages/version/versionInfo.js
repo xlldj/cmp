@@ -28,7 +28,9 @@ class VersionInfo extends React.Component {
       url: '',
       urlError: false,
       apkError: false,
-      fileList: []
+      fileList: [],
+      envType: '',
+      envError: false
     }
   }
   fetchData =(body)=>{
@@ -142,7 +144,7 @@ class VersionInfo extends React.Component {
     this.props.hide(true)
   }
   postInfo = () => {
-    let {system, versionNo, type, method, url, content, id, fileList, posting} = this.state
+    let {system, versionNo, type, method, url, content, id, fileList, envType, posting} = this.state
     if (posting) {
       return
     }
@@ -153,7 +155,8 @@ class VersionInfo extends React.Component {
       system: parseInt(system, 10),
       versionNo: versionNo,
       type: parseInt(type, 10),
-      content: content
+      content: content,
+      envType: parseInt(envType, 10)
     }
     if (method === '1') {
       body.url = url
@@ -182,15 +185,20 @@ class VersionInfo extends React.Component {
         }        
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource,body,cb, null)
   }
   completeEdit = () => {
-    let {system, versionNo, type, method, url, content, fileList, checking, posting} = this.state, nextState = {}
+    let {system, versionNo, type, method, url, content, fileList, envType, checking, posting} = this.state, nextState = {}
     if (!system) {
       nextState.systemError = true
       return this.setState(nextState)
     }
     nextState.systemError = false
+    if (!envType) {
+      nextState.envError = true
+      return this.setState(nextState)
+    }
+    nextState.envError = false
     if (!versionNo) {
       nextState.codeError = true
       nextState.codeErrorMsg = '版本号不能为空！'
@@ -270,7 +278,10 @@ class VersionInfo extends React.Component {
     this.checkExist(null)
   }
   checkExist = (callback) => {
-    let {versionNo, id, system, originalVersion, checking} = this.state
+    let {versionNo, id, system, originalVersion, envType, checking} = this.state
+    if (!envType) {
+      return
+    }
     if (id && versionNo.trim() === originalVersion) {
       callback && callback()
       return
@@ -284,7 +295,8 @@ class VersionInfo extends React.Component {
     let resource = '/version/check'
     const body = {
       system: parseInt(system, 10),
-      versionNo: versionNo.trim() 
+      versionNo: versionNo.trim(),
+      envType: parseInt(envType, 10)
     }
     const cb = (json) => {
       const nextState = {
@@ -414,12 +426,29 @@ class VersionInfo extends React.Component {
       })
     }
   }
-
+  changeEnv = (value) => {
+    this.setState({
+      envType: value
+    })
+  }
+  checkEnv = (v) => {
+    if (!v) {
+      return this.setState({
+        envError: true
+      })
+    }
+    if (this.state.envError) {
+      this.setState({
+        envError: false,
+      })
+    }
+  }
   render () {
     let {id, type, typeError, versionNo, codeError, codeErrorMsg, 
       content, contentError, contentErrorMsg,
       system, systemError, method, methodError,
-      url, urlError, apkError, fileList, posting
+      url, urlError, apkError, fileList, posting,
+      envType, envError
     } = this.state
 
     return (
@@ -437,11 +466,25 @@ class VersionInfo extends React.Component {
               checkOpt={this.checkSystem}
               invalidTitle='选择系统'
             />
-            {systemError ? <span className='checkInvalid'>系统不能为空！</span>:null}        
+            {systemError ? <span className='checkInvalid'>系统不能为空！</span> : null}        
+          </li>
+          <li>
+            <p>选择环境:</p>
+            <BasicSelectorWithoutAll
+              width={'140px'}
+              disabled={id}
+              className={id ? 'disabled' : ''}
+              staticOpts={CONSTANTS.VERSIONENV}
+              selectedOpt={envType}
+              changeOpt={this.changeEnv}
+              checkOpt={this.checkEnv}
+              invalidTitle='选择环境'
+            />
+            {envError ? <span className='checkInvalid'>环境不能为空！</span> : null}
           </li>
           <li>
             <p>版本号:</p>
-            <input value={versionNo} disabled={id} className={id ? 'disabled' : ''} onChange={this.changeCode} onBlur={this.checkCode} placeholder='' />
+            <input value={versionNo}  onChange={this.changeCode} onBlur={this.checkCode} placeholder='' />
             {codeError ? <span className='checkInvalid'>{codeErrorMsg}</span>:null}        
           </li>
           <li>

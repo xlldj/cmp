@@ -11,7 +11,6 @@ const Bread = withRouter((props) => {
 
   extraBreadcrumbItems = pathSnippets.map((_, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`
-    let urlPath = _
     if (index === l) {
       return null
     }

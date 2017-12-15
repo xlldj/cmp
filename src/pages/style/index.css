@@ -530,6 +530,10 @@ button.grayBackColor:linked {
   border-color: #ddd;
   border-radius: 5px;
 }
+.info > ul > li .longItem {
+  width: calc(100% - 130px);
+  line-height: 22px;
+}
 .info > ul .imgWrapper {
   display: flex;
   flex: none;
@@ -649,6 +653,10 @@ button.grayBackColor:linked {
   border-color: #ddd;
   border-radius: 5px;
 }
+.infoList > ul > li .longItem {
+  width: calc(100% - 130px);
+  line-height: 22px;
+}
 .infoList > ul .imgWrapper {
   display: flex;
   flex: none;
@@ -767,7 +775,7 @@ button.grayBackColor:linked {
   margin-right: 0;
 }
 .searchLine .searchInput {
-  width: 200px;
+  width: 150px;
   height: 30px;
 }
 .searchLine .searchInput input {
@@ -778,6 +786,11 @@ button.grayBackColor:linked {
 }
 .seperateItem {
   margin-right: 5px;
+}
+/* for number show in orderTable and fundTable */
+.profitBanner {
+  margin-top: -8px;
+  margin-bottom: 8px;
 }
 /* for older version upload button in task module */
 .uploadButton {

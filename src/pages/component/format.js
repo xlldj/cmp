@@ -3,7 +3,7 @@ const Format = {}
 Format.dayFormat = (v) => {
   let t = v.split('-')
   let newT = t.map((r, i) => {
-    let n = parseInt(r), s = n.toString()
+    let n = parseInt(r, 10), s = n.toString()
     return s
   })
   return newT.join('-')
@@ -12,14 +12,13 @@ Format.dayFormat = (v) => {
 Format.hourFormat = (v) => {
   let t = v.split('-')
   let newT = t.map((r, i) => {
-    let n = parseInt(r), s = n.toString()
+    let n = parseInt(r, 10), s = n.toString()
     return s
   })
   return newT.slice(0, 3).join('-') + ' ' + newT[3] + ':00'
 }
 
 Format.minuteFormat = (v) => { // v is a string , only hour ,this is for adding '0'
-  let t = parseInt(v)
   if (v < 10) {
     return '0' + v
   } else {
@@ -27,7 +26,6 @@ Format.minuteFormat = (v) => { // v is a string , only hour ,this is for adding 
   }
 }
 Format.adding0 = (v) => { // only for adding 0
-  let t = parseInt(v)
   if (v < 10) {
     return '0' + v
   } else {
@@ -41,8 +39,8 @@ Format.hourMinute = (o) => { // o is object, like {hour: 4, minute: 34}
 
 Format.fullTime = (v) => {
   let a = v.split('-')
-  let y = a[0], m = parseInt(a[1]) > 9 ? a[1] : `0${a[1]}`, d = parseInt(a[2]) > 9 ? a[2] : `0${a[2]}`
-  let h = parseInt(a[3]) > 9 ? a[3] : `0${a[3]}`
+  let y = a[0], m = parseInt(a[1], 10) > 9 ? a[1] : `0${a[1]}`, d = parseInt(a[2], 10) > 9 ? a[2] : `0${a[2]}`
+  let h = parseInt(a[3], 10) > 9 ? a[3] : `0${a[3]}`
   return `${y}-${m}-${d} ${h}:00`
 }
 
@@ -59,13 +57,13 @@ Format.hourLabel = (v) => {
 
 Format.getWeekNum = (v) => {
   let a = v.split('-')
-  return parseInt(a[1])
+  return parseInt(a[1], 10)
 }
 
 Format.monthFormat = (x) => {
   // x---'2017-09'
   let a = x.split('-')
-  return a[0] + '年' + parseInt(a[1]) + '月'
+  return a[0] + '年' + parseInt(a[1], 10) + '月'
 }
 Format.number2chi = (num) => {
   if (num >= 100) {
@@ -73,9 +71,9 @@ Format.number2chi = (num) => {
   }
   const chineseCharacter = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九']
   const arr = num.toString().split('').reverse('')
-  let m = chineseCharacter[parseInt(arr[0])], n = '', nn
+  let m = chineseCharacter[parseInt(arr[0], 10)], n = '', nn
   if (arr[1]) {
-    n = chineseCharacter[parseInt(arr[1])]
+    n = chineseCharacter[parseInt(arr[1], 10)]
     nn = n === '一' ? '十' : `${n}十`
   }
 

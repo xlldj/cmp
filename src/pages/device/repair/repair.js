@@ -9,9 +9,6 @@ const RepairRate = asyncComponent(() => import(/* webpackChunkName: "repairRate"
 const RepairLog = asyncComponent(() => import(/* webpackChunkName: "repairLog" */ "./repairLog"))
 
 class Repairs extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div className='repair'>

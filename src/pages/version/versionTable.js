@@ -35,6 +35,11 @@ class VersionTable extends React.Component {
       width: '10%',
       className: 'firstCol'
     }, {
+      title: '环境',
+      dataIndex: 'envType',
+      width: '8%',
+      render: (text, record) => (CONSTANTS.VERSIONENV[record.envType])
+    }, {
       title: '更新方式',
       dataIndex: 'type',
       width: '10%',

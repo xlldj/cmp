@@ -261,11 +261,11 @@ class SchoolInfoEdit extends React.Component {
       body.id = parseInt(id, 10)
     }
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-        this.setState({
-          posting: false
-        })
       } else {
         /* tell server to reload account */
         if(json.data){
@@ -279,9 +279,6 @@ class SchoolInfoEdit extends React.Component {
           this.tellClientReload()
         } else {
           Noti.hintServiceError()
-          this.setState({
-            posting: false
-          })
         }
       }
     }

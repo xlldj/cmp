@@ -1,7 +1,6 @@
 import React from 'react'
-import {asyncComponent} from '../../component/asyncComponent'
 
-import {Table, Button, Popconfirm, Modal} from 'antd'
+import {Table, Popconfirm, Modal} from 'antd'
 
 import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
@@ -52,7 +51,7 @@ class ComponentType extends React.Component {
             <a href='' onClick={(e) => {this.edit(e,index)}}>编辑</a>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e,index)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>
@@ -105,7 +104,7 @@ class ComponentType extends React.Component {
     })
   }
   postCpType = () => {
-    let {deviceType, addingName} = this.state
+    let {deviceType} = this.state
     if (!deviceType || deviceType==='0') {
       return this.setState({
         dtError: true
@@ -118,7 +117,7 @@ class ComponentType extends React.Component {
     }
     const body = {
       description: this.state.addingName,
-      deviceType: parseInt(this.state.deviceType)
+      deviceType: parseInt(this.state.deviceType, 10)
     }
     let resource
     if(this.state.editing){

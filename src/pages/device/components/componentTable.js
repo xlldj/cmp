@@ -49,7 +49,7 @@ class ComponentTable extends React.Component {
             <Link to={`/device/components/editComponent/:${record.id}`}>编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>
@@ -132,7 +132,7 @@ class ComponentTable extends React.Component {
   }
 
   render () {
-    const {dataSource, componentTypes, total, loading} = this.state
+    const {dataSource, total, loading} = this.state
     const {page} = this.props
 
 

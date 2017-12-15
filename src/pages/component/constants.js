@@ -67,6 +67,7 @@ const CONSTANTS = {
   CHARTTYPES: {1: 'order', 2: 'user', 3: 'bonus', 4: 'funds', 5: 'repair', 6: 'repair/time'},
   SETTLETYPE: {1: '消息回复', 2: '电话回复'},
   UPDATETYPE: {1: '强制升级', 2: '普通升级'},
+  VERSIONENV: {1: '用户端', 2: '管理端'},
   SYSTEMS: {1: 'iOS', 2: 'Android'},
   VERSIONADDMETHOD: {1: '地址填入', 2: '安装包上传'},
 

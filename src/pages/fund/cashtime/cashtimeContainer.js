@@ -6,9 +6,6 @@ const CashtimeTable = asyncComponent(() => import(/* webpackChunkName: "cashtime
 const CashtimeInfo = asyncComponent(() => import(/* webpackChunkName: "cashtimeInfo" */ "./cashtimeInfo"))
 
 class CashtimeContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

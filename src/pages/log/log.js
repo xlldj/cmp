@@ -152,7 +152,7 @@ class Log extends React.Component{
       if (json.error) {
         // throw new Error(json.error.displayMessage||json.error.debugMessage)
         this.handleLogError(json.error)
-      }else{
+      } else {
         let {nickName, id, pictureUrl} = json.data.user
         let user = {
           name: nickName,
@@ -179,7 +179,6 @@ class Log extends React.Component{
     this.setState({
       posting: false
     })
-    Noti.hintServiceError()
   }
   pressEnter = (e) => {
     let key = e.key

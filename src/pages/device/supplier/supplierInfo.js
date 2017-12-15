@@ -4,15 +4,6 @@ import {Button} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
-import AddPlusAbs from '../../component/addPlusAbs'
-import CONSTANTS from '../../component/constants'
-import SchoolSelector from '../../component/schoolSelectorWithoutAll'
-import DeviceWithouAll from '../../component/deviceWithoutAll'
-const BACKTITLE = {
-  fromInfoSet: '返回学校信息设置'
-}
-const initialItems = [{prepay: ''}]
-const initialDrinkItems =[[{prepay: '', usefor: 1}],[{prepay: '', usefor: 2}],[{prepay: '', usefor: 3}]]
 
 class SupplierInfo extends React.Component {
   constructor (props) {
@@ -24,7 +15,8 @@ class SupplierInfo extends React.Component {
       alias: '',
       aliasError: false,
       version: '',
-      versionError: false
+      versionError: false,
+      posting: false
     }
   }
   fetchData =(body)=>{
@@ -56,7 +48,7 @@ class SupplierInfo extends React.Component {
     this.props.hide(false)
     if(this.props.match.params.id){
       const body={
-        id:parseInt(this.props.match.params.id.slice(1))
+        id:parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
@@ -65,7 +57,13 @@ class SupplierInfo extends React.Component {
     this.props.hide(true)
   }
   completeEdit = () => {
-    let {id, name, alias, version} = this.state
+    let {id, name, alias, version, posting} = this.state
+    if (posting) {
+      return
+    }
+    this.setState({
+      posting: true
+    })
 
     const body = {
       name: name,
@@ -79,32 +77,36 @@ class SupplierInfo extends React.Component {
       body.id = id
     }
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if(json.error){
         throw new Error(json.error.displayMessage || json.error)
       }else{
         /*--------redirect --------*/
         if(json.data){
+          // throw new Error('test')
           Noti.hintSuccess(this.props.history,'/device/suppliers')
         }else{
           throw new Error('网络出错，请稍后重试～')
-        }        
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
   }
   confirm = () => {
-    let {id, name, alias, version} = this.state
+    let {name, alias} = this.state
     if (!name) {
       return this.setState({
         nameError: true
       })
     }
-    /*版本号可以为空 
     if (!alias) {
       return this.setState({
         aliasError: true
       })
     }
+    /*版本号可以为空 
     if (!version) {
       return this.setState({
         versionError: true
@@ -136,11 +138,7 @@ class SupplierInfo extends React.Component {
         throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
-          // Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
-          throw {
-            title: '添加出错',
-            message: '当前设备已有预付选项，请返回该项编辑'
-          }
+          Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
         } else {
           if (callback) {
             callback()
@@ -199,7 +197,7 @@ class SupplierInfo extends React.Component {
   }
 
   render () {
-    let {id, name, nameError, alias, aliasError, version, versionError} = this.state
+    let {name, nameError, alias, aliasError, version, versionError} = this.state
 
     return (
       <div className='infoList '>
