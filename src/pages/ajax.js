@@ -34,7 +34,7 @@ AjaxHandler.tiForOther = () => setTimeout(() => {
   AjaxHandler.showingOther = false
 }, 4000)
 
-const abortablePromise = (fetch_promise, cb, errorCb, options) => {
+const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
   let timeoutAction = null
 
   // 这是一个可以被reject的promise
@@ -50,7 +50,6 @@ const abortablePromise = (fetch_promise, cb, errorCb, options) => {
                                       if (response.status >= 200 && response.status < 300) {
                                         return response
                                       }
-
                                       throw response
                                     })
                                     .then((response) => {
@@ -61,19 +60,33 @@ const abortablePromise = (fetch_promise, cb, errorCb, options) => {
                                       throw new TypeError('返回的数据类型出错!')
                                     })
                                     .then((json) => {
-                                      cb(json)
+                                      if (json.error) {
+                                        if (serviceErrorCb) {
+                                          serviceErrorCb(json.error)
+                                        } else {
+                                          throw new Error({
+                                            type: 'service',
+                                            message: json.error.displayMessage
+                                          })
+                                        }
+                                      } else {
+                                        cb(json)
+                                      }
                                     })
                                     .catch((error) => {
                                       console.log(error)
-                                      let title, message
                                       if (options && options.clearPosting && options.thisObj) {
                                         options.thisObj.setState({
                                           posting: false
                                         })
                                       }
-                                      if (errorCb) {
-                                        return errorCb(error)
+                                      if (options && options.clearChecking && options.thisObj) {
+                                        options.thisObj.setState({
+                                          checking: false
+                                        })
                                       }
+                                      let title, message
+                                      // if timeout 
                                       if (error === 'timeout') {
                                         title = '请求超时'
                                         message = '请稍后重试～'
@@ -81,9 +94,9 @@ const abortablePromise = (fetch_promise, cb, errorCb, options) => {
                                         if (!AjaxHandler.showingTo) {
                                           Noti.hintLock(title, message)
                                           AjaxHandler.showingTo = true
-                                          AjaxHandler.tiForTo()
+                                          return AjaxHandler.tiForTo()
                                         }
-                                      } else {
+                                      } else if (error.type === 'service') { // if service error
                                         title = error.title || '请求出错'
                                         if (error.code === 10008) {
                                           message = error.displayMessage
@@ -126,6 +139,8 @@ const abortablePromise = (fetch_promise, cb, errorCb, options) => {
                                             AjaxHandler.tiForOther()
                                           }
                                         }
+                                      } else { // network error and other errors
+                                        Noti.hintNetworkError()
                                       }
                                       /* if (!AjaxHandler.showingError) {
                                         if (error.status === 401) {
@@ -144,7 +159,7 @@ const abortablePromise = (fetch_promise, cb, errorCb, options) => {
   return abortable_promise
 }
 
-AjaxHandler.ajax = (resource, body, cb, errorCb, options) => {
+AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
   /* ----handle the 'api' ----- */
   if (resource.includes('/api')) {
     resource = resource.replace('/api', '')
@@ -173,7 +188,7 @@ AjaxHandler.ajax = (resource, body, cb, errorCb, options) => {
 
   let fetch_promise = fetch(url, {method: 'POST', body: JSON.stringify(body), headers: hdrs})
 
-  return abortablePromise(fetch_promise, cb, errorCb, options)
+  return abortablePromise(fetch_promise, cb, serviceErrorCb, options)
 }
 AjaxHandler.ajaxClient = (resource, body, cb) => {
   const domain = 'http://116.62.236.67:5081'

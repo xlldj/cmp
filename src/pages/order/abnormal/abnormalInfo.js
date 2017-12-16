@@ -87,7 +87,11 @@ class AbnormalInfo extends React.Component {
           </li>
           <li><p>开始时间:</p>{Time.getTimeStr(data.createTime)}</li>
           <li><p>结束时间:</p>{data.finishTime ? Time.getTimeStr(data.finishTime) : ''}</li>
-          <li><p>结账方式:</p>{data.checkoutByOther ? '代结账' : '自结账'}</li>
+          <li><p>订单状态:</p><span>已退单</span></li>
+          <li>
+            <p>退单原因:</p>
+            <span>系统退单</span>
+          </li>
           <li><p>预付金额:</p><span>{`${data.prepay}`}</span></li>
           <li><p>实际消费:</p><span className='shalowRed'>{`${data.consume}`}</span></li>
           {

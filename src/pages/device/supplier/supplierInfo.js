@@ -16,7 +16,9 @@ class SupplierInfo extends React.Component {
       aliasError: false,
       version: '',
       versionError: false,
-      posting: false
+      posting: false, 
+      checking: false,
+      originalName: ''
     }
   }
   fetchData =(body)=>{
@@ -30,6 +32,7 @@ class SupplierInfo extends React.Component {
           let nextState={
             id: id,
             name: name,
+            originalName: name,
             alias: alias
           }
           if (version) {
@@ -95,7 +98,7 @@ class SupplierInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
   }
   confirm = () => {
-    let {name, alias} = this.state
+    let {id, name, alias, originalName, checking, posting} = this.state
     if (!name) {
       return this.setState({
         nameError: true
@@ -106,39 +109,47 @@ class SupplierInfo extends React.Component {
         aliasError: true
       })
     }
+    if (checking || posting) {
+      return
+    }
     /*版本号可以为空 
     if (!version) {
       return this.setState({
         versionError: true
       })
     }*/
-    /*
-    if (!(id && originalSchool === schoolId && originalDevice === originalDevice)) {
+    if (!(id && originalName === name)) {
       this.checkExist(this.completeEdit)
     } else {
       this.completeEdit()
     }
-    */
-    this.completeEdit()
+    // this.completeEdit()
   }
   back = () => {
     this.props.history.goBack()
   }
   /* -----需要改成对应的查重------ */
-  checkExist = (callback) => {
-    let dt = parseInt(this.state.deviceType, 10)
-    let schoolId = parseInt(this.state.schoolId, 10)
-    let resource = '/device/prepay/option/check'
+  checkExist = (callback, state) => {
+    let {name, checking} = {...this.state, ...state}
+    if (checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
+    let resource = '/supplier/check'
     const body = {
-      deviceType: dt,
-      schoolId: schoolId
+      name: name
     }
     const cb = (json) => {
+      this.setState({
+        checking: false
+      })
       if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
-          Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
+          Noti.hintLock('添加出错', '当前供应商已被添加，请勿重复添加！')
         } else {
           if (callback) {
             callback()
@@ -168,6 +179,7 @@ class SupplierInfo extends React.Component {
       nextState.nameError = false
     }
     this.setState(nextState)
+    this.checkExist(null, {name: v})
   }
   changeAlias = (e) => {
     this.setState({

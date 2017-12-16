@@ -340,7 +340,7 @@ class OrderTable extends React.Component {
           confirm={this.confirmRange}
           onOpenChange={this.onOpenChange}
 
-          searchInputText='宿舍／订单号' 
+          searchInputText='宿舍/订单号/手机号' 
           searchingText={this.state.searchingText} 
           pressEnter={this.pressEnter} 
           changeSearch={this.changeSearch}

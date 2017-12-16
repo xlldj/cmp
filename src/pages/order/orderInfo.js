@@ -271,15 +271,15 @@ class OrderInfo extends React.Component {
           maskClosable={modalClosable}
           className='popupModal'
         >
-          <span>
-            由于
-            <input 
+          <div className='chargeBackModal'>
+            <span>由于</span>
+            <textarea
               value={this.state.modalMessage} 
               onChange={this.modalMessageChange} 
               onBlur={this.modalBlured}
             />
-            ，此单已做退单处理，你可以前往消费记录中查看，有一笔免费的订单。
-          </span>
+          </div>
+          <p>，此单已做退单处理，你可以前往消费记录中查看，有一笔免费的订单。</p>
           {this.state.modalMessageError ? <p className='checkInvalid' style={{textAlign: 'left'}}>消息不能为空！</p> : null }
         </Modal>
       </div>

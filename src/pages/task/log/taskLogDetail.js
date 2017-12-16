@@ -67,8 +67,8 @@ class TaskLogDetail extends React.Component {
           if (data.userId) {
             nextState.repairmanId = data.userId
           }
-          if (data.username) {
-            nextState.repairmanName = data.username
+          if (data.assignName) {
+            nextState.repairmanName = data.assignName
           }
           if (data.level) {
             nextState.priority = data.level
@@ -118,7 +118,7 @@ class TaskLogDetail extends React.Component {
     this.updateToast()
   }
   changeDescription = (e) => {
-    let v = e.target.value.trim()
+    let v = e.target.value
     this.setState({
       description: v
     })

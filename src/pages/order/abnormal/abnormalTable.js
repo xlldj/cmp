@@ -85,18 +85,7 @@ class AbnormalTable extends React.Component {
       title: '使用状态',
       dataIndex: 'status',
       width: '10%',
-      render: (text,record,index)=> {
-        switch(record.status){
-          case 1:
-            return <Badge status='warning' text='使用中' />
-          case 2:
-            return <Badge status='success' text='使用结束' />
-          case 4:
-            return <Badge status='default' text='已退单' />
-          default:
-            return <Badge status='warning' text='使用结束' />
-        }
-      }
+      render: (text,record,index)=> (<Badge status='default' text='已退单' />)
     }, {
       title: '消费金额',
       dataIndex: 'paymentType',
