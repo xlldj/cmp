@@ -20,7 +20,7 @@ const LogCard = (props) => {
           <Link to={props.detailAddr} >编辑</Link>
           <span className='ant-divider' />
           <Popconfirm title='确定要删除么?' onConfirm={props.delete} okText='确认' cancelText='取消'>
-            <a href='#'>删除</a>
+            <a href=''>删除</a>
           </Popconfirm>
         </p>
       </div>

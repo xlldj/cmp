@@ -7,6 +7,7 @@ import Time from '../../component/time'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -171,6 +172,9 @@ class SchoolList extends React.Component {
     // nothing
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
     let {page, schoolId} = nextProps
     const body ={
       page: page,

@@ -30,7 +30,7 @@ class PrepayInfo extends React.Component {
         throw new Error(json.error.displayMessage || json.error)
       }else{
         if(json.data){
-          json.data.items.map((r,i)=>{
+          json.data.items.forEach((r,i)=>{
             let start = moment('1/1/2017', 'DD/MM/YYYY'), end = moment('1/1/2017', 'DD/MM/YYYY')
             start.hour(r.startTime.hour)
             start.minute(r.startTime.minute)
@@ -59,7 +59,7 @@ class PrepayInfo extends React.Component {
     this.props.hide(false)
     if(this.props.match.params.id){
       const body={
-        id:parseInt(this.props.match.params.id.slice(1))
+        id:parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
@@ -96,7 +96,7 @@ class PrepayInfo extends React.Component {
         })
       }
     }
-    items.map((r,i)=>{
+    items.forEach((r,i)=>{
       let startTime = {
         hour:moment(r.startTime).hour(),
         minute: moment(r.startTime).minute()
@@ -111,12 +111,12 @@ class PrepayInfo extends React.Component {
     })
     const body = {
       items: items,
-      deviceType: parseInt(this.state.deviceType),
-      schoolId: parseInt(this.state.selectedSchool)
+      deviceType: parseInt(this.state.deviceType, 10),
+      schoolId: parseInt(this.state.selectedSchool, 10)
     }
     let resource
     if(this.props.match.params.id){
-      body.id = parseInt(this.props.match.params.id.slice(1))
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
       resource = '/api/time/range/water/update'
     } else {
       resource = '/api/time/range/water/add'
@@ -187,7 +187,7 @@ class PrepayInfo extends React.Component {
     if (this.state.schoolError) {
       nextState.schoolError = false
     }
-    nextState.selectedSchool = parseInt(v)
+    nextState.selectedSchool = parseInt(v, 10)
     this.setState(nextState)
   }
   checkSchool = (v) => {
@@ -227,13 +227,13 @@ class PrepayInfo extends React.Component {
       deviceTypeError: false
     })
     let {selectedSchool, deviceType} = this.state
-    if (parseInt(selectedSchool) && parseInt(deviceType)) {
+    if (parseInt(selectedSchool, 10) && parseInt(deviceType, 10)) {
       this.checkExist(null)
     }
   }
   checkExist = (callback) => {
     let {selectedSchool, deviceType, id, initialSchool, initialDT} = this.state
-    if (id && (parseInt(selectedSchool) === initialSchool) && (parseInt(deviceType) === initialDT)) {
+    if (id && (parseInt(selectedSchool, 10) === initialSchool) && (parseInt(deviceType, 10) === initialDT)) {
       if (callback) {
         callback()
       }
@@ -241,18 +241,18 @@ class PrepayInfo extends React.Component {
     }
     let resource = '/time/range/water/check'
     const body = {
-      schoolId: parseInt(selectedSchool),
-      deviceType: parseInt(deviceType)
+      schoolId: parseInt(selectedSchool, 10),
+      deviceType: parseInt(deviceType, 10)
     }
     const cb = (json) => {
       if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
-          throw {
+          throw new Error({
             title: '操作出错',
             message: '当前学校已有该类型设备的供水时间设置，请勿重复添加'
-          }
+          })
         } else {
           if (callback) {
             callback()

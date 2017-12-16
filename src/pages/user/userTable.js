@@ -6,6 +6,7 @@ import SearchLine from '../component/searchLine'
 import SchoolSelector from '../component/schoolSelector'
 import Time from '../component/time'
 import CONSTANTS from '../component/constants'
+import { checkObject } from '../util/checkSame'
 
 
 import PropTypes from 'prop-types'
@@ -15,17 +16,6 @@ import { changeUser } from '../../actions'
 const subModule = 'userList'
 
 const SIZE = CONSTANTS.PAGINATION
-
-const typeName = {
-  1: '热水器',
-  2: '饮水机',
-  3: '洗衣机',
-  4: '电吹风'
-}
-const STATUS = {
-  1: '正常',
-  2: '报修'
-}
 
 class UserTable extends React.Component {
   static propTypes = {
@@ -49,11 +39,26 @@ class UserTable extends React.Component {
     }, {
       title: '用户手机号',
       dataIndex: 'mobile'
-    },{
+    }, {
+      title: '手机型号',
+      dataIndex: 'mobileBrand',
+      width: '20%',
+      render: (text, record) => {
+        let result = ''
+        if (record.mobileBrand) {
+          result += record.mobileBrand
+        }
+        if (record.mobileModel) {
+          result += `(${record.mobileModel})`
+        }
+        result = result ? result : '----'
+        return result
+      }
+    }, {
       title: '注册时间',
       dataIndex: 'createTime',
       render:(text,record)=>(Time.getTimeStr(record.createTime))
-    },{
+    }, {
       title: (<p className='lastCol'>操作</p>),
       dataIndex: 'operation',
       width: '12%',
@@ -121,6 +126,9 @@ class UserTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'selectKey'])) {
+      return
+    }
     let {page, schoolId, selectKey} = nextProps
     const body = {
       page: page,
@@ -171,7 +179,7 @@ class UserTable extends React.Component {
 
     return (
       <div className='contentArea'>
-        <SearchLine searchInputText='手机号' selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} searchingText={this.state.searchingText} pressEnter={this.pressEnter} changeSearch={this.changeSearch} />
+        <SearchLine searchInputText='手机号/手机型号' selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} searchingText={this.state.searchingText} pressEnter={this.pressEnter} changeSearch={this.changeSearch} />
 
         <div className='tableList'>     
           <Table 

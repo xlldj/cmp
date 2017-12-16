@@ -13,6 +13,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../../actions'
+import {checkObject} from '../../util/checkSame'
 const subModule = 'abnormal'
 
 const SIZE = CONSTANTS.PAGINATION
@@ -179,6 +180,9 @@ class AbnormalOrder extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['schoolId', 'selectKey', 'page'])) {
+      return
+    }
     let {page, selectKey, schoolId} = nextProps
     const body = {
       page: page,

@@ -15,6 +15,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeGift } from '../../actions'
+import {checkObject} from '../util/checkSame'
 const subModule = 'giftList'
 
 
@@ -69,7 +70,7 @@ class GiftTable extends React.Component {
             <Link to={`/gift/list/giftInfo/:${record.id}`} >编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要失效此红包么?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
-              <a href="#">失效</a>
+              <a href="">失效</a>
             </Popconfirm>
         </div>
       )
@@ -122,6 +123,9 @@ class GiftTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'deviceType'])) {
+      return
+    }
     let {page, deviceType} = nextProps
     const body = {
       page: page,

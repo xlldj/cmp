@@ -17,7 +17,6 @@ class BasicSelector extends React.Component{
     return (
       <Select
         value={this.props.selectedOpt}
-        className={this.props.className ? this.props.className : ''} 
         disabled={this.props.disabled ? this.props.disabled : false} 
         width={this.props.width ? this.props.width : ''}
         className={this.props.className ? this.props.className : 'customSelect'}

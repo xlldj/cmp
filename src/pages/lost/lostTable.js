@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link} from 'react-router-dom'
 
-import {Table, Select} from 'antd'
+import {Table} from 'antd'
 
 import AjaxHandler from '../ajax'
 import SearchLine from '../component/searchLine'
@@ -15,11 +15,11 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeLost } from '../../actions'
+import { checkObject } from '../util/checkSame'
 const subModule = 'lostList'
 
 const SIZE = CONSTANTS.PAGINATION
 
-const Option = Select.Option
 const typeName = CONSTANTS.LOSTTYPE
 
 class LostTable extends React.Component {
@@ -30,7 +30,7 @@ class LostTable extends React.Component {
   }
   constructor(props){
     super(props)
-    let dataSource=[], selectedSchool='all', selectedType='all'
+    let dataSource=[]
     this.state = {
       dataSource,
       loading: false,
@@ -127,6 +127,9 @@ class LostTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'type'])) {
+      return
+    }
     let {page, schoolId, type} = nextProps
     const body = {
       page: page,
@@ -159,7 +162,7 @@ class LostTable extends React.Component {
     this.props.changeLost(subModule, {page: page})
   }
   render () {
-    const {schools,dataSource, total, loading} = this.state
+    const {dataSource, total, loading} = this.state
     const {page, schoolId, type} = this.props
 
 

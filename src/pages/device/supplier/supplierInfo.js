@@ -37,6 +37,7 @@ class SupplierInfo extends React.Component {
           let nextState={
             id: id,
             name: name,
+            originalName: name,
             alias: alias
           }
           if (agreement) {
@@ -79,32 +80,35 @@ class SupplierInfo extends React.Component {
       body.id = id
     }
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if(json.error){
         throw new Error(json.error.displayMessage || json.error)
       }else{
         /*--------redirect --------*/
         if(json.data){
+          // throw new Error('test')
           Noti.hintSuccess(this.props.history,'/device/suppliers')
         }else{
           throw new Error('网络出错，请稍后重试～')
-        }        
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
   }
   confirm = () => {
-    let {name, agreement, write, notify, service} = this.state
+    let {id, name, alias, agreement, write, notify, service} = this.state
     if (!name) {
       return this.setState({
         nameError: true
       })
     }
-    /*版本号可以为空 
     if (!alias) {
       return this.setState({
         aliasError: true
       })
-    } */
+    }
     if (!agreement) {
       return this.setState({
         agreementError: true
@@ -125,41 +129,43 @@ class SupplierInfo extends React.Component {
         serviceError: true
       })
     }
-    /*
-    if (!(id && originalSchool === schoolId && originalDevice === originalDevice)) {
-      this.checkExist(this.completeEdit)
-    } else {
+    /* if edit a supplier, name is forbidden to be changed. so no need to check exist */
+    if (id) {
       this.completeEdit()
+    } else {
+      this.checkExist(this.completeEdit)
     }
-    */
-    this.completeEdit()
+    // this.completeEdit()
   }
   back = () => {
     this.props.history.goBack()
   }
   /* -----需要改成对应的查重------ */
-  checkExist = (callback) => {
-    let dt = parseInt(this.state.deviceType, 10)
-    let schoolId = parseInt(this.state.schoolId, 10)
-    let resource = '/device/prepay/option/check'
+  checkExist = (callback, state) => {
+    let {name, checking} = {...this.state, ...state}
+    if (checking) {
+      return
+    }
+    this.setState({
+      checking: true
+    })
+    let resource = '/supplier/check'
     const body = {
-      deviceType: dt,
-      schoolId: schoolId
+      name: name
     }
     const cb = (json) => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+      this.setState({
+        checking: false
+      })
+      if (json.data.result) {
+        Noti.hintLock('添加出错', '当前供应商已被添加，请返回该项编辑')
       } else {
-        if (json.data.result) {
-          Noti.hintLock('添加出错', '当前设备已有预付选项，请返回该项编辑')
-        } else {
-          if (callback) {
-            callback()
-          }
+        if (callback) {
+          callback()
         }
       }
     }
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.ajax(resource, body, cb, null, {clearChecking: true, thisObj: this})
   }
   changeName = (e) => {
     this.setState({
@@ -181,6 +187,7 @@ class SupplierInfo extends React.Component {
       nextState.nameError = false
     }
     this.setState(nextState)
+    this.checkExist(null, {name: v})
   }
   changeAlias = (e) => {
     this.setState({
@@ -276,7 +283,7 @@ class SupplierInfo extends React.Component {
   }
 
   render () {
-    let {name, nameError, alias, aliasError, agreement, agreementError, notify, notifyError, 
+    let {id, name, nameError, alias, aliasError, agreement, agreementError, notify, notifyError, 
       write, writeError, service, serviceError
     } = this.state
 
@@ -285,7 +292,7 @@ class SupplierInfo extends React.Component {
         <ul>
           <li>
             <p>供应商名称:</p>
-            <input value={name} onChange={this.changeName} onBlur={this.checkName} />
+            <input value={name} disabled={id ? true : false} onChange={this.changeName} onBlur={this.checkName} />
             {nameError ? <span className='checkInvalid'>供应商名字不能为空！</span> : null}
           </li>
           <li>

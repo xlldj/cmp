@@ -10,17 +10,41 @@ if (recentSchools) {
   let recent = recentSchools.split(',')
   let schoolId = recent[0]
   selectedSchool = schoolId
-} else {
+}
+/* else {
   let defaultSchool = getLocal('defaultSchool')
   if (defaultSchool) {
     selectedSchool = defaultSchool
   }
 }
+*/
+
+const initialSchools = {
+  recent: [],
+  schools: [],
+  schoolSet: false
+}
+const setSchoolList = (state = initialSchools, action) => {
+  const {type} = action
+  if (type === ActionTypes.SET_SCHOOL_LIST) {
+    if (selectedSchool === 'all' && action.value.schools.length > 0) {
+      selectedSchool = action.value.schools[0].id.toString()
+    }
+    const value = action.value
+    // console.log({...state, ...value})
+    return {...state, ...value}
+  }
+  return state
+}
 
 const initialSchoolState = {
   schoolList: {
     page: 1,
-    schoolId: 'all'
+    schoolId: selectedSchool
+  },
+  overview: {
+    page: 1,
+    schoolId: selectedSchool
   }
 }
 const changeSchool = (state = initialSchoolState, action) => {
@@ -36,7 +60,7 @@ const changeSchool = (state = initialSchoolState, action) => {
 const initialDeviceState = {
   deviceList: {
     page: 1,
-    schoolId: 'all',
+    schoolId: selectedSchool,
     deviceType: 'all',
     selectKey: ''
   },
@@ -44,24 +68,28 @@ const initialDeviceState = {
     page: 1
   },
   prepay: {
-    page: 1
+    page: 1,
+    schoolId: selectedSchool
   },
   timeset: {
+    schoolId: selectedSchool,
     page: 1
   },
   suppliers: {
     page: 1
   },
   rateSet: {
+    schoolId: selectedSchool,
     page: 1
   },
   repair: {
     page: 1,
     deviceType: 'all',
-    schoolId: 'all',
+    schoolId: selectedSchool,
     status: 'all'
   },
   rateLimit: {
+    schoolId: selectedSchool,
     page: 1
   }
 }
@@ -83,7 +111,8 @@ const initialOrderState = {
     status: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow()
+    endTime: Time.getNow(),
+    userType: 'all'
   },
   abnormal: {
     page: 1,
@@ -91,13 +120,12 @@ const initialOrderState = {
     deviceType: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow()
+    endTime: Time.getNow(),
+    userType: 'all'
   }
 }
 const changeOrder = (state = initialOrderState, action) => {
   const {type} = action
-  console.log(state)
-  console.log(action)
 
   if (type === ActionTypes.CHANGE_ORDER) {
     const {subModule, keyValuePair} = action
@@ -115,22 +143,26 @@ const initialFundState = {
     status: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow()
+    endTime: Time.getNow(),
+    userType: 'all'
   },
   cashtime: {
-    page: 1
+    page: 1,
+    schoolId: selectedSchool
   },
   charge: {
+    schoolId: selectedSchool,
     page: 1
   },
   deposit: {
     page: 1,
-    schoolId: 'all'
+    schoolId: selectedSchool
   },
   abnormal: {
     schoolId: selectedSchool,
     page: 1,
-    selectKey: ''
+    selectKey: '',
+    userType: 'all'
   }
 }
 const changeFund = (state = initialFundState, action) => {
@@ -151,7 +183,7 @@ const initialGiftState = {
   },
   act: {
     page: 1,
-    schoolId: 'all'
+    schoolId: selectedSchool
   }
 }
 const changeGift = (state = initialGiftState, action) => {
@@ -164,10 +196,11 @@ const changeGift = (state = initialGiftState, action) => {
   return state
 }
 
+// 失物招领
 const initialLostState = {
   lostList: {
     page: 1,
-    schoolId: 'all',
+    schoolId: selectedSchool,
     type: 'all'
   }
 }
@@ -181,6 +214,7 @@ const changeLost = (state = initialLostState, action) => {
   return state
 }
 
+// 用户管理
 const initialUserState = {
   userList: {
     page: 1,
@@ -198,6 +232,7 @@ const changeUser = (state = initialUserState, action) => {
   return state
 }
 
+// 客服工单
 const initialTaskState = {
   taskList: {
     page: 1,
@@ -234,6 +269,7 @@ const changeTask = (state = initialTaskState, action) => {
   return state
 }
 
+// 员工管理
 const initialEmployeeState = {
   employeeList: {
     page: 1,
@@ -250,6 +286,7 @@ const changeEmployee = (state = initialEmployeeState, action) => {
   return state
 }
 
+// 公告管理
 const initialNotifyState = {
   notify: {
     page: 1,
@@ -268,6 +305,8 @@ const changeNotify = (state = initialNotifyState, action) => {
   }
   return state
 }
+
+// 版本管理
 const initialVersionState = {
   version: {
     page: 1
@@ -277,6 +316,38 @@ const changeVersion = (state = initialVersionState, action) => {
   const {type} = action
 
   if (type === ActionTypes.CHANGE_VERSION) {
+    const {subModule, keyValuePair} = action
+    return merge({}, state, {[subModule]: keyValuePair})
+  }
+  return state
+}
+
+/* 统计分析模块 */
+const initialStatState = {
+  overview: {
+    schoolId: selectedSchool
+  },
+  charts: {
+    schoolId: selectedSchool,
+    timeSpan: 2,
+    currentChart: 1,
+    target: 1,
+    compare: false,
+    currentMonth: true,
+    monthStr: Time.getMonthFormat(Date.parse(new Date()))
+  },
+  rank: {
+    schoolId: selectedSchool,
+    page: 1,
+    currentRank: 1,
+    timeSpan: 1,
+    schoolName: ''
+  }
+}
+const changeStat = (state = initialStatState, action) => {
+  const {type} = action
+
+  if (type === ActionTypes.CHANGE_STAT) {
     const {subModule, keyValuePair} = action
     return merge({}, state, {[subModule]: keyValuePair})
   }
@@ -294,7 +365,9 @@ const rootReducer = combineReducers({
   changeTask,
   changeEmployee,
   changeNotify,
-  changeVersion
+  changeVersion,
+  setSchoolList,
+  changeStat
 })
 
 export default rootReducer

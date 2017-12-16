@@ -9,6 +9,7 @@ import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
+import {} from '../../util/numberHandle'
 
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
@@ -69,7 +70,6 @@ class RateInfo extends React.Component {
       }else{
         if(json.data){
           let r=json.data
-
           let nextState = {
             deviceType: r.deviceType,
             originalDT: r.deviceType,
@@ -86,21 +86,20 @@ class RateInfo extends React.Component {
           let setRateGroup = true // false时不需要设置rateGroupsVersionB
           if (r.supplierId) {
             nextState.supplierId = r.supplierId
-              let supplier = this.state.supplierData.find((r) => (r.id === r.supplierId))
-              if (supplier && supplier.agreement === 2) {
-                setRateGroup = false // true时需要设置rategroups
-                nextState.currentAgreement = 2
-                nextState.rateGroupsVersionB = r.rateGroups&&r.rateGroups.map((rate) => ({
-                  volume: rate.volume,
-                  price: rate.price * 100,
-                  pulse: rate.pulse
-                }))
-              }
+            let supplier = this.state.supplierData.find((s) => (s.id === r.supplierId))
+            if (supplier && supplier.agreement === 2) {
+              setRateGroup = false // true时需要设置rategroups
+              nextState.currentAgreement = 2
+              nextState.rateGroupsVersionB = r.rateGroups&&r.rateGroups.map((rate) => ({
+                price: rate.price ? rate.price : '',
+                pulse: rate.pulse ? rate.pulse : ''
+              }))
+            }
           }
           if (setRateGroup) {
             nextState.rateGroups = r.rateGroups&&r.rateGroups.map((rate) => ({
-              price: rate.price * 100,
-              pulse: rate.pulse
+              price: rate.price ? rate.price : '',
+              pulse: rate.pulse ? rate.pulse : ''
             }))
           }
           this.setState(nextState)
@@ -190,15 +189,11 @@ class RateInfo extends React.Component {
       schoolId: parseInt(schoolId, 10)
     }
     const cb = (json) => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+      if (json.data.result) {
+        Noti.hintLock('添加出错', '当前学校的该类型设备已有费率选项，请勿重复添加')
       } else {
-        if (json.data.result) {
-          Noti.hintLock('添加出错', '当前学校的该类型设备已有费率选项，请勿重复添加')
-        } else {
-          if (callback) {
-            callback()
-          }
+        if (callback) {
+          callback()
         }
       }
     }
@@ -273,7 +268,7 @@ class RateInfo extends React.Component {
         checkRateGroups = false
         for (let i = 0; i < rateGroupsVersionB.length ; i++) {
           let r = rateGroupsVersionB[i]
-          if (!r.volume || !r.price || !r.pulse) {
+          if (!r.price || !r.pulse) {
             rateGroupsVersionB[i].error = true
             nextState.rateGroupsVersionB = rateGroupsVersionB
             this.setState(nextState)
@@ -330,7 +325,7 @@ class RateInfo extends React.Component {
     const taps = this.state.closeTapGroups.map((r) => (r.value))
     let {id, deviceType, billingMethod, schoolId, supplierId, rateGroupsVersionB, supplierData} = this.state
     rateGroups.forEach((r) => {
-      r.price = r.price / 100
+      r.price = r.price
     })
     const body = {
       billingMethod: parseInt(billingMethod, 10),
@@ -354,18 +349,14 @@ class RateInfo extends React.Component {
     if (setRateGroups) {
       body.rates = rateGroupsVersionB
     }
+
     let resource='/api/rate/save'
     const cb = (json) => {
-      if(json.error){
-        throw new Error(json.error || json.error.displayMessage)
+      if(json.data){
+        Noti.hintSuccess(this.props.history,'/device/rateSet')
       }else{
-        /*--------redirect --------*/
-        if(json.data){
-          Noti.hintSuccess(this.props.history,'/device/rateSet')
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
-      }
+        throw new Error('网络出错，请稍后重试～')
+      }        
     }
     AjaxHandler.ajax(resource,body,cb)
   }
@@ -505,11 +496,9 @@ class RateInfo extends React.Component {
       )
     })
     const rateItemsVersionB = rateGroupsVersionB && rateGroupsVersionB.map((r,i) => {
-      console.log(r.error)
       return(
           <li className='rateSets' key={`rateB${i}`}>
-            <input type='number' className='shortInput' onChange={(e) => {this.changeWaterB(e,i)}} key={`volumeB${i}`} value={r.volume?r.volume:''} />
-            <span key={`spanVolume${i}`}>升水/</span>
+            <span key={`spanVolume${i}`}>1升水/</span>
             <input type='number' className='shortInput' onChange={(e) => {this.changePriceB(e,i)}} key={`priceB${i}`} value={r.price?r.price:''} />
             <span key={`spanPrice${i}`}>分钱/</span>
             <input type='number' className='shortInput' onChange={(e) => {this.changePulseB(e,i)}} key={`pulseB${i}`} value={r.pulse?r.pulse:''} />

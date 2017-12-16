@@ -1,6 +1,6 @@
 import React from 'react'
 import moment from 'moment'
-import { Button,Radio, Modal, Table, notification ,Icon,Upload, Select, DatePicker} from 'antd'
+import { Button,Radio, Modal, Table, notification, Select, DatePicker} from 'antd'
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import CONSTANTS from '../../component/constants'
@@ -10,8 +10,6 @@ import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 const FILEADDR = CONSTANTS.FILEADDR
 const Option = Select.Option
-const FILEURL = CONSTANTS.FILEURL
-const preview = CONSTANTS.preview
 
 const RadioGroup = Radio.Group
 
@@ -174,7 +172,7 @@ class ActInfo extends React.Component {
             }else{
               newState.released = false
             }
-            d.gifts.map((g,i)=>{
+            d.gifts.forEach((g,i)=>{
               let gift = gifts.find((r,ind)=>(r.id===g.giftId))
               if(!!gift){
                 gift.count = g.quantity
@@ -389,7 +387,7 @@ class ActInfo extends React.Component {
     let {gifts,type,name,selectedSchool,amount,releaseMethod,amountRandom,
       startTime, endTime, fileList,url,inventory,code, online
     }=this.state,items=[]
-    gifts.map((g,i)=>{
+    gifts.forEach((g,i)=>{
       if(g.count){
         items.push({
           giftId: g.id,
@@ -400,18 +398,18 @@ class ActInfo extends React.Component {
     let start = parseInt(moment(startTime).valueOf(), 10)
     let end = parseInt(moment(endTime).valueOf(), 10)
     const body = {
-      schoolId: parseInt(selectedSchool),
+      schoolId: parseInt(selectedSchool, 10),
       name: name,
-      type: parseInt(type),
+      type: parseInt(type, 10),
       amount: amount,
-      releaseMethod: parseInt(releaseMethod),
+      releaseMethod: parseInt(releaseMethod, 10),
       startTime: start,
       endTime: end,
       gifts:items,
       online: online
     }
     if(releaseMethod === '2'){
-      body.amountRandom = parseInt(amountRandom)
+      body.amountRandom = parseInt(amountRandom, 10)
     }
     if(type==='3'){
       body.inventory = inventory
@@ -423,7 +421,7 @@ class ActInfo extends React.Component {
       body.url = url
     }
     if(this.props.match.params.id){
-      body.id = parseInt(this.props.match.params.id.slice(1))
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
     }
     const cb = (json) => {
         if(json.error){
@@ -496,7 +494,7 @@ class ActInfo extends React.Component {
     }
     let oriGifts = JSON.parse(JSON.stringify(this.state.gifts))
     newState.amount = total
-    gifts.map((g,i) => {
+    gifts.forEach((g,i) => {
       if(g.count){
         let editGift = oriGifts.find((r,i) => (r.id === g.id))
         if(!!editGift){
@@ -526,7 +524,7 @@ class ActInfo extends React.Component {
   changeReleaseMethod = (e) => {
     let newState = {}
     let v = e.target.value
-    let {releaseMethodError, releaseMethodLock} = this.state
+    let {releaseMethodLock} = this.state
     if(releaseMethodLock){
       return this.hintLock()
     }
@@ -659,31 +657,15 @@ class ActInfo extends React.Component {
   }
   render () {
     let {id, selectedSchool,schoolError,type,typeError,name,nameError,endTime,endTimeError,
-      online,onlineError,amount,amountError,releaseMethod,releaseMethodLock,releaseMethodError,
-      releaseMethodLockHint,amountRandom,amountRandomError,randomErrorMessage,imageEntrance,url,
+      online, amount,amountError,releaseMethod, releaseMethodError,
+      amountRandom,amountRandomError,randomErrorMessage, url,
       urlError,code,codeError,
       inventory,inventoryError, remainInventory, usedInventory, inventoryErrorMsg,
-      schools,gifts,fileList,released, imageError,
+      gifts,fileList,released, imageError,
       startTime, startTimeError
     } = this.state
 
     let timeValid = Date.parse(new Date()) >= parseInt(moment(startTime).valueOf(), 10) && Date.parse(new Date()) <= parseInt(moment(endTime).valueOf(), 10)
-
-    const codeArea = (
-      <div className='info'>
-        <ul>
-
-        </ul>
-      </div>
-    )
-
-    const h5Area = (
-      <div className='info'>
-        <ul>
-
-        </ul>
-      </div>
-    )
 
     const selectRandomGift = (
         <span>
@@ -691,20 +673,6 @@ class ActInfo extends React.Component {
           <input disabled={released?true:false} className={released ? 'disabled' : ''} type='number' min='0' max={amount} style={{width:'50px',marginLeft:'5px',marginRight:'5px'}} value={amountRandom} onChange={this.changeAmountRandom} onBlur={this.checkAmountRandom} />
           个发放
         </span>
-    )
-
-    const detail = (
-      <div className='info'>
-        <ul>
-        </ul>
-      </div>
-    )
-
-     const uploadButton = (
-      <div>
-        <Icon type="plus" />
-        <div className="ant-upload-text">Upload</div>
-      </div>
     )
 
     return (
@@ -940,7 +908,7 @@ class GiftTable extends React.Component{
   cancel = () => {
     //clear all the data
     let all = JSON.parse(JSON.stringify(this.state.allTypeData))
-    all.map((r,i)=>{
+    all.forEach((r,i)=>{
       r.count = 0
     })
     this.setState({
@@ -951,7 +919,7 @@ class GiftTable extends React.Component{
     this.props.closeModal()
   }
   render(){
-    const {dataSource, selectedDevice} = this.state
+    const {dataSource} = this.state
 
     let ds = Object.keys(deviceName)
     const deviceOptions = ds.map((d,i) => (

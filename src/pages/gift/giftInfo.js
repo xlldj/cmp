@@ -94,7 +94,7 @@ class GiftInfo extends React.Component {
     let url = '/api/gift/save'
     const body = {
       amount: parseInt(amount, 10),
-      deviceType: parseInt(deviceType),
+      deviceType: parseInt(deviceType, 10),
       type: type
     }
     if (type === 1) {
@@ -104,7 +104,7 @@ class GiftInfo extends React.Component {
       body.timeLimit = timeLimit
     }
     if(this.props.match.params.id){
-      body.id = parseInt(this.props.match.params.id.slice(1))
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
     }
     const cb = (json) => {
         if(json.error){
@@ -157,8 +157,8 @@ class GiftInfo extends React.Component {
   }
   checkSame = () => {
     // deviceType始终是相同的，因为不允许在编辑时更改
-    let {amount, timeLimit, startTime, endTime, type, deviceType,
-         originalAmount, originalTL, originalST, originalET, originalType,originalDT} = this.state
+    let {amount, timeLimit, startTime, endTime, type,
+         originalAmount, originalTL, originalST, originalET, originalType} = this.state
 
     if (amount !== originalAmount) {
       return false
@@ -185,7 +185,7 @@ class GiftInfo extends React.Component {
     let url = '/gift/check'
     const body = {
       amount: parseInt(amount, 10),
-      deviceType: parseInt(deviceType),
+      deviceType: parseInt(deviceType, 10),
       type: type
     }
     if (type === 1) {
@@ -311,7 +311,9 @@ class GiftInfo extends React.Component {
       })
     }
     if (this.state.typeError) {
-      typeError: false
+      this.setState({
+        typeError: false
+      })
     }
   }
   changeRange = (dates, dateString) => {

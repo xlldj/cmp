@@ -6,8 +6,8 @@ export function getLog () {
   return sessionStorage.getItem('logged')
 }
 
-export function removeStore () {
-  return sessionStorage.removeItem('logged')
+export function removeStore (key) {
+  return sessionStorage.removeItem(key)
 }
 
 export function setStore (key, value) {
@@ -27,5 +27,5 @@ export function getLocal (key, value) {
 }
 
 export function removeLocal (key, value) {
-  localStorage.removeItem(key, value)
+  localStorage.removeItem(key)
 }

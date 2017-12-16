@@ -1,14 +1,11 @@
 import React from 'react'
-import { Route, Redirect, Switch} from 'react-router-dom'
+import { Route, Switch} from 'react-router-dom'
 import {asyncComponent} from '../../component/asyncComponent'
 
 const DeviceTable = asyncComponent(() => import(/* webpackChunkName: "deviceTable" */ "./devicesTable"))
 const DeviceInfo = asyncComponent(() => import(/* webpackChunkName: "deviceInfo" */ "./deviceInfo"))
 
 class DeviceContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

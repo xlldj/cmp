@@ -4,13 +4,11 @@ import {Table} from 'antd'
 
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
-import Time from '../../component/time'
 const SIZE = CONSTANTS.PAGINATION
 
 class RepairRate extends React.Component {
   constructor(props){
     super(props)
-    let dataSource=[]
     let data = [{
       "id": 0,
       "rating": 0,

@@ -1,12 +1,17 @@
+/* 员工列表 */
+/* 'force' in '/employee/delete': if force to delete. 
+  1. false: no force, if account has remainder, pop a modal;
+  2. true: force delete
+*/
 import React from 'react'
 import { Link} from 'react-router-dom'
-import { Table, Button } from 'antd'
-import Popconfirm from 'antd/lib/popconfirm'
+import { Table, Button, Popconfirm, Modal } from 'antd'
 import Noti from '../noti'
 import AjaxHandler from '../ajax'
 import SearchLine from '../component/searchLine'
 import CONSTANTS from '../component/constants'
 
+import {checkObject} from '../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -32,7 +37,9 @@ class EmployeeList extends React.Component {
       dataSource: [],
       searchingText: '',
       loading: false,
-      total: ''
+      total: '',
+      deletingId: '',
+      hintDeleteModal: false
     }
     this.columns = [{
       title: '手机号',
@@ -56,7 +63,11 @@ class EmployeeList extends React.Component {
       className: 'lastCol',
       render: (text, record, index) => (
         <div style={{textAlign:'right'}} key={index} className='editable-row-operations'>
-            <Link to={`/employee/userInfo/:${record.id}`} >编辑</Link>
+          <Link to={`/employee/userInfo/:${record.id}`} >编辑</Link>
+          <span className='ant-divider' />
+        <Popconfirm title="确定要删除此员工?" onConfirm={(e) => {this.delete(e, record.id, false)}} okText="确认" cancelText="取消">
+          <a href="">删除</a>
+        </Popconfirm>
         </div>
       )
     }]
@@ -107,6 +118,9 @@ class EmployeeList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'selectKey'])) {
+      return
+    }
     let {page, selectKey} = nextProps
     const body = {
       page: page,
@@ -120,30 +134,60 @@ class EmployeeList extends React.Component {
       searchingText: selectKey
     })
   }
-  delete = (e,id) => {
-    e.preventDefault()
-    let resource='/api/user/delete'
+  delete = (e, id, force) => {
+    if (e) {
+      e.preventDefault()
+    }
+    let {deletingId} = this.state
+    if (deletingId !== id) {
+      this.setState({
+        deletingId: id
+      })
+    }
+    let resource='/employee/delete'
     const body={
-      id: id
+      id: id,
+      force: force 
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
+      let nextState = {}
+      if(json.error){
+        Noti.hintServiceError(json.error.displayMessage)
+      } else {
+        /*--------redirect --------*/
+        if (json.data) {
+          let {result, failReason} = json.data
+          // if account has remainder, and this delete if first time.
+          if (result === false && force === false) { // account has remainder
+            nextState.hintDeleteModal = true
+          } else if (result === false) { // service error, unknown reason
+            Noti.hintWarning('删除出错', failReason || '请稍后重新尝试')
+          } else { // delete success
             const body={
               page: this.props.page,
-              selectKey: '',
-              size: 100
+              selectKey: this.props.selectKey,
+              size: SIZE
             }
             this.fetchData(body)
-          }else{
-            Noti.hintError()
-          }        
+          }
+        } else { // this should not happen
+          Noti.hintError()
         }
+        this.setState(nextState)
+      }
     }
     AjaxHandler.ajax(resource,body,cb)    
+  }
+  forceDelete = () => {
+    this.delete(null, this.state.deletingId, true)
+    this.setState({
+      hintDeleteModal: false
+    })
+  }
+  cancelDelete = () => {
+    this.setState({
+      hintDeleteModal: false
+    })
   }
   pressEnter = () => {
     let v = this.state.searchingText.trim()
@@ -170,7 +214,7 @@ class EmployeeList extends React.Component {
   }
 
   render () {
-    const {dataSource,searchingText, total, loading} = this.state
+    const {dataSource,searchingText, total, loading, hintDeleteModal} = this.state
     const {page} = this.props
 
     return (
@@ -194,6 +238,19 @@ class EmployeeList extends React.Component {
           </div>
           :null
         }
+        <Modal
+          title='账户还有余额'
+          visible={hintDeleteModal}
+          onOk={this.forceDelete}
+          onCancel={this.cancelDelete}
+          maskClosable={true}
+          className='popupModal'
+        >
+          <span>
+            当前账户还有余额，您可以提取余额后再删除。确定不提取直接删除么？
+          </span>
+        </Modal>
+
       </div>
     )
   }

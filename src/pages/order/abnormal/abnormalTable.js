@@ -13,6 +13,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../../actions'
+import {checkObject} from '../../util/checkSame'
 const subModule = 'abnormal'
 
 const SIZE = CONSTANTS.PAGINATION
@@ -57,41 +58,34 @@ class AbnormalTable extends React.Component {
     }, {
       title: '使用设备',
       dataIndex: 'deviceType',
-      width: '8%',
+      width: '7%',
       render: (text,record,index) => (typeName[record.deviceType])
     }, {
       title: '所在学校',
       dataIndex: 'schoolName'
     }, {
+      title: '设备地址',
+      dataIndex: 'location',
+      width: '10%'
+    }, {
       title: '开始时间',
       dataIndex: 'createTime',
-      width: '11%',
+      width: '10%',
       render: (text,record,index) => {
         return Time.getTimeStr(record.createTime)
       }
     }, {
       title: '结束时间',
       dataIndex: 'finishTime',
-      width: '11%',
+      width: '10%',
       render: (text,record,index) => {
         return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
       }
     }, {
       title: '使用状态',
       dataIndex: 'status',
-      width: '12%',
-      render: (text,record,index)=> {
-        switch(record.status){
-          case 1:
-            return <Badge status='warning' text='使用中' />
-          case 2:
-            return <Badge status='success' text='使用结束' />
-          case 4:
-            return <Badge status='default' text='已退单' />
-          default:
-            return <Badge status='warning' text='使用结束' />
-        }
-      }
+      width: '10%',
+      render: (text,record,index)=> (<Badge status='default' text='已退单' />)
     }, {
       title: '消费金额',
       dataIndex: 'paymentType',
@@ -107,7 +101,6 @@ class AbnormalTable extends React.Component {
     }, {
       title: (<p className='lastCol'>操作</p>),
       dataIndex: 'operation',
-      width: '10%',
       render: (text, record, index) => (
         <div className='editable-row-operations lastCol'>
           <span>
@@ -173,6 +166,9 @@ class AbnormalTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['schoolId', 'deviceType', 'selectKey', 'page', 'startTime', 'endTime'])) {
+      return
+    }
     let {schoolId, deviceType, selectKey, page, startTime, endTime} = nextProps
     const body={
       page: page,

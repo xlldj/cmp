@@ -36,7 +36,7 @@ Noti.hintWarning = (message, description) => {
 /* 通用网络错误 */
 Noti.hintNetworkError = (description) => {
   notification['error']({
-    message: '请求出错',
+    message: '网络出错',
     description: description || CONSTANTS.NETWORKERRORMESSAGE,
     duration: 2
   })

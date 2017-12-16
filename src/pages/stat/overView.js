@@ -5,12 +5,21 @@ import Time from '../component/time'
 import AjaxHandler from '../ajax'
 import userImg from '../assets/user2.png'
 
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeStat } from '../../actions'
+import {checkObject} from '../util/checkSame'
+const subModule = 'overview'
+
 const initilaState = {
-	selectedSchool: 'all',
 	units:[]
 };
 
-export default class OverView extends Component {
+class OverView extends Component {
+  static propTypes = {
+    schoolId: PropTypes.string.isRequired
+  }
 	state = initilaState;
 
 	fetchData = (body)=>{
@@ -28,30 +37,48 @@ export default class OverView extends Component {
 	}
 
 	componentDidMount(){
+		let {schoolId} = this.props
 		const body={
 			startTime: Time.getTodayStart(),
 			endTime: Time.getNow()
+		}
+		if (schoolId !== 'all') {
+			body.schoolId = parseInt(schoolId, 10)
 		}
 		
 		this.fetchData(body)
 	}
 
-	changeSchool=(v)=>{
-		this.setState({
-			selectedSchool:v 
-		})
-		const body={
+  componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['schoolId'])) {
+      return
+    }
+		let {schoolId} = nextProps
+		if (schoolId === this.props.schoolId) {
+			return
+		}
+    const body={
 			startTime: Time.getTodayStart(),
 			endTime: Time.getNow()
+    }
+		if (schoolId !== 'all') {
+			body.schoolId = parseInt(schoolId, 10)
 		}
-		if(v!=='all'){
-			body.schoolId = parseInt(v,10)
-		}
+		
 		this.fetchData(body)
+	}
+	
+	changeSchool=(v)=>{
+		let {schoolId} = this.props
+		if (schoolId !== v) {
+			this.props.changeStat(subModule, {schoolId: v})
+		}
 	}
 
 	render() {
-		const {units,selectedSchool} = this.state
+		const {units} = this.state
+		const {schoolId} = this.props
+
 		const userData = units&&units.find((r,i)=>(r.type===1))
 		const showerOrder = units&&units.find((r,i)=>(r.type===2))
 		const drinkerOrder = units&&units.find((r,i)=>(r.type===3))
@@ -64,7 +91,7 @@ export default class OverView extends Component {
 			<div className='overview' >
 				<div className='ovHeader'>
 					<h1>今日总揽</h1>
-					<SchoolSelector selectedSchool={selectedSchool} changeSchool={this.changeSchool} />
+					<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />
 				</div>
 				<div className='ovContent'>
 					<div className='userDetail'>
@@ -85,3 +112,13 @@ export default class OverView extends Component {
 		)
 	}
 }
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    schoolId: state.changeStat[subModule].schoolId
+  }
+}
+
+export default withRouter(connect(mapStateToProps, {
+	changeStat
+})(OverView))

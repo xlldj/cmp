@@ -5,8 +5,7 @@ import {asyncComponent} from '../component/asyncComponent'
 
 import Bread from '../bread'
 import './style/style.css'
-import {getLocal, setLocal} from '../util/storage'
-import AjaxHandler from '../ajax'
+import {getLocal} from '../util/storage'
 import Time from '../component/time'
 
 import { connect } from 'react-redux'
@@ -40,54 +39,41 @@ class FundDisp extends React.Component {
   }
   clearStatus4fundIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
+    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow(), userType: 'all'})
   }
   clearStatus4fundIIcashtime = () => {
+    this.getDefaultSchool()
     this.props.changeFund('cashtime', {page: 1})
   }
   clearStatus4fundIIcharge = () => {
+    this.getDefaultSchool()
     this.props.changeFund('charge', {page: 1})
   }
   clearStatus4fundIIdeposit = () => {
+    this.getDefaultSchool()
     this.props.changeFund('deposit', {page: 1, schoolId: 'all'})
   }
   clearStatus4fundIIabnormal = () => {
     this.getDefaultSchool()
-    this.props.changeFund('abnormal', {page: 1, selectKey: ''})
+    this.props.changeFund('abnormal', {page: 1, selectKey: '', userType: 'all'})
   }
   getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools')
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
       let schoolId = recent[0]
       selectedSchool = schoolId
-    } else if (getLocal('defaultSchool')) {
-      let defaultSchool = getLocal('defaultSchool')
+    } else if (defaultSchool) {
       selectedSchool = defaultSchool
-    } else {
-      this.setDefaultSchool()
-    }
+    } 
     if (selectedSchool !== 'all') {
       this.props.changeFund('fundList', {schoolId: selectedSchool})
+      this.props.changeFund('cashtime', {schoolId: selectedSchool})
+      this.props.changeFund('charge', {schoolId: selectedSchool})
+      this.props.changeFund('deposit', {schoolId: selectedSchool})
       this.props.changeFund('abnormal', {schoolId: selectedSchool})
     }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
-      page: 1,
-      size: 1
-    }
-    const cb = (json) => {
-      if (json.data.schools) {
-        let selectedSchool = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', selectedSchool)
-        this.props.changeFund('fundList', {schoolId: selectedSchool})
-        this.props.changeFund('abnormal', {schoolId: selectedSchool})
-      } 
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
   render () {
     return (

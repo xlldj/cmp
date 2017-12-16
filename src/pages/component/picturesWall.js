@@ -1,5 +1,4 @@
 import React from 'react'
-import plupload from 'plupload'
 import Upload from 'antd/lib/upload'
 import Icon from 'antd/lib/icon'
 import Modal from 'antd/lib/modal'
@@ -103,10 +102,10 @@ class PicturesWall extends React.Component {
         this.setState(json.data)
         this.postToOss(file)
       } else {
-        throw {
+        throw new Error({
           title: '请求出错',
           message: '网络出错，请稍后重试！'
-        }
+        })
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -126,7 +125,7 @@ class PicturesWall extends React.Component {
   getSuffix = (filename) => {
     let pos = filename.lastIndexOf('.')
     let suffix = ''
-    if (pos != -1) {
+    if (pos !== -1) {
         suffix = filename.substring(pos)
     }
     return suffix;
@@ -148,13 +147,14 @@ class PicturesWall extends React.Component {
       </div>
     );
     let cn = 'clearfix'
-    const disabled = this.props.disabled ? true : false
+    const disabled = this.props.disabled ? this.props.disabled : false
     return (
       <div className={cn} >
         <Upload
           accept={this.props.accept ? this.props.accept : 'image/*'}
           action={CONSTANTS.FILESERVER}
           listType="picture-card"
+          disabled={disabled}
           fileList={fileList}
           onPreview={this.handlePreview}
           onChange={this.handleChange}

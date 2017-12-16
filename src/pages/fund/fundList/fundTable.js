@@ -15,6 +15,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../../actions'
+import { checkObject } from '../../util/checkSame'
 const subModule = 'fundList'
 
 const typeName = CONSTANTS.FUNDTYPE
@@ -37,7 +38,8 @@ class FundTable extends React.Component {
     selectKey: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired,
     startTime: PropTypes.number.isRequired,
-    endTime: PropTypes.number.isRequired
+    endTime: PropTypes.number.isRequired,
+    userType: PropTypes.string.isRequired
   }
   constructor(props){
     super(props)
@@ -129,6 +131,8 @@ class FundTable extends React.Component {
         if(json.data){
           nextState.dataSource = json.data.funds
           nextState.total = json.data.total
+          nextState.totalRecharge = json.data.totalRecharge || '未知'
+          nextState.totalWithdraw = json.data.totalWithdraw || '未知'
         }else{
           this.setState(nextState)
           throw new Error('网络出错，请稍后重试～')
@@ -146,7 +150,7 @@ class FundTable extends React.Component {
 
   componentDidMount(){
     this.props.hide(false) 
-    let {page, schoolId, type, status, selectKey, startTime, endTime} = this.props
+    let {page, schoolId, type, status, selectKey, startTime, endTime, userType} = this.props
     const body = {
       page: page,
       size: SIZE
@@ -160,14 +164,17 @@ class FundTable extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if(type !== 'all'){
+    if (type !== 'all') {
       body.type = type
     }
-    if(status !== 'all'){
+    if (status !== 'all') {
       body.status = [parseInt(status, 10)]
     }
-    if(selectKey){
+    if (selectKey) {
       body.selectKey = selectKey
+    }
+    if (userType && userType !== 'all') {
+      body.userType = parseInt(userType, 10)
     }
     this.fetchData(body)
     this.setState({
@@ -178,7 +185,10 @@ class FundTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page, schoolId, type, status, selectKey, startTime, endTime} = nextProps
+    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'type', 'status', 'selectKey', 'startTime', 'endTime', 'userType'])) {
+      return
+    }
+    let {page, schoolId, type, status, selectKey, startTime, endTime, userType} = nextProps
     const body = {
       page: page,
       size: SIZE
@@ -200,6 +210,9 @@ class FundTable extends React.Component {
     }
     if(selectKey){
       body.selectKey = selectKey
+    }
+    if (userType && userType !== 'all') {
+      body.userType = parseInt(userType, 10)
     }
     this.fetchData(body)
     this.setState({
@@ -280,10 +293,17 @@ class FundTable extends React.Component {
       }
       this.confirmed = false
     }
-  }  
+  } 
+  changeUserType = (v) => {
+    let {userType} = this.props
+    if (userType === v) {
+      return
+    }
+    this.props.changeFund(subModule, {userType: v, page: 1})
+  } 
   render () {
-    const {searchingText,dataSource, total, loading, subStartTime, subEndTime} = this.state
-    let {page, schoolId, type, status, startTime, endTime} = this.props
+    const {searchingText,dataSource, total, loading, subStartTime, subEndTime, totalWithdraw, totalRecharge} = this.state
+    let {page, schoolId, type, status, userType} = this.props
 
     return (
       <div className='contentArea'>
@@ -299,10 +319,17 @@ class FundTable extends React.Component {
           searchingText={searchingText} 
           pressEnter={this.pressEnter} 
           changeSearch={this.changeSearch} 
-          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
-          selector2={<OperationSelector selectedOpration={type} changeOpration={this.changeOpration} />} 
-          selector3={<BasicSelector allTitle='全部状态' staticOpts={STATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
+          selector1={<BasicSelector allTitle='全部用户' staticOpts={CONSTANTS.ORDERUSERTYPES} selectedOpt={userType} changeOpt={this.changeUserType} />}
+          selector2={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
+          selector3={<OperationSelector selectedOpration={type} changeOpration={this.changeOpration} />} 
+          selector4={<BasicSelector allTitle='全部状态' staticOpts={STATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
         />
+
+        <p className='profitBanner' >
+          充值总额: {totalRecharge}
+          <span className='mgl10'>提现总额: {totalWithdraw}</span>
+        </p>
+
         <div className='tableList'>
           <Table bordered loading={loading} rowKey={(record)=>(record.id)} pagination={{pageSize: SIZE, current: page, total: total}}  dataSource={dataSource} 
             columns={this.columns} 
@@ -326,7 +353,8 @@ const mapStateToProps = (state, ownProps) => ({
   selectKey: state.changeFund[subModule].selectKey,
   page: state.changeFund[subModule].page,
   startTime: state.changeFund[subModule].startTime,
-  endTime: state.changeFund[subModule].endTime
+  endTime: state.changeFund[subModule].endTime,
+  userType: state.changeFund[subModule].userType
 })
 
 export default withRouter(connect(mapStateToProps, {

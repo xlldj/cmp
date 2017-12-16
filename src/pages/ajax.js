@@ -6,15 +6,17 @@ const AjaxHandler = {
   showingError: false
 }
 
+/* tell user current token is out-of-date, force to refresh */
 const hintExpire = () => {
   // alert('expire')
   const logout = () => {
-    removeStore()
+    removeStore('logged')
     window.location.assign('/')
   }
   Noti.hintAndClick('您的账户已在别的地方登录', '您将被强制退出，请重新登录', logout)
 }
 
+/* This is timeout for error hint. For each category, only show the hint once in 4s */
 AjaxHandler.ti = () => setTimeout(() => {
   AjaxHandler.showingError = false
 }, 4000)
@@ -33,8 +35,16 @@ AjaxHandler.tiFor10003 = () => setTimeout(() => {
 AjaxHandler.tiForOther = () => setTimeout(() => {
   AjaxHandler.showingOther = false
 }, 4000)
+AjaxHandler.tiForNet = () => setTimeout(() => {
+  AjaxHandler.showingNetError = false
+}, 4000);
+AjaxHandler.tiForBug = () => setTimeout(() => {
+  AjaxHandler.showingBug = false
+}, 4000)
 
-const abortablePromise = (fetch_promise, cb, errorCb) => {
+/* fetch has no timeout originally, so give a timeout promise to compete. If timeout happens first, Hint error. */
+/* But Notice, the ajax may be successful (Especially under slow network) */
+const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
   let timeoutAction = null
 
   // 这是一个可以被reject的promise
@@ -50,7 +60,6 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
                                       if (response.status >= 200 && response.status < 300) {
                                         return response
                                       }
-
                                       throw response
                                     })
                                     .then((response) => {
@@ -61,24 +70,63 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
                                       throw new TypeError('返回的数据类型出错!')
                                     })
                                     .then((json) => {
-                                      cb(json)
+                                      if (json.error) {
+                                        /* if the caller has own service-error-callback, do not throw error, just exect it */
+                                        /* else throw the error */
+                                        if (serviceErrorCb) {
+                                          serviceErrorCb(json.error)
+                                        } else {
+                                          throw new Error(json.error)
+                                        }
+                                      } else {
+                                        /* successful callback */
+                                        cb(json)
+                                      }
                                     })
                                     .catch((error) => {
                                       console.log(error)
-                                      let title, message
-                                      if (errorCb) {
-                                        errorCb()
+                                      /* if need clear posting status for the caller class even error occurs, clear the status */
+                                      if (options && options.clearPosting && options.thisObj) {
+                                        options.thisObj.setState({
+                                          posting: false
+                                        })
                                       }
+                                      /* same for checking status clear */
+                                      if (options && options.clearChecking && options.thisObj) {
+                                        options.thisObj.setState({
+                                          checking: false
+                                        })
+                                      }
+                                      let title, message
+                                      // if timeout 
                                       if (error === 'timeout') {
                                         title = '请求超时'
                                         message = '请稍后重试～'
-                                        // 如果是超时，判断是否显示超时错误，无则提示，否则返回
+                                        // 如果是超时，判断是否正在显示超时错误，无则提示，否则返回
                                         if (!AjaxHandler.showingTo) {
                                           Noti.hintLock(title, message)
                                           AjaxHandler.showingTo = true
-                                          AjaxHandler.tiForTo()
+                                          return AjaxHandler.tiForTo()
                                         }
-                                      } else {
+                                      } else if (error.status && (error.status < 200 || error.status >= 300)) {
+                                        // network error
+                                        if (error.status === 401) {
+                                          // 若为异地登录，提示重新登录，
+                                          if (!AjaxHandler.showingExpire) {
+                                            hintExpire()
+                                            AjaxHandler.showingExpire = true
+                                          }
+                                          return
+                                        } else {
+                                          /* ordinary network error, just toast */
+                                          if (!AjaxHandler.showingNetError) {
+                                            Noti.hintNetworkError()
+                                            AjaxHandler.showingNetError = true
+                                            return AjaxHandler.tiForNet()
+                                          }
+                                        }
+                                      } else if (error.code) { 
+                                        // error.code shows this is form server.
                                         title = error.title || '请求出错'
                                         if (error.code === 10008) {
                                           message = error.displayMessage
@@ -96,60 +144,58 @@ const abortablePromise = (fetch_promise, cb, errorCb) => {
                                           console.log(error.message)
                                           message = error.message || error.displayMessage || '网络错误，请稍后刷新重试'
                                         }
-                                        // 若为异地登录，提示重新登录，
-                                        if (error.status === 401) {
-                                          if (!AjaxHandler.showingExpire) {
-                                            hintExpire()
-                                            AjaxHandler.showingExpire = true
-                                          }
-                                          return
-                                        }
                                         // 是否有对应回调，无则归为other类中
                                         let tiCallback = AjaxHandler[`tiFor${error.code}`]
                                         if (tiCallback) {
                                           // 如果有对应的回调，且当前未显示该类错误，显示错误
                                           if (!AjaxHandler[`showing${error.code}`]) {
-                                            Noti.hintLock(title, message)
+                                            Noti.hintWarning(title, message)
                                             AjaxHandler[`showing${error.code}`] = true
                                             tiCallback()
                                           }
                                         } else {
                                           // 显示其它错误
                                           if (!AjaxHandler.showingOther) {
-                                            Noti.hintLock(title, message)
+                                            Noti.hintWarning(title, message)
                                             AjaxHandler.showingOther = true
                                             AjaxHandler.tiForOther()
                                           }
                                         }
-                                      }
-                                      /* if (!AjaxHandler.showingError) {
-                                        if (error.status === 401) {
-                                          hintExpire()
-                                          AjaxHandler.showingError = true
-                                          return
+                                      } else { 
+                                        // program bug
+                                        if (!AjaxHandler.showingBug) {
+                                          Noti.hintLock('程序出错', error.displayMessage || '请咨询相关人员！')
+                                          AjaxHandler.showingBug = true
+                                          AjaxHandler.tiForBug()
                                         }
-                                        Noti.hintLock(title, message)
-                                        AjaxHandler.showingError = true
-                                        AjaxHandler.ti()
-                                      } */
+                                      }
                                     })
 
+  /* reject timeout promise after 5s */
   setTimeout(() => { timeoutAction() }, 5000)
 
   return abortable_promise
 }
 
-AjaxHandler.ajax = (resource, body, cb, errorCb, domain) => {
+AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
   /* ----handle the 'api' ----- */
+  /* this is because cmp used a node.js server as a mock server at the beginning. And I used '/api' to distinguish it from Java server api */
   if (resource.includes('/api')) {
     resource = resource.replace('/api', '')
   }
   // 默认使用管理端账户，除非用domain字段传入
   // debugger
-  const url = (domain ? domain : 'http://116.62.236.67:5080') + resource
+  let url 
+  // = (domain ? domain : 'http://116.62.236.67:5080') + resource
   // const url = (domain ? domain : 'http://10.0.0.4:5080') + resource
   // const url = (domain ? domain : 'https://api.xiaolian365.com/m') + resource
-  // const url = resource
+  if (options && options.domain) {
+    url = options.domain + resource
+  } else {
+    url = 'http://116.62.236.67:5080' + resource  
+    // url = 'http://10.0.0.4:5080' + resource
+    // url = 'https://api.xiaolian365.com/m' + resource
+  }
 
   const token = getToken()
 
@@ -161,25 +207,15 @@ AjaxHandler.ajax = (resource, body, cb, errorCb, domain) => {
 
   let fetch_promise = fetch(url, {method: 'POST', body: JSON.stringify(body), headers: hdrs})
 
-  return abortablePromise(fetch_promise, cb, errorCb)
+  return abortablePromise(fetch_promise, cb, serviceErrorCb, options)
 }
+
+/* for client ajax request */
 AjaxHandler.ajaxClient = (resource, body, cb) => {
   const domain = 'http://116.62.236.67:5081'
   // const domain = 'http://10.0.0.4:5081'
   // const domain = 'https://api.xiaolian365.com/c'
-  AjaxHandler.ajax(resource, body, cb, null, domain)
-}
-
-AjaxHandler.uploadFile = (body, cb) => {
-  let url = 'https://api.xiaolian365.com/file/upload'
-  const token = getToken()
-
-  const hdrs = {
-    token: token
-  }
-
-  let fetchPromise = fetch(url, {method: 'POST', body: body, headers: hdrs, mode: 'cors'})
-  return abortablePromise(fetchPromise, cb)
+  AjaxHandler.ajax(resource, body, cb, null, {domain: domain})
 }
 
 export default AjaxHandler

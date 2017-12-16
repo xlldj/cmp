@@ -6,9 +6,6 @@ const PriceTable = asyncComponent(() => import(/* webpackChunkName: "priceTable"
 const PriceInfo = asyncComponent(() => import(/* webpackChunkName: "priceInfo" */ "./priceInfo"))
 
 class PriceContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

@@ -1,6 +1,5 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
 
 import {Table, Popconfirm} from 'antd'
 
@@ -10,7 +9,8 @@ import AjaxHandler from '../../ajax'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 import Format from '../../component/format'
-
+import SchoolSelector from '../../component/schoolSelector'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -27,6 +27,7 @@ const SIZE = CONSTANTS.PAGINATION
 
 class CashtimeTable extends React.Component {
   static propTypes = {
+    schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
   constructor (props) {
@@ -65,7 +66,7 @@ class CashtimeTable extends React.Component {
             <Link to={`/fund/cashtime/editCashtime/:${record.id}`}>编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>
@@ -102,14 +103,39 @@ class CashtimeTable extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    const body={
-      page: this.props.page,
+    let {page, schoolId} = this.props
+    const body = {
+      page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
   }
   componentWillUnmount () {
     this.props.hide(true)
+  }
+  componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
+    let {page, schoolId} = nextProps
+    const body = {
+      page: page,
+      size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+    this.fetchData(body)
+  }
+  changeSchool = (value) => {
+    let {schoolId} = this.props
+    if (schoolId === value) {
+      return
+    }
+    this.props.changeFund(subModule, {page: 1, schoolId: value})
   }
   delete = (e,id) => {
     e.preventDefault()
@@ -135,23 +161,21 @@ class CashtimeTable extends React.Component {
     }
     AjaxHandler.ajax(resource,body,cb)
   }
-  componentWillReceiveProps (nextProps) {
-    let {page} = nextProps
-    const body = {
-      page: page,
-      size: SIZE
-    }
-    this.fetchData(body)
-  }
   changePage = (pageObj) => {
     let page = pageObj.current
     this.props.changeFund(subModule, {page: page})
   }
   render () {
-    let {page, total, loading} = this.state
+    let {total, loading} = this.state
+    let {page, schoolId} = this.props
+
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='添加提现时间' addLink='/fund/cashtime/addCashtime' />
+        <SearchLine 
+          addTitle='添加提现时间' 
+          addLink='/fund/cashtime/addCashtime'
+          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />}  
+        />
 
           <div className='tableList'>
             <Table bordered
@@ -167,6 +191,7 @@ class CashtimeTable extends React.Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
+  schoolId: state.changeFund[subModule].schoolId,
   page: state.changeFund[subModule].page
 })
 

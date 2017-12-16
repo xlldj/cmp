@@ -3,8 +3,7 @@ import { Route} from 'react-router-dom'
 import Bread from '../bread'
 import {asyncComponent} from '../component/asyncComponent'
 import './style/style.css'
-import {getLocal, setLocal} from '../util/storage'
-import AjaxHandler from '../ajax'
+import {getLocal} from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -23,36 +22,18 @@ class UserDisp extends React.Component {
     this.props.changeUser('userList', {page: 1, selectKey: ''})
   }
   getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools')
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
       let schoolId = recent[0]
       selectedSchool = schoolId
-    } else if (getLocal('defaultSchool')) {
-      let defaultSchool = getLocal('defaultSchool')
+    } else if (defaultSchool) {
       selectedSchool = defaultSchool
-    } else {
-      this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
       this.props.changeUser('userList', {schoolId: selectedSchool})
     }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
-      page: 1,
-      size: 1
-    }
-    const cb = (json) => {
-      if (json.data.schools) {
-        let selectedSchool = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', selectedSchool)
-        this.props.changeUser('userList', {schoolId: selectedSchool}) 
-      } 
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
 
   render () {

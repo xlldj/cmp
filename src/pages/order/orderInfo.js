@@ -12,6 +12,9 @@ const STATUSCLASS = {
   4: ''
 }
 
+const backTitle = {
+  fromComplaint: '返回账单投诉'
+}
 class OrderInfo extends React.Component {
   constructor (props) {
     super(props)
@@ -177,6 +180,11 @@ class OrderInfo extends React.Component {
               <li><p>结束时间:</p>{data.finishTime ? Time.getTimeStr(data.finishTime) : ''}</li>
             : null
           }
+          {
+            data.status !== 1 ?
+              <li><p>结账方式:</p>{data.checkoutByOther ? '代结账' : '自结账'}</li>
+            : null
+          }
           <li><p>使用状态:</p><span className={STATUSCLASS[data.status]}>{CONSTANTS.ORDERSTATUS[data.status]}</span></li>
           <li><p>预付金额:</p><span>{`${data.prepay}`}</span></li>
           {
@@ -252,7 +260,7 @@ class OrderInfo extends React.Component {
           : null
         }
         <div className='btnArea'>
-          <Button onClick={this.back}>返回</Button>
+          <Button onClick={this.back}>{this.props.location.state?(backTitle[this.props.location.state.path]):'返回'}</Button>
         </div>
 
         <Modal
@@ -263,15 +271,15 @@ class OrderInfo extends React.Component {
           maskClosable={modalClosable}
           className='popupModal'
         >
-          <span>
-            由于
-            <input 
+          <div className='chargeBackModal'>
+            <span>由于</span>
+            <textarea
               value={this.state.modalMessage} 
               onChange={this.modalMessageChange} 
               onBlur={this.modalBlured}
             />
-            ，此单已做退单处理，你可以前往消费记录中查看，有一笔免费的订单。
-          </span>
+          </div>
+          <p>，此单已做退单处理，你可以前往消费记录中查看，有一笔免费的订单。</p>
           {this.state.modalMessageError ? <p className='checkInvalid' style={{textAlign: 'left'}}>消息不能为空！</p> : null }
         </Modal>
       </div>

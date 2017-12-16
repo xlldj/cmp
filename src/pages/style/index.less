@@ -52,6 +52,12 @@ a:hover{
 a:active{
   text-decoration: none;
 }
+.outLink{
+  color: #585c5e;
+}
+.outLink:hover{
+  color: #108EE9;
+}
 input,textarea{
   border-radius: 4px;
   border: 1px solid #ddd;
@@ -438,6 +444,7 @@ button.grayBackColor:linked{
       line-height: @liHeight;
       height: @liHeight;
       color: #222;
+      word-break: keep-all;
 
       .flex;
 
@@ -449,6 +456,11 @@ button.grayBackColor:linked{
       }
       button,span{
         margin-right: 5px;
+      }
+      .longItem{
+        // max-width: 140px;
+        width: calc(~ '100% - 130px');
+        line-height: 20px;
       }
     }
     .imgWrapper{
@@ -540,6 +552,10 @@ button.grayBackColor:linked{
         background-color: #fff;
         border-color:#ddd;
         border-radius: 5px;
+      }
+      .longItem{
+        width: calc(~'100% - 130px');
+        line-height: 22px;
       }
     }
     .imgWrapper{
@@ -669,7 +685,7 @@ button.grayBackColor:linked{
     input{
       padding-left: 25px !important;
     }
-    width: 200px;
+    width: 150px;
     height: 30px;
   }
   .addSchoolBtn{
@@ -678,6 +694,12 @@ button.grayBackColor:linked{
 }
 .seperateItem{
   margin-right: 5px;
+}
+
+/* for number show in orderTable and fundTable */
+.profitBanner{
+	margin-top: -8px;
+	margin-bottom: 8px;
 }
 
 /* for older version upload button in task module */ 
@@ -828,7 +850,7 @@ button.grayBackColor:linked{
         overflow-y: scroll;
         .breadc{
           background-color: #fff;
-          position: fixed;
+          position: absolute;
           top: 0;
           height: 50px;
           width: 100%;

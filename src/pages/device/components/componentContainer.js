@@ -8,9 +8,6 @@ const ComponentInfo = asyncComponent(() => import(/* webpackChunkName: "componen
 const ComponentType = asyncComponent(() => import(/* webpackChunkName: "componentType" */ "./componentType"))
 
 class ComponentContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

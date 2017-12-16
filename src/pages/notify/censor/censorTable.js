@@ -7,6 +7,7 @@ import Noti from '../../noti'
 import Time from '../../component/time'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
+import {checkObject} from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -165,6 +166,9 @@ class NotifyTable extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page'])) {
+      return
+    }
     let {page} = nextProps
     const body = {
       page: page,

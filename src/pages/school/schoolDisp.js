@@ -8,6 +8,7 @@ import './style/style.css'
 //import BlockManage from './schoolList/blockManage'
 //import SchoolBusiness from './schoolList/schoolBusiness'
 import Bread from '../bread'
+import {getLocal} from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -34,32 +35,32 @@ const breadcrumbNameMap = {
 };
 
 class SchoolDisp extends React.Component{
-  state = {
-    selectedSchoolId: 0,//note this may turn out to be string,may need change
-    editingBlock: 0,
-    schoolInfo: null
-  }
-  changeSchool = (info) => {
-    this.setState({
-      selectedSchoolId: info.id,
-      schoolInfo: info
-    })
-  }
-  changeEditingBlock = (i) => {
-    this.setState({
-      editingBlock: i
-    })
-  }
-  setSchool = (info)=>{
-    this.setState({
-      schoolInfo:JSON.parse(JSON.stringify(info))
-    })
-  }
   setStatusForschool = () => {
     this.clearStatus4schoolIIlist()
   }
   clearStatus4schoolIIlist = () => {
-    this.props.changeSchool('schoolList', {page: 1, schoolId: 'all'})
+    this.getDefaultSchool()
+    this.props.changeSchool('schoolList', {page: 1})
+  }
+  clearStatus4schoolIIoverview = () => {
+    this.getDefaultSchool()
+    this.props.changeSchool('overview', {page: 1})
+  }
+
+  getDefaultSchool = () => {
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
+    var selectedSchool = 'all'
+    if (recentSchools) {
+      let recent = recentSchools.split(',')
+      let schoolId = recent[0]
+      selectedSchool = schoolId
+    } else if (defaultSchool) {
+      selectedSchool = defaultSchool
+    }
+    if (selectedSchool !== 'all') {
+      this.props.changeSchool('schoolList', {schoolId: selectedSchool})
+      this.props.changeSchool('overview', {schoolId: selectedSchool})
+    }
   }
   render(){
     return(

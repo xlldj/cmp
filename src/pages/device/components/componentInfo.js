@@ -1,10 +1,7 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
 
 import {Button} from 'antd'
 
-import Time from '../../component/time'
 import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
@@ -71,7 +68,7 @@ class ComponentInfo extends React.Component {
     this.props.hide(false)
     let id = this.props.match.params.id
     if(id) {
-      this.fetchData(parseInt(id.slice(1)))
+      this.fetchData(parseInt(id.slice(1), 10))
     }
   }
   componentWillUnmount () {
@@ -86,7 +83,7 @@ class ComponentInfo extends React.Component {
       deviceType: value,
       componentType: 0 // clear componentType as device Type changes
     })
-    this.fetchComponentTypes(parseInt(value))
+    this.fetchComponentTypes(parseInt(value, 10))
   }
   checkDevice = (v) => {
     if (!v || v==='0') {
@@ -119,12 +116,12 @@ class ComponentInfo extends React.Component {
     let resource
     const body={
       model: model,
-      typeId: parseInt(componentType),
-      deviceType: parseInt(deviceType)
+      typeId: parseInt(componentType, 10),
+      deviceType: parseInt(deviceType, 10)
     }
     let id = this.props.match.params.id
     if (id) {
-      body.id = parseInt(id.slice(1))
+      body.id = parseInt(id.slice(1), 10)
       resource ='/api/device/component/update'
     } else {
       resource = '/api/device/component/add'

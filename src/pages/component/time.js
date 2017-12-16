@@ -2,7 +2,7 @@ import Format from './format'
 const Time = {}
 /* ------get time base today------ */
 Time.getTimeStr = (t) => {
-  let a = new Date(t), ay = a.getFullYear(), aM = a.getMonth() > 8 ? parseInt(a.getMonth()) + 1 : '0' + (parseInt(a.getMonth()) + 1)
+  let a = new Date(t), ay = a.getFullYear(), aM = a.getMonth() > 8 ? parseInt(a.getMonth(), 10) + 1 : '0' + (parseInt(a.getMonth(), 10) + 1)
   let aD = a.getDate() > 9 ? a.getDate() : '0' + a.getDate(), aH = a.getHours() > 9 ? a.getHours() : '0' + a.getHours(), aMi = a.getMinutes() > 9 ? a.getMinutes() : '0' + a.getMinutes()
   let n = new Date()
   let applyTS = `${ay}-${aM}-${aD} ${aH}:${aMi}`
@@ -191,7 +191,7 @@ Time.add1Month = (x) => {
 }
 Time.add1Date = (x) => {
   let a = x.split(' ')
-  let h = parseInt(a[1])
+  let h = parseInt(a[1], 10)
   let t = new Date(a[0])
   t.setHours(h)
   let ts = Date.parse(t) + 24 * 3600 * 1000
@@ -212,7 +212,7 @@ Time.getHourFormat = (t) => {
 
 Time.ago24Hour = (x) => {
   let a = x.split(' ')
-  let t = new Date(a[0]), h = parseInt(a[1])
+  let t = new Date(a[0]), h = parseInt(a[1], 10)
   t.setHours(h)
   let ts = Date.parse(t) - 24 * 3600 * 1000
   return Time.getHourFormat(ts)
@@ -269,7 +269,7 @@ Time.getFirstWeekNum = (t) => {
   return Math.floor(weeks)
 }
 Time.getMonthFormat = (t) => {
-  let time = new Date(t), y = time.getFullYear(), m = time.getMonth() > 8 ? parseInt(time.getMonth()) + 1 : '0' + (parseInt(time.getMonth()) + 1)
+  let time = new Date(t), y = time.getFullYear(), m = time.getMonth() > 8 ? parseInt(time.getMonth(), 10) + 1 : '0' + (parseInt(time.getMonth(), 10) + 1)
   return y + '-' + m
 }
 Time.formatSpan = (span) => {

@@ -2,14 +2,13 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 
 import Table from 'antd/lib/table'
-import Button from 'antd/lib/button'
-import Popconfirm from 'antd/lib/popconfirm'
 
-import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 
+import SchoolSelector from '../../component/schoolSelector'
+import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -21,6 +20,7 @@ const SIZE = CONSTANTS.PAGINATION
 
 class ChargeTable extends React.Component {
   static propTypes = {
+    schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
   constructor (props) {
@@ -96,9 +96,13 @@ class ChargeTable extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    const body={
-      page: this.props.page,
+    let {page, schoolId} = this.props
+    const body = {
+      page: page,
       size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
   }
@@ -106,12 +110,25 @@ class ChargeTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {page} = nextProps
+    if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
+      return
+    }
+    let {page, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE
     }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
     this.fetchData(body)
+  }
+  changeSchool = (value) => {
+    let {schoolId} = this.props
+    if (schoolId === value) {
+      return
+    }
+    this.props.changeFund(subModule, {page: 1, schoolId: value})
   }
   changePage = (pageObj) => {
     let page = pageObj.current
@@ -119,10 +136,14 @@ class ChargeTable extends React.Component {
   }
   render () {
     let {total, loading, dataSource} = this.state 
-    let {page} = this.props
+    let {page, schoolId} = this.props
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='添加充值面额' addLink='/fund/charge/addCharge' />
+        <SearchLine 
+          addTitle='添加充值面额' 
+          addLink='/fund/charge/addCharge'
+          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />}  
+        />
 
         <div className='tableList'>
           <Table bordered 
@@ -139,6 +160,7 @@ class ChargeTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+  schoolId: state.changeFund[subModule].schoolId,
   page: state.changeFund[subModule].page
 })
 

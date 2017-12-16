@@ -9,6 +9,7 @@ import SearchLine from '../component/searchLine'
 import SchoolSelector from '../component/schoolSelector'
 import BasicSelector from '../component/basicSelector'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
+import {checkObject} from '../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -29,8 +30,6 @@ const TARGETS = {
   2: '所有客服任务'
 }
 
-const DEVICETYPES = CONSTANTS.DEVICETYPE
-const STATUS = CONSTANTS.REPAIRSTATUS
 const SIZE = CONSTANTS.PAGINATION
 /*------后端接受的all为true/false,必传，post之前将0，1转为true/false---------*/
 /*------后端接受的pending为int，不传为所有，我用0表示不传---------------------*/
@@ -49,7 +48,8 @@ class TaskList extends React.Component {
   constructor (props) {
     super(props)
     let dataSource = []
-    this.state = { dataSource, 
+    this.state = { 
+      dataSource, 
       loading: false,
       total: 0
     }
@@ -98,12 +98,10 @@ class TaskList extends React.Component {
           case 5:
           case 6:
             return record.csName;
-            break;
           case 3:
           case 4:
           case 7:
             return record.assignName;
-            break;
           default: 
             return record.csName || '----'
         }
@@ -141,6 +139,8 @@ class TaskList extends React.Component {
               return <Badge status='error' text={CONSTANTS.REPAIRSTATUSFORSHOW[record.status]} />
             case 6:
               return <Badge status='error' text={CONSTANTS.REPAIRSTATUSFORSHOW[record.status]+`(${record.assignName})`} />
+            default: 
+              return <Badge status='error' text='未知' />
           }
         }
       }
@@ -159,7 +159,7 @@ class TaskList extends React.Component {
         return (
           <div className='editable-row-operations'>
             <span>
-              <Link to={{pathname: addr, state: 'fromTask'}} >详情</Link>
+              <Link to={{pathname: addr, state: {path: 'fromTask'}}} >详情</Link>
             </span>
           </div>
         )
@@ -244,6 +244,9 @@ class TaskList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'all', 'assigned', 'sourceType', 'pending', 'schoolId'])) {
+      return
+    }
     let {all, assigned, sourceType, pending, page, schoolId} = nextProps
     const body = {
       page: page,
@@ -316,8 +319,8 @@ class TaskList extends React.Component {
     return (
       <div className='contentArea'>
         <div className='navLink'>
-          <a href='#' className={assigned ? '' : 'active'} onClick={this.toNa} >待处理的任务</a>
-          <a href='#' className={assigned ? 'active' : ''} onClick={this.toAssigned} >已指派的任务</a>
+          <a href='' className={assigned ? '' : 'active'} onClick={this.toNa} >待处理的任务</a>
+          <a href='' className={assigned ? 'active' : ''} onClick={this.toAssigned} >已指派的任务</a>
         </div>
         <SearchLine 
           selector1={

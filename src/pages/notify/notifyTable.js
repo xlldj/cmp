@@ -1,6 +1,5 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {asyncComponent} from '../component/asyncComponent'
 
 import {Table, Popconfirm} from 'antd'
 
@@ -10,7 +9,7 @@ import AjaxHandler from '../ajax'
 import SearchLine from '../component/searchLine'
 import BasicSelector from '../component/basicSelector'
 import CONSTANTS from '../component/constants'
-import Format from '../component/format'
+import {checkObject} from '../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -95,7 +94,7 @@ class NotifyTable extends React.Component {
             <Link to={`/notify/list/notifyInfo/:${record.id}`}>编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>
@@ -176,6 +175,9 @@ class NotifyTable extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page', 'type'])) {
+      return
+    }
     let {page, type} = nextProps
     const body = {
       page: page,

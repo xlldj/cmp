@@ -127,7 +127,6 @@ class BlockManage extends React.Component {
       this.setState({
         fetchingIndex: i
       })
-      let schoolId = this.state.schoolId
       let residenceId = this.state.data[i].id
       const body = {
         residenceId: residenceId
@@ -143,10 +142,10 @@ class BlockManage extends React.Component {
     const cb = (json) => {
       let nextState = {loading: false}
       if (json.error) {
-        throw {
+        throw new Error({
           title: '请求出错',
           message: json.error.displayMessage || '网络出错，请稍后重试'
-        }
+        })
       } else {
         let data = JSON.parse(JSON.stringify(this.state.data))
         let {fetchingIndex} = this.state
@@ -175,7 +174,7 @@ class BlockManage extends React.Component {
             <Link  to={'/school/list/blockManage/editingBlock/:'+block.id} onClick={(e) => {this.routeToDetail(e, block.id)}} >编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此楼么?" onClick={this.alertDelete} onConfirm={(e) => {this.deleteBlock(e,block.id)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>

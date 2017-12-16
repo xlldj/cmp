@@ -10,10 +10,13 @@ import DeviceSelector from '../component/deviceSelector'
 import SchoolSelector from '../component/schoolSelector'
 import BasicSelector from '../component/basicSelector'
 
+import './style/style.less'
+
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../actions'
+import {checkObject} from '../util/checkSame'
 const subModule = 'orderList'
 
 const SIZE = CONSTANTS.PAGINATION
@@ -34,7 +37,8 @@ class OrderTable extends React.Component {
     selectKey: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired,
     startTime: PropTypes.number.isRequired,
-    endTime: PropTypes.number.isRequired
+    endTime: PropTypes.number.isRequired,
+    userType: PropTypes.string.isRequired
   }
   constructor(props){
     super(props)
@@ -43,6 +47,7 @@ class OrderTable extends React.Component {
       dataSource, 
       loading: false,
       total: 0,
+      totalIncome: 0,
       searchingText: '',
       subStartTime: this.props.startTime,
       subEndTime: this.props.endTime
@@ -59,29 +64,33 @@ class OrderTable extends React.Component {
     }, {
       title: '使用设备',
       dataIndex: 'deviceType',
-      width: '8%',
+      width: '7%',
       render: (text,record,index) => (typeName[record.deviceType])
     }, {
       title: '所在学校',
       dataIndex: 'schoolName'
     }, {
+      title: '设备地址',
+      dataIndex: 'location',
+      width: '10%'
+    }, {
       title: '开始时间',
       dataIndex: 'createTime',
-      width: '11%',
+      width: '10%',
       render: (text,record,index) => {
         return Time.getTimeStr(record.createTime)
       }
     }, {
       title: '结束时间',
       dataIndex: 'finishTime',
-      width: '11%',
+      width: '10%',
       render: (text,record,index) => {
         return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
       }
     }, {
       title: '使用状态',
       dataIndex: 'status',
-      width: '12%',
+      width: '10%',
       render: (text,record,index)=> {
         switch(record.status){
           case 1:
@@ -111,7 +120,6 @@ class OrderTable extends React.Component {
     }, {
       title: (<p className='lastCol'>操作</p>),
       dataIndex: 'operation',
-      width: '10%',
       render: (text, record, index) => (
         <div className='editable-row-operations lastCol'>
           <span>
@@ -139,6 +147,7 @@ class OrderTable extends React.Component {
           })
           nextState.dataSource = json.data.orders
           nextState.total = json.data.total
+          nextState.totalIncome = json.data.totalIncome || 0
         }else{
           throw new Error('网络出错，请稍后重试～')
         }        
@@ -153,7 +162,7 @@ class OrderTable extends React.Component {
     let {state}=this.props.history.location
     // this.props.changeOrder('order', {startTime: Time.get7DaysAgo(), endTime: Time.getNow()})
 
-    let {page, schoolId, deviceType, status, selectKey, startTime, endTime} = this.props
+    let {page, schoolId, deviceType, status, selectKey, startTime, endTime, userType} = this.props
     const body={
       page: page,
       size: SIZE
@@ -171,9 +180,14 @@ class OrderTable extends React.Component {
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
+    } else {
+      body.statusList = [1, 2, 4]
     }
     if (selectKey) {
       body.selectKey = selectKey
+    }
+    if (userType && userType !== 'all') {
+      body.userType = parseInt(userType, 10)
     }
     if (state) {
       // this.props.changeOrder('order', {schoolId: 'all'})
@@ -191,7 +205,10 @@ class OrderTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    let {schoolId, deviceType, status, selectKey, page, startTime, endTime} = nextProps
+    if (checkObject(this.props, nextProps, ['schoolId', 'deviceType', 'status', 'selectKey', 'page', 'startTime', 'endTime', 'userType'])) {
+      return
+    }
+    let {schoolId, deviceType, status, selectKey, page, startTime, endTime, userType} = nextProps
     const body={
       page: page,
       size: SIZE
@@ -210,9 +227,14 @@ class OrderTable extends React.Component {
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
+    } else {
+      body.statusList = [1, 2, 4]
     }
     if (selectKey) {
       body.selectKey = selectKey
+    }
+    if (userType && userType !== 'all') {
+      body.userType = parseInt(userType, 10)
     }
     let {state}=this.props.history.location
     if (state) {
@@ -296,9 +318,16 @@ class OrderTable extends React.Component {
       this.confirmed = false
     }
   }
+  changeUserType = (v) => {
+    let {userType} = this.props
+    if (userType === v) {
+      return
+    }
+    this.props.changeOrder(subModule, {userType: v, page: 1})
+  }
   render () {
-    const {schoolId, deviceType, status} = this.props
-    const {dataSource, total, loading, subStartTime, subEndTime} = this.state
+    const {schoolId, deviceType, status, userType} = this.props
+    const {dataSource, total, totalIncome, loading, subStartTime, subEndTime} = this.state
     const {state} = this.props.location
 
     return (
@@ -311,14 +340,19 @@ class OrderTable extends React.Component {
           confirm={this.confirmRange}
           onOpenChange={this.onOpenChange}
 
-          searchInputText='宿舍／订单号' 
+          searchInputText='宿舍/订单号/手机号' 
           searchingText={this.state.searchingText} 
           pressEnter={this.pressEnter} 
           changeSearch={this.changeSearch}
-          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
-          selector2={<DeviceSelector selectedDevice={deviceType} changeDevice={this.changeDevice} />} 
-          selector3={<BasicSelector allTitle='所有使用状态' staticOpts={CONSTANTS.ORDERSTATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
+          selector1={<BasicSelector allTitle='所有用户' staticOpts={CONSTANTS.ORDERUSERTYPES} selectedOpt={userType} changeOpt={this.changeUserType} />}
+          selector2={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
+          selector3={<DeviceSelector selectedDevice={deviceType} changeDevice={this.changeDevice} />} 
+          selector4={<BasicSelector allTitle='所有使用状态' staticOpts={CONSTANTS.ORDERSTATUS} selectedOpt={status} changeOpt={this.changeStatus} />} 
         />
+
+        <p className='profitBanner' >
+          总收益: {totalIncome}元
+        </p>
 
         <div className='tableList'>
           <Table 
@@ -349,7 +383,8 @@ const mapStateToProps = (state, ownProps) => {
     selectKey: state.changeOrder[subModule].selectKey,
     page: state.changeOrder[subModule].page,
     startTime: state.changeOrder[subModule].startTime,
-    endTime: state.changeOrder[subModule].endTime
+    endTime: state.changeOrder[subModule].endTime,
+    userType: state.changeOrder[subModule].userType
   }
 }
 

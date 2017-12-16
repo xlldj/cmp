@@ -6,9 +6,6 @@ const TimesetTable = asyncComponent(() => import(/* webpackChunkName: "timesetTa
 const TimesetInfo = asyncComponent(() => import(/* webpackChunkName: "timesetInfo" */ "./timesetInfo"))
 
 class TimesetContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

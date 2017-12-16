@@ -5,6 +5,7 @@ import AjaxHandler from '../ajax'
 import Time from '../component/time'
 import SearchLine from '../component/searchLine'
 import CONSTANTS from '../component/constants'
+import {checkObject} from '../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -33,6 +34,11 @@ class VersionTable extends React.Component {
       dataIndex: 'versionNo',
       width: '10%',
       className: 'firstCol'
+    }, {
+      title: '环境',
+      dataIndex: 'envType',
+      width: '8%',
+      render: (text, record) => (CONSTANTS.VERSIONENV[record.envType])
     }, {
       title: '更新方式',
       dataIndex: 'type',
@@ -114,6 +120,9 @@ class VersionTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['page'])) {
+      return
+    }
     let {page} = nextProps
     const body = {
       page: page,

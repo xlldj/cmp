@@ -52,7 +52,7 @@ class AccountInfo extends React.Component{
     this.fetchData(body)
   }
   componentWillUnmount () {
-    this.props.hide(true)
+    // this.props.hide(true)
   }
 
   changePwd = (e)=>{
@@ -171,7 +171,7 @@ class AccountInfo extends React.Component{
               </li>
               <li>
                 <p>登录密码:</p>
-                <a href='#' onClick={this.changePwd}>更改密码</a>
+                <a href='' onClick={this.changePwd}>更改密码</a>
               </li>
               <li>
                 <p>员工姓名:</p>

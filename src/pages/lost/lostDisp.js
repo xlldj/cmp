@@ -6,8 +6,7 @@ import './style/style.css'
 //import LostInfo from './lostInfo'
 //import LostTable from './lostTable'
 import Bread from '../bread'
-import {getLocal, setLocal} from '../util/storage'
-import AjaxHandler from '../ajax'
+import {getLocal} from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -26,36 +25,18 @@ class LostDisp extends React.Component {
     this.props.changeLost('lostList', {page: 1, type: 'all'})
   }
   getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools')
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
       let schoolId = recent[0]
       selectedSchool = schoolId
-    } else if (getLocal('defaultSchool')) {
-      let defaultSchool = getLocal('defaultSchool')
+    } else if (defaultSchool) {
       selectedSchool = defaultSchool
-    } else {
-      this.setDefaultSchool()
     }
     if (selectedSchool !== 'all') {
       this.props.changeLost('lostList', {schoolId: selectedSchool})
     }
-  }
-  setDefaultSchool = () => {
-    let resource = '/school/list'
-    const body = {
-      page: 1,
-      size: 1
-    }
-    const cb = (json) => {
-      if (json.data.schools) {
-        let selectedSchool = json.data.schools[0].id.toString()
-        setLocal('defaultSchool', selectedSchool)
-        this.props.changeLost('lostList', {schoolId: selectedSchool})
-      } 
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
   render () {
     return (

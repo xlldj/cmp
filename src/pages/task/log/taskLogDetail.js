@@ -4,7 +4,6 @@ import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import Time from '../../component/time'
 import CONSTANTS from '../../component/constants'
-import {asyncComponent} from '../../component/asyncComponent'
 import PicturesWall from '../../component/picturesWall'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
@@ -23,8 +22,6 @@ class TaskLogDetail extends React.Component {
     this.state = {id, type, typeError, brief, briefError,
       description, descriptionError, fileList,
       schoolId, schoolError,
-      schoolId: '',
-      schoolError: false,
       repairmanId: '',
       repairmanName: '',
       repairmanError: false,
@@ -32,7 +29,9 @@ class TaskLogDetail extends React.Component {
       schoolName: '',
       priority: '',
       remark: '',
-      needToast: false
+      needToast: false,
+      status: '', 
+      showRepairmanName: true // only useful when status === 6
     }
   }
   componentDidMount(){
@@ -41,7 +40,7 @@ class TaskLogDetail extends React.Component {
       let id = this.props.match.params.id.slice(1)
       let resource = '/api/work/note/one'
       const body = {
-        id: parseInt(id)
+        id: parseInt(id, 10)
       }
       const cb = (json) => {
         if(json.error){
@@ -53,6 +52,12 @@ class TaskLogDetail extends React.Component {
             brief: data.brief,
             description: data.description || ''
           }
+          if (data.status) {
+            nextState.status = data.status
+            if (data.status === 6) {
+              nextState.showRepairmanName = false
+            }
+          }
           if (data.type) {
             nextState.type = data.type.toString()
           }
@@ -62,8 +67,8 @@ class TaskLogDetail extends React.Component {
           if (data.userId) {
             nextState.repairmanId = data.userId
           }
-          if (data.username) {
-            nextState.repairmanName = data.username
+          if (data.assignName) {
+            nextState.repairmanName = data.assignName
           }
           if (data.level) {
             nextState.priority = data.level
@@ -72,7 +77,7 @@ class TaskLogDetail extends React.Component {
             nextState.remark = data.remark
           }
           if(data.images&&data.images.length>0){
-            data.images.map((r,i)=>{
+            data.images.forEach((r,i)=>{
               fileList.push({
                 uid:i-10,
                 status: 'done',
@@ -113,7 +118,7 @@ class TaskLogDetail extends React.Component {
     this.updateToast()
   }
   changeDescription = (e) => {
-    let v = e.target.value.trim()
+    let v = e.target.value
     this.setState({
       description: v
     })
@@ -259,7 +264,8 @@ class TaskLogDetail extends React.Component {
       repairmanName: name,
       priority: priority,
       remark: remark,
-      showModal: false
+      showModal: false,
+      showRepairmanName: true
     })
     this.updateToast({repairmanId: id})
   }
@@ -273,16 +279,16 @@ class TaskLogDetail extends React.Component {
     this.setState(nextState)
   }
   render () {
-    const {id, titleError, type, typeError, brief, briefError,description, 
+    const {id, type, typeError, brief, briefError,description, 
       descriptionError, fileList,
       schoolId, schoolError, schoolName,
       showModal,
-      repairmanId, repairmanName, repairmanError,
+      repairmanName, repairmanError,
       priority, remark,
+      status, showRepairmanName,
       needToast
     } = this.state
 
-    console.log(needToast)
     return (
       <div className='infoList' >
         <div className='info takLogInfo'>
@@ -337,15 +343,16 @@ class TaskLogDetail extends React.Component {
             </li>
             <li className='imgWrapper'>
               <p>图片：</p>
-              <div className='upload'>
-                <PicturesWall setImages={this.setImages} fileList={fileList} dir='work-log' />
+              <div className='upload' >
+                <PicturesWall disabled={id ? true : false} setImages={this.setImages} fileList={fileList} dir='work-log' />
               </div>
             </li>
             {type.toString() === '2' ?
                <li>
                 <p>选择维修员：</p>
-                {repairmanName ? <span>{repairmanName}</span> : null}
+                {showRepairmanName ? <span>{repairmanName}</span> : null}
                 {id ? null : <Button type='primary' onClick={this.showAllocate}>指派维修员</Button>}
+                {id && status === 6 ? <Button type='primary' onClick={this.showAllocate}>重新指派维修员</Button> : null}
                 {repairmanError && (<span className='checkInvalid'>请指派维修员！</span>)}
               </li>
               : null
@@ -354,7 +361,7 @@ class TaskLogDetail extends React.Component {
         </div>
 
         <div className='btnArea'>
-          {type === '2' && id ? null : <Button type='primary'  onClick={this.handleSubmit} >确认</Button>}
+          {status !== 6 && type === '2' && id ? null : <Button type='primary'  onClick={this.handleSubmit} >确认</Button>}
           {
             needToast ?
               <Popconfirm title="当前任务还未发布，确定要返回么?" onConfirm={this.cancelSubmit} okText="确认" cancelText="取消">

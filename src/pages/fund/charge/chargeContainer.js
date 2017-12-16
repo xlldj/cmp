@@ -6,9 +6,6 @@ const ChargeTable = asyncComponent(() => import(/* webpackChunkName: "chargeTabl
 const ChargeInfo = asyncComponent(() => import(/* webpackChunkName: "chargeInfo" */ "./chargeInfo"))
 
 class ChargeContainer extends React.Component {
-  constructor (props) {
-    super(props)
-  }
   render () {
     return (
       <div>

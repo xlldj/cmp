@@ -1,6 +1,5 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
 
 import {Table, Popconfirm} from 'antd'
 
@@ -48,7 +47,7 @@ class SupplierTable extends React.Component {
             <Link to={`/device/suppliers/info/:${record.id}`}>编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e, record.id)}} okText="确认" cancelText="取消">
-              <a href="#">删除</a>
+              <a href="">删除</a>
             </Popconfirm>
           </span>
         </div>

@@ -19,7 +19,9 @@ const backTitle = {
   fromOrder: '返回订单详情',
   fromFund: '返回资金详情',
   fromRepair: '返回维修详情',
-  fromRepairLog: '返回用户报修记录'
+  fromRepairLog: '返回用户报修记录',
+  fromFeedback: '返回意见反馈',
+  fromComplaint: '返回账单投诉'
 }
 
 class UserInfo extends React.Component {

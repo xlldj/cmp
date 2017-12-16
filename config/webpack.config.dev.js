@@ -143,11 +143,7 @@ module.exports = {
         use: [
           {loader: 'style-loader'},
           {loader: 'css-loader'},
-          {loader: 'less-loader',
-            options: {
-              modifyVars: themeVariables
-            }
-          }
+          {loader: 'less-loader'}
         ]
       },
       // "postcss" loader applies autoprefixer to our CSS.

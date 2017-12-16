@@ -10,6 +10,11 @@ import Button from 'antd/lib/button'
 import Radio from 'antd/lib/radio'
 import CONSTANTS from '../../component/constants'
 
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setSchoolList } from '../../../actions'
+
 const FILEADDR = CONSTANTS.FILEADDR
 const RadioGroup = Radio.Group;
 
@@ -106,6 +111,9 @@ class Loc extends React.Component {
 }
 
 class SchoolInfoEdit extends React.Component {
+  static propTypes = {
+    schools: PropTypes.array.isRequired
+  }
   constructor (props) {
     super(props)
     this.state = {
@@ -253,26 +261,34 @@ class SchoolInfoEdit extends React.Component {
       body.id = parseInt(id, 10)
     }
     const cb = (json) => {
+      this.setState({
+        posting: false
+      })
       if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-        this.setState({
-          posting: false
-        })
       } else {
         /* tell server to reload account */
         if(json.data){
           // Noti.hintSuccess(this.props.history,'/school')
+          let school = {
+            id: json.data.id,
+            name: name
+          }
+          this.addSchoolToReducer(school)
           this.tellServerReload()
-          // this.tellClientReload()
+          this.tellClientReload()
         } else {
           Noti.hintServiceError()
-          this.setState({
-            posting: false
-          })
         }
       }
     }
     AjaxHandler.ajax(url, body, cb)   
+  }
+
+  addSchoolToReducer = (school) => {
+    let {schools} = this.props
+    schools.push(school)
+    this.props.setSchoolList({schools})
   }
 
   clearReloadStatus = () => {
@@ -290,12 +306,12 @@ class SchoolInfoEdit extends React.Component {
     const body = null
     const cb = (json) => {
       const nextState = {
-        posting: false 
+        serverResponsed: true
       }
-      // let {clientResponsed, clientReloaded} = this.state
+      let {clientResponsed, clientReloaded} = this.state
       if (json.data.result) {
         nextState.serverReloaded = true
-        /* if (clientResponsed) {
+        if (clientResponsed) {
           nextState.posting = false
           if (clientReloaded) {
             this.hintSuccess()
@@ -303,14 +319,12 @@ class SchoolInfoEdit extends React.Component {
             this.clearReloadStatus()
             Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
           }
-        }*/
-        this.hintSuccess()
+        }
       } else {
-        /* if (clientResponsed) {
+        if (clientResponsed) {
           this.clearReloadStatus()
           Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
-        }*/
-        Noti.hintServiceError('学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～')
+        }
       }
       this.setState(nextState)
     }
@@ -997,4 +1011,14 @@ class SchoolInfoEdit extends React.Component {
   }
 }
 
-export default SchoolInfoEdit
+// export default SchoolInfoEdit
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    schools: state.setSchoolList.schools,
+  }
+}
+
+export default withRouter(connect(mapStateToProps, {
+  setSchoolList 
+})(SchoolInfoEdit))
