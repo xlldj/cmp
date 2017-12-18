@@ -196,7 +196,7 @@ class Feedback extends React.Component {
     }))
 
     const carousel = (
-      <Carousel dots={true} accessibility={true}  className='carouselItem' autoplay={true} arrows={true} initialSlide={initialSlide} >
+      <Carousel dots={true} accessibility={true}  className='carouselItem' autoplay={false} arrows={true} initialSlide={initialSlide} >
         {carouselItems}
       </Carousel>
     )
