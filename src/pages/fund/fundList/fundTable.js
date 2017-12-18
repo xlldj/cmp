@@ -131,8 +131,8 @@ class FundTable extends React.Component {
         if(json.data){
           nextState.dataSource = json.data.funds
           nextState.total = json.data.total
-          nextState.totalRecharge = json.data.totalRecharge || '未知'
-          nextState.totalWithdraw = json.data.totalWithdraw || '未知'
+          nextState.totalRecharge = json.data.totalRecharge
+          nextState.totalWithdraw = json.data.totalWithdraw
         }else{
           this.setState(nextState)
           throw new Error('网络出错，请稍后重试～')

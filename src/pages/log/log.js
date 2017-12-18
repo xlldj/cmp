@@ -181,6 +181,11 @@ class Log extends React.Component{
     }
   }
   handleLogError = (error) => {
+    if (this.state.posting) {
+      this.setState({
+        posting: false
+      })
+    }
     let {code, displayMessage} = error
     if (code === 30004 || code === 30006) {
       this.refs.mobileBorder.classList.add('activeBorder')
