@@ -93,7 +93,7 @@ class GiftInfo extends React.Component {
     let {amount, deviceType, timeLimit, type, startTime, endTime} = this.state
     let url = '/api/gift/save'
     const body = {
-      amount: parseInt(amount, 10),
+      amount: parseFloat(amount, 10),
       deviceType: parseInt(deviceType, 10),
       type: type
     }
@@ -120,11 +120,11 @@ class GiftInfo extends React.Component {
   handleSubmit = () => {
     let {id, amount, timeLimit, startTime, endTime, type, deviceType} = this.state
     /*-------------need to check the data here---------------*/
-    if(!amount){
+    if(!amount || amount < 0){
       return this.setState({
         amountError: true
       })
-    }   
+    } 
     if (!type) {
       return this.setState({
         typeError: true
@@ -184,7 +184,7 @@ class GiftInfo extends React.Component {
     let {amount, deviceType, timeLimit, type, startTime, endTime} = this.state
     let url = '/gift/check'
     const body = {
-      amount: parseInt(amount, 10),
+      amount: parseFloat(amount, 10),
       deviceType: parseInt(deviceType, 10),
       type: type
     }
@@ -210,13 +210,17 @@ class GiftInfo extends React.Component {
     AjaxHandler.ajax(url, body, cb) 
   }
   changeAmount = (e) => {
+    let v = e.target.value
+    if (v.includes('.')) {
+      v = parseFloat(v).toFixed(1)
+    }
     this.setState({
-      amount: e.target.value
+      amount: v
     })
   }
   checkAmount = (e) => {
-    let v= e.target.value.trim()
-    if(!v){
+    let v = parseFloat(e.target.value)
+    if(!v || v < 0){
       return this.setState({
         amountError: true
       })
@@ -337,7 +341,7 @@ class GiftInfo extends React.Component {
           <li>
             <p>红包金额(元)：</p>
             <input type='number' value={amount}  onChange={this.changeAmount} onBlur={this.checkAmount} placeholder="红包金额" /> 
-            {amountError?(<span className='checkInvalid'>红包金额不能为空！</span>):null}
+            {amountError?(<span className='checkInvalid'>红包金额必须为正书(支持1位小数)！</span>):null}
           </li>        
           <li>
             <p>使用期限类型：</p>

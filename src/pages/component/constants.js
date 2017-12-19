@@ -254,7 +254,24 @@ const CONSTANTS = {
       name: '员工管理',
       path: 'employee',
       key: 8,
-      icon: 'solution'
+      icon: 'solution',
+      children: [
+        {
+          name: '员工列表',
+          path: 'list',
+          key: 1
+        },
+        {
+          name: '身份设置',
+          path: 'role',
+          key: 2
+        },
+        {
+          name: '权限设置',
+          path: 'authen',
+          key: 3
+        }
+      ]
     },
     {
       name: '统计分析',

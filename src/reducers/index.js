@@ -110,8 +110,8 @@ const initialOrderState = {
     deviceType: 'all',
     status: 'all',
     selectKey: '',
-    startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow(),
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
     userType: 'all'
   },
   abnormal: {
@@ -119,8 +119,8 @@ const initialOrderState = {
     schoolId: selectedSchool,
     deviceType: 'all',
     selectKey: '',
-    startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow(),
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
     userType: 'all'
   }
 }
@@ -142,8 +142,8 @@ const initialFundState = {
     type: 'all',
     status: 'all',
     selectKey: '',
-    startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow(),
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
     userType: 'all'
   },
   cashtime: {
@@ -274,6 +274,12 @@ const initialEmployeeState = {
   employeeList: {
     page: 1,
     selectKey: ''
+  },
+  authenList: {
+    page: 1,
+  },
+  roleList: {
+    page: 1
   }
 }
 const changeEmployee = (state = initialEmployeeState, action) => {

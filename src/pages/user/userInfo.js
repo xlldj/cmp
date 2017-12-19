@@ -180,7 +180,7 @@ class UserInfo extends React.Component {
     this.props.changeOrder('orderList', 
       {
         page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
-        selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+        selectKey: '', startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
       }
     )
     let id = this.state.data.id
@@ -191,7 +191,7 @@ class UserInfo extends React.Component {
     this.props.changeFund('fundList', 
       {
         page: 1, selectKey: mobile.toString(), type: 'all', status: 'all', schoolId: 'all',
-        startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+        startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
       }
     )
     this.props.history.push({pathname:'/fund/list',state:{path: 'fromUser', mobile: mobile}})

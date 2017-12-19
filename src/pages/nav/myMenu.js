@@ -172,11 +172,11 @@ class MyMenu extends React.Component {
   }
   clearStatus4orderIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeOrder('orderList', {page: 1, deviceType: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow(), userType: 'all'})
+    this.props.changeOrder('orderList', {page: 1, deviceType: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd(), userType: 'all'})
   }
   clearStatus4orderIIabnormal = () => {
     this.getDefaultSchool()
-    this.props.changeOrder('abnormal', {page: 1, deviceType: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow(), userType: 'all'})
+    this.props.changeOrder('abnormal', {page: 1, deviceType: 'all', selectKey: '', startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd(), userType: 'all'})
   }
 
 
@@ -185,7 +185,7 @@ class MyMenu extends React.Component {
   }
   clearStatus4fundIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow(), userType: 'all'})
+    this.props.changeFund('fundList', {page: 1, type: 'all', status: 'all', selectKey: '', startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd(), userType: 'all'})
   }
   clearStatus4fundIIcashtime = () => {
     this.getDefaultSchool()

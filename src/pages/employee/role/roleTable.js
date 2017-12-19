@@ -1,34 +1,29 @@
-/* 员工列表 */
-/* 'force' in '/employee/delete': if force to delete. 
-  1. false: no force, if account has remainder, pop a modal;
-  2. true: force delete
+/* ----------------------------权限列表----------------------------- */
+/* ------------------------state description----------------------- */
+/* 
 */
+
 import React from 'react'
 import { Link} from 'react-router-dom'
 import { Table, Button, Popconfirm, Modal } from 'antd'
-import Noti from '../noti'
-import AjaxHandler from '../ajax'
-import SearchLine from '../component/searchLine'
-import CONSTANTS from '../component/constants'
+import Noti from '../../noti'
+import AjaxHandler from '../../ajax'
+import SearchLine from '../../component/searchLine'
+import CONSTANTS from '../../component/constants'
 
-import {checkObject} from '../util/checkSame'
+import {checkObject} from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeEmployee } from '../../actions'
-const subModule = 'employeeList'
-
+import { changeEmployee } from '../../../actions'
+const subModule = 'roleList'
 
 const SIZE = CONSTANTS.PAGINATION
 const TYPE = CONSTANTS.ROLE
-const BACKTITLE={
-  fromInfoSet: '返回学校信息设置'
-}
 
-class EmployeeList extends React.Component {
+class RoleTable extends React.Component {
   static propTypes = {
-    selectKey: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
   constructor(props){
@@ -189,22 +184,6 @@ class EmployeeList extends React.Component {
       hintDeleteModal: false
     })
   }
-  pressEnter = () => {
-    let v = this.state.searchingText.trim()
-    this.setState({
-      searchingText: v
-    })
-    let selectKey = this.props.selectKey
-    if (v === selectKey) {
-      return
-    }
-    this.props.changeEmployee(subModule, {page: 1, selectKey: v})
-  }
-  changeSearch = (e) => {
-    this.setState({
-      searchingText: e.target.value
-    })
-  }
   back = (e) => {
     this.props.history.goBack()
   }
@@ -214,12 +193,12 @@ class EmployeeList extends React.Component {
   }
 
   render () {
-    const {dataSource,searchingText, total, loading, hintDeleteModal} = this.state
+    const {dataSource, total, loading, hintDeleteModal} = this.state
     const {page} = this.props
 
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='添加新员工' addLink='/employee/list/add' searchInputText='身份／姓名／手机号' searchingText={searchingText} pressEnter={this.pressEnter} changeSearch={this.changeSearch} />
+        <SearchLine addTitle='添加权限点' addLink='/employee/authen/add'  />
 
         <div className='tableList'>
           <Table 
@@ -232,12 +211,9 @@ class EmployeeList extends React.Component {
             onChange={this.changePage}
           />
         </div>
-        {this.props.location.state ?
           <div className='btnRight'>
-            <Button onClick={this.back}>{BACKTITLE[this.props.location.state.path]}</Button>
+            <Button onClick={this.back}>返回</Button>
           </div>
-          :null
-        }
         <Modal
           title='账户还有余额'
           visible={hintDeleteModal}
@@ -259,10 +235,9 @@ class EmployeeList extends React.Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
-  selectKey: state.changeEmployee[subModule].selectKey,
   page: state.changeEmployee[subModule].page
 })
 
 export default withRouter(connect(mapStateToProps, {
  changeEmployee 
-})(EmployeeList))
+})(RoleTable))
