@@ -43,6 +43,7 @@ class Main extends React.Component {
     ti: null
   }
   componentDidMount () {
+    console.log(this.props.history)
     this.props.setSchoolList({
       schoolSet: false,
       schools: [],

@@ -76,7 +76,7 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                         if (serviceErrorCb) {
                                           serviceErrorCb(json.error)
                                         } else {
-                                          throw new Error(json.error)
+                                          throw json.error
                                         }
                                       } else {
                                         /* successful callback */
