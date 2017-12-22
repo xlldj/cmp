@@ -27,20 +27,14 @@ class AccountInfo extends React.Component{
   fetchData = (body) => {
     let resource='/api/employee/one'
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            this.setState({
-              mobile:json.data.mobile,
-              nickName:json.data.nickName,
-              type:json.data.type
-            })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+      if (json.data) {
+        /*--------redirect --------*/
+        this.setState({
+          mobile:json.data.mobile,
+          nickName:json.data.nickName,
+          type:json.data.type
+        })   
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   }
@@ -97,9 +91,7 @@ class AccountInfo extends React.Component{
       oldPassword: this.state.oldPwd
     }
     const cb = (json) => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
+      if (json.data) {
         Noti.hintOk('密码重置成功', '您可以继续其他操作')
         this.setState({
           visible: false

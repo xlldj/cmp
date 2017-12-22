@@ -1,3 +1,11 @@
+export const SET_AUTHENDATA = 'SET_AUTHENDATA'
+export const setAuthenData = (value) => {
+  return {
+    type: SET_AUTHENDATA,
+    value
+  }
+}
+
 export const SET_SCHOOL_LIST = 'SET_SCHOOL_LIST'
 export const setSchoolList = (value) => {
   return {

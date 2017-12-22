@@ -63,9 +63,7 @@ class DepositInfo extends React.Component {
               })
               this.fetchData(body)
             } 
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }       
         }
     }
     AjaxHandler.ajax(resource,body,cb)    
@@ -139,9 +137,7 @@ class DepositInfo extends React.Component {
                 denominations: denos
               }
             )
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }      
         }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -191,9 +187,7 @@ class DepositInfo extends React.Component {
           newState.denominations = d.items
           this.setState(newState)
           this.fetchDenominations()
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }  
       }
     }
     AjaxHandler.ajax(resource,body,cb)

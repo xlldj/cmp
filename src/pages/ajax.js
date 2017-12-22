@@ -97,6 +97,12 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                           checking: false
                                         })
                                       }
+                                      /* same for loading status clear */
+                                      if (options && options.clearLoading && options.thisObj) {
+                                        options.thisObj.setState({
+                                          loading: false
+                                        })
+                                      }
                                       let title, message
                                       // if timeout 
                                       if (error === 'timeout') {
@@ -162,9 +168,17 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                           }
                                         }
                                       } else { 
-                                        // program bug
-                                        if (!AjaxHandler.showingBug) {
-                                          Noti.hintLock('程序出错', error.displayMessage || '请咨询相关人员！')
+                                        if (error.title) {
+                                          // error myself throwed, need to clear
+                                          Noti.hintLock(error.title, error.message)
+                                        } else if (error.message === 'Failed to fetch') {
+                                          if (!AjaxHandler.showingNetError) {
+                                            Noti.hintNetworkError()
+                                            AjaxHandler.showingNetError = true
+                                            return AjaxHandler.tiForNet()
+                                          }
+                                        } else if (!AjaxHandler.showingBug) {
+                                          Noti.hintLock('程序出错', '请咨询相关人员')
                                           AjaxHandler.showingBug = true
                                           AjaxHandler.tiForBug()
                                         }

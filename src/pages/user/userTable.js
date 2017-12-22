@@ -91,7 +91,6 @@ class UserTable extends React.Component {
           }
         }else{
           this.setState(nextState)
-          throw new Error('网络出错，请稍后重试～')
         }        
       }
       this.setState(nextState)
@@ -179,7 +178,8 @@ class UserTable extends React.Component {
 
     return (
       <div className='contentArea'>
-        <SearchLine searchInputText='手机号/手机型号' selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} searchingText={this.state.searchingText} pressEnter={this.pressEnter} changeSearch={this.changeSearch} />
+        <SearchLine searchInputText='手机号/手机型号' 
+          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} searchingText={this.state.searchingText} pressEnter={this.pressEnter} changeSearch={this.changeSearch} />
 
         <div className='tableList'>     
           <Table 

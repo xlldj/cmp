@@ -6,8 +6,13 @@ import Noti from '../noti'
 import {setToken} from '../util/handleToken'
 import {setStore, getLocal, removeStore} from '../util/storage'
 import {clientDetect} from '../util/clientDetect'
+import {buildAuthenData} from '../util/authenDataHandle'
 import logLogo from '../assets/log_logo.png'
 import './style/style.css'
+
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import {setAuthenData, buildCurrentAuthen, buildReadableAuthen} from '../../actions'
 
 //const Form = asyncComponent(() => import(/* webpackChunkName: "form" */ "antd/lib/form"))
 //const Button = asyncComponent(() => import(/* webpackChunkName: "button" */ "antd/lib/button"))
@@ -98,80 +103,102 @@ class Log extends React.Component{
     /* if (ref === 'pwdBorder') {
       this.refs.pwd.type = 'password'
     } */
-  }  
+  }
   handleSubmit = () => {
-    let {mobile, password, posting} = this.state
-    /* if (!remember) {
-      this.refs.pwd.type = 'text'
-      console.log(this.refs.pwd)
-    } */
-    if (!mobile) {
-      this.setState({
-        mobileError: true,
-        mobileErrorMsg: '手机号不能为空'
-      })
-      this.refs.mobileBorder.classList.add('error')
-      return
-    } else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(mobile)) {
-      this.setState({
-        mobileError: true,
-        mobileErrorMsg: '手机号格式不正确'
-      })
-      this.refs.mobileBorder.classList.add('error')
-      return
-    }
-    if (!password) {
-      this.setState({
-        pwdError: true
-      })
-      this.refs.pwdBorder.classList.add('error')
-      return
-    }
-
-    if (posting) {
-      return
-    }
-    this.setState({
-      posting: true
-    })
-
-    const {brand, model} = clientDetect()
-
-    const resource = '/cmp/login'
-    const body = {
-      mobile: parseInt(mobile, 10),
-      password: password,
-      system: 3, // from cmp
-      brand: brand, // operating system
-      model: model // browser type
-    }
-    const cb = (json) => {
-      this.setState({
-        posting: false
-      })
-      if (json.error) {
-        // throw new Error(json.error.displayMessage||json.error.debugMessage)
-        this.handleLogError(json.error)
-      } else {
-        let {nickName, id, pictureUrl} = json.data.user
-        let user = {
-          name: nickName,
-          id: id,
-          portrait: pictureUrl,
-        }
-        setToken(json.data.token)
-        if (json.data.forbidden) {
-          setStore('forbidden', 1)
-        } else {
-          removeStore('forbidden')
-        }
-        setStore('username', nickName)
-        setStore('userId', id)
-        this.props.login(user)
-        Noti.hintLog()
+    try {
+      let {mobile, password, posting} = this.state
+      /* if (!remember) {
+        this.refs.pwd.type = 'text'
+        console.log(this.refs.pwd)
+      } */
+      if (!mobile) {
+        this.setState({
+          mobileError: true,
+          mobileErrorMsg: '手机号不能为空'
+        })
+        this.refs.mobileBorder.classList.add('error')
+        return
+      } else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(mobile)) {
+        this.setState({
+          mobileError: true,
+          mobileErrorMsg: '手机号格式不正确'
+        })
+        this.refs.mobileBorder.classList.add('error')
+        return
       }
+      if (!password) {
+        this.setState({
+          pwdError: true
+        })
+        this.refs.pwdBorder.classList.add('error')
+        return
+      }
+
+      if (posting) {
+        return
+      }
+      this.setState({
+        posting: true
+      })
+
+      const {brand, model} = clientDetect()
+
+      const resource = '/cmp/login'
+      const body = {
+        mobile: parseInt(mobile, 10),
+        password: password,
+        system: 3, // from cmp
+        brand: brand, // operating system
+        model: model // browser type
+      }
+      const cb = (json) => {
+        this.setState({
+          posting: false
+        })
+        if (json.error) {
+          this.handleLogError(json.error)
+        } else {
+          let {nickName, id, pictureUrl, privileges} = json.data.user
+          let {fullPrivileges} = json.data
+          if (fullPrivileges) {
+            // set full privileges data
+            let status = buildAuthenData(fullPrivileges)
+            this.props.setAuthenData({
+              full: status
+            })
+          }
+          if (privileges) {
+            // set privileges for the current user
+            let currentAuthenStatus = buildCurrentAuthen(privileges)
+            this.props.setAuthenData({
+              current: currentAuthenStatus
+            })
+            let readableAuthenStatus = buildReadableAuthen(privileges)
+            this.props.setAuthenData({
+              readableAuthenStatus: readableAuthenStatus
+            })
+          }
+          let user = {
+            name: nickName,
+            id: id,
+            portrait: pictureUrl,
+          }
+          setToken(json.data.token)
+          if (json.data.forbidden) {
+            setStore('forbidden', 1)
+          } else {
+            removeStore('forbidden')
+          }
+          setStore('username', nickName)
+          setStore('userId', id)
+          this.props.login(user)
+          Noti.hintLog()
+        }
+      }
+      AjaxHandler.ajax(resource,body,cb, this.handleLogError, {clearPosting: true, thisObj: this}) 
+    } catch (e) {
+      Noti.hintProgramError()
     }
-    AjaxHandler.ajax(resource,body,cb, this.handleLogError, {clearPosting: true, thisObj: this})
   }
 
   pressEnter = (e) => {
@@ -278,5 +305,6 @@ class Log extends React.Component{
     )    
   }
 }
-
-export default Log
+export default withRouter(connect(null, {
+  setAuthenData
+})(Log))

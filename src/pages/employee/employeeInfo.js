@@ -1,43 +1,55 @@
 import React from 'react'
 import { Button} from 'antd'
-import Modal from 'antd/lib/modal'
-import Table from 'antd/lib/table'
 import AjaxHandler from '../ajax'
 import Noti from '../noti'
 import CONSTANTS from '../component/constants'
-import BasicSelector from '../component/basicSelectorWithoutAll'
 import {setStore, getStore} from '../util/storage'
-
-const TYPE = CONSTANTS.ROLE
+import {obj2arr} from '../util/types'
+import MultiSelectModal from '../component/multiSelectModal'
+import SchoolMutilSelect from '../component/schoolMultiSelectModal'
+import AuthenDataTable from '../component/authenDataTable'
 
 class EmployeeInfo extends React.Component {
   constructor (props) {
     super(props)
     let id='',mobile='',nickName='',type='0',mobileError=false,nameError=false,nameErrorMessage='',schools=[],showSchools=false,typeError=false
     let mobileErrorMessage = '手机号格式不正确', originalMobile = 0, schoolError = false
-    this.state = {id,mobile,nickName,type,mobileError,mobileErrorMessage, nameError,nameErrorMessage, originalMobile, schools,showSchools, typeError, schoolError}
+    const roles = obj2arr(CONSTANTS.ROLE)
+    const roleData = roles.map((r) => {
+      r.selected = false
+      return r
+    })
+    this.state = {id,mobile,nickName,type,mobileError,mobileErrorMessage, nameError,
+      nameErrorMessage, originalMobile, schools,showSchools, typeError, schoolError,
+      account: '',
+      accountError: false,
+      selectedRoleItems: [],
+      roleError: false,
+      showRoleModal: false,
+      roleData: roleData,
+      allSchools: false,
+      selectedSchools: []
+    }
+    this.roleColumns = [{
+      title: '身份',
+      dataIndex: 'value',
+      width: '75%'
+    }]
   }
   fetchData = (body) => {
     let resource='/api/employee/one'
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            let {id, mobile, type, nickName, schools} = json.data
-            this.setState({
-              id: id,
-              mobile: mobile,
-              type: type,
-              nickName: nickName,
-              schools: schools,
-              originalMobile: mobile
-            })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+      if(json.data){
+        let {id, mobile, type, nickName, schools} = json.data
+        this.setState({
+          id: id,
+          mobile: mobile,
+          type: type,
+          nickName: nickName,
+          schools: schools,
+          originalMobile: mobile
+        })
+      }       
     }
     AjaxHandler.ajax(resource,body,cb)
   } 
@@ -102,9 +114,7 @@ class EmployeeInfo extends React.Component {
             }
           }
           Noti.hintSuccess(this.props.history,'/employee')
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }       
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -192,9 +202,7 @@ class EmployeeInfo extends React.Component {
       const nextState = {
         checking: false
       }
-      if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage)
-      } else {
+      if (json.data) {
         if (json.data.result) {
           nextState.mobileError = true
           nextState.mobileErrorMessage = '该手机号已注册！'
@@ -240,28 +248,31 @@ class EmployeeInfo extends React.Component {
     }
   }
   setSchools = (data) => {
-    let schools = []
-    data.forEach((r,i)=>{
+    let selectedSchools = []
+    let nextState = {
+      showSchools: false
+    }
+    let {dataSource, all} = data
+    nextState.allSchools = all
+    if (all) {
+      return this.setState(nextState)
+    }
+    dataSource.forEach((r,i)=>{
       if(r.selected){
-        schools.push({
+        selectedSchools.push({
           id: r.id,
           name: r.name
         })
       }
     })
-    if (schools.length === 0 && parseInt(this.state.type, 10) === 2) {// 若为维修员，选择了0个学校，报错
-      this.setState({
-        schoolError: true
-      })
-    } else if (this.state.schoolError && schools.length !== 0) {// 若不为0，且当前有维修员无学校报错，清空报错
-      this.setState({
-        schoolError: false
-      })
+    nextState.selectedSchools = selectedSchools
+    if (selectedSchools.length === 0) {// 选择了0个学校，报错
+      nextState.schoolError = true
+    } else if (this.state.schoolError) {// 清空报错
+      nextState.schoolError = false
     }
-    this.setState({
-      showSchools: false,
-      schools: schools
-    })
+
+    this.setState(nextState)
   }
   showSchools = (e) => {
     e.preventDefault()
@@ -274,53 +285,89 @@ class EmployeeInfo extends React.Component {
       showSchools: false
     })
   }
+  buildAccount = () => {
+    // get an account
+  }
+  showRoleModal = (e) => {
+    e.preventDefault()
+    this.setState({
+      showRoleModal: true
+    })
+  }
+  setRoleItems = (data) => {
+    let roleData = JSON.parse(JSON.stringify(data))
+    this.setState({
+      roleData: roleData,
+      showRoleModal: false
+    })
+  }
+  closeRoleSelect = () => {
+    this.setState({
+      showRoleModal: false
+    })
+  }
+
   render () {
-    const {id, schools, showSchools, type,nickName,nameError,nameErrorMessage, typeError, mobileError, mobileErrorMessage, schoolError} = this.state
-    const selectedSchoolItems = schools&&schools.map((r,i)=>(
+    const {id, 
+      account, accountError,
+      nickName,nameError,nameErrorMessage,
+      mobile, mobileError, mobileErrorMessage,
+      roleError, showRoleModal, roleData,
+      showSchools, schoolError, selectedSchools,
+      allSchools
+    } = this.state
+    const selectedSchoolItems = selectedSchools && selectedSchools.map((r,i)=>(
       <span key={i}>{r.name}</span>
     ))
+    const selectedRoleItems = roleData && roleData.map((r, i) => {
+      return (<span key={i}>{r.selected ? r.value : ''}</span>)
+    })
 
     return (
-      <div className='infoList userInfo'>
+      <div className='infoList employeeInfo'>
         <ul>
           <li>
-            <p>员工手机号:</p>
-            <input 
-              disabled={id}
-              className={id ? 'disabled' : ''} onChange={this.changeMobile} onBlur={this.checkMobile} value={this.state.mobile} />
-            { mobileError ? <span className='checkInvalid'>{mobileErrorMessage}</span> : null }
+            <p>员工账号:</p>
+            {id ? null : <Button onClick={this.buildAccount} type='primary' >生成</Button>}
+            <span>{account}</span>
+            {accountError ? <span className='checkInvalid'>请先生成账号!</span> : null}
           </li>
           <li>
             <p>员工姓名:</p>
             <input className='value' onChange={this.changeName} onBlur={this.checkName} value={nickName} />
             { nameError ? <span className='checkInvalid'>{nameErrorMessage}</span> : null }
-          </li>   
+          </li>
+          <li>
+            <p>员工手机号:</p>
+            <input 
+              disabled={id}
+              className={id ? 'disabled' : ''} 
+              onChange={this.changeMobile} 
+              onBlur={this.checkMobile} 
+              value={mobile} 
+            />
+            { mobileError ? <span className='checkInvalid'>{mobileErrorMessage}</span> : null }
+          </li>
           <li>
             <p>员工身份:</p>
-            <BasicSelector
-              width={CONSTANTS.SELECTWIDTH}
-              selectedOpt={type}
-              changeOpt ={this.changeType}
-              checkOpt ={this.checkType}
-              staticOpts={TYPE}
-              invalidTitle='选择角色'
-            />
-            { typeError ? <span className='checkInvalid'>请选择身份！</span> : null }
+            <a className='mgr10' onClick={this.showRoleModal} href='' >点击选择</a>
+            <span className='value'>{selectedRoleItems}</span>
+            {roleError ? <span className='checkInvalid' >请为选择最少一个角色！</span> : null}
           </li>
-          {type.toString()==='2'&&(
-            <li>
-              <p>维修员管理的学校:</p>
-              <a className='value' onClick={this.showSchools} href='' >点击选择</a>
-            </li>
-          )}
-          {type.toString()==='2'&&(  
-            <li>
-              <p >已选择的学校:</p>
-              <span className='value'>{selectedSchoolItems}</span>
-              {schoolError ? <span className='checkInvalid' >请为维修员选择最少一个学校！</span> : null}
-            </li>
-          )}
+          <li>
+            <p>指定学校:</p>
+            <a className='mgr10' onClick={this.showSchools} href='' >点击选择</a>
+            <span className='value'>{allSchools ? '全部学校' : selectedSchoolItems}</span>
+            {schoolError ? <span className='checkInvalid' >请为选择最少一个学校！</span> : null}
+          </li>
+          <li className='itemsWrapper'>
+            <AuthenDataTable
+              clickable={false}
+              authenStatus={CONSTANTS.authenData}
+            />
+          </li>
         </ul>
+
         <div className='btnArea'>*登录账号为员工手机号，初始密码为"Xl"+手机号</div>
         <div className='btnArea'>
           <Button type='primary' onClick={this.confirm}>确认</Button>
@@ -328,157 +375,25 @@ class EmployeeInfo extends React.Component {
         </div>
         <div style={{clear:'both'}}></div>
 
+        <MultiSelectModal 
+          closeModal={this.closeRoleSelect} 
+          confirm={this.setRoleItems} 
+          show={showRoleModal} 
+          dataSource={roleData} 
+          columns={this.roleColumns} 
+        />
+
         <div>
-          <RepairmanTable closeModal={this.closeModal} setSchools={this.setSchools} showModal={showSchools} schools={JSON.parse(JSON.stringify(schools))} />
+          <SchoolMutilSelect 
+            all={allSchools} 
+            closeModal={this.closeModal} 
+            setSchools={this.setSchools} 
+            showModal={showSchools} 
+            selectedSchools={JSON.parse(JSON.stringify(selectedSchools))} 
+          />
         </div>
 
       </div>
-    )
-  }
-}
-
-class RepairmanTable extends React.Component{
-  constructor(props){
-    super(props)
-    let dataSource = [],searchingText = ''
-    this.state = {
-      dataSource,
-      searchingText
-    }
-  }
-  fetchSchools = (body) => {
-    let resource='/school/list'
-    const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            let schoolLists = json.data.schools, schools = this.props.schools
-            schools.forEach((r,i)=>{
-              let s = schoolLists.find((e,ind)=>(e.id === r.id))
-              s.selected = true
-            })
-            schoolLists.forEach((r,i)=>{
-              if(!r.selected){
-                r.selected = false
-              }
-            })
-            this.setState({
-              dataSource: schoolLists
-            })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
-    }
-    AjaxHandler.ajax(resource,body,cb)
-  }
-  componentDidMount(){
-    const body={
-      page: 1,
-      size: 100
-    }
-    this.fetchSchools(body)
-  }
-  componentWillReceiveProps (nextProps) {
-    let nextSchools = nextProps.schools
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
-    dataSource.forEach((r) => (r.selected = false))
-    nextSchools.forEach((r) => {
-      let s = dataSource.find((school) => (school.id === r.id))
-      if (s) {
-        s.selected = true
-      }
-    })
-    this.setState({
-      dataSource: dataSource
-    })
-  }
-  confirm = () => {
-    this.props.setSchools(JSON.parse(JSON.stringify(this.state.dataSource)))
-  }
-  cancel = () => {
-    //clear all the data
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
-    dataSource.forEach((r) => (r.selected = false))
-    this.setState({
-      dataSource: dataSource
-    })
-    this.props.closeModal()
-  }
-  changeSelect = (e,i) => {
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
-    dataSource[i].selected = !dataSource[i].selected
-    this.setState({
-      dataSource: dataSource
-    })
-  }
-  searchKey = (e) => {
-    if(e.key.toLowerCase() === 'enter'){
-      this.handleSearch()
-    }
-  }
-  changeSearch = (e) => {
-    this.setState({
-      searchingText: e.target.value.trim()
-    })
-  }
-  handleSearch = () => {
-    const body = {
-      page: 1,
-      size: 80000,
-      namePrefix: this.state.searchingText
-    }
-    this.fetchSchools(body)
-  }
-  resetSearch = () => {
-    this.setState({
-      searchingText: ''
-    })
-    const body = {
-      page: 1,
-      size: 80000
-    }
-    this.fetchSchools(body)
-  }
-  selectRow = (record, index, event) => {
-    this.changeSelect(null, index)
-  }
-  render(){
-    const {dataSource} = this.state
-
-    const columns = [{
-      title: (<p >学校名称</p>),
-      dataIndex: 'name'
-    }, {
-      title: (<p style={{textAlign:'center'}}>操作</p>),
-      dataIndex: 'operation',
-      width: '100',
-      className: 'center',
-      render: (text, record, index) => (
-        <input type='checkbox' checked={record.selected} onChange={(e)=>{this.changeSelect(e,index)}} />
-      )
-    }]
-
-    const schools = dataSource&&dataSource.filter((r,i)=>(r.selected === true))
-
-    const selectedSchoolItems = schools&&schools.map((r,i)=>(
-      <span className='seperateItem' key={i} >{r.name}/</span>
-    ))
-
-    return (
-      <Modal wrapClassName='modal' width={800} title='' visible={this.props.showModal} onCancel={this.cancel} onOk={this.confirm} okText='' footer={null}>
-        <div className='giftStatus searchLine maintainerSchSel'>
-          <input placeholder="搜索学校" className='searchInput' value={this.state.searchingText} onKeyDown={this.searchKey} onChange={this.changeSearch} />
-          <Button className='rightConfirm' type='primary' onClick={this.confirm} >确定</Button>
-        </div>
-        <div className='depositGiftTable'>
-          <p style={{marginBottom:'10px'}}>当前已选择的学校:{selectedSchoolItems}</p>
-          <Table rowKey={record=>record.id}  pagination={false} dataSource={dataSource} columns={columns} onRowClick={this.selectRow} />
-        </div>
-        
-      </Modal>
     )
   }
 }

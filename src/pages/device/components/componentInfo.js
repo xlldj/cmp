@@ -28,9 +28,7 @@ class ComponentInfo extends React.Component {
       id: id
     }
     const cb=(json)=>{
-      if(json.error){
-        throw new Error(json.error.displayMessage || json.error.message || json.error)
-      }else{
+      if (json.data) {
         this.setState({
           id: json.data.id,
           model: json.data.model,
@@ -50,9 +48,7 @@ class ComponentInfo extends React.Component {
       deviceType: deviceType
     }
     const cb=(json)=>{
-      if(json.error){
-        throw new Error(json.error.displayMessage || json.error.message || json.error)
-      }else{
+      if(json.data) {
         let componentTypes = {}
         json.data.componentTypes.forEach((r, i)=>{
           componentTypes[r.id] = r.description
@@ -127,15 +123,13 @@ class ComponentInfo extends React.Component {
       resource = '/api/device/component/add'
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
+      if (json.data) {
+        if(json.data){
+          Noti.hintSuccess(this.props.history,'/device/components')
         }else{
-          if(json.data){
-            Noti.hintSuccess(this.props.history,'/device/components')
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+          throw new Error('网络出错，请稍后重试～')
+        }        
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   }

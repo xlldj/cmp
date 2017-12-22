@@ -33,26 +33,20 @@ class SchoolSelector extends React.Component{
       size: 100
     }
     const cb = (json) => {
-      if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
-      }else{
+      if (json.data) {
         /*--------redirect --------*/
-        if(json.data){
-          let recentSchools = getLocal('recentSchools'), recent = []
+        let recentSchools = getLocal('recentSchools'), recent = []
 
-          if (recentSchools) {
-            let localRecentArray = recentSchools.split(',')
-            localRecentArray.forEach((r) => {
-              let index = json.data.schools.findIndex((s) => (s.id === parseInt(r, 10)))
-              if (index !== -1) {
-                recent.push(json.data.schools[index])
-              }
-            })
-          } 
-          this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        if (recentSchools) {
+          let localRecentArray = recentSchools.split(',')
+          localRecentArray.forEach((r) => {
+            let index = json.data.schools.findIndex((s) => (s.id === parseInt(r, 10)))
+            if (index !== -1) {
+              recent.push(json.data.schools[index])
+            }
+          })
+        } 
+        this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
       }
     }
     AjaxHandler.ajax(resource,body,cb)

@@ -68,8 +68,6 @@ class GiftInfo extends React.Component {
               nextState.originalTL = json.data.timeLimit
             }
             this.setState(nextState)
-          }else{
-            throw new Error('网络出错，请稍后重试～')
           }        
         }
     }

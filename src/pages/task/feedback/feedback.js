@@ -109,8 +109,6 @@ class Feedback extends React.Component {
           if (body.page === 1) {
             nextState.page = 1
           }
-        }else{
-          throw new Error('网络出错，请稍后重试～')
         }
       }
       this.setState(nextState)

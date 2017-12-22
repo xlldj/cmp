@@ -18,9 +18,11 @@ const breadcrumbNameMap = {
   '/list/add': '添加员工',
   '/list/detail': '详情',
   '/authen': '权限设置',
+  '/authen/add': '添加权限',
   '/authen/list': '权限列表',
   '/authen/detail': '详情',
   '/role': '身份设置',
+  '/role/add': '添加身份',
   '/role/list': '身份列表',
   '/role/detail': '详情'
 }

@@ -42,9 +42,7 @@ class AbnormalInfo extends React.Component {
             this.setState({
               data: json.data
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }     
         }
     }
     AjaxHandler.ajax(resource,body,cb)

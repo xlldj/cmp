@@ -79,9 +79,7 @@ class RateInfo extends React.Component {
             nextState.closeTapGroups = taps
           }
           this.setState(nextState)
-        }else{
-          throw new Error('网络出错，获取供应商列表失败，请稍后重试～')
-        }        
+        }     
       }
     }
     AjaxHandler.ajax(resource,body,cb)

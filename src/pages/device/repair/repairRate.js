@@ -68,9 +68,7 @@ class RepairRate extends React.Component {
         if(json.data){
           nextState.dataSource = json.data.repairRatings
           nextState.total = json.data.total
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }       
       }
       this.setState(nextState)
     }

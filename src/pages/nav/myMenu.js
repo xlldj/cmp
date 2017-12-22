@@ -3,24 +3,58 @@ import {Link} from 'react-router-dom'
 import {Icon} from 'antd'
 import './style/index.css'
 import CONSTANTS from '../component/constants'
-import {getStore, setLocal, getLocal} from '../util/storage'
+import {setLocal, getLocal} from '../util/storage'
 import Time from '../component/time'
 
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat } from '../../actions'
+import { changeSchool, changeDevice, changeOrder,
+  changeFund, changeGift, changeLost, changeUser, 
+  changeTask, changeEmployee, changeNotify, 
+  changeVersion, changeStat, setAuthenData } from '../../actions'
 import { withRouter } from 'react-router-dom'
 
 // const this.rootBlock = CONSTANTS.this.rootBlock
 
 class MyMenu extends React.Component {
+  static propTypes = {
+    schools: PropTypes.array.isRequired,
+    schoolSet: PropTypes.bool.isRequired,
+    recent: PropTypes.array.isRequired,
+    full: PropTypes.array.isRequired,
+    current: PropTypes.array.isRequired
+  }
   constructor (props) {
     super(props)
-    let forbidden = getStore('forbidden')
-    if (forbidden) {
-      this.rootBlock = CONSTANTS.forbiddenRootBlock
-    } else {
-      this.rootBlock = CONSTANTS.rootBlock
-    }
+    // let forbidden = getStore('forbidden')
+    let {current} = this.props
+    // get the main nav, COUSTANTS.rootBlock is the full nav
+    let rootBlock = CONSTANTS.rootBlock.filter((r) => {
+      let found = current.find(rec => rec.name === r.name)
+      if (found) {
+        return true
+      } else {
+        return false
+      }
+    })
+    // get the sub nav
+    rootBlock.forEach((r) => {
+      let subBlock = []
+      let root = current.find(rec => rec.name === r.name)
+      // should always exist
+      if (root && root.children) {
+      subBlock = r.children.filter((sub) => {
+          let found = root.children.find(rs => rs.name === sub.name)
+          if (found) {
+            return true
+          } else {
+            return false
+          }
+        })
+      }
+      r.children = subBlock
+    })
+    this.rootBlock = rootBlock
     this.state = {
       current: '',
       openKeys: [],
@@ -39,6 +73,11 @@ class MyMenu extends React.Component {
   componentDidUpdate () {
     let pathname = window.location.pathname
     if (pathname !== this.state.pathname) {
+      console.log(pathname)
+      console.log(this.state.pathname)
+      if (pathname.includes('infoSet')) {
+        alert('update')
+      }
       this.changeMenu()
     }
   }
@@ -362,10 +401,13 @@ const mapStateToProps = (state, ownProps) => {
   return {
     schools: state.setSchoolList.schools,
     schoolSet: state.setSchoolList.schoolSet,
-    recent: state.setSchoolList.recent
+    recent: state.setSchoolList.recent,
+    full: state.setAuthenData.full,
+    current: state.setAuthenData.current
   }
 }
 export default withRouter(connect(mapStateToProps, {
   changeSchool, changeDevice, changeOrder, changeFund, changeGift, 
-  changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat
+  changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat,
+  setAuthenData
 })(MyMenu))

@@ -3,6 +3,7 @@
 @blue: #ebf4fd;
 @liHeight: 45px;
 @labelWidth: 130px;
+@border: #aaa;
 .fi(@alignItems: center; @justifyContent: flex-start){
   display: inline-flex;
   flex: none;
@@ -306,6 +307,9 @@ button.grayBackColor:linked{
 .center{
   text-align: center;
 }
+.rightAlign{
+  text-align: right;
+}
 
 /* for choose gift popup. both used in deposit-activity and other */
 .giftStatus{
@@ -319,6 +323,18 @@ button.grayBackColor:linked{
       width: 20px;
       margin:10px;
     }
+  }
+}
+
+/* for multi selector modal */
+.multiSelectModalHeader{
+  display: inline-flex;
+  justify-content: space-between;
+  margin: 30px 10px 0px 40px;
+  width: 89%;
+  .hint{
+    line-height: 40px;
+    
   }
 }
 
@@ -694,6 +710,7 @@ button.grayBackColor:linked{
 }
 .seperateItem{
   margin-right: 5px;
+  margin-left: 5px;
 }
 
 /* for number show in orderTable and fundTable */
@@ -744,6 +761,59 @@ button.grayBackColor:linked{
 /* for custom select */
 .customSelect{
   width: 110px;
+}
+
+/* for authen data table */
+.roleTable{
+	box-sizing: border-box;
+	div, .levelHeader, .levelContent, .levelChildrenWrapper{
+		box-sizing: border-box;
+	}
+	.levelContent{
+		display: flex;
+		align-items: center;
+		height: 100%;
+	  text-align: center;
+	}
+	.levelHeader{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 120px;
+		height: 100%;
+		border: 1px solid @border;
+		border-bottom: none;
+	}
+	.level2Header, .level3Header, .level4Header{
+		border-left: none;
+	}
+	.levelHeader:last-child, .level2Header:last-child, .level1ChildrenWrapper, .level1Header{
+		border-bottom: 1px solid @border;
+	}
+	.levelChildrenWrapper{
+		display: block;
+	}
+	.level4Header{
+		text-align: left;
+		padding-left: 10px;
+		width: 240px;
+		height: 40px;
+		
+	}
+	.selectBox{
+		width: 100px;
+		height: 40px;
+		border: 1px solid @border;
+		border-left: none;
+		border-bottom: none;
+	}
+  .selected{
+    background-color: #eee;
+  }
+  .editBox{
+
+    line-height: 40px;
+  }
 }
 
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set */
@@ -1068,6 +1138,9 @@ button.grayBackColor:linked{
 }
 .mgl10{
   margin-left: 10px;
+}
+.mgr10{
+  margin-right: 10px;
 }
 
 @media screen and (min-width: 1440px) {

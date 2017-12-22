@@ -135,7 +135,6 @@ class FundTable extends React.Component {
           nextState.totalWithdraw = json.data.totalWithdraw ? json.data.totalWithdraw : 0
         }else{
           this.setState(nextState)
-          throw new Error('网络出错，请稍后重试～')
         }        
       }
       this.setState(nextState)

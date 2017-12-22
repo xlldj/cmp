@@ -1,1 +1,15 @@
-.infoList>ul>li>p{width:140px!important}.maintainerSchSel{width:89%;margin-bottom:10px}
+.infoList > ul > li > p {
+  width: 140px !important;
+}
+.maintainerSchSel {
+  width: 89%;
+  margin-bottom: 10px;
+}
+.roleTable {
+  width: 100%;
+  margin-left: 60px;
+}
+.authenTable .roleTable {
+  margin-left: 0;
+  width: 85%;
+}

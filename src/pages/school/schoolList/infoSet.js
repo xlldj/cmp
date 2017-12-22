@@ -113,8 +113,6 @@ class InfoSet extends React.Component{
             nextState.finished = finished
             nextState.status = status
             this.setState(nextState)
-          }else{
-            throw new Error('网络出错，请稍后重试～')
           }        
         }
     }

@@ -42,9 +42,7 @@ class VersionInfo extends React.Component {
         if (json.data) {
           this.setState(json.data)
           this.setState({originalVersion: json.data.versionNo})
-        } else {
-          throw new Error('网络出错，获取数据失败，请稍后重试～')
-        }        
+        }     
       }
     }
     AjaxHandler.ajax(resource,body,cb)

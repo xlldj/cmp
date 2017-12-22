@@ -35,9 +35,7 @@ class DeviceInfo extends React.Component {
         this.setState({
           repairs: json.data.repairDevices
         })
-      } else {
-        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
-      } 
+      }
     }
     AjaxHandler.ajax(resource, body, cb)
   }

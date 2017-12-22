@@ -10,6 +10,7 @@ import Noti from '../noti'
 import AjaxHandler from '../ajax'
 import SearchLine from '../component/searchLine'
 import CONSTANTS from '../component/constants'
+import SchoolSelector from '../component/schoolSelector'
 
 import {checkObject} from '../util/checkSame'
 
@@ -29,7 +30,8 @@ const BACKTITLE={
 class EmployeeList extends React.Component {
   static propTypes = {
     selectKey: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    schoolId: PropTypes.string.isRequired
   }
   constructor(props){
     super(props)
@@ -44,19 +46,54 @@ class EmployeeList extends React.Component {
     this.columns = [{
       title: '手机号',
       dataIndex: 'mobile',
-      width: '25%',
+      width: '20%',
       className: 'firstCol'
+    }, {
+      title: '学校',
+      dataIndex: 'schools',
+      width: '30%',
+      render: (text, record) => {
+        try {
+          if (record.schoolLimit) {
+            return '全部学校'
+          } else {
+            let schools = record.schools
+            let result = schools && schools.map((r, i) => {
+              if (i === schools.length - 1) {
+                return r.name
+              } else {
+                return  r.name + ','
+              }
+            })
+            return result
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      }
     }, {
       title: '姓名',
       dataIndex: 'nickName',
-      width: '25%'
+      width: '14%'
     }, {
       title: '身份',
-      dataIndex: 'type',
-      width: '25%',
-      render: (text,record,index) => (
-        TYPE[record.type]
-      )
+      dataIndex: 'types',
+      width: '22%',
+      render: (text, record) => {
+        try {
+          let types = record.types
+          let result = types && types.map((r, i) => {
+            if (i === types.length - 1) {
+              return TYPE[r]
+            } else {
+              return TYPE[r]
+            }
+          })
+          return result
+        } catch (e) {
+          console.log(e)
+        }
+      }
     }, {
       title: '操作',
       dataIndex: 'operation',
@@ -79,16 +116,9 @@ class EmployeeList extends React.Component {
     let resource='/api/employee/list'
     const cb = (json) => {
       let nextState = {loading: false}
-      if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
-      }else{
-        if(json.data){
-          nextState.dataSource =  json.data.users
-          nextState.total = json.data.total
-        }else{
-          this.setState(nextState)
-          throw new Error('网络出错，请稍后重试～')
-        }      
+      if (json.data) {
+        nextState.dataSource =  json.data.users
+        nextState.total = json.data.total
       }
       this.setState(nextState)  
     }
@@ -101,13 +131,16 @@ class EmployeeList extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    let {page, selectKey} = this.props
+    let {page, selectKey, schoolId} = this.props
     const body = {
       page: page,
       size: SIZE
     }
     if (selectKey) {
       body.selectKey = selectKey
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
     this.setState({
@@ -118,16 +151,19 @@ class EmployeeList extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    if (checkObject(this.props, nextProps, ['page', 'selectKey'])) {
+    if (checkObject(this.props, nextProps, ['page', 'selectKey', 'schoolId'])) {
       return
     }
-    let {page, selectKey} = nextProps
+    let {page, selectKey, schoolId} = nextProps
     const body = {
       page: page,
       size: SIZE
     }
     if (selectKey) {
       body.selectKey = selectKey
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
     this.setState({
@@ -212,14 +248,29 @@ class EmployeeList extends React.Component {
     let page = pageObj.current
     this.props.changeEmployee(subModule, {page: page})
   }
+  changeSchool = (value) => {
+    let {schoolId} = this.props
+    if (schoolId === value) {
+      return
+    }
+    this.props.changeEmployee(subModule, {page: 1, schoolId: value})
+  }
 
   render () {
     const {dataSource,searchingText, total, loading, hintDeleteModal} = this.state
-    const {page} = this.props
+    const {page, schoolId} = this.props
 
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='添加新员工' addLink='/employee/list/add' searchInputText='身份／姓名／手机号' searchingText={searchingText} pressEnter={this.pressEnter} changeSearch={this.changeSearch} />
+        <SearchLine 
+          addTitle='添加新员工' 
+          addLink='/employee/list/add' 
+          searchInputText='身份／姓名／手机号' 
+          searchingText={searchingText} 
+          pressEnter={this.pressEnter} 
+          changeSearch={this.changeSearch} 
+          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />}
+        />
 
         <div className='tableList'>
           <Table 
@@ -256,11 +307,10 @@ class EmployeeList extends React.Component {
   }
 }
 
-
-
 const mapStateToProps = (state, ownProps) => ({
   selectKey: state.changeEmployee[subModule].selectKey,
-  page: state.changeEmployee[subModule].page
+  page: state.changeEmployee[subModule].page,
+  schoolId: state.changeEmployee[subModule].schoolId
 })
 
 export default withRouter(connect(mapStateToProps, {

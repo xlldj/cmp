@@ -39,12 +39,7 @@ class PriceInfo extends React.Component {
           this.setState({
             originalSchool: json.data.schoolId
           })
-        }else{
-          throw {
-            title: '请求出错',
-            message: '网络出错，请稍后重试～'
-          }
-        }        
+        }       
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -92,12 +87,7 @@ class PriceInfo extends React.Component {
         /*--------redirect --------*/
         if(json.data){
           Noti.hintSuccess(this.props.history,'/device/price')
-        }else{
-          throw {
-            title: '请求出错',
-            message: '网络出错，请稍后重试～'
-          }
-        }        
+        }       
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -143,11 +133,7 @@ class PriceInfo extends React.Component {
         }
       } else {
         if (json.data.result) {
-          // Noti.hintLock('添加出错', '当前设备已有单价选项，请勿重复添加')
-          throw {
-            title: '添加出错',
-            message: '当前设备已有单价选项，请勿重复添加'
-          }
+          Noti.hintLock('添加出错', '当前设备已有单价选项，请勿重复添加')
         } else {
           if (callback) {
             callback()

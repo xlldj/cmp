@@ -260,8 +260,6 @@ class RankPanel extends Component {
             })
           }
           this.props.setSchoolList({schoolSet: true, recent: recent, schools: json.data.schools})
-        }else{
-          throw new Error('网络出错，请稍后重试～')
         }        
       }
     }

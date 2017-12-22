@@ -469,6 +469,120 @@ const CONSTANTS = {
       key: 9,
       icon: 'line-chart'
     }
+  ],
+  AuthenOpeType: {
+    1: '查看',
+    2: '操作'
+  },
+  ROOTNAME2URL: {
+    '学校管理': 'school',
+    '设备管理': 'device',
+    '订单管理': 'order',
+    '充值提现': 'fund',
+    '红包管理': 'gift',
+    '失物招领': 'lost',
+    '用户管理': 'user',
+    '客服工单': 'task',
+    '员工管理': 'employee',
+    '统计分析': 'stat',
+    '公告管理': 'notify',
+    '版本更新': 'version'
+  },
+  
+  authenData: [
+    {
+      name: '学校管理',
+      key: '1',
+      level: 1,
+      selected: false,
+      count: 7,
+      children: [
+        {
+          name: '学校列表',
+          key: '1-1',
+          level: 2,
+          selected: false,
+          count: 6,
+          children: [
+            {
+              name: '查看',
+              key: '1-1-1',
+              level: 3,
+              selected: false,
+              count: 2,
+              children: [
+                {
+                  name: '学校列表/搜索/查询',
+                  key: '1-1-1-1',
+                  level: 4,
+                  selected: false
+                },
+                {
+                  name: '楼栋查看',
+                  key: '1-1-1-2',
+                  level: 4,
+                  selected: false 
+                }
+              ]
+            },
+            {
+              name: '操作',
+              key: '1-1-2',
+              level: 3,
+              selected: false,
+              count: 4,
+              children: [
+                {
+                  name: '添加/编辑学校信息',
+                  key: '1-1-2-1',
+                  level: 4
+                },
+                {
+                  name: '楼栋编辑',
+                  key: '1-1-2-2',
+                  level: 4,
+                  selected: false
+                },
+                {
+                  name: '功能入口管理',
+                  key: '1-1-2-3',
+                  level: 4,
+                  selected: false
+                },
+                {
+                  name: '禁用学校',
+                  key: '1-1-2-4',
+                  level: 4,
+                  selected: false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: '信息总览',
+          key: '1-2',
+          level: 2,
+          selected: false,
+          children: [
+            {
+              name: '查看',
+              key: '1-2-1',
+              level: 3,
+              selected: false,
+              children: [
+                {
+                  name: '信息总览列表/搜索/查询',
+                  key: '1-2-1-1',
+                  level: 4,
+                  selected: false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
   ]
 }
 

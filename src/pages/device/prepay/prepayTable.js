@@ -78,9 +78,6 @@ class PrepayTable extends React.Component {
           let data = JSON.parse(JSON.stringify(json.data.options))
           nextState.dataSource = data
           nextState.total = json.data.total
-        }else{
-          this.setState(nextState)
-          throw new Error('网络出错，请稍后重试～')
         }
       }
       this.setState(nextState)

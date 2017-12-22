@@ -68,9 +68,7 @@ class NotifyInfo extends React.Component {
             nextState.mobiles = mobiles
           }
           this.setState(nextState)
-        }else{
-          throw new Error('网络出错，获取数据失败，请稍后重试～')
-        }        
+        }       
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -566,7 +564,7 @@ class NotifyInfo extends React.Component {
 
 
           {type ? contentInput : null}
-          {type === '1' ? endItem : null }
+          {type === '1' || type === '2' ? endItem : null }
           {type === '3' ? mobileItem : null }
 
         </ul>
@@ -619,9 +617,7 @@ class SchoolMultiSelector extends React.Component{
             this.setState({
               dataSource: schoolLists
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }       
         }
     }
     AjaxHandler.ajax(resource,body,cb)

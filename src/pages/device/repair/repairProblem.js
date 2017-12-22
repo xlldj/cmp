@@ -83,9 +83,7 @@ class RepairProblem extends React.Component {
           })
           nextState.dataSource = data
           nextState.total = json.data.total
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }       
       }
       this.setState(nextState)
     }
@@ -176,9 +174,7 @@ class RepairProblem extends React.Component {
             }
             this.fetchData(body)
           }
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }     
       }
     }
     AjaxHandler.ajax(resource,body,cb)

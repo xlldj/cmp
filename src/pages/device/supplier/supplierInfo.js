@@ -39,9 +39,7 @@ class SupplierInfo extends React.Component {
             nextState.version = version
           }
           this.setState(nextState)
-        }else{
-          throw new Error('网络出错，获取数据失败，请稍后重试～')
-        }        
+        }      
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -88,10 +86,7 @@ class SupplierInfo extends React.Component {
       }else{
         /*--------redirect --------*/
         if(json.data){
-          // throw new Error('test')
           Noti.hintSuccess(this.props.history,'/device/suppliers')
-        }else{
-          throw new Error('网络出错，请稍后重试～')
         }
       }
     }
