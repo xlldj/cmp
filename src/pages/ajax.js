@@ -200,9 +200,6 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
   // 默认使用管理端账户，除非用domain字段传入
   // debugger
   let url 
-  // = (domain ? domain : 'http://116.62.236.67:5080') + resource
-  // const url = (domain ? domain : 'http://10.0.0.4:5080') + resource
-  // const url = (domain ? domain : 'https://api.xiaolian365.com/m') + resource
   if (options && options.domain) {
     url = options.domain + resource
   } else {

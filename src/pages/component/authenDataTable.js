@@ -70,14 +70,15 @@ export default class AuthenDataTable extends React.Component{
     }
     this.props.setStatus(authenStatus)
   }
-  delete = (e, key) => {
+  delete = (e, id) => {
     e.preventDefault()
     if (this.props.delete) {
-      this.props.delete(key)
+      this.props.delete(id)
     }
   }
   render(){
     const {authenStatus, edit} = this.props
+    console.log(authenStatus)
 
     const authenPanel = authenStatus && authenStatus.map((r, i) => {
       let level2 = r.children && r.children.map((rec, ind) => {
@@ -99,7 +100,7 @@ export default class AuthenDataTable extends React.Component{
                     (<span className='editBox'>
                       <Link to={`/employee/authen/detail/:${item.id}`}>编辑</Link>
                       <span className='ant-divider' />
-                      <a href='' onClick={(e) => {this.delete(e, item.key)}}>删除</a>
+                      <a href='' onClick={(e) => {this.delete(e, item.id)}}>删除</a>
                     </span>)
                     : 
                     (item.selected ? '√' : '')

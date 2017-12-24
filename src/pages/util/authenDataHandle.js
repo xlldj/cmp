@@ -1,12 +1,13 @@
 import Noti from '../noti'
 import CONSTANTS from '../component/constants'
-const rootName2Url = CONSTANTS.ROOTNAME2URL
-const SUBNAME2URL = CONSTANTS.SUBNAME2URL
-const OPETYPES = CONSTANTS.OPETYPES
+const privilege2Url = CONSTANTS.PRIVILEGE2URL
+const OPETYPES = CONSTANTS.AuthenOpeType
 
 export function buildAuthenData (data, selected) {
   /* count: count of authentication items, for style */
-  /*   key: to facilitate the handle of click event in ahthen table */  
+  /*   key: to facilitate the handle of click event in ahthen table */
+  console.log(data)
+  // debugger
   if (!data) {
     return
   }
@@ -22,50 +23,108 @@ export function buildAuthenData (data, selected) {
         // current main block has the sub
         subBlock.count++
         let operBlock = subBlock.children && subBlock.children.find(o => o.opeType === oper)
+        // debugger
         if (operBlock) {
           // current sub has the operation block
           operBlock.count++
-          operBlock.push({
+          operBlock.children.push({
             name: r.desc,
             id: authenId,
             key: operBlock.key + (operBlock.length + 1),
             level: 4,
-            selected: selected ? selected : false
+            selected: selected || false
           })
         } else {
           // push a operation block into sub
+          let sl = subBlock.children.length + 1
           subBlock.children.push({
             name: OPETYPES[oper],
             opeType: oper,
-            key: subBlock.key + (subBlock.children.length + 1),
+            key: subBlock.key + '-' + sl,
             level: 3,
-            selected: selected ? selected : false,
+            selected: selected || false,
             count: 1,
-            children: []
+            children: [
+              {
+                name: r.desc,
+                id: authenId,
+                key: subBlock.key + '-' + sl + '-1',
+                level: 4,
+                selected: selected || false
+              }
+            ]
           })
         }
       } else {
         // push a sub into main
-        mainBlock.push({
+        let ml = mainBlock.children.length + 1
+        mainBlock.children.push({
           name: r.subName,
           id: subId,
-          key: mainBlock.key + '-' + (mainBlock.children.length + 1),
+          key: mainBlock.key + '-' + ml,
           level: 2,
-          selected: selected ? selected : false,
+          selected: selected || false,
           count: 1,
-          children: []
+          children: [
+            {
+              name: OPETYPES[oper],
+              opeType: oper,
+              key: mainBlock.key + '-' + ml + '-1',
+              level: 3,
+              selected: selected || false,
+              count: 1,
+              children: [
+                {
+                  name: r.desc,
+                  id: authenId,
+                  key: mainBlock.key + '-' + ml + '-1-1',
+                  level: 4,
+                  selected: selected || false
+                }
+              ]
+            }
+          ]
         })
       }
     } else {
       // push a main into status
+      let l = status.length + 1
       status.push({
         name: r.mainName,
         id: mainId,
-        key: (i + 1).toString(),
-        level: 1, 
-        selected: selected ? selected : false,
+        key: l,
+        level: 1,
+        selected: selected || false,
         count: 1,
-        children: []
+        children: [
+          {
+            name: r.subName,
+            id: subId,
+            key: l + '-1',
+            level: 2,
+            selected: selected || false,
+            count: 1,
+            children: [
+              {
+                name: OPETYPES[oper],
+                opeType: oper,
+                key: l + '-1-1',
+                level: 3,
+                selected: selected || false,
+                count: 1,
+                children: [
+                  {
+                    name: r.desc,
+                    id: authenId,
+                    key: l + '-1-1-1',
+                    level: 4,
+                    selected: selected || false
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       })
     }
   })
@@ -74,26 +133,39 @@ export function buildAuthenData (data, selected) {
 
 // build current user's authentication status, only has selected items
 export function buildCurrentAuthen (data) {
+  if (data.length === 0) {
+    return
+  }
   let status = buildAuthenData(data, true)
   return status
 }
 
-// build a real authentication data, has all the items and set selected for each
-export function buildRealAuthen (full, status) {
-  // data is the full data, status is real authentication data(server format)
+// build a array which contains forbidden url
+export function buildForbiddenUrl (full, current) {
+  if (!full || full.length === 0) {
+    return
+  }
+  if (!current || current.length === 0) {
+    return
+  }
   try {
-    let data = JSON.parse(JSON.stringify(full))
-    status.forEach((r) => {
-      let mainBlock = data.find(rec => rec.id === r.mainId)
-      mainBlock.selected = true
-      let subBlock = mainBlock.find(rec => rec.id === r.subId)
-      subBlock.selected = true
-      let operBlock = subBlock.find(rec => rec.opeType === r.oper)
-      operBlock.selected = true
-      let authenItem = operBlock.find(rec => rec.id === r.id)
-      authenItem.selected = true
+    let forbidden = full.forEach((r) => {
+      let found = current.find(rec => rec.id === r.id)
+      if (found) {
+        return false
+      } else {
+        return true
+      }
     })
-    return data
+    let forbiddenUrls = []
+    forbidden.forEach((r) => {
+      console.log(privilege2Url[r.desc])
+      let urls = privilege2Url[r.desc]
+      urls.forEach((u) => {
+        forbiddenUrls.push(u)
+      })
+    })
+    return forbiddenUrls
   } catch (e) {
     console.log(e)
     Noti.hintProgramError()
@@ -122,6 +194,35 @@ export function buildAuthenDataForServer (status) {
   return result
 }
 
+export function updatePrivilege (data, status) {
+  // data is a full privelege table, status is the info need to be added
+  if (!data || !status) {
+    return
+  }
+  status.forEach((r) => {
+    let mainId = r.mainId, subId = r.subId, oper = r.oper, authenId = r.id
+    let mainBlock = data.find(s => s.id === mainId)
+    if (mainBlock) {
+      // status has the mainId
+      mainBlock.selected = true
+      let subBlock = mainBlock.children.find(sub => sub.id === subId)
+      if (subBlock) {
+        subBlock.selected = true
+        // current main block has the sub
+        let operBlock = subBlock.children && subBlock.children.find(o => o.opeType === oper)
+        if (operBlock) {
+          operBlock.selected = true
+          // current sub has the operation block
+          let authen = operBlock.find(x => x.id === authenId)
+          if (authen) {
+            authen.selected = true
+          }
+        }
+      }
+    }
+  })
+  return data
+}
 /*
 export function buildReadableAuthen (data) {
   let status = {}

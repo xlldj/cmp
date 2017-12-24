@@ -5,7 +5,7 @@
 
 import React from 'react'
 import SearchLine from '../../component/searchLine'
-import CONSTANTS from '../../component/constants'
+// import CONSTANTS from '../../component/constants'
 import AuthenDataTable from '../../component/authenDataTable'
 import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
@@ -25,16 +25,14 @@ class AuthenTable extends React.Component {
     }
   }
   componentDidMount(){
+    console.log(this.props.full)
     this.props.hide(false)
   }
   componentWillUnmount () {
     this.props.hide(true)
   }
-  delete = (key) => {
+  delete = (id) => {
     try {
-      let {full} = this.props
-      let keys = key.split('-')
-      let id = full[(keys[0] - 1)].children[(keys[1] - 1)].children[(keys[2] - 1)].children[keys[3]].id
       let resource = '/privilege/delete'
       const body = {
         id: id
@@ -65,7 +63,7 @@ class AuthenTable extends React.Component {
             clickable={false}
             edit={true}
             delete={this.delete}
-            authenStatus={CONSTANTS.authenData}
+            authenStatus={this.props.full}
           />
         </div>
 

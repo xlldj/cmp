@@ -13,201 +13,21 @@ if (recentSchools) {
 }
 
 const initialAuthenData = {
-  full: [
-    {
-      name: '学校管理',
-      key: '1',
-      level: 1,
-      selected: false,
-      count: 7,
-      children: [
-        {
-          name: '学校列表',
-          key: '1-1',
-          level: 2,
-          selected: false,
-          count: 6,
-          children: [
-            {
-              name: '查看',
-              key: '1-1-1',
-              level: 3,
-              selected: false,
-              count: 2,
-              children: [
-                {
-                  name: '学校列表/搜索/查询',
-                  key: '1-1-1-1',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '楼栋查看',
-                  key: '1-1-1-2',
-                  level: 4,
-                  selected: false 
-                }
-              ]
-            },
-            {
-              name: '操作',
-              key: '1-1-2',
-              level: 3,
-              selected: false,
-              count: 4,
-              children: [
-                {
-                  name: '添加/编辑学校信息',
-                  key: '1-1-2-1',
-                  level: 4
-                },
-                {
-                  name: '楼栋编辑',
-                  key: '1-1-2-2',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '功能入口管理',
-                  key: '1-1-2-3',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '禁用学校',
-                  key: '1-1-2-4',
-                  level: 4,
-                  selected: false
-                }
-              ]
-            }
-          ]
-        },
-        {
-          name: '信息总览',
-          key: '1-2',
-          level: 2,
-          selected: false,
-          children: [
-            {
-              name: '查看',
-              key: '1-2-1',
-              level: 3,
-              selected: false,
-              children: [
-                {
-                  name: '信息总览列表/搜索/查询',
-                  key: '1-2-1-1',
-                  level: 4,
-                  selected: false
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  full: [],
+  originalPrivileges: [],
   current: [
-    {
-      name: '学校管理',
-      key: '1',
-      level: 1,
-      selected: false,
-      count: 7,
-      children: [
-        {
-          name: '学校列表',
-          key: '1-1',
-          level: 2,
-          selected: false,
-          count: 6,
-          children: [
-            {
-              name: '查看',
-              key: '1-1-1',
-              level: 3,
-              selected: false,
-              count: 2,
-              children: [
-                {
-                  name: '学校列表/搜索/查询',
-                  key: '1-1-1-1',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '楼栋查看',
-                  key: '1-1-1-2',
-                  level: 4,
-                  selected: false 
-                }
-              ]
-            },
-            {
-              name: '操作',
-              key: '1-1-2',
-              level: 3,
-              selected: false,
-              count: 4,
-              children: [
-                {
-                  name: '添加/编辑学校信息',
-                  key: '1-1-2-1',
-                  level: 4
-                },
-                {
-                  name: '楼栋编辑',
-                  key: '1-1-2-2',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '功能入口管理',
-                  key: '1-1-2-3',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '禁用学校',
-                  key: '1-1-2-4',
-                  level: 4,
-                  selected: false
-                }
-              ]
-            }
-          ]
-        },
-        {
-          name: '信息总览',
-          key: '1-2',
-          level: 2,
-          selected: false,
-          children: [
-            {
-              name: '查看',
-              key: '1-2-1',
-              level: 3,
-              selected: false,
-              children: [
-                {
-                  name: '信息总览列表/搜索/查询',
-                  key: '1-2-1-1',
-                  level: 4,
-                  selected: false
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  ],
+  forbiddenUrls: [],
+  authenSet: false,
+  rolePrivileges: {},
+  mainNavs: [],
+  subNavs: {}
 }
 const setAuthenData = (state = initialAuthenData, action) => {
   const {type} = action
   if (type === ActionTypes.SET_AUTHENDATA) {
     const value = action.value
+    console.log(value)
     return {...state, ...value}
   }
   return state
@@ -471,7 +291,7 @@ const initialEmployeeState = {
     selectKey: ''
   },
   authenList: {
-    page: 1,
+    page: 1
   },
   roleList: {
     page: 1

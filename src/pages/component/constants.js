@@ -583,7 +583,11 @@ const CONSTANTS = {
         }
       ]
     }
-  ]
+  ],
+  PRIVILEGE2URL: {
+    '学校列表/搜索/查询': ['/school'],
+    '添加/编辑学校信息': ['/school/list/add', '/school/list/edit']
+  }
 }
 
 export default CONSTANTS

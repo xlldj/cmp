@@ -24,11 +24,11 @@ const InfoSet = asyncComponent(() => import(/* webpackChunkName: 'infoSet' */ '.
 
 const breadcrumbNameMap = {
   '/list': '学校列表',
-  '/list/schoolInfoEdit': '学校信息',
-  '/list/addSchool': '添加学校',
+  '/list/edit': '学校信息',
+  '/list/add': '添加学校',
   '/list/blockManage': '楼栋管理',
-  '/list/blockManage/addingBlock': '添加楼栋',
-  '/list/blockManage/editingBlock': '编辑楼栋',
+  '/list/blockManage/add': '添加楼栋',
+  '/list/blockManage/edit': '编辑楼栋',
   '/list/business':'功能入口管理',
   '/overview': '学校信息总览',
   '/infoSet': '学校设置'
@@ -75,10 +75,10 @@ class SchoolDisp extends React.Component{
 
         <div className='disp'>
           <Switch>
-            <Route path='/school/list/schoolInfoEdit/:id' render={(props) => (<SchoolInfoEdit hide={this.props.hide} {...props} />)} />
-            <Route path='/school/list/addSchool' render={(props) => (<SchoolInfoEdit hide={this.props.hide} {...props} />)} />
-            <Route path='/school/list/blockManage/editingBlock/:id' render={(props) => (<AddingBlock hide={this.props.hide} {...props} />)} />
-            <Route path='/school/list/blockManage/addingBlock' render={(props) => (<AddingBlock hide={this.props.hide} {...props} />)} />
+            <Route path='/school/list/edit/:id' render={(props) => (<SchoolInfoEdit hide={this.props.hide} {...props} />)} />
+            <Route path='/school/list/add' render={(props) => (<SchoolInfoEdit hide={this.props.hide} {...props} />)} />
+            <Route path='/school/list/blockManage/edit/:id' render={(props) => (<AddingBlock hide={this.props.hide} {...props} />)} />
+            <Route path='/school/list/blockManage/add' render={(props) => (<AddingBlock hide={this.props.hide} {...props} />)} />
             <Route path='/school/list/blockManage/:id' render={(props) => (<BlockManage hide={this.props.hide} {...props} />)} />
             <Route exact path='/school/list/blockManage' render={(props) => (<BlockManage hide={this.props.hide} {...props} />)} />
             <Route path='/school/list/business/:id' render={(props) => (<SchoolBusiness hide={this.props.hide} {...props}/>)} />

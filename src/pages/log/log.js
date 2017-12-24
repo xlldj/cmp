@@ -6,13 +6,13 @@ import Noti from '../noti'
 import {setToken} from '../util/handleToken'
 import {setStore, getLocal, removeStore} from '../util/storage'
 import {clientDetect} from '../util/clientDetect'
-import {buildAuthenData} from '../util/authenDataHandle'
+import {buildAuthenData, buildForbiddenUrl, buildCurrentAuthen} from '../util/authenDataHandle'
 import logLogo from '../assets/log_logo.png'
 import './style/style.css'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import {setAuthenData, buildCurrentAuthen, buildReadableAuthen} from '../../actions'
+import {setAuthenData} from '../../actions'
 
 //const Form = asyncComponent(() => import(/* webpackChunkName: "form" */ "antd/lib/form"))
 //const Button = asyncComponent(() => import(/* webpackChunkName: "button" */ "antd/lib/button"))
@@ -158,25 +158,31 @@ class Log extends React.Component{
         if (json.error) {
           this.handleLogError(json.error)
         } else {
-          let {nickName, id, pictureUrl, privileges} = json.data.user
-          let {fullPrivileges} = json.data
-          if (fullPrivileges) {
+          let {nickName, id, pictureUrl} = json.data.user
+          let {fullPrivileges, privileges} = json.data
+          if (fullPrivileges && privileges) {
             // set full privileges data
-            let status = buildAuthenData(fullPrivileges)
-            this.props.setAuthenData({
-              full: status
-            })
-          }
-          if (privileges) {
+            let full = buildAuthenData(fullPrivileges)
+
             // set privileges for the current user
             let currentAuthenStatus = buildCurrentAuthen(privileges)
+
+            // get forbidden urls
+            let forbiddenUrls = buildForbiddenUrl(fullPrivileges, privileges)
+
             this.props.setAuthenData({
-              current: currentAuthenStatus
+              full: full || [],
+              originalPrivileges: fullPrivileges || [],
+              current: currentAuthenStatus || [],
+              forbiddenUrls: forbiddenUrls || [],
+              authenSet: true
             })
-            let readableAuthenStatus = buildReadableAuthen(privileges)
-            this.props.setAuthenData({
-              readableAuthenStatus: readableAuthenStatus
-            })
+            let authenInfo = {
+              full: full,
+              current: currentAuthenStatus,
+              forbiddenUrls: forbiddenUrls
+            }
+            setStore('authenInfo', JSON.stringify(authenInfo))
           }
           let user = {
             name: nickName,

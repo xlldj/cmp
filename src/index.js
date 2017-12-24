@@ -18,7 +18,12 @@ const user = {
     id: 0,
     portrait: ''
 }
-
+const getConfirmation = (message, callback) => {
+  console.log('comfirm')
+  console.log(message)
+  const allowTransition = window.confirm(message)
+  callback(allowTransition)
+}
 class Layouts extends React.Component {
   state = {
     logged: false,
@@ -87,7 +92,9 @@ class Layouts extends React.Component {
 
 ReactDOM.render(
   (<Provider store={store} >
-    <Router >
+    <Router 
+      getUserConfirmation={getConfirmation}
+    >
     <Layouts />
    </Router>
    </Provider>

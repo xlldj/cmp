@@ -8,6 +8,7 @@ import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 import Noti from '../../noti'
 import { checkObject } from '../../util/checkSame'
+import {mul} from '../../util/numberHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -159,7 +160,7 @@ class Overview extends React.Component {
               })
 
               let rateGroups = r.rate&&r.rate.rateGroups&&r.rate.rateGroups.map((rate, x) => (
-                <div className='rateItem' key={`rateItem-${x}`}>{rate.price * 100}分钱/{rate.pulse}脉冲</div>
+                <div className='rateItem' key={`rateItem-${x}`}>{mul(rate.price, 100)}分钱/{rate.pulse}脉冲</div>
               ))
 
               let waterTimeItems =r.waterTimeRange&&r.waterTimeRange.items&&r.waterTimeRange.items.map((range, y) => (

@@ -2,33 +2,44 @@ import React from 'react'
 import { Button} from 'antd'
 import AjaxHandler from '../ajax'
 import Noti from '../noti'
-import CONSTANTS from '../component/constants'
+// import CONSTANTS from '../component/constants'
 import {setStore, getStore} from '../util/storage'
-import {obj2arr} from '../util/types'
 import MultiSelectModal from '../component/multiSelectModal'
 import SchoolMutilSelect from '../component/schoolMultiSelectModal'
 import AuthenDataTable from '../component/authenDataTable'
 
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setAuthenData } from '../../actions'
+import { updatePrivilege } from '../util/authenDataHandle';
+
 class EmployeeInfo extends React.Component {
+  static propTypes = {
+    full: PropTypes.array.isRequired,
+    rolePrivileges: PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
-    let id='',mobile='',nickName='',type='0',mobileError=false,nameError=false,nameErrorMessage='',schools=[],showSchools=false,typeError=false
+    let id='',mobile='',nickName='', mobileError=false,nameError=false,nameErrorMessage='',schools=[],showSchools=false,typeError=false
     let mobileErrorMessage = '手机号格式不正确', originalMobile = 0, schoolError = false
-    const roles = obj2arr(CONSTANTS.ROLE)
+    /* const roles = obj2arr(CONSTANTS.ROLE)
     const roleData = roles.map((r) => {
       r.selected = false
       return r
-    })
-    this.state = {id,mobile,nickName,type,mobileError,mobileErrorMessage, nameError,
+    }) */
+    this.state = {id,mobile,nickName,mobileError,mobileErrorMessage, nameError,
       nameErrorMessage, originalMobile, schools,showSchools, typeError, schoolError,
       account: '',
       accountError: false,
       selectedRoleItems: [],
       roleError: false,
       showRoleModal: false,
-      roleData: roleData,
+      roleData: [],
       allSchools: false,
-      selectedSchools: []
+      selectedSchools: [],
+      authenStatus: [],
+      roles: []
     }
     this.roleColumns = [{
       title: '身份',
@@ -36,31 +47,93 @@ class EmployeeInfo extends React.Component {
       width: '75%'
     }]
   }
+  fetchRoles = () => {
+    let resource = '/role/list'
+    const body = {
+      page: 1,
+      size: 10000
+    }
+    const cb = (json) => {
+      if (json.data.roles) {
+        json.data.roles.forEach((role) => {
+          role.selected = false
+        })
+        this.setState({
+          roleData: json.data.roles
+        })
+        // if edit, get the info
+        if(this.props.match.params.id){
+          let id = this.props.match.params.id.slice(1) 
+          const body={
+            id: parseInt(id, 10)
+          }
+          this.fetchData(body)
+        }
+      }
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   fetchData = (body) => {
     let resource='/api/employee/one'
     const cb = (json) => {
       if(json.data){
-        let {id, mobile, type, nickName, schools} = json.data
+        let {id, mobile, roles, nickName, schools} = json.data
         this.setState({
           id: id,
           mobile: mobile,
-          type: type,
+          roles: roles,
           nickName: nickName,
           schools: schools,
           originalMobile: mobile
         })
+        // get the role privileges
+        let {rolePrivileges} = this.props
+        roles.forEach((r) => {
+          /* notice the data format here. */
+          if (rolePrivileges[r.id]) {
+            this.addPrivilege(rolePrivileges[r.id])
+          } else {
+            this.fetchPrivilege(r.id)
+          }
+        })
+        if (roles.length > 0) {
+          this.fetchPrivileges(id)
+        }
       }       
     }
     AjaxHandler.ajax(resource,body,cb)
-  } 
+  }
+  fetchPrivilege = (id) => {
+    let resource = '/role/one'
+    const body = {
+      id: id
+    }
+    const cb = (json) => {
+      let {privileges} = json.data
+      this.addPrivilege(privileges)
+      let rolePrivileges = this.props.rolePrivileges
+      rolePrivileges[id] = privileges
+      this.props.setAuthenData({
+        rolePrivileges: rolePrivileges
+      })
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
+  addPrivilege = (privileges) => {
+    let {authenStatus} = this.state
+    let status = updatePrivilege(authenStatus, privileges)
+    this.setState({
+      authenStatus: status
+    })
+  }
   componentDidMount () {
     this.props.hide(false)
-    if(this.props.match.params.id){
-      let id = this.props.match.params.id.slice(1) 
-      const body={
-        id: parseInt(id, 10)
-      }
-      this.fetchData(body)
+    // get all the roles
+    this.fetchRoles()
+    if (this.props.full) {
+      this.setState({
+        authenStatus: this.props.full
+      })
     }
   }
   componentWillUnmount () {
@@ -70,7 +143,7 @@ class EmployeeInfo extends React.Component {
     this.props.history.push('/employee')
   }
   postData = () => {
-    let {mobile,nickName,type,id,schools, posting} = this.state
+    let {mobile,nickName,roles,id,schools, posting} = this.state
     if (posting) {
       return
     }
@@ -81,9 +154,9 @@ class EmployeeInfo extends React.Component {
     const body={
       mobile: mobile,
       nickName: nickName,
-      type: parseInt(type, 10)
+      roles: parseInt(roles, 10)
     }
-    if(type.toString()==='2'){
+    if(roles.toString()==='2'){
       let newschools = schools.map((r,i)=>{
         return r.id
       })
@@ -134,7 +207,7 @@ class EmployeeInfo extends React.Component {
         nameErrorMessage: '名字不能为空！'
       })
     }
-    let r = this.state.type
+    let r = this.state.roles
     if (!r || r==='0') {
       return this.setState({
         typeError: true
@@ -218,7 +291,7 @@ class EmployeeInfo extends React.Component {
   }
   changeType = (v) => {
     this.setState({
-      type: v
+      roles: v
     })
   }
   checkType = (v) => {
@@ -314,7 +387,7 @@ class EmployeeInfo extends React.Component {
       mobile, mobileError, mobileErrorMessage,
       roleError, showRoleModal, roleData,
       showSchools, schoolError, selectedSchools,
-      allSchools
+      allSchools, authenStatus
     } = this.state
     const selectedSchoolItems = selectedSchools && selectedSchools.map((r,i)=>(
       <span key={i}>{r.name}</span>
@@ -363,7 +436,7 @@ class EmployeeInfo extends React.Component {
           <li className='itemsWrapper'>
             <AuthenDataTable
               clickable={false}
-              authenStatus={CONSTANTS.authenData}
+              authenStatus={authenStatus}
             />
           </li>
         </ul>
@@ -397,5 +470,11 @@ class EmployeeInfo extends React.Component {
     )
   }
 }
+const mapStateToProps = (state, ownProps) => ({
+  rolePrivileges: state.setAuthenData.rolePrivileges,
+  full: state.setAuthenData.full
+})
 
-export default EmployeeInfo
+export default withRouter(connect(mapStateToProps, {
+  setAuthenData 
+ })(EmployeeInfo))

@@ -30,7 +30,7 @@ class MyMenu extends React.Component {
     let {current} = this.props
     // get the main nav, COUSTANTS.rootBlock is the full nav
     let rootBlock = CONSTANTS.rootBlock.filter((r) => {
-      let found = current.find(rec => rec.name === r.name)
+      let found = current && current.find(rec => rec.name === r.name)
       if (found) {
         return true
       } else {
@@ -40,7 +40,7 @@ class MyMenu extends React.Component {
     // get the sub nav
     rootBlock.forEach((r) => {
       let subBlock = []
-      let root = current.find(rec => rec.name === r.name)
+      let root = current && current.find(rec => rec.name === r.name)
       // should always exist
       if (root && root.children) {
       subBlock = r.children.filter((sub) => {
@@ -54,7 +54,8 @@ class MyMenu extends React.Component {
       }
       r.children = subBlock
     })
-    this.rootBlock = rootBlock
+    // this.rootBlock = rootBlock
+    this.rootBlock = CONSTANTS.rootBlock
     this.state = {
       current: '',
       openKeys: [],
@@ -73,11 +74,6 @@ class MyMenu extends React.Component {
   componentDidUpdate () {
     let pathname = window.location.pathname
     if (pathname !== this.state.pathname) {
-      console.log(pathname)
-      console.log(this.state.pathname)
-      if (pathname.includes('infoSet')) {
-        alert('update')
-      }
       this.changeMenu()
     }
   }

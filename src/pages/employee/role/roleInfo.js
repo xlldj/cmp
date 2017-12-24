@@ -9,7 +9,7 @@ import {buildRealAuthen, buildAuthenDataForServer} from '../../util/authenDataHa
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeEmployee } from '../../../actions'
+import { changeEmployee, setAuthenData } from '../../../actions'
 
 class RoleInfo extends React.Component {
   static propTypes = {
@@ -42,6 +42,7 @@ class RoleInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb)
   }
   componentDidMount () {
+    console.log(this.props.full)
     this.props.hide(false)
     if(this.props.match.params.id){
       let id = parseInt(this.props.match.params.id.slice(1), 10)
@@ -169,7 +170,7 @@ class RoleInfo extends React.Component {
               disabled={id}
               className={id ? 'disabled' : ''} 
               onChange={this.changeName} 
-              onBlur={this.checkName} 
+              onBlur={this.checkName}
               value={name} 
             />
             { nameError ? <span className='checkInvalid'>名称不能为空！</span> : null }
@@ -199,9 +200,10 @@ class RoleInfo extends React.Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
-  fullAutenData: state.setAuthenData.full
+  full: state.setAuthenData.full
 })
 
 export default withRouter(connect(mapStateToProps, {
- changeEmployee 
+ changeEmployee,
+ setAuthenData 
 })(RoleInfo))

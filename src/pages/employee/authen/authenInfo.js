@@ -13,7 +13,10 @@ import { setAuthenData } from '../../../actions'
 
 class AuthenInfo extends React.Component {
   static propTypes = {
-    full: PropTypes.array.isRequired
+    full: PropTypes.array.isRequired,
+    mainNavs: PropTypes.array.isRequired,
+    subNavs: PropTypes.object.isRequired,
+    originalPrivileges:PropTypes.array.isRequired
   }
   constructor (props) {
     super(props)
@@ -39,34 +42,104 @@ class AuthenInfo extends React.Component {
     this.mainNav = mainNav
   }
   fetchData = (body) => {
-    let resource='/api/employee/one'
+    let resource='/api/privilege/one'
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            let {id, mobile, type, nickName, schools} = json.data
-            this.setState({
-              id: id,
-              mobile: mobile,
-              type: type,
-              nickName: nickName,
-              schools: schools,
-              originalMobile: mobile
-            })
-          }        
-        }
+      let {mainId, subId, oper, desc, paths} = json.data
+      const nextState = {
+        main: mainId,
+        sub: subId,
+        ope: oper,
+        des: desc
+      }
+      if (paths && (paths.length > 1)) {
+        let path = []
+        paths.forEach((p) => {
+          path.push({
+            name: p,
+            error: false
+          })
+        })
+        nextState.path = path
+      }
+      this.setState(nextState)
+      // set subItems for nav
+      if (!this.props.subNavs[subId]) {
+        this.fetchNavs({
+          parentId: mainId,
+          level: 2
+        })
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   } 
+  setMainNavs = (navs) => {
+    let mainNav = {}
+    navs.forEach((r) => {
+      mainNav[r.id] = r.name
+    })
+    this.mainNav = mainNav
+  }
+  fetchNavs = (body) => {
+    let resource = '/nav/list'
+    const cb = (json) => {
+      let subNavs = JSON.parse(JSON.stringify(this.props.subNavs))
+      // add the nav info to the navs of the store
+      if (body.level === 1) {
+        this.setMainNavs(json.data.navs)
+        this.props.setAuthenData({
+          mainNavs: json.data.navs
+        })
+      } else {
+        let subItems = {} 
+        json.data.navs.forEach((r) => {
+          subItems[r.id] = r.name
+        })
+        subNavs[body.parentId] = subItems
+        console.log(subNavs)
+        this.props.setAuthenData({
+          subNavs: subNavs
+        })
+      }
+      /* 
+      json.data.navs.forEach((r) => {
+        if (r.level === 1) {
+          let exist = navs.find(n => n.id === r.id)
+          if (!exist) {
+            r.children = {}
+            navs.push(r)
+          }
+        } else {
+          let main = navs.find(n => n.id === r.parentId)
+          if (main) {
+            let sub = main.children && main.children[r.id]
+            if (!sub) {
+              main.children[r.id] = r.name
+            }
+          }
+        }
+      })
+      */
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   componentDidMount () {
     this.props.hide(false)
-    if(this.props.match.params.id){
-      let id = this.props.match.params.id.slice(1) 
-      const body={
-        id: parseInt(id, 10)
+    // fetch all the nav info
+    const body = {
+      level: 1
+    }
+    if (this.props.mainNavs.length === 0) {
+      this.fetchNavs(body)
+    } else {
+      this.setMainNavs(this.props.mainNavs)
+    }
+
+    if (this.props.match.params.id) {
+      let id = parseInt(this.props.match.params.id.slice(1), 10)
+      const body = {
+        id: id
       }
+      console.log(body)
       this.fetchData(body)
     }
   }
@@ -101,11 +174,16 @@ class AuthenInfo extends React.Component {
     const cb = (json) => {
       if (json.data.result) {
         Noti.hintSuccess(this.props.history, '/employee/authen')
+        // push the info to store
+        this.updateAuthenData()
       } else {
         Noti.hintWarning('添加出错', json.data.failReason || '请稍后重试')
       }
     }
+    console.log(body)
     AjaxHandler.ajax(resource, body, cb)
+  }
+  updateAuthenData = () => {
   }
   confirm = () => {
     const {main, sub, ope, des, path, checking, posting} = this.state
@@ -149,6 +227,7 @@ class AuthenInfo extends React.Component {
       main: v
     })
     if (v) {
+      /*
       let block = this.props.full.find(r => r.id === parseInt(v, 10))
       let subItems = {}
       if (block) {
@@ -157,6 +236,16 @@ class AuthenInfo extends React.Component {
         })
         this.setState({
           subItems: subItems
+        })
+      }
+      */
+      let {subNavs} = this.props
+      let id = parseInt(v, 10)
+      let subItems = subNavs[id]
+      if (!subItems) {
+        this.fetchNavs({
+          level: 2,
+          parentId: id
         })
       }
     }
@@ -262,9 +351,10 @@ class AuthenInfo extends React.Component {
   
   render () {
     const {id, main, mainError, sub, subError, 
-      subItems, ope, opeError, des, desError, 
+      ope, opeError, des, desError, 
       path, pathError
     } = this.state
+    const {subNavs} = this.props
     const pathItems = path && path.map((r, i) => {
       return (
         <div key={`path${i}`}>
@@ -296,7 +386,7 @@ class AuthenInfo extends React.Component {
             <BasicSelector
               invalidTitle=''
               width={CONSTANTS.SELECTWIDTH}
-              staticOpts={subItems}
+              staticOpts={subNavs[parseInt(main, 10)] || {}}
               selectedOpt={sub}
               disabled={id}
               className={id ? 'disabled' : ''} 
@@ -342,7 +432,10 @@ class AuthenInfo extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  full: state.setAuthenData.full
+  full: state.setAuthenData.full,
+  mainNavs: state.setAuthenData.mainNavs,
+  subNavs: state.setAuthenData.subNavs,
+  originalPrivileges: state.setAuthenData.originalPrivileges
 })
 
 export default withRouter(connect(mapStateToProps, {

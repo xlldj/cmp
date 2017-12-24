@@ -74,7 +74,7 @@ class SchoolList extends React.Component {
       render: (text, record, index) => (
         <div className='lastCol'>
           <span>
-            <Link to={`/school/list/schoolInfoEdit/:${record.id}`} >编辑学校信息</Link>
+            <Link to={`/school/list/edit/:${record.id}`} >编辑学校信息</Link>
             <span className='ant-divider' />
             <Link to={`/school/list/blockManage/:${record.id}`} >楼栋管理</Link>
             <span className='ant-divider' />
@@ -203,7 +203,7 @@ class SchoolList extends React.Component {
       <div className='contentArea'>
         <SearchLine 
           addTitle='添加学校' 
-          addLink='/school/list/addSchool' 
+          addLink='/school/list/add' 
           selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />}
         />
 

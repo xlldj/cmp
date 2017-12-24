@@ -5,14 +5,19 @@ import Layout from 'antd/lib/layout'
 import MyMenu from './nav/myMenu'
 import userImg from './assets/user.png'
 import logo from './assets/logo.png'
-import {getLocal, setLocal, removeLocal} from './util/storage'
+import {getLocal, setLocal, removeLocal, getStore} from './util/storage'
 import AjaxHandler from './ajax'
+import Noti from './noti'
+import {buildAuthenData} from './util/authenDataHandle'
+import {setStore} from './util/storage'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat, setSchoolList } from '../actions'
-
+import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, 
+  changeLost, changeUser, changeTask, changeEmployee, changeNotify, 
+  changeVersion, changeStat, setSchoolList, setAuthenData
+} from '../actions'
 
 const Welcome = asyncComponent(() => import(/* webpackChunkName: "welcome" */ "./welcome/welcome"))
 const SchoolDisp = asyncComponent(() => import(/* webpackChunkName: "school" */ "./school/schoolDisp"))
@@ -35,28 +40,114 @@ class Main extends React.Component {
   static propTypes = {
     schools: PropTypes.array.isRequired,
     recent: PropTypes.array.isRequired,
-    schoolSet: PropTypes.bool.isRequired
+    schoolSet: PropTypes.bool.isRequired,
+    forbiddenUrls: PropTypes.array.isRequired,
+    authenSet: PropTypes.bool.isRequired
   }
 
   state = {
     hasChildren: true,
+    showForbidden: false,
+    tiForForbid: null,
     ti: null
   }
   componentDidMount () {
-    console.log(this.props.history)
+    // set school list globally
     this.props.setSchoolList({
       schoolSet: false,
       schools: [],
       recent: []
     })
     this.fetchSchools()
+
+    // set authen info globally
+    try {
+      let {authenSet} = this.props
+      if (!authenSet) {
+        let authenInfo = JSON.parse(getStore('authenInfo'))
+        console.log(authenInfo)
+        if (authenInfo) {
+          authenInfo.authenSet = true
+          this.props.setAuthenData(authenInfo)
+        } else {
+          this.fetchAuthenData()
+        }
+      }
+    } catch (e) {
+      console.log(e)
+      Noti.hintProgramError()
+    }
+
     this.props.hide(false)
+  }
+  fetchAuthenData = () => {
+    let resource = '/privilege/list'
+    const body = null
+    const cb = (json) => {
+      let fullPrivileges = json.data.privileges
+      // set full privileges data
+      let full = buildAuthenData(fullPrivileges)
+      console.log(full)
+      this.props.setAuthenData({
+        full: full,
+        originalPrivileges: fullPrivileges,
+        authenSet: true
+      })
+      let authenInfo = {
+        full: full
+      }
+      setStore('authenInfo', JSON.stringify(authenInfo))  
+    }
+    AjaxHandler.ajax(resource, body, cb)
   }
   componentWillUnmount () {
     this.props.hide(true)
     if (this.state.ti) {
       clearTimeout(this.state.ti)
     }
+    if (this.state.tiForForbid) {
+      clearTimeout(this.tiForForbid)
+    }
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    // url control. if next location is a forbidden url , stop update
+    let nextLocation = nextProps.history.location.pathname
+    console.log(this.props)
+    let {forbiddenUrls} = this.props
+    console.log(forbiddenUrls)
+    try {
+      let forbidden = forbiddenUrls.findIndex((r) => {
+        if (r.includes(nextLocation)) {
+          return true
+        } else {
+          return false
+        }
+      })
+      if (forbidden !== -1) {
+        // if not showing forbidden, show it. Trigger a timer to avoid duplicate show
+        if (!this.state.showForbidden) {
+          Noti.hintWarning('访问受限', '您没有访问该页面的权限')
+          let tiForForbid = setTimeout(this.clearShowForbidden, 2000)
+          this.setState({
+            tiForForbid: tiForForbid,
+            showForbidden: true
+          })
+        }
+        return false
+      } else {
+        return true
+      }
+    } catch (e) {
+      console.log(e)
+      return true
+    }
+  }
+
+  clearShowForbidden = () => {
+    this.setState({
+      showForbidden: false,
+      tiForForbid: null
+    })
   }
 
   fetchSchools = () => {
@@ -173,10 +264,11 @@ class Main extends React.Component {
             className='nav'
           >
             <div className='sideWrapper'>
-               <Link to='/welcome' >
-               <div className="logo" onClick={this.welcome}>
-               <img src={logo} alt='' />
-              </div></Link>
+              <Link to='/welcome' >
+                <div className="logo" >
+                <img src={logo} alt='' />
+                </div>
+              </Link>
 
               <MyMenu changeWidth={this.changeWidth} />
             </div>
@@ -217,11 +309,14 @@ const mapStateToProps = (state, ownProps) => {
   return {
     schools: state.setSchoolList.schools,
     recent: state.setSchoolList.recent,
-    schoolSet: state.setSchoolList.schoolSet
+    schoolSet: state.setSchoolList.schoolSet,
+    forbiddenUrls: state.setAuthenData.forbiddenUrls,
+    authenSet: state.setAuthenData.authenSet
   }
 }
 export default withRouter(connect(mapStateToProps, {
   changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion,
   setSchoolList,
-  changeStat
+  changeStat,
+  setAuthenData
 })(Main))
