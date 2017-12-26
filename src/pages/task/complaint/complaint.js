@@ -47,7 +47,8 @@ class ComplaintTable extends React.Component {
     type: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired,
     selectKey: PropTypes.string.isRequired,
-    schoolId: PropTypes.string.isRequired
+    schoolId: PropTypes.string.isRequired,
+    forbiddenStatus: PropTypes.object.isRequired
   }
   constructor (props) {
     super(props)
@@ -152,6 +153,9 @@ class ComplaintTable extends React.Component {
     })
   }
   setReply = (e, id) => {
+    if (this.props.forbiddenStatus.REPLY_COMPLAINT) {
+      return Noti.hintWarning('', '您没有权限进行此操作')
+    }
     if (this.state.replying) {
       return
     }
@@ -284,6 +288,9 @@ class ComplaintTable extends React.Component {
     })
   }
   replyMessage = (id) => {
+    if (this.props.forbiddenStatus.REPLY_COMPLAINT) {
+      return Noti.hintWarning('', '您没有权限进行此操作')
+    }
     this.setState({
       messageVisible: true,
       orderId: id
@@ -471,7 +478,8 @@ const mapStateToProps = (state, ownProps) => ({
   page: state.changeTask[subModule].page,
   status: state.changeTask[subModule].status,
   selectKey: state.changeTask[subModule].selectKey,
-  schoolId: state.changeTask[subModule].schoolId
+  schoolId: state.changeTask[subModule].schoolId,
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
 export default withRouter(connect(mapStateToProps, {

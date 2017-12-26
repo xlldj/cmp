@@ -78,7 +78,6 @@ export default class AuthenDataTable extends React.Component{
   }
   render(){
     const {authenStatus, edit} = this.props
-    console.log(authenStatus)
 
     const authenPanel = authenStatus && authenStatus.map((r, i) => {
       let level2 = r.children && r.children.map((rec, ind) => {
@@ -164,7 +163,7 @@ export default class AuthenDataTable extends React.Component{
     })
 
     return (
-      <Collapse accordion onChange={this.changePanel} className='roleTable' >
+      <Collapse onChange={this.changePanel} defaultActiveKey='panel0' className='roleTable' >
         {authenPanel}
       </Collapse>
     )

@@ -27,7 +27,8 @@ const NOTIFYTYPES = CONSTANTS.NOTIFYTYPES
 class NotifyTable extends React.Component {
   static propTypes = {
     type: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    forbiddenStatus: PropTypes.object.isRequired
   }
   constructor (props) {
     super(props)
@@ -147,6 +148,9 @@ class NotifyTable extends React.Component {
   }
   delete = (e,id) => {
     e.preventDefault()
+    if (this.props.forbiddenStatus.DELETE_NOTIFY) {
+      return Noti.hintWarning('', '您没有当前操作权限')
+    }
     let resource='/api/notify/delete'
     const body = {
       id: id
@@ -228,7 +232,8 @@ class NotifyTable extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     type: state.changeNotify.notify.type,
-    page: state.changeNotify.notify.page
+    page: state.changeNotify.notify.page,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 

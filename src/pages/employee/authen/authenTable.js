@@ -13,7 +13,7 @@ import AjaxHandler from '../../ajax'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { setAuthenData } from '../../../actions'
+import { setAuthenData, fetchPrivileges } from '../../../actions'
 
 class AuthenTable extends React.Component {
   static propTypes = {
@@ -25,7 +25,7 @@ class AuthenTable extends React.Component {
     }
   }
   componentDidMount(){
-    console.log(this.props.full)
+    // console.log(this.props.full)
     this.props.hide(false)
   }
   componentWillUnmount () {
@@ -39,6 +39,7 @@ class AuthenTable extends React.Component {
       }
       const cb = (json) => {
         if (json.data.result) {
+          this.props.fetchPrivileges()
           Noti.hintOk('删除成功', '该权限已删除')
         } else {
           Noti.hintWarning('删除出错', json.data.failReason || '请稍后重试')
@@ -73,10 +74,12 @@ class AuthenTable extends React.Component {
 }
 
 
-const mapStateToProps = (state, ownProps) => ({
+const mapStateToProps = (state, ownProps) => {
+  return {
   full: state.setAuthenData.full
-})
+}}
 
 export default withRouter(connect(mapStateToProps, {
-  setAuthenData
+  setAuthenData,
+  fetchPrivileges
 })(AuthenTable))

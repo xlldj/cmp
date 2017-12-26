@@ -32,11 +32,13 @@ class SchoolMultiSelectModal extends React.Component{
   }
 
   componentDidMount(){
+    console.log(this.props.schools)
   }
   componentWillReceiveProps (nextProps) {
+    console.log(nextProps.schools)
     let nextSchools = JSON.parse(JSON.stringify(nextProps.selectedSchools))
     let all = nextProps.all
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    let dataSource = JSON.parse(JSON.stringify(nextProps.schools))
     if (all) {
       dataSource.forEach((r) => (r.selected = true))
       return this.setState({
@@ -165,7 +167,7 @@ class SchoolMultiSelectModal extends React.Component{
     }, {
       title: (<p style={{textAlign:'center'}}>操作</p>),
       dataIndex: 'selected',
-      width: '100',
+      width: '100px',
       className: 'center',
       render: (text, record, index) => (
         <input type='checkbox' checked={record.selected} onChange={(e)=>{this.changeSelect(e,index)}} />

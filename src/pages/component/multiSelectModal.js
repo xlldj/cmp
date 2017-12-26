@@ -55,7 +55,7 @@ export default class MultiSelectModal extends React.Component{
     const selectedArr = dataSource && dataSource.filter((r,i)=>(r.selected === true))
 
     const selectedItems = selectedArr && selectedArr.map((r,i)=>(
-      <span className='seperateItem' key={i} >{r.value}/</span>
+      <span className='seperateItem' key={i} >{r.value || r.name}/</span>
     ))
 
     return (
@@ -72,7 +72,7 @@ export default class MultiSelectModal extends React.Component{
           <Button className='rightConfirm' type='primary' onClick={this.confirm} >确定</Button>
         </div>
         <div className='depositGiftTable'>
-          <Table rowKey={record=>record.key}  pagination={false} dataSource={dataSource || []} columns={this.columns} onRowClick={this.selectRow} />
+          <Table rowKey={record=>record.id}  pagination={false} dataSource={dataSource || []} columns={this.columns} onRowClick={this.selectRow} />
         </div>
         
       </Modal>

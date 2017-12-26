@@ -55,7 +55,11 @@ class MyMenu extends React.Component {
       r.children = subBlock
     })
     // this.rootBlock = rootBlock
-    this.rootBlock = CONSTANTS.rootBlock
+    if (rootBlock.length > 0) {
+      this.rootBlock = rootBlock
+    } else {
+      this.rootBlock = CONSTANTS.rootBlock
+    }
     this.state = {
       current: '',
       openKeys: [],
@@ -114,9 +118,9 @@ class MyMenu extends React.Component {
 
   getDefaultSchool = () => {
     let {recent, schools, schoolSet} = this.props
-    if (!schoolSet) {
+    /* if (!schoolSet) {
       return this.setDefaultSchool()
-    }
+    } */
     var selectedSchool = 'all', defaultSchool = getLocal('defaultSchool')
     if (recent.length > 0) {
       selectedSchool = recent[0].id.toString()

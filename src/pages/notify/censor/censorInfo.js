@@ -8,8 +8,14 @@ import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
 import CONSTANTS from '../../component/constants'
 
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 class NotifyInfo extends React.Component {
+  static propTypes = {
+    forbiddenStatus: PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     let type=''
@@ -230,6 +236,7 @@ class NotifyInfo extends React.Component {
       status, creatorName,
       showModal, note, pass
     } = this.state
+    let {forbiddenStatus} = this.props
 
     const schoolItems = schools.map((s, i) => (<span className='puncSeperated' key={i}>{s.name}</span>))
 
@@ -276,8 +283,8 @@ class NotifyInfo extends React.Component {
         </ul>
 
         <div className='btnArea'>
-          <Button onClick={this.censorRefuse} >审核未通过</Button>
-          <Button type='primary' onClick={this.censorPass} >审核通过</Button>
+          {forbiddenStatus.CENSOR_NOTIFY ? null : <Button onClick={this.censorRefuse} >审核未通过</Button>}
+          {forbiddenStatus.CENSOR_NOTIFY ? null : <Button type='primary' onClick={this.censorPass} >审核通过</Button>}
           <Button onClick={this.cancel} >返回</Button>
         </div>
 
@@ -292,4 +299,11 @@ class NotifyInfo extends React.Component {
   }
 }
 
-export default NotifyInfo
+const mapStateToProps = (state, ownProps) => {
+  return {
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
+  }
+}
+
+export default withRouter(connect(mapStateToProps, {
+})(NotifyInfo))

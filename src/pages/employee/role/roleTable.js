@@ -12,18 +12,21 @@ import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 
 import {checkObject} from '../../util/checkSame'
+import {add, mul} from '../../util/numberHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeEmployee } from '../../../actions'
+import { changeEmployee, setRoleList } from '../../../actions'
 const subModule = 'roleList'
 
 const SIZE = CONSTANTS.PAGINATION
 
 class RoleTable extends React.Component {
   static propTypes = {
-    page: PropTypes.number.isRequired
+    page: PropTypes.number.isRequired,
+    roles: PropTypes.array.isRequired,
+    rolesSet: PropTypes.bool.isRequired
   }
   constructor(props){
     super(props)
@@ -65,35 +68,61 @@ class RoleTable extends React.Component {
     const cb = (json) => {
       let nextState = {loading: false}
       if (json.data) {
-        nextState.dataSource =  json.data.users
-        nextState.total = json.data.total
-      }     
+        this.props.setRoleList({
+          roles: json.data.roles,
+          rolesSet: true
+        })
+      }
       this.setState(nextState)  
     }
     AjaxHandler.ajax(resource,body,cb, null, {clearLoading: true, thisObj: this})
   }
+  setData = () => {
+    let {page, roles} = this.props
+    console.log(roles)
+    let total = roles.length
+    let start = mul((page - 1), SIZE)
+    let end = add(start, SIZE) > total ? total : add(start, SIZE)
+    let data = roles.slice(start, end)
+    console.log(data)
+    this.setState({
+      dataSource: data,
+      total: total
+    })
+  }
   componentDidMount(){
     this.props.hide(false)
-    let {page} = this.props
-    const body = {
-      page: page,
-      size: SIZE
+    let {rolesSet} = this.props
+    if (rolesSet) {
+      this.setData()
+    } else {
+      const body = {
+        page: 1,
+        size: 10000
+      }
+      this.fetchData(body)
     }
-    this.fetchData(body)
   }
   componentWillUnmount () {
     // this.props.hide(true)
   }
   componentWillReceiveProps (nextProps) {
-    if (checkObject(this.props, nextProps, ['page'])) {
+    if (checkObject(this.props, nextProps, ['page', 'roles', 'rolesSet'])) {
       return
     }
-    let {page} = nextProps
-    const body = {
-      page: page,
-      size: SIZE
+    console.log(nextProps)
+
+    let {rolesSet} = nextProps
+    if (rolesSet) {
+      this.props = nextProps
+      this.setData()
+    } else {
+      const body = {
+        page: 1,
+        size: SIZE
+      }
+      this.fetchData(body)
     }
-    this.fetchData(body)
   }
   delete = (e, id) => {
     if (e) {
@@ -154,9 +183,12 @@ class RoleTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
+  roles: state.setRoleList.roles,
+  rolesSet: state.setRoleList.rolesSet,
   page: state.changeEmployee[subModule].page
 })
 
 export default withRouter(connect(mapStateToProps, {
- changeEmployee 
+ changeEmployee,
+ setRoleList 
 })(RoleTable))

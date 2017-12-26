@@ -9,6 +9,11 @@ import DeviceSelector from '../../component/deviceWithoutAll'
 import Time from '../../component/time'
 import CONSTANTS from '../../component/constants'
 
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setAuthenData } from '../../../actions'
+
 const DEVICETYPE = CONSTANTS.DEVICETYPE
 const SIZE = CONSTANTS.PAGINATION
 
@@ -18,6 +23,9 @@ const SIZE = CONSTANTS.PAGINATION
 //const Modal = asyncComponent(() => import(/* webpackChunkName: "modal" */ "antd/lib/modal"))
 
 class RepairProblem extends React.Component {
+  static propTypes = {
+    forbiddenStatus: PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     const dataSource = []
@@ -272,9 +280,10 @@ class RepairProblem extends React.Component {
   }
   render () {
     const {editing, deviceType, deviceTypeError, page, total, loading, dataSource} = this.state
+    const {forbiddenStatus} = this.props
     return (
       <div className='contentArea'>
-        <SearchLine openTitle='添加' openModal={this.addProblem} />
+          {forbiddenStatus.EDIT_REPAIR_PROBLEM ? null : <SearchLine openTitle='添加' openModal={this.addProblem} />}
 
           <div className='tableList'>
             <Table bordered
@@ -315,4 +324,10 @@ class RepairProblem extends React.Component {
   }
 }
 
-export default RepairProblem
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
+
+export default withRouter(connect(mapStateToProps, {
+  setAuthenData
+})(RepairProblem))

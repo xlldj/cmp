@@ -18,8 +18,9 @@ const initialAuthenData = {
   current: [
   ],
   forbiddenUrls: [],
+  forbiddenStatus: {
+  },
   authenSet: false,
-  rolePrivileges: {},
   mainNavs: [],
   subNavs: {}
 }
@@ -28,7 +29,24 @@ const setAuthenData = (state = initialAuthenData, action) => {
   if (type === ActionTypes.SET_AUTHENDATA) {
     const value = action.value
     console.log(value)
-    return {...state, ...value}
+    return Object.assign({}, state, value)
+  }
+  return state
+}
+
+const initialRoleList = {
+  roles: [],
+  rolesSet: false,
+  rolePrivileges: [],
+  rolePrivilegesSet: false
+}
+const setRoleList = (state = initialRoleList, action) => {
+  const {type} = action
+  if (type === ActionTypes.SET_ROLE_LIST) {
+    console.log(action.value)
+    const value = action.value
+    // console.log({...state, ...value})
+    return Object.assign({}, state, value)
   }
   return state
 }
@@ -389,7 +407,8 @@ const rootReducer = combineReducers({
   changeVersion,
   setSchoolList,
   changeStat,
-  setAuthenData
+  setAuthenData,
+  setRoleList
 })
 
 export default rootReducer

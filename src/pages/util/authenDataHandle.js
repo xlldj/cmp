@@ -6,7 +6,6 @@ const OPETYPES = CONSTANTS.AuthenOpeType
 export function buildAuthenData (data, selected) {
   /* count: count of authentication items, for style */
   /*   key: to facilitate the handle of click event in ahthen table */
-  console.log(data)
   // debugger
   if (!data) {
     return
@@ -23,14 +22,13 @@ export function buildAuthenData (data, selected) {
         // current main block has the sub
         subBlock.count++
         let operBlock = subBlock.children && subBlock.children.find(o => o.opeType === oper)
-        // debugger
         if (operBlock) {
           // current sub has the operation block
           operBlock.count++
           operBlock.children.push({
             name: r.desc,
             id: authenId,
-            key: operBlock.key + (operBlock.length + 1),
+            key: operBlock.key + '-' + (operBlock.children.length + 1),
             level: 4,
             selected: selected || false
           })
@@ -140,7 +138,34 @@ export function buildCurrentAuthen (data) {
   return status
 }
 
+// build authen status based on full. Such as in roleInfo.js, employeeInfo.js
+// 'data' is a constructed authen structure like in buildAuthenData()
+// 'status' is a array of selected privileges, fetched from server,
+export function buildAuthenBaseOnfull (data, status) {
+  let full = JSON.parse(JSON.stringify(data))
+  console.log(full)
+  console.log(status)
+  // debugger
+  status.forEach(s => {
+    let mainBlock = full.find(m => m.id === s.mainId)
+    if (mainBlock && mainBlock.children) {
+      mainBlock.selected = true
+      let subBlock = mainBlock.children.find(sub => sub.id === s.subId)
+      if (subBlock && subBlock.children) {
+        subBlock.selected = true
+        let operBlock = subBlock.children.find(o => o.opeType === s.oper)
+        if (operBlock && operBlock.children) {
+          operBlock.selected = true
+          let item = operBlock.children.find(a => a.id === s.id)
+          item.selected = true
+        }
+      }
+    }
+  })
+  return full
+}
 // build a array which contains forbidden url
+// 'full' and 'current' are some structure: flatten object array directly from server.
 export function buildForbiddenUrl (full, current) {
   if (!full || full.length === 0) {
     return
@@ -149,7 +174,7 @@ export function buildForbiddenUrl (full, current) {
     return
   }
   try {
-    let forbidden = full.forEach((r) => {
+    let forbidden = full.filter((r) => {
       let found = current.find(rec => rec.id === r.id)
       if (found) {
         return false
@@ -161,9 +186,9 @@ export function buildForbiddenUrl (full, current) {
     forbidden.forEach((r) => {
       console.log(privilege2Url[r.desc])
       let urls = privilege2Url[r.desc]
-      urls.forEach((u) => {
-        forbiddenUrls.push(u)
-      })
+      if (urls) {
+        forbiddenUrls = forbiddenUrls.concat(urls)
+      }
     })
     return forbiddenUrls
   } catch (e) {
@@ -172,30 +197,58 @@ export function buildForbiddenUrl (full, current) {
   }
 }
 
+export function buildForbiddenStatus (full, current) {
+  let desc2status = CONSTANTS.DESC2STATUS
+  let forbiddenStatus = {}
+  // find all the forbidden items
+  if (current && current.length > 0 && full && full.length > 0) {
+    let forbidden = full.filter((r) => {
+      let found = current.find(rec => rec.id === r.id)
+      if (found) {
+        return false
+      } else {
+        return true
+      }
+    })
+    // if need to set in store/setAuthenData.forbiddenStatus, set it
+    forbidden.forEach(p => {
+      if (desc2status[p.desc]) {
+        let key = desc2status[p.desc]
+        forbiddenStatus[key] = true
+      }
+    })
+    return forbiddenStatus
+  }
+}
+
+// used in authenInfo
 // build previleges data for server
 export function buildAuthenDataForServer (status) {
-  let data = []
-  const buildItem = (model) => {
-    if (model.children) {
-      model.children.forEach((r) => {
-        buildItem(r)
+  const result = []
+  // debugger
+  status.forEach(main => {
+    if (main.children) {
+      main.children.forEach(sub => {
+        if (sub.children) {
+          sub.children.forEach(oper => {
+            if (oper.children) {
+              oper.children.forEach(item => {
+                if (item.selected) {
+                  result.push(item.id)
+                }
+              })
+            }
+          })
+        }
       })
-    } else {
-      data.push(model.id)
-    }
-  }
-  data = buildItem(status)
-  let result = []
-  data.forEach((r) => {
-    if (r.selected) {
-      result.push(r.id)
     }
   })
   return result
 }
 
-export function updatePrivilege (data, status) {
+export function updatePrivilege (full, status) {
   // data is a full privelege table, status is the info need to be added
+  let data = JSON.parse(JSON.stringify(full))
   if (!data || !status) {
     return
   }
@@ -223,6 +276,7 @@ export function updatePrivilege (data, status) {
   })
   return data
 }
+
 /*
 export function buildReadableAuthen (data) {
   let status = {}

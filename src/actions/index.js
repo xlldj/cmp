@@ -1,7 +1,51 @@
+import AjaxHandler from '../pages/ajax'
+import {buildAuthenData} from '../pages/util/authenDataHandle'
+import {getStore, setStore} from '../pages/util/storage'
+
 export const SET_AUTHENDATA = 'SET_AUTHENDATA'
 export const setAuthenData = (value) => {
   return {
     type: SET_AUTHENDATA,
+    value
+  }
+}
+
+// fetch privilege/list 
+export const fetchPrivileges = () => {
+  return dispatch => {
+    let resource = '/privilege/list'
+    const body = null
+    const cb = (json) => {
+      let fullPrivileges = json.data.privileges
+      // set full privileges data
+      let full = buildAuthenData(fullPrivileges)
+      let data = {
+        full: full,
+        originalPrivileges: fullPrivileges,
+        authenSet: true
+      }
+      // set data into store
+      dispatch({
+        type: 'SET_AUTHENDATA',
+        value: data
+      })
+      // store info into sessionStorage so it will remain when refresh
+      // sessionStorage/authenInfo should always exist here, because it's set when login
+      let authenInfo = JSON.parse(getStore('authenInfo'))
+      if (authenInfo) {
+        let auth = Object.assign({}, authenInfo, {full: full})
+        console.log(auth)
+        setStore('authenInfo', JSON.stringify(auth))
+      }
+    }
+    return AjaxHandler.ajax(resource, body, cb)
+  }
+}
+
+export const SET_ROLE_LIST = 'SET_ROLE_LIST'
+export const setRoleList = (value) => {
+  return {
+    type: SET_ROLE_LIST,
     value
   }
 }

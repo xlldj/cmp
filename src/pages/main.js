@@ -1,3 +1,11 @@
+/* state description */
+/* build flow
+    1. fetch schools for school selector
+    2. check if authentication status is set, if not, read from sessionStorage. If still false, hint relog again
+    3. use 'forbiddenUrls' to control if show some url. This prop is set along with authentication info. So It will always exist in when update
+*/
+
+
 import React from 'react'
 import {Route, Redirect, Link} from 'react-router-dom'
 import { asyncComponent } from './component/asyncComponent'
@@ -8,15 +16,15 @@ import logo from './assets/logo.png'
 import {getLocal, setLocal, removeLocal, getStore} from './util/storage'
 import AjaxHandler from './ajax'
 import Noti from './noti'
-import {buildAuthenData} from './util/authenDataHandle'
-import {setStore} from './util/storage'
+import {removeStore} from './util/storage'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, 
   changeLost, changeUser, changeTask, changeEmployee, changeNotify, 
-  changeVersion, changeStat, setSchoolList, setAuthenData
+  changeVersion, changeStat, setSchoolList, setAuthenData,
+  fetchPrivileges
 } from '../actions'
 
 const Welcome = asyncComponent(() => import(/* webpackChunkName: "welcome" */ "./welcome/welcome"))
@@ -60,17 +68,21 @@ class Main extends React.Component {
     })
     this.fetchSchools()
 
-    // set authen info globally
+    // Set authen info globally
+    // Typically, 'authenSet' should be true(it's set when login).
+    // If browser refreshed, store may be cleared thus need to be read from sessionStorage
+    // Or if sessiongStorage is null, it should be 'refresh but did not log after version change'. Hint to log again.
     try {
       let {authenSet} = this.props
       if (!authenSet) {
         let authenInfo = JSON.parse(getStore('authenInfo'))
-        console.log(authenInfo)
+        // console.log(authenInfo)
         if (authenInfo) {
           authenInfo.authenSet = true
           this.props.setAuthenData(authenInfo)
         } else {
-          this.fetchAuthenData()
+          this.hintRelog()
+          // this.props.fetchPrivileges()
         }
       }
     } catch (e) {
@@ -80,25 +92,12 @@ class Main extends React.Component {
 
     this.props.hide(false)
   }
-  fetchAuthenData = () => {
-    let resource = '/privilege/list'
-    const body = null
-    const cb = (json) => {
-      let fullPrivileges = json.data.privileges
-      // set full privileges data
-      let full = buildAuthenData(fullPrivileges)
-      console.log(full)
-      this.props.setAuthenData({
-        full: full,
-        originalPrivileges: fullPrivileges,
-        authenSet: true
-      })
-      let authenInfo = {
-        full: full
-      }
-      setStore('authenInfo', JSON.stringify(authenInfo))  
+  hintRelog = () => {
+    const logout = () => {
+      removeStore('logged')
+      window.location.assign('/')
     }
-    AjaxHandler.ajax(resource, body, cb)
+    Noti.hintAndClick('您的账户已在别的地方登录', '您将被强制退出，请重新登录', logout)
   }
   componentWillUnmount () {
     this.props.hide(true)
@@ -112,9 +111,7 @@ class Main extends React.Component {
   shouldComponentUpdate (nextProps, nextState) {
     // url control. if next location is a forbidden url , stop update
     let nextLocation = nextProps.history.location.pathname
-    console.log(this.props)
     let {forbiddenUrls} = this.props
-    console.log(forbiddenUrls)
     try {
       let forbidden = forbiddenUrls.findIndex((r) => {
         if (r.includes(nextLocation)) {
@@ -154,7 +151,7 @@ class Main extends React.Component {
     let resource='/school/list'
     const body={
       page: 1,
-      size: 100
+      size: 1000
     }
     const cb = (json) => {
       if(json.error){
@@ -318,5 +315,6 @@ export default withRouter(connect(mapStateToProps, {
   changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion,
   setSchoolList,
   changeStat,
-  setAuthenData
+  setAuthenData,
+  fetchPrivileges
 })(Main))

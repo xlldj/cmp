@@ -146,6 +146,11 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                           title = '状态异常'
                                           // message = error.displayMessage
                                           message = '当前操作针对的信息已在别处被更改，请稍后重新查看其状态'
+                                        } else if (error.code === 30002) {
+                                          // dispatched when employee/account exists (employeeInfo.js)
+                                          title = '账号重复'
+                                          message = error.displayMessage || '账号重复，请重新生成后提交'
+                                          // message = '当前操作针对的信息已在别处被更改，请稍后重新查看其状态'
                                         } else {
                                           console.log(error.message)
                                           message = error.message || error.displayMessage || '网络错误，请稍后刷新重试'
@@ -203,8 +208,8 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
   if (options && options.domain) {
     url = options.domain + resource
   } else {
-    url = 'http://116.62.236.67:5080' + resource  
-    // url = 'http://10.0.0.4:5080' + resource
+    // url = 'http://116.62.236.67:5080' + resource  
+    url = 'http://10.0.0.4:5080' + resource
     // url = 'https://api.xiaolian365.com/m' + resource
   }
 
@@ -223,8 +228,8 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
 
 /* for client ajax request */
 AjaxHandler.ajaxClient = (resource, body, cb) => {
-  const domain = 'http://116.62.236.67:5081'
-  // const domain = 'http://10.0.0.4:5081'
+  // const domain = 'http://116.62.236.67:5081'
+  const domain = 'http://10.0.0.4:5081'
   // const domain = 'https://api.xiaolian365.com/c'
   AjaxHandler.ajax(resource, body, cb, null, {domain: domain})
 }

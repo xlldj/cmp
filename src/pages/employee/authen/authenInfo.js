@@ -1,3 +1,10 @@
+/* ---------  description ----------- */
+/* 1. Used to add/edit privilege info
+   2. 'desc' is not checked to be different, so be cautious
+   3. 'path' is local name, corresponding to 'paths' of server format
+   4. main and sub navs is build from 'store/mainNavs' and 'store/subNavs'. If 'subNavs[i]' is null, fetch.
+*/
+
 import React from 'react'
 import { Button} from 'antd'
 import AjaxHandler from '../../ajax'
@@ -9,11 +16,10 @@ import AddPlusAbs from '../../component/addPlusAbs'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { setAuthenData } from '../../../actions'
+import { setAuthenData, fetchPrivileges } from '../../../actions'
 
 class AuthenInfo extends React.Component {
   static propTypes = {
-    full: PropTypes.array.isRequired,
     mainNavs: PropTypes.array.isRequired,
     subNavs: PropTypes.object.isRequired,
     originalPrivileges:PropTypes.array.isRequired
@@ -22,36 +28,31 @@ class AuthenInfo extends React.Component {
     super(props)
     this.state = {
       id: 0,
-      main: '',
+      mainId: '',
       mainError: false,
-      sub: '',
+      subId: '',
       subError: false,
-      ope: '',
+      oper: '',
       opeError: false,
-      des: '',
+      desc: '',
       desError: false,
       path: [{name: '', error: false}],
       pathError: false,
       subItems: {}
     }
-    const mainNav = {}
-    let full = this.props.full
-    full.forEach((r) => {
-      mainNav[r.id] = r.name
-    })
-    this.mainNav = mainNav
   }
   fetchData = (body) => {
     let resource='/api/privilege/one'
     const cb = (json) => {
-      let {mainId, subId, oper, desc, paths} = json.data
+      let {id, mainId, subId, oper, desc, paths} = json.data
       const nextState = {
-        main: mainId,
-        sub: subId,
-        ope: oper,
-        des: desc
+        id: id,
+        mainId: mainId,
+        subId: subId,
+        oper: oper,
+        desc: desc
       }
-      if (paths && (paths.length > 1)) {
+      if (paths && (paths.length > 0)) {
         let path = []
         paths.forEach((p) => {
           path.push({
@@ -61,9 +62,10 @@ class AuthenInfo extends React.Component {
         })
         nextState.path = path
       }
+      console.log(nextState)
       this.setState(nextState)
       // set subItems for nav
-      if (!this.props.subNavs[subId]) {
+      if (!this.props.subNavs[mainId]) {
         this.fetchNavs({
           parentId: mainId,
           level: 2
@@ -109,11 +111,11 @@ class AuthenInfo extends React.Component {
             navs.push(r)
           }
         } else {
-          let main = navs.find(n => n.id === r.parentId)
-          if (main) {
-            let sub = main.children && main.children[r.id]
-            if (!sub) {
-              main.children[r.id] = r.name
+          let mainId = navs.find(n => n.id === r.parentId)
+          if (mainId) {
+            let subId = mainId.children && mainId.children[r.id]
+            if (!subId) {
+              mainId.children[r.id] = r.name
             }
           }
         }
@@ -139,7 +141,6 @@ class AuthenInfo extends React.Component {
       const body = {
         id: id
       }
-      console.log(body)
       this.fetchData(body)
     }
   }
@@ -150,7 +151,7 @@ class AuthenInfo extends React.Component {
     this.props.history.goBack()
   }
   postData = () => {
-    const {id, sub, ope, des, path, posting} = this.state
+    const {id, subId, oper, desc, path, posting} = this.state
     if (posting) {
       return
     }
@@ -162,10 +163,10 @@ class AuthenInfo extends React.Component {
     })
     let resource = '/privilege/add'
     const body = {
-      navId: parseInt(sub, 10),
-      oper: parseInt(ope, 10),
-      desc: des,
-      path: pathArr
+      navId: parseInt(subId, 10),
+      oper: parseInt(oper, 10),
+      desc: desc,
+      paths: pathArr
     }
     if (id) {
       resource = '/privilege/update'
@@ -173,72 +174,58 @@ class AuthenInfo extends React.Component {
     }
     const cb = (json) => {
       if (json.data.result) {
+        // update privileges info of store first
+        this.props.fetchPrivileges()
         Noti.hintSuccess(this.props.history, '/employee/authen')
-        // push the info to store
-        this.updateAuthenData()
       } else {
         Noti.hintWarning('添加出错', json.data.failReason || '请稍后重试')
       }
     }
-    console.log(body)
+    // console.log(body)
     AjaxHandler.ajax(resource, body, cb)
   }
-  updateAuthenData = () => {
-  }
   confirm = () => {
-    const {main, sub, ope, des, path, checking, posting} = this.state
+    const {mainId, subId, oper, desc, checking, posting} = this.state
     if (checking || posting) {
       return
     }
-    if (!main) {
+    if (!mainId) {
       return this.setState({
         mainError: true
       })
     }
-    if (!sub) {
+    if (!subId) {
       return this.setState({
         subError: true
       })
     }
-    if (!ope) {
+    if (!oper) {
       return this.setState({
         opeError: true
       })
     }
-    if (!des) {
+    if (!desc) {
       return this.setState({
         desError: true
       })
     }
-    path.forEach((r, i) => {
+    let path = JSON.parse(JSON.stringify(this.state.path))
+    for (let i=0;i<path.length;i++) {
+      let r = path[i]
       if (!r.name) {
-        path.splice(i, 1)
+        r.error = true
+        return this.setState({
+          path: path
+        })
       }
-    })
-    if (path.length === 0) {
-      return this.setState({
-        pathError: true
-      })
     }
     this.postData()
   }
   changeMain = (v) => {
     this.setState({
-      main: v
+      mainId: v
     })
     if (v) {
-      /*
-      let block = this.props.full.find(r => r.id === parseInt(v, 10))
-      let subItems = {}
-      if (block) {
-        block.children.forEach((r) => {
-          subItems[r.id] = r.name
-        })
-        this.setState({
-          subItems: subItems
-        })
-      }
-      */
       let {subNavs} = this.props
       let id = parseInt(v, 10)
       let subItems = subNavs[id]
@@ -263,7 +250,7 @@ class AuthenInfo extends React.Component {
   }
   changeSub = (v) => {
     this.setState({
-      sub: v
+      subId: v
     })
   }
   checkSub = (v) => {
@@ -279,7 +266,7 @@ class AuthenInfo extends React.Component {
   }
   changeOpe = (v) => {
     this.setState({
-      ope: v
+      oper: v
     })
   }
   checkOpe = (v) => {
@@ -295,7 +282,7 @@ class AuthenInfo extends React.Component {
   }
   changeDes = (e) => {
     this.setState({
-      des: e.target.value
+      desc: e.target.value
     })
   }
   checkDes = (e) => {
@@ -303,13 +290,13 @@ class AuthenInfo extends React.Component {
     if (!v) {
       return this.setState({
         desError: true,
-        des: v
+        desc: v
       })
     }
     if (this.state.desError) {
       this.setState({
         desError: false,
-        des: v
+        desc: v
       })
     }
   }
@@ -350,30 +337,30 @@ class AuthenInfo extends React.Component {
   }
   
   render () {
-    const {id, main, mainError, sub, subError, 
-      ope, opeError, des, desError, 
-      path, pathError
+    const {id, mainId, mainError, subId, subError, 
+      oper, opeError, desc, desError, 
+      path
     } = this.state
     const {subNavs} = this.props
     const pathItems = path && path.map((r, i) => {
       return (
         <div key={`path${i}`}>
-          <input value={r.name} onChange={(e) => {this.changePath(e, i)}} onBlur={(e) => {this.checkPath(e, i)}} />
+          <input value={r.name} className='longInput' onChange={(e) => {this.changePath(e, i)}} onBlur={(e) => {this.checkPath(e, i)}} />
           {r.error ? <span className='checkInvalid'>链接不能为空！</span> : null}
         </div>
       )
     })
 
     return (
-      <div className='infoList'>
+      <div className='infoList authenInfo'>
         <ul>
           <li>
             <p>主导航:</p>
             <BasicSelector
               invalidTitle=''
               width={CONSTANTS.SELECTWIDTH}
-              staticOpts={this.mainNav}
-              selectedOpt={main}
+              staticOpts={this.mainNav || {}}
+              selectedOpt={mainId}
               disabled={id}
               className={id ? 'disabled' : ''} 
               changeOpt={this.changeMain} 
@@ -386,8 +373,8 @@ class AuthenInfo extends React.Component {
             <BasicSelector
               invalidTitle=''
               width={CONSTANTS.SELECTWIDTH}
-              staticOpts={subNavs[parseInt(main, 10)] || {}}
-              selectedOpt={sub}
+              staticOpts={subNavs[parseInt(mainId, 10)] || {}}
+              selectedOpt={subId}
               disabled={id}
               className={id ? 'disabled' : ''} 
               changeOpt={this.changeSub} 
@@ -399,7 +386,7 @@ class AuthenInfo extends React.Component {
             <p>权限类型:</p>
             <BasicSelector
               width={CONSTANTS.SELECTWIDTH}
-              selectedOpt={ope}
+              selectedOpt={oper}
               changeOpt ={this.changeOpe}
               checkOpt ={this.checkOpe}
               staticOpts={CONSTANTS.AuthenOpeType}
@@ -409,7 +396,7 @@ class AuthenInfo extends React.Component {
           </li>
           <li>
             <p>权限名称:</p>
-            <input value={des} onChange={this.changeDes} onBlur={this.checkDes} />
+            <input value={desc} className='longInput' onChange={this.changeDes} onBlur={this.checkDes} />
             {desError ? <span className='checkInvalid'>名称不能为空！</span> : null}
           </li>
           <li className='itemsWrapper'>
@@ -418,7 +405,6 @@ class AuthenInfo extends React.Component {
               {pathItems}    
               <AddPlusAbs count={path.length} add={this.add} abstract={this.abstract} /> 
             </div>
-            {pathError ? <span className='checkInvalid'>链接不能为空！</span> : null}
           </li>
         </ul>
         <div className='btnArea'>
@@ -432,12 +418,12 @@ class AuthenInfo extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  full: state.setAuthenData.full,
   mainNavs: state.setAuthenData.mainNavs,
   subNavs: state.setAuthenData.subNavs,
   originalPrivileges: state.setAuthenData.originalPrivileges
 })
 
 export default withRouter(connect(mapStateToProps, {
-  setAuthenData
+  setAuthenData,
+  fetchPrivileges
 })(AuthenInfo))

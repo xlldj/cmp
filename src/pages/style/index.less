@@ -765,7 +765,8 @@ button.grayBackColor:linked{
 
 /* for authen data table */
 .roleTable{
-	box-sizing: border-box;
+  box-sizing: border-box;
+  user-select: none;
 	div, .levelHeader, .levelContent, .levelChildrenWrapper{
 		box-sizing: border-box;
 	}
@@ -808,7 +809,7 @@ button.grayBackColor:linked{
 		border-bottom: none;
 	}
   .selected{
-    background-color: #eee;
+    background-color: @blue;
   }
   .editBox{
 
@@ -816,9 +817,10 @@ button.grayBackColor:linked{
   }
 }
 
-/* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set */
+/* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable{
   margin:10px 40px 40px 40px;
+  user-select: none;
   .optInDeposit{
     display: inline-flex;
     width: 100%;

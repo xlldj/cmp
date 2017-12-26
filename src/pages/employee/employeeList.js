@@ -20,7 +20,6 @@ import { withRouter } from 'react-router-dom'
 import { changeEmployee } from '../../actions'
 const subModule = 'employeeList'
 
-
 const SIZE = CONSTANTS.PAGINATION
 const TYPE = CONSTANTS.ROLE
 const BACKTITLE={
@@ -31,7 +30,8 @@ class EmployeeList extends React.Component {
   static propTypes = {
     selectKey: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired,
-    schoolId: PropTypes.string.isRequired
+    schoolId: PropTypes.string.isRequired,
+    forbiddenStatus: PropTypes.object.isRequired
   }
   constructor(props){
     super(props)
@@ -171,6 +171,9 @@ class EmployeeList extends React.Component {
     })
   }
   delete = (e, id, force) => {
+    if (this.props.DELETE_EMPLOYEE) {
+      return Noti.hintWarning('', '您没有权限进行此操作')
+    }
     if (e) {
       e.preventDefault()
     }
@@ -310,7 +313,8 @@ class EmployeeList extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
   selectKey: state.changeEmployee[subModule].selectKey,
   page: state.changeEmployee[subModule].page,
-  schoolId: state.changeEmployee[subModule].schoolId
+  schoolId: state.changeEmployee[subModule].schoolId,
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
 export default withRouter(connect(mapStateToProps, {

@@ -1,27 +1,36 @@
+/* ----------- description --------- */
+/* 1. authenStatus is build from props.full
+   2. AuthenDataTable's 'authenStatus' is passed from state/authenStatus. 
+      Each time changed in AuthenDataTable, change state/AuthenDataTable on hook of confirm.
+*/
+
 import React from 'react'
 import { Button} from 'antd'
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
-import CONSTANTS from '../../component/constants'
 import AuthenDataTable from '../../component/authenDataTable'
-import {buildRealAuthen, buildAuthenDataForServer} from '../../util/authenDataHandle'
+import {buildAuthenBaseOnfull, buildAuthenDataForServer} from '../../util/authenDataHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeEmployee, setAuthenData } from '../../../actions'
+import { changeEmployee, setAuthenData, setRoleList } from '../../../actions'
 
 class RoleInfo extends React.Component {
   static propTypes = {
+    originalPrivileges: PropTypes.array.isRequired,
     full: PropTypes.array.isRequired
   }
   constructor (props) {
     super(props)
     this.state = {
       id: '',
+      name: '',
+      originalName: '',
+      nameError: false,
       checking: false,
       posting: false,
-      authenStatus: CONSTANTS.authenData
+      authenStatus: this.props.full || []
     }
   }
   fetchData = (body) => {
@@ -29,9 +38,18 @@ class RoleInfo extends React.Component {
     const cb = (json) => {
       try {
         if(json.data){
-          let {previleges} = json.data
-          let authenStatus = buildRealAuthen(this.props.full, previleges)
+          let {name, privileges} = json.data
+          let status = []
+          privileges.forEach(p => {
+            let r = this.props.originalPrivileges.find(o => o.id === p)
+            if (r) {
+              status.push(r)
+            }
+          })
+          let authenStatus = buildAuthenBaseOnfull(this.props.full, status)
           this.setState({
+            name: name,
+            originalName: name,
             authenStatus: authenStatus 
           })
         }  
@@ -62,7 +80,7 @@ class RoleInfo extends React.Component {
     this.props.history.goBack()
   }
   postData = () => {
-    let {id, authenStatus, posting} = this.state
+    let {id, name, authenStatus, posting} = this.state
     if (posting) {
       return
     }
@@ -70,9 +88,10 @@ class RoleInfo extends React.Component {
       posting: true
     })
     let resource
-    let previleges = buildAuthenDataForServer(this.props.full, authenStatus)
+    let privileges = buildAuthenDataForServer(authenStatus)
     const body={
-      previleges: previleges
+      name: name,
+      privileges: privileges
     }
     if(id){
       body.id = id
@@ -86,29 +105,81 @@ class RoleInfo extends React.Component {
           posting: false
         })
         if (json.data.result) {
+          this.updateRolesInStore()
           Noti.hintSuccess(this.props.history,'/employee/role')
         } else {
-          Noti.hintWaring(null, json.data.failReason || '添加出错，请稍后重试')
+          Noti.hintWarning(null, json.data.failReason || '添加出错，请稍后重试')
         }
       } catch (e) {
         console.log(e)
       }     
     }
+    // console.log(body)
     AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
   }
+  updateRolesInStore = () => {
+    this.props.setRoleList({
+      rolesSet: false,
+      rolePrivilegesSet: false
+    })
+    this.fetchRoles()
+  }
+  fetchRoles = () => {
+    let resource = '/role/list'
+    const body = {
+      page: 1,
+      size: 10000
+    }
+    const cb = (json) => {
+      if (json.data.roles) {
+        this.props.setRoleList({
+          roles: json.data.roles,
+          rolesSet: true
+        })
+        if (!this.props.rolePrivilegesSet) {
+          this.fetchRolePrivileges()
+        }
+      }
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
+  fetchRolePrivileges = () => {
+    let {roles} = this.props
+    let roleIds = roles.map(r => r.id)
+    let resource = '/role/detail/list'
+    const body = {
+      ids: roleIds
+    }
+    const cb = (json) => {
+      let {roles} = json.data
+      this.props.setRoleList({
+        rolePrivileges: roles,
+        rolePrivilegesSet: true
+      })
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   confirm = () => {
-    let {id, checking, posting} = this.state
+    let {name, originalName, id, checking, posting} = this.state
+    if (!name) {
+      return this.setState({
+        nameError: true
+      })
+    }
     if (checking || posting) {
       return
     }
-    if (id) {
+    // if edit and name is not changed, post directly
+    if (id && (name === originalName)) {
       this.postData()
     } else {
       this.checkExist(this.postData)
     }
   }
-  checkExist = (callback) => {
-    let {checking, name} = this.state
+  checkExist = (callback, state) => {
+    console.log('checking')
+    let {checking, name} = {...this.state, state}
+    console.log(checking)
     if (checking) {
       return
     }
@@ -124,7 +195,7 @@ class RoleInfo extends React.Component {
         checking: false
       }
       if (json.data.result) {
-        Noti.hintWaring('', '该身份已存在于系统中!')
+        Noti.hintWarning('', '该身份已存在于系统中!')
       } else {
         if (callback) {
           callback()
@@ -147,6 +218,7 @@ class RoleInfo extends React.Component {
         nameError: true
       })
     } else {
+      this.checkExist(null, {name: m})
       this.setState({
         name: m,
         nameError: false
@@ -200,10 +272,15 @@ class RoleInfo extends React.Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
-  full: state.setAuthenData.full
+  originalPrivileges: state.setAuthenData.originalPrivileges,
+  full: state.setAuthenData.full,
+  roles: state.setRoleList.roles,
+  rolesSet: state.setRoleList.rolesSet,
+  rolePrivilegesSet: state.setRoleList.rolePrivilegesSet
 })
 
 export default withRouter(connect(mapStateToProps, {
- changeEmployee,
- setAuthenData 
+  changeEmployee,
+  setAuthenData,
+  setRoleList
 })(RoleInfo))

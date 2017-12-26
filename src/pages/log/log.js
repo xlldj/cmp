@@ -6,7 +6,7 @@ import Noti from '../noti'
 import {setToken} from '../util/handleToken'
 import {setStore, getLocal, removeStore} from '../util/storage'
 import {clientDetect} from '../util/clientDetect'
-import {buildAuthenData, buildForbiddenUrl, buildCurrentAuthen} from '../util/authenDataHandle'
+import {buildAuthenData, buildForbiddenUrl, buildCurrentAuthen, buildForbiddenStatus} from '../util/authenDataHandle'
 import logLogo from '../assets/log_logo.png'
 import './style/style.css'
 
@@ -165,22 +165,35 @@ class Log extends React.Component{
             let full = buildAuthenData(fullPrivileges)
 
             // set privileges for the current user
-            let currentAuthenStatus = buildCurrentAuthen(privileges)
+            let priviInfos = []
+            privileges.forEach(p => {
+              let info = fullPrivileges.find(f => f.id === p)
+              if (info) {
+                priviInfos.push(info)
+              }
+            })
+            let currentAuthenStatus = buildCurrentAuthen(priviInfos)
 
             // get forbidden urls
-            let forbiddenUrls = buildForbiddenUrl(fullPrivileges, privileges)
+            let forbiddenUrls = buildForbiddenUrl(fullPrivileges, priviInfos)
+
+            // set forbidden operation, which can not be stopped by url
+            let forbiddenStatus = buildForbiddenStatus(fullPrivileges, priviInfos)
 
             this.props.setAuthenData({
               full: full || [],
               originalPrivileges: fullPrivileges || [],
               current: currentAuthenStatus || [],
               forbiddenUrls: forbiddenUrls || [],
+              forbiddenStatus: forbiddenStatus || {},
               authenSet: true
             })
             let authenInfo = {
               full: full,
+              originalPrivileges: fullPrivileges,
               current: currentAuthenStatus,
-              forbiddenUrls: forbiddenUrls
+              forbiddenUrls: forbiddenUrls,
+              forbiddenStatus: forbiddenStatus
             }
             setStore('authenInfo', JSON.stringify(authenInfo))
           }
