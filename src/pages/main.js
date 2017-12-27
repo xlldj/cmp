@@ -1,3 +1,11 @@
+/* state description */
+/* build flow
+    1. fetch schools for school selector
+    2. check if authentication status is set, if not, read from sessionStorage. If still false, hint relog again
+    3. use 'forbiddenUrls' to control if show some url. This prop is set along with authentication info. So It will always exist in when update
+*/
+
+
 import React from 'react'
 import {Route, Redirect, Link} from 'react-router-dom'
 import { asyncComponent } from './component/asyncComponent'
@@ -5,14 +13,19 @@ import Layout from 'antd/lib/layout'
 import MyMenu from './nav/myMenu'
 import userImg from './assets/user.png'
 import logo from './assets/logo.png'
-import {getLocal, setLocal, removeLocal} from './util/storage'
+import {getLocal, setLocal, removeLocal, getStore} from './util/storage'
 import AjaxHandler from './ajax'
+import Noti from './noti'
+import {removeStore} from './util/storage'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion, changeStat, setSchoolList } from '../actions'
-
+import { changeSchool, changeDevice, changeOrder, changeFund, changeGift, 
+  changeLost, changeUser, changeTask, changeEmployee, changeNotify, 
+  changeVersion, changeStat, setSchoolList, setAuthenData,
+  fetchPrivileges
+} from '../actions'
 
 const Welcome = asyncComponent(() => import(/* webpackChunkName: "welcome" */ "./welcome/welcome"))
 const SchoolDisp = asyncComponent(() => import(/* webpackChunkName: "school" */ "./school/schoolDisp"))
@@ -35,34 +48,118 @@ class Main extends React.Component {
   static propTypes = {
     schools: PropTypes.array.isRequired,
     recent: PropTypes.array.isRequired,
-    schoolSet: PropTypes.bool.isRequired
+    schoolSet: PropTypes.bool.isRequired,
+    forbiddenUrls: PropTypes.array.isRequired,
+    authenSet: PropTypes.bool.isRequired
   }
 
   state = {
     hasChildren: true,
-    ti: null
+    showForbidden: false,
+    tiForForbid: null,
+    ti: null,
+    forbiddenUrl: ''
   }
   componentDidMount () {
+    // set school list globally
     this.props.setSchoolList({
       schoolSet: false,
       schools: [],
       recent: []
     })
     this.fetchSchools()
+
+    // Set authen info globally
+    // Typically, 'authenSet' should be true(it's set when login).
+    // If browser refreshed, store may be cleared thus need to be read from sessionStorage
+    // Or if sessiongStorage is null, it should be 'refresh but did not log after version change'. Hint to log again.
+    try {
+      let {authenSet} = this.props
+      if (!authenSet) {
+        let authenInfo = JSON.parse(getStore('authenInfo'))
+        // console.log(authenInfo)
+        if (authenInfo) {
+          authenInfo.authenSet = true
+          this.props.setAuthenData(authenInfo)
+        } else {
+          this.hintRelog()
+          // this.props.fetchPrivileges()
+        }
+      }
+    } catch (e) {
+      console.log(e)
+      Noti.hintProgramError()
+    }
+
     this.props.hide(false)
+  }
+  hintRelog = () => {
+    const logout = () => {
+      removeStore('logged')
+      window.location.assign('/')
+    }
+    Noti.hintAndClick('您的账户已在别的地方登录', '您将被强制退出，请重新登录', logout)
   }
   componentWillUnmount () {
     this.props.hide(true)
     if (this.state.ti) {
       clearTimeout(this.state.ti)
     }
+    if (this.state.tiForForbid) {
+      clearTimeout(this.tiForForbid)
+    }
+  }
+  shouldComponentUpdate (nextProps, nextState) {
+    // url control. if next location is a forbidden url , stop update
+    let nextLocation = nextProps.history.location.pathname
+    let {forbiddenUrls} = this.props
+    try {
+      let forbidden = forbiddenUrls.findIndex((r) => {
+        if (nextLocation.includes(r)) {
+          return true
+        } else {
+          return false
+        }
+      })
+      console.log('update')
+      if (forbidden !== -1) {
+        // return false
+        // if not showing forbidden, and nextLocation !== this.state.forbiddenUrl, show it. Trigger a timer to avoid duplicate show
+        if (!this.state.showForbidden && (nextLocation !== this.forbiddenUrl)) {
+          Noti.hintWarning('访问受限', '您没有访问该页面的权限')
+          let tiForForbid = setTimeout(this.clearShowForbidden, 2000)
+          this.setState({
+            tiForForbid: tiForForbid,
+            showForbidden: true
+          })
+          this.forbiddenUrl = nextLocation
+        }
+        return false
+      } else {
+        this.forbiddenUrl = ''
+        return true
+      }
+    } catch (e) {
+      console.log(e)
+      return true
+    }
+  }
+
+  clearShowForbidden = () => {
+    if (this.tiForForbid) {
+      clearTimeout(this.tiForForbid)
+    }
+    this.setState({
+      showForbidden: false,
+      tiForForbid: null
+    })
   }
 
   fetchSchools = () => {
     let resource='/school/list'
     const body={
       page: 1,
-      size: 100
+      size: 1000
     }
     const cb = (json) => {
       if(json.error){
@@ -172,10 +269,11 @@ class Main extends React.Component {
             className='nav'
           >
             <div className='sideWrapper'>
-               <Link to='/welcome' >
-               <div className="logo" onClick={this.welcome}>
-               <img src={logo} alt='' />
-              </div></Link>
+              <Link to='/welcome' >
+                <div className="logo" >
+                <img src={logo} alt='' />
+                </div>
+              </Link>
 
               <MyMenu changeWidth={this.changeWidth} />
             </div>
@@ -216,11 +314,15 @@ const mapStateToProps = (state, ownProps) => {
   return {
     schools: state.setSchoolList.schools,
     recent: state.setSchoolList.recent,
-    schoolSet: state.setSchoolList.schoolSet
+    schoolSet: state.setSchoolList.schoolSet,
+    forbiddenUrls: state.setAuthenData.forbiddenUrls,
+    authenSet: state.setAuthenData.authenSet
   }
 }
 export default withRouter(connect(mapStateToProps, {
   changeSchool, changeDevice, changeOrder, changeFund, changeGift, changeLost, changeUser, changeTask, changeEmployee, changeNotify, changeVersion,
   setSchoolList,
-  changeStat
+  changeStat,
+  setAuthenData,
+  fetchPrivileges
 })(Main))

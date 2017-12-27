@@ -95,9 +95,7 @@ class ActInfo extends React.Component {
             id: id
           })
         } 
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }      
       }
     }
     AjaxHandler.ajax(resource,body,cb)    
@@ -116,8 +114,6 @@ class ActInfo extends React.Component {
             this.setState({
               schools: json.data.schools
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
           }        
         }
     }
@@ -180,9 +176,7 @@ class ActInfo extends React.Component {
             })
             newState.gifts = gifts
             this.setState(newState)
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }       
         }
     }
     AjaxHandler.ajax(resource,body,cb)

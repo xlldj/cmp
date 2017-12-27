@@ -254,7 +254,24 @@ const CONSTANTS = {
       name: '员工管理',
       path: 'employee',
       key: 8,
-      icon: 'solution'
+      icon: 'solution',
+      children: [
+        {
+          name: '员工列表',
+          path: 'list',
+          key: 1
+        },
+        {
+          name: '身份设置',
+          path: 'role',
+          key: 2
+        },
+        {
+          name: '权限设置',
+          path: 'authen',
+          key: 3
+        }
+      ]
     },
     {
       name: '统计分析',
@@ -452,7 +469,194 @@ const CONSTANTS = {
       key: 9,
       icon: 'line-chart'
     }
-  ]
+  ],
+  AuthenOpeType: {
+    1: '查看',
+    2: '操作'
+  },
+  ROOTNAME2URL: {
+    '学校管理': 'school',
+    '设备管理': 'device',
+    '订单管理': 'order',
+    '充值提现': 'fund',
+    '红包管理': 'gift',
+    '失物招领': 'lost',
+    '用户管理': 'user',
+    '客服工单': 'task',
+    '员工管理': 'employee',
+    '统计分析': 'stat',
+    '公告管理': 'notify',
+    '版本更新': 'version'
+  },
+  DESC2STATUS: {
+    '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
+    '屏蔽失物招领': 'SHIELD_LOST_INFO',
+    '重置用户密码': 'RESET_USER_PWD',
+    '指派客服任务': 'ASSIGN_CUSTOM_TASK',
+    '电话/消息回复': 'REPLY_COMPLAINT',
+    '删除员工': 'DELETE_EMPLOYEE',
+    '删除公告': 'DELETE_NOTIFY',
+    '审核': 'CENSOR_NOTIFY'
+  },
+  authenData: [
+    {
+      name: '学校管理',
+      key: '1',
+      level: 1,
+      selected: false,
+      count: 7,
+      children: [
+        {
+          name: '学校列表',
+          key: '1-1',
+          level: 2,
+          selected: false,
+          count: 6,
+          children: [
+            {
+              name: '查看',
+              key: '1-1-1',
+              level: 3,
+              selected: false,
+              count: 2,
+              children: [
+                {
+                  name: '学校列表/搜索/查询',
+                  key: '1-1-1-1',
+                  level: 4,
+                  selected: false
+                },
+                {
+                  name: '楼栋查看',
+                  key: '1-1-1-2',
+                  level: 4,
+                  selected: false 
+                }
+              ]
+            },
+            {
+              name: '操作',
+              key: '1-1-2',
+              level: 3,
+              selected: false,
+              count: 4,
+              children: [
+                {
+                  name: '添加/编辑学校信息',
+                  key: '1-1-2-1',
+                  level: 4
+                },
+                {
+                  name: '楼栋编辑',
+                  key: '1-1-2-2',
+                  level: 4,
+                  selected: false
+                },
+                {
+                  name: '功能入口管理',
+                  key: '1-1-2-3',
+                  level: 4,
+                  selected: false
+                },
+                {
+                  name: '禁用学校',
+                  key: '1-1-2-4',
+                  level: 4,
+                  selected: false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: '信息总览',
+          key: '1-2',
+          level: 2,
+          selected: false,
+          children: [
+            {
+              name: '查看',
+              key: '1-2-1',
+              level: 3,
+              selected: false,
+              children: [
+                {
+                  name: '信息总览列表/搜索/查询',
+                  key: '1-2-1-1',
+                  level: 4,
+                  selected: false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  PRIVILEGE2URL: {
+    '学校列表/搜索/查询': ['/school'],
+    '楼栋列表': ['/school/list/blockManage'],
+    '上线设置': ['school/infoSet'],
+    '添加/编辑学校信息': ['/school/list/add', '/school/list/edit'],
+    '添加/编辑楼栋': ['school/list/blockManage/add', 'school/list/blockManage/edit'],
+    '功能入口管理': ['school/list/business'],
+    '信息总览列表/搜索/查询': ['school/overview'],
+    '设备列表/搜索/查询': ['device/list'],
+    '设备详情': ['device/deviceInfo'],
+    '设备配件列表/搜索/查询': ['device/components'],
+    '配件类型管理/添加配件/编辑配件': ['device/components/componentType', 'device/components/addComponent', 'device/components/editComponent'],
+    '设备预付列表/搜索/查询': ['device/prepay'],
+    '添加/编辑预付选项': ['device/prepay/addPrepay', 'device/prepay/addPrepay'],
+    '设备供水时段列表/搜索/查询': ['device/timeset'],
+    '添加/编辑供水时段': ['device/timeset/addTimeset', 'device/timeset/editTimeset'],
+    '设备供应商列表/搜索/查询': ['device/suppliers'],
+    '添加/编辑供应商': ['device/suppliers/addInfo', 'device/suppliers/info'],
+    '设备费率列表/搜索/查询': ['device/rateSet'],
+    '添加/编辑设备费率': ['device/rateSet/addRate', 'device/rateSet/rateInfo'],
+    '扣费速率列表/搜索/查询': ['device/rateLimit'],
+    '添加/编辑扣费速率': ['device/rateLimit/addRateLimit', 'device/rateLimit/editRateLimit'],
+    '报修列表/搜索/查询': ['device/repair'],
+    '报修常见问题列表': ['device/repair/repairProblem'],
+    '维修员评价列表': ['device/repair/repairRate'],
+    '报修详情(处理报修任务)': ['device/repair/repairInfo'],
+    '设备订单列表/搜索/查询': ['order/list'],
+    '订单详情（处理退单）': ['order/list/orderInfo'],
+    '异常订单列表/搜索/查询': ['order/abnormal'],
+    '异常订单详情（处理退单）': ['order/abnormal/detail'],
+    '充值提现列表/搜索/查询': ['fund/list'],
+    '充值提现详情（提现审核）': ['fund/list/fundInfo'],
+    '提现时间列表/搜索/查询': ['fund/cashtime'],
+    '添加/编辑提现时间': ['fund/cashtime/addCashtime', 'fund/cashtime/editCashtime'],
+    '充值面额列表/搜索/查询': ['fund/charge'],
+    '添加/编辑充值面额': ['fund/charge/addCharge', 'fund/charge/editCharge'],
+    '充值活动列表/搜索/查询': ['fund/deposit'],
+    '添加/编辑充值活动': ['fund/deposit/addDeposit', 'fund/deposit/depositInfo'],
+    '异常充值提现列表/搜索/查询': ['/fund/abnormal'],
+    '红包列表/搜索/查询': ['/gift/list'],
+    '添加/编辑红包': ['gift/list/addGift', 'gift/list/giftInfo'],
+    '红包活动列表/搜索/查询': ['gift/act'],
+    '添加/编辑红包活动': ['/gift/act/addAct', 'gift/act/actInfo'],
+    '失物招领列表/搜索/查询': ['lost'],
+    '失物招领详情': ['lost/lostInfo'],
+    '用户列表/搜索/查询': ['user'],
+    '用户详情': ['user/userInfo'],
+    '工单列表/搜索/查询': ['task/list'],
+    '工单详情': ['fund/list/fundInfo', 'device/repair/repairInfo'],
+    '客服工作记录列表/搜索/查询': ['task/log'],
+    '客服工作记录详情': ['task/log/detail'],
+    '添加工作记录': ['task/log/add'],
+    '账单投诉列表/搜索/查询': ['task/complaint'],
+    '意见反馈列表/搜索/查询': ['task/feedback'],
+    '员工列表搜索/查询': ['employee/list'],
+    '添加/编辑员工': ['employee/list/add', 'employee/list/detail'],
+    '身份列表': ['employee/role'],
+    '创建身份': ['employee/role/add'],
+    '统计分析图表': ['stat'],
+    '公告列表/搜索/查询': ['notify/list'],
+    '公告审核列表/详情': ['notify/censor', 'notify/censor/info'],
+    '版本更新列表': ['version'],
+    '添加/编辑版本更新': ['version/add', 'version/detail']
+  }
 }
 
 export default CONSTANTS

@@ -199,4 +199,7 @@ Noti.hintAndRoute = (message, description, history, route) => {
     duration: 1
   })
 }
+Noti.hintProgramError = () => {
+  Noti.hintLock('程序出错', '请联系相关人员')
+}
 export default Noti

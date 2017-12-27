@@ -5,11 +5,10 @@ import Noti from '../noti'
 import CONSTANTS from '../component/constants'
 import AjaxHandler from '../ajax'
 
-
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
-
 
 const SEX = {
   1:'男',
@@ -23,8 +22,10 @@ const backTitle = {
   fromFeedback: '返回意见反馈',
   fromComplaint: '返回账单投诉'
 }
-
 class UserInfo extends React.Component {
+  static propTypes = {
+    forbiddenStatus: PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     this.state = {
@@ -180,7 +181,7 @@ class UserInfo extends React.Component {
     this.props.changeOrder('orderList', 
       {
         page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
-        selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+        selectKey: '', startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
       }
     )
     let id = this.state.data.id
@@ -191,13 +192,14 @@ class UserInfo extends React.Component {
     this.props.changeFund('fundList', 
       {
         page: 1, selectKey: mobile.toString(), type: 'all', status: 'all', schoolId: 'all',
-        startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+        startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
       }
     )
     this.props.history.push({pathname:'/fund/list',state:{path: 'fromUser', mobile: mobile}})
   }
   render () {
     let {data, cancelDefriending, reseting} = this.state
+    const {forbiddenStatus} = this.props
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
     return (
       <div className='infoList'>
@@ -218,16 +220,18 @@ class UserInfo extends React.Component {
           <li><p>注册时间:</p>{time}</li>
           <li><p>用户订单记录:</p><a onClick={this.toOrderOfUser} >查看详情</a></li>
           <li><p>充值提现记录:</p><a onClick={this.toFundOfUser}>查看详情</a></li>
-          <li>
-            <p>重置密码:</p>
-            { reseting ?
-              <a href=''>重置</a>
-              :
-              <Popconfirm title="确定要重置么?" onConfirm={this.resetPwd} okText="确认" cancelText="取消">
-                <a href="">重置</a>
-              </Popconfirm>
-            }
-          </li> 
+          {forbiddenStatus.RESET_USER_PWD ? null : 
+            <li>
+              <p>重置密码:</p>
+              { reseting ?
+                <a href=''>重置</a>
+                :
+                <Popconfirm title="确定要重置么?" onConfirm={this.resetPwd} okText="确认" cancelText="取消">
+                  <a href="">重置</a>
+                </Popconfirm>
+              }
+            </li> 
+          }
           {data.blacklistInfo ?
             <li>
               <p></p>
@@ -266,8 +270,10 @@ class UserInfo extends React.Component {
     )
   }
 }
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 
-
-export default withRouter(connect(null, {
+export default withRouter(connect(mapStateToProps, {
   changeOrder, changeFund
 })(UserInfo))

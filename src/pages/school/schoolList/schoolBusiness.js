@@ -27,9 +27,7 @@ class SchoolBusiness extends React.Component{
             this.setState({
               businesses: json.data.businesses
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }       
         }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -118,7 +116,6 @@ class SchoolBusiness extends React.Component{
 
   render(){
     let {businesses, schoolName, clearError, posting} = this.state
-    console.log(posting)
     return (
       <div className='infoList'>
         <ul>

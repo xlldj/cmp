@@ -11,13 +11,45 @@ if (recentSchools) {
   let schoolId = recent[0]
   selectedSchool = schoolId
 }
-/* else {
-  let defaultSchool = getLocal('defaultSchool')
-  if (defaultSchool) {
-    selectedSchool = defaultSchool
-  }
+
+const initialAuthenData = {
+  full: [],
+  originalPrivileges: [],
+  current: [
+  ],
+  forbiddenUrls: [],
+  forbiddenStatus: {
+  },
+  authenSet: false,
+  mainNavs: [],
+  subNavs: {}
 }
-*/
+const setAuthenData = (state = initialAuthenData, action) => {
+  const {type} = action
+  if (type === ActionTypes.SET_AUTHENDATA) {
+    const value = action.value
+    console.log(value)
+    return Object.assign({}, state, value)
+  }
+  return state
+}
+
+const initialRoleList = {
+  roles: [],
+  rolesSet: false,
+  rolePrivileges: [],
+  rolePrivilegesSet: false
+}
+const setRoleList = (state = initialRoleList, action) => {
+  const {type} = action
+  if (type === ActionTypes.SET_ROLE_LIST) {
+    console.log(action.value)
+    const value = action.value
+    // console.log({...state, ...value})
+    return Object.assign({}, state, value)
+  }
+  return state
+}
 
 const initialSchools = {
   recent: [],
@@ -110,8 +142,8 @@ const initialOrderState = {
     deviceType: 'all',
     status: 'all',
     selectKey: '',
-    startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow(),
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
     userType: 'all'
   },
   abnormal: {
@@ -119,8 +151,8 @@ const initialOrderState = {
     schoolId: selectedSchool,
     deviceType: 'all',
     selectKey: '',
-    startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow(),
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
     userType: 'all'
   }
 }
@@ -142,8 +174,8 @@ const initialFundState = {
     type: 'all',
     status: 'all',
     selectKey: '',
-    startTime: Time.get7DaysAgo(),
-    endTime: Time.getNow(),
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
     userType: 'all'
   },
   cashtime: {
@@ -272,8 +304,15 @@ const changeTask = (state = initialTaskState, action) => {
 // 员工管理
 const initialEmployeeState = {
   employeeList: {
+    schoolId: selectedSchool,
     page: 1,
     selectKey: ''
+  },
+  authenList: {
+    page: 1
+  },
+  roleList: {
+    page: 1
   }
 }
 const changeEmployee = (state = initialEmployeeState, action) => {
@@ -367,7 +406,9 @@ const rootReducer = combineReducers({
   changeNotify,
   changeVersion,
   setSchoolList,
-  changeStat
+  changeStat,
+  setAuthenData,
+  setRoleList
 })
 
 export default rootReducer

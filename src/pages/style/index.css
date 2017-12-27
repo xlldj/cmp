@@ -273,6 +273,9 @@ button.grayBackColor:linked {
 .center {
   text-align: center;
 }
+.rightAlign {
+  text-align: right;
+}
 /* for choose gift popup. both used in deposit-activity and other */
 .giftStatus {
   margin: 30px 10px 20px 40px;
@@ -286,6 +289,16 @@ button.grayBackColor:linked {
   font-size: 18px;
   width: 20px;
   margin: 10px;
+}
+/* for multi selector modal */
+.multiSelectModalHeader {
+  display: inline-flex;
+  justify-content: space-between;
+  margin: 30px 10px 0px 40px;
+  width: 89%;
+}
+.multiSelectModalHeader .hint {
+  line-height: 40px;
 }
 /* for form style */
 .formContent {
@@ -786,6 +799,7 @@ button.grayBackColor:linked {
 }
 .seperateItem {
   margin-right: 5px;
+  margin-left: 5px;
 }
 /* for number show in orderTable and fundTable */
 .profitBanner {
@@ -833,9 +847,70 @@ button.grayBackColor:linked {
 .customSelect {
   width: 110px;
 }
-/* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set */
+/* for authen data table */
+.roleTable {
+  box-sizing: border-box;
+  user-select: none;
+  cursor: pointer;
+}
+.roleTable div,
+.roleTable .levelHeader,
+.roleTable .levelContent,
+.roleTable .levelChildrenWrapper {
+  box-sizing: border-box;
+}
+.roleTable .levelContent {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+.roleTable .levelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 100%;
+  border: 1px solid #aaa;
+  border-bottom: none;
+}
+.roleTable .level2Header,
+.roleTable .level3Header,
+.roleTable .level4Header {
+  border-left: none;
+}
+.roleTable .levelHeader:last-child,
+.roleTable .level2Header:last-child,
+.roleTable .level1ChildrenWrapper,
+.roleTable .level1Header {
+  border-bottom: 1px solid #aaa;
+}
+.roleTable .levelChildrenWrapper {
+  display: block;
+}
+.roleTable .level4Header {
+  text-align: left;
+  padding-left: 10px;
+  width: 240px;
+  height: 40px;
+}
+.roleTable .selectBox {
+  width: 100px;
+  height: 40px;
+  border: 1px solid #aaa;
+  border-left: none;
+  border-bottom: none;
+}
+.roleTable .selected {
+  background-color: #ebf4fd;
+}
+.roleTable .editBox {
+  line-height: 40px;
+}
+/* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable {
   margin: 10px 40px 40px 40px;
+  user-select: none;
 }
 .depositGiftTable .optInDeposit {
   display: inline-flex;
@@ -1134,6 +1209,9 @@ button.grayBackColor:linked {
 }
 .mgl10 {
   margin-left: 10px;
+}
+.mgr10 {
+  margin-right: 10px;
 }
 @media screen and (min-width: 1440px) {
   body {

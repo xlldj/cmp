@@ -39,9 +39,7 @@ class ChargeInfo extends React.Component {
           let result = items.map((r) => ({value: r}))
           nextState.items = result
           this.setState(nextState)
-        }else{
-          throw new Error('网络出错，获取数据失败，请稍后重试～')
-        }        
+        }      
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -88,9 +86,7 @@ class ChargeInfo extends React.Component {
         /*--------redirect --------*/
         if(json.data){
           Noti.hintSuccess(this.props.history,'/fund/charge')
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }       
       }
     }
     AjaxHandler.ajax(resource,body,cb)

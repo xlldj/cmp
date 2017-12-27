@@ -63,9 +63,7 @@ class FundInfo extends React.Component {
             this.setState({
               data: json.data
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }     
         }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -175,7 +173,7 @@ class FundInfo extends React.Component {
   }
   render () {
     let {operationType, schoolName, mobile, userId, remarks, thirdAccountType, thirdAccountName, 
-      createTime, orderNo, status, amount} = this.state.data
+      createTime, orderNo, status, amount, csName} = this.state.data
     let {failedReason, showCensor, reasonError} = this.state
     let dStr = Time.getTimeStr(createTime)
 
@@ -194,6 +192,7 @@ class FundInfo extends React.Component {
         <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
       </div>
     )
+    let censorPassed = (status === 2) || (status === 3) || (status === 4) || (status === 5)
 
     return (
       <div className='infoList' >
@@ -209,6 +208,14 @@ class FundInfo extends React.Component {
           <li><p>{FUNDTYPE[operationType]}时间:</p>{dStr}</li>
           <li><p>流水号:</p>{orderNo || '暂无'}</li>
           <li><p>{FUNDTYPE[operationType]}状态:</p><span className={classOfType[status]} >{WITHDRAWSTATUS[status]}</span></li>
+          {
+            operationType === 2 && censorPassed ?
+            <li>
+              <p>审核人:</p>
+              <span>{csName || ''}</span>
+            </li>
+            : null
+          }
         </ul>
 
         {operationType===2 && status===1 ? censorBtn : backBtn}

@@ -20,18 +20,11 @@ class SchoolSelector extends React.Component{
       size: 100
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            this.setState({
-              schools: json.data.schools
-            })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
-        }
+      if (json.data) {
+        this.setState({
+          schools: json.data.schools
+        })       
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   } 

@@ -247,12 +247,14 @@ class SchoolInfoEdit extends React.Component {
       lon: lnglat.longitude,
       location: location,
       accountName: accountName,
-      accountType: accountType,
-      appId: appId,
-      pid: pid,
-      appPrivateKey: appPrivateKey,
-      appPublicKey: appPublicKey,
-      alipayPublicKey: alipayPublicKey
+      accountType: accountType
+    }
+    if (appId !== '********') {
+      body.appId = appId
+      body.pid = pid
+      body.appPrivateKey = appPrivateKey
+      body.appPublicKey = appPublicKey
+      body.alipayPublicKey = alipayPublicKey
     }
     if(this.state.fileList.length>0 && this.state.fileList[0].url){
       body.logo = this.state.fileList[0].url.replace(FILEADDR, '')
@@ -275,14 +277,18 @@ class SchoolInfoEdit extends React.Component {
             name: name
           }
           this.addSchoolToReducer(school)
-          this.tellServerReload()
-          this.tellClientReload()
+          if (appId !== '********') {
+            this.tellServerReload()
+            this.tellClientReload()
+          } else {
+            this.hintSuccess()
+          }
         } else {
           Noti.hintServiceError()
         }
       }
     }
-    AjaxHandler.ajax(url, body, cb)   
+    AjaxHandler.ajax(url, body, cb, null, {clearPosting: true, thisObj: this})   
   }
 
   addSchoolToReducer = (school) => {
@@ -366,7 +372,10 @@ class SchoolInfoEdit extends React.Component {
 
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
-    let {id, name, initialName, city, location, accountName, appId, pid, appPrivateKey, appPublicKey, alipayPublicKey, validateSuccess} = this.state, nextState = {}
+    let {id, name, initialName, city, location, accountName,
+      appId, pid, appPrivateKey, appPublicKey, alipayPublicKey, 
+      validateSuccess
+    } = this.state, nextState = {}
     if(!name){
       nextState.nameError = true
       nextState.nameErrorMessage = '学校名字不能为空'
@@ -823,7 +832,7 @@ class SchoolInfoEdit extends React.Component {
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.ajax(resource, body, cb, null, {clearChecking: true, thisObj: this})
   }
   editAccount = () => {
     /* 置位validateSuccess, validateFailure, accountComplete, accountEditing, 以及账户相关信息 */

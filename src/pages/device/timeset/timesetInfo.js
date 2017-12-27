@@ -11,10 +11,11 @@ import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../component/constants'
+
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
-class PrepayInfo extends React.Component {
+class TimesetInfo extends React.Component {
   constructor (props) {
     super(props)
     let deviceType = '0', items = [{startTime:moment('1/1/2017', 'DD/MM/YYYY'),endTime: moment('1/1/2017', 'DD/MM/YYYY')}], deviceTypeError = false, selectedSchool = '0', schoolError=false
@@ -27,7 +28,7 @@ class PrepayInfo extends React.Component {
     let resource='/api/time/range/water/one'
     const cb=(json)=>{
       if(json.error){
-        throw new Error(json.error.displayMessage || json.error)
+        throw (json.error.displayMessage || json.error)
       }else{
         if(json.data){
           json.data.items.forEach((r,i)=>{
@@ -47,8 +48,6 @@ class PrepayInfo extends React.Component {
             initialSchool: json.data.schoolId,
             initialDT: json.data.deviceType
           })
-        }else{
-          throw new Error('网络出错，获取数据失败，请稍后重试～')
         }        
       }
     }
@@ -83,7 +82,7 @@ class PrepayInfo extends React.Component {
       })
     }
     const items = JSON.parse(JSON.stringify(this.state.items))
-    for (let i=0;i<items.length;i++) {
+    for (let i=0, l = items.length; i < l; i++) {
       let r = items[i]
       if (r.timeValueError) {
         return
@@ -128,9 +127,7 @@ class PrepayInfo extends React.Component {
           /*--------redirect --------*/
           if(json.data){
             Noti.hintSuccess(this.props.history,'/device/timeset')
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }     
         }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -246,13 +243,10 @@ class PrepayInfo extends React.Component {
     }
     const cb = (json) => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        throw (json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
-          throw new Error({
-            title: '操作出错',
-            message: '当前学校已有该类型设备的供水时间设置，请勿重复添加'
-          })
+          Noti.hintLock('操作出错', '当前学校已有该类型设备的供水时间设置，请勿重复添加')
         } else {
           if (callback) {
             callback()
@@ -264,7 +258,8 @@ class PrepayInfo extends React.Component {
   }
 
   render () {
-    let {id, deviceType, items, deviceTypeError, selectedSchool, schoolError} = this.state
+    let {id, deviceType, items, deviceTypeError, selectedSchool, schoolError
+    } = this.state
     const times = items&&items.map((r,i) => {
       return(
           <div key={`time${i}`}>
@@ -295,9 +290,11 @@ class PrepayInfo extends React.Component {
             <SchoolSelectWithoutAll 
               disabled={id}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''} selectedSchool={selectedSchool.toString()} changeSchool={this.changeSchool} checkSchool={this.checkSchool} /> 
+              className={id ? 'disabled' : ''} selectedSchool={selectedSchool.toString()} 
+              changeSchool={this.changeSchool} checkSchool={this.checkSchool} /> 
             {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
           </li>
+
           <li>
             <p>设备类型:</p>
             <DeviceWithoutAll 
@@ -324,4 +321,4 @@ class PrepayInfo extends React.Component {
   }
 }
 
-export default PrepayInfo
+export default TimesetInfo

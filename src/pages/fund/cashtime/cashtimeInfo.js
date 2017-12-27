@@ -56,9 +56,7 @@ class CashtimeInfo extends React.Component {
           nextState.type = type
           nextState.id = id
           this.setState(nextState)
-        }else{
-          throw new Error(json.error.displayMessage || json.error)
-        }        
+        }       
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -142,9 +140,7 @@ class CashtimeInfo extends React.Component {
         /*--------redirect --------*/
         if(json.data){
           Noti.hintSuccess(this.props.history,'/fund/cashtime')
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }    
       }
     }
     if (posting) {

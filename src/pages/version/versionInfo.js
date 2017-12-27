@@ -1,3 +1,10 @@
+/* fetch the latest version number */
+/* 
+  1. Fetch when 'system' and 'envType' is set.
+  2. If edit, does not need to fetch.
+*/
+
+
 import React from 'react'
 
 import {Button, Popconfirm} from 'antd'
@@ -20,8 +27,7 @@ class VersionInfo extends React.Component {
       contentError: '',
       contentErrorMsg: '',
       system: '',
-      defaultIOS: '',
-      defaultAndroid: '',
+      defaultAddr: {},
       systemError: false,
       method: '',
       methodError: false,
@@ -42,9 +48,7 @@ class VersionInfo extends React.Component {
         if (json.data) {
           this.setState(json.data)
           this.setState({originalVersion: json.data.versionNo})
-        } else {
-          throw new Error('网络出错，获取数据失败，请稍后重试～')
-        }        
+        }     
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -61,13 +65,7 @@ class VersionInfo extends React.Component {
       this.setState({
         id: id
       })
-    } else {
-      this.getLatestVersion()
     }
-  }
-  getLatestVersion () {
-    this.getLatestIOS()
-    this.getLatestAndroid()
   }
   getDefaultVersion (arr) {
     let reversed = arr.reverse()
@@ -90,51 +88,25 @@ class VersionInfo extends React.Component {
     })
     return reversed.reverse().join('.')
   }
-  getLatestIOS () {
+  fetchVersion (body) {
     let resource = '/version/list'
-    const body = {
-      page: 1,
-      size: 1,
-      system: 1
-    }
+    body.page = 1
+    body.size = 1
     const cb = (json) => {
       if (json.data && json.data.versions) {
-        let nextState = {}, defaultIOS = '1.0.0'
+        let key = body.envType.toString() + body.system.toString()
+        let nextState = {}
+        let {defaultAddr} = this.state
+        let addr = JSON.parse(JSON.stringify(defaultAddr))
         if (json.data.versions.length > 0) {
-          let ios = json.data.versions[0].versionNo
-          let vs = ios.split('.')
-          let nextVersion = this.getDefaultVersion(vs)
-          defaultIOS = nextVersion
+          let no = json.data.versions[0].versionNo
+          if (no) {
+            let vs = no.split('.')
+            let vnumber = this.getDefaultVersion(vs)
+            addr[key] = vnumber || ''
+          }
         }
-        nextState.defaultIOS = defaultIOS
-        if (this.state.system === '1') {
-          nextState.versionNo = defaultIOS
-        }
-        this.setState(nextState)
-      }
-    }
-    AjaxHandler.ajax(resource, body, cb)
-  }
-  getLatestAndroid () {
-    let resource = '/version/list'
-    const body = {
-      page: 1,
-      size: 1,
-      system: 2
-    }
-    const cb = (json) => {
-      if (json.data && json.data.versions) {
-        let nextState = {}, defaultAndroid = '1.0.0'
-        if (json.data.versions.length > 0) {
-          let android = json.data.versions[0].versionNo
-          let vs = android.split('.')
-          let nextVersion = this.getDefaultVersion(vs)
-          defaultAndroid = nextVersion
-        }
-        nextState.defaultAndroid = defaultAndroid
-        if (this.state.system === '2') {
-          nextState.versionNo = defaultAndroid
-        }
+        nextState.defaultAddr = addr
         this.setState(nextState)
       }
     }
@@ -364,11 +336,20 @@ class VersionInfo extends React.Component {
     let nextState = {
       system: v
     }
-    let {defaultIOS, defaultAndroid} = this.state
-    if (v === '1') {
-      nextState.versionNo = defaultIOS
-    } else if (v === '2') {
-      nextState.versionNo = defaultAndroid
+    let {envType, defaultAddr} = this.state
+    // if 'envType' is set
+    if (envType) {
+      let envSys = envType.toString() + v
+      if (defaultAddr[envSys]) {
+        // let addArr = defaultAddr[envSys].split('-')
+        nextState.versionNo = defaultAddr[envSys]
+      } else {
+        const body = {
+          envType: parseInt(envType, 10),
+          system: parseInt(v, 10)
+        }
+        this.fetchVersion(body)
+      }
     }
     this.setState(nextState)
   }
@@ -426,10 +407,26 @@ class VersionInfo extends React.Component {
       })
     }
   }
-  changeEnv = (value) => {
-    this.setState({
-      envType: value
-    })
+  changeEnv = (v) => {
+    let nextState = {
+      envType: v
+    }
+
+    let {system, defaultAddr} = this.state
+    // if 'system' is set
+    if (system) {
+      let envSys = v + system.toString()
+      if (defaultAddr[envSys]) {
+        nextState.versionNo = defaultAddr[envSys]
+      } else {
+        const body = {
+          envType: parseInt(v, 10),
+          system: parseInt(system, 10)
+        }
+        this.fetchVersion(body)
+      }
+    }
+    this.setState(nextState)
   }
   checkEnv = (v) => {
     if (!v) {

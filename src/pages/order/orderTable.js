@@ -147,9 +147,7 @@ class OrderTable extends React.Component {
           })
           nextState.dataSource = json.data.orders
           nextState.total = json.data.total
-          nextState.totalIncome = json.data.totalIncome || 0
-        }else{
-          throw new Error('网络出错，请稍后重试～')
+          nextState.totalIncome = json.data.totalIncome
         }        
       }
       this.setState(nextState)

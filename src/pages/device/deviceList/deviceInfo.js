@@ -35,9 +35,7 @@ class DeviceInfo extends React.Component {
         this.setState({
           repairs: json.data.repairDevices
         })
-      } else {
-        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
-      } 
+      }
     }
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -96,7 +94,7 @@ class DeviceInfo extends React.Component {
     this.props.changeOrder('orderList', 
       {
         page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
-        selectKey: '', startTime: Time.get7DaysAgo(), endTime: Time.getNow()
+        selectKey: '', startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
       }
     )
     let {data, deviceType} = this.state

@@ -131,11 +131,10 @@ class FundTable extends React.Component {
         if(json.data){
           nextState.dataSource = json.data.funds
           nextState.total = json.data.total
-          nextState.totalRecharge = json.data.totalRecharge || '未知'
-          nextState.totalWithdraw = json.data.totalWithdraw || '未知'
+          nextState.totalRecharge = json.data.totalRecharge ? json.data.totalRecharge : 0
+          nextState.totalWithdraw = json.data.totalWithdraw ? json.data.totalWithdraw : 0
         }else{
           this.setState(nextState)
-          throw new Error('网络出错，请稍后重试～')
         }        
       }
       this.setState(nextState)
@@ -326,8 +325,8 @@ class FundTable extends React.Component {
         />
 
         <p className='profitBanner' >
-          充值总额: {totalRecharge}
-          <span className='mgl10'>提现总额: {totalWithdraw}</span>
+          充值总额: {totalRecharge}元
+          <span className='mgl10'>提现总额: {totalWithdraw}</span>元
         </p>
 
         <div className='tableList'>

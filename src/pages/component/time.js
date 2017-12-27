@@ -290,4 +290,14 @@ Time.get7DaysAgo = () => {
   let tt = t - 7 * 24 * 3600 * 1000
   return tt
 }
+Time.get7DaysAgoStart = () => {
+  let t = new Date(Time.get7DaysAgo())
+  t.setHours(0, 0, 0)
+  return Date.parse(t)
+}
+Time.getTodayEnd = () => {
+  let t = new Date()
+  t.setHours(23, 59, 59)
+  return Date.parse(t)
+}
 export default Time

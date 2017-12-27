@@ -171,7 +171,7 @@ class BlockManage extends React.Component {
         <div key={`header${index}`}  className='panelHeader' >
           <span >{block.fullName}</span>
           <span className='editLink'>
-            <Link  to={'/school/list/blockManage/editingBlock/:'+block.id} onClick={(e) => {this.routeToDetail(e, block.id)}} >编辑</Link>
+            <Link  to={'/school/list/blockManage/edit/:'+block.id} onClick={(e) => {this.routeToDetail(e, block.id)}} >编辑</Link>
             <span className='ant-divider' />
             <Popconfirm title="确定要删除此楼么?" onClick={this.alertDelete} onConfirm={(e) => {this.deleteBlock(e,block.id)}} okText="确认" cancelText="取消">
               <a href="">删除</a>
@@ -216,7 +216,7 @@ class BlockManage extends React.Component {
       <div className='blockManage contentArea'>
         <div className='nameHeader'>
           <div className='schoolName'>当前管理的学校：{this.state.schoolName}</div>
-          <div><Link to='/school/list/blockManage/addingBlock' ><Button type='primary'>添加楼栋</Button></Link></div>
+          <div><Link to='/school/list/blockManage/add' ><Button type='primary'>添加楼栋</Button></Link></div>
         </div>
         <Collapse accordion onChange={this.changePanel} >
           {panels}

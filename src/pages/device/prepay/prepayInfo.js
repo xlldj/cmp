@@ -56,9 +56,7 @@ class PrepayInfo extends React.Component {
             nextState.prepay = prepay
           }
           this.setState(nextState)
-        }else{
-          throw new Error('网络出错，获取数据失败，请稍后重试～')
-        }        
+        }      
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -132,9 +130,7 @@ class PrepayInfo extends React.Component {
         /*--------redirect --------*/
         if(json.data){
           Noti.hintSuccess(this.props.history,'/device/prepay')
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }       
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -326,9 +322,7 @@ class PrepayInfo extends React.Component {
             this.setState({
               businesses: json.data.businesses
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }       
         }
     }
     AjaxHandler.ajax(resource,body,cb)

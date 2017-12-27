@@ -85,9 +85,7 @@ class DevicesTable extends React.Component {
             this.setState({
               schools: json.data.schools
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }       
         }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -110,9 +108,7 @@ class DevicesTable extends React.Component {
         if(json.data){
           nextState.dataSource = json.data.devices
           nextState.total = json.data.total
-        }else{
-          throw new Error('网络出错，请稍后重试～')
-        }        
+        }  
       }
       this.setState(nextState)
     }

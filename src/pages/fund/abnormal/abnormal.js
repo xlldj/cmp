@@ -146,7 +146,6 @@ class AbnormalOrder extends React.Component {
           }
         }else{
           this.setState(nextState)
-          throw new Error('网络出错，请稍后重试～')
         }
       }
       this.setState(nextState)

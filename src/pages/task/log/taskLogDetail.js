@@ -7,6 +7,12 @@ import CONSTANTS from '../../component/constants'
 import PicturesWall from '../../component/picturesWall'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeOrder, changeFund } from '../../../actions'
+
 const FILEADDR = CONSTANTS.FILEADDR
 const TASKTYPES = {
   1: '工作记录',
@@ -14,6 +20,9 @@ const TASKTYPES = {
 }
 
 class TaskLogDetail extends React.Component {
+  static propTypes = {
+    forbiddenStatus: PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     let id = '', type = '', typeError = ''
@@ -288,6 +297,10 @@ class TaskLogDetail extends React.Component {
       status, showRepairmanName,
       needToast
     } = this.state
+    const {forbiddenStatus} = this.props
+    if (forbiddenStatus.ASSIGN_CUSTOM_TASK) {
+      delete TASKTYPES[2]
+    }
 
     return (
       <div className='infoList' >
@@ -404,9 +417,7 @@ class RepairmanTable extends React.Component{
             this.setState({
               dataSource: json.data.repairmans
             })
-          }else{
-            throw new Error('网络出错，请稍后重试～')
-          }        
+          }       
         }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -537,4 +548,10 @@ class RepairmanTable extends React.Component{
   }
 }
 
-export default TaskLogDetail
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
+
+export default withRouter(connect(mapStateToProps, {
+  changeOrder, changeFund
+})(TaskLogDetail))
