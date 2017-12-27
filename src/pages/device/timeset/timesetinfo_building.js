@@ -1,3 +1,4 @@
+/* this is a version with different timeset for different building of same school */
 import React from 'react'
 import moment from 'moment';
 import TimePicker from 'rc-time-picker';
@@ -11,6 +12,7 @@ import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../component/constants'
+import BasicSelector from '../../component/basicSelector'
 
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
@@ -21,14 +23,17 @@ class TimesetInfo extends React.Component {
     let deviceType = '0', items = [{startTime:moment('1/1/2017', 'DD/MM/YYYY'),endTime: moment('1/1/2017', 'DD/MM/YYYY')}], deviceTypeError = false, selectedSchool = '0', schoolError=false
     let id = 0
     this.state = { 
-      deviceType, items, deviceTypeError, selectedSchool, schoolError, id
+      deviceType, items, deviceTypeError, selectedSchool, schoolError, id,
+      building: '',
+      buildingData: {},
+      buildingError: false
     }
   }
   fetchData =(body)=>{
     let resource='/api/time/range/water/one'
     const cb=(json)=>{
       if(json.error){
-        throw (json.error.displayMessage || json.error)
+        throw new Error(json.error.displayMessage || json.error)
       }else{
         if(json.data){
           json.data.items.forEach((r,i)=>{
@@ -82,7 +87,7 @@ class TimesetInfo extends React.Component {
       })
     }
     const items = JSON.parse(JSON.stringify(this.state.items))
-    for (let i=0, l = items.length; i < l; i++) {
+    for (let i=0;i<items.length;i++) {
       let r = items[i]
       if (r.timeValueError) {
         return
@@ -174,6 +179,31 @@ class TimesetInfo extends React.Component {
 
     this.setState(nextState)
   }
+  fetchBuildings = (id) => {
+    let schoolId = parseInt(id, 10)
+    const body = {
+      page: 1,
+      size: 1000,
+      schoolId: schoolId,
+      residenceLevel: 1
+    }
+    let resource='/api/residence/list'
+    const cb = (json) => {
+      try {
+        let data = json.data.residences
+        let buildingData = {}
+        data.forEach((r) => {
+          buildingData[r.id] = r.name
+        })
+        this.setState({
+          buildingData: buildingData
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    AjaxHandler.ajax(resource,body,cb)  
+  }
   changeSchool = (v) => {
     if (!v) {
       return this.setState({
@@ -186,6 +216,7 @@ class TimesetInfo extends React.Component {
     }
     nextState.selectedSchool = parseInt(v, 10)
     this.setState(nextState)
+    this.fetchBuildings(v)
   }
   checkSchool = (v) => {
     if (!v || v==='0') {
@@ -256,9 +287,26 @@ class TimesetInfo extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
+  changeBuilding = (v) => {
+    this.setState({
+      building: v
+    })
+  }
+  checkBuilding = (v) => {
+    if (!v) {
+      return this.setState({
+        buildingError: true
+      })
+    } else if (this.state.buildingError) {
+      this.setState({
+        buildingError: false
+      })
+    }
+  }
 
   render () {
-    let {id, deviceType, items, deviceTypeError, selectedSchool, schoolError
+    let {id, deviceType, items, deviceTypeError, selectedSchool, schoolError,
+      buildingData, building, buildingError
     } = this.state
     const times = items&&items.map((r,i) => {
       return(
@@ -293,6 +341,22 @@ class TimesetInfo extends React.Component {
               className={id ? 'disabled' : ''} selectedSchool={selectedSchool.toString()} 
               changeSchool={this.changeSchool} checkSchool={this.checkSchool} /> 
             {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
+          </li>
+
+          <li>
+            <p>选择楼栋:</p>
+            <BasicSelector
+              disabled={id}
+              all={true}
+              allTitle='全部楼栋'
+              width={CONSTANTS.SELECTWIDTH}
+              className={id ? 'disabled' : ''}
+              staticOpts={buildingData}
+              selectedOpt={building}
+              changeOpt={this.changeBuilding}
+              checkOpt={this.checkBuilding}
+            /> 
+            {buildingError?<span className='checkInvalid'>楼栋不能为空！</span>:null}
           </li>
 
           <li>

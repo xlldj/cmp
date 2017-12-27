@@ -192,7 +192,7 @@ class FundInfo extends React.Component {
         <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
       </div>
     )
-    let censorPassed = status === 3 || status === 4 || status === 5
+    let censorPassed = (status === 2) || (status === 3) || (status === 4) || (status === 5)
 
     return (
       <div className='infoList' >
