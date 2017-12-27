@@ -21,7 +21,6 @@ import { changeEmployee } from '../../actions'
 const subModule = 'employeeList'
 
 const SIZE = CONSTANTS.PAGINATION
-const TYPE = CONSTANTS.ROLE
 const BACKTITLE={
   fromInfoSet: '返回学校信息设置'
 }
@@ -44,10 +43,35 @@ class EmployeeList extends React.Component {
       hintDeleteModal: false
     }
     this.columns = [{
-      title: '手机号',
-      dataIndex: 'mobile',
-      width: '20%',
+      title: '登录账号',
+      dataIndex: 'account',
+      width: '15%',
       className: 'firstCol'
+    }, {
+      title: '手机号',
+      dataIndex: 'contactMobile',
+      width: '15%'
+    }, {
+      title: '姓名',
+      dataIndex: 'nickName',
+      width: '14%'
+    }, {
+      title: '身份',
+      dataIndex: 'roles',
+      width: '12%',
+      render: (text, record) => {
+        try {
+          let roles = record.roles, type = record.type
+          if (type === 2) {
+            return '维修员'
+          } else {
+            let result = roles && roles.map(r => r.name)
+            return result.join('、')
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      }
     }, {
       title: '学校',
       dataIndex: 'schools',
@@ -55,8 +79,6 @@ class EmployeeList extends React.Component {
       render: (text, record) => {
         try {
           if (record.schoolLimit) {
-            return '全部学校'
-          } else {
             let schools = record.schools
             let result = schools && schools.map((r, i) => {
               if (i === schools.length - 1) {
@@ -66,30 +88,9 @@ class EmployeeList extends React.Component {
               }
             })
             return result
+          } else {
+            return '不限制学校'
           }
-        } catch (e) {
-          console.log(e)
-        }
-      }
-    }, {
-      title: '姓名',
-      dataIndex: 'nickName',
-      width: '14%'
-    }, {
-      title: '身份',
-      dataIndex: 'types',
-      width: '22%',
-      render: (text, record) => {
-        try {
-          let types = record.types
-          let result = types && types.map((r, i) => {
-            if (i === types.length - 1) {
-              return TYPE[r]
-            } else {
-              return TYPE[r]
-            }
-          })
-          return result
         } catch (e) {
           console.log(e)
         }

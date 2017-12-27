@@ -273,7 +273,7 @@ class TimesetInfo extends React.Component {
     }
     const cb = (json) => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        throw (json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
           Noti.hintLock('操作出错', '当前学校已有该类型设备的供水时间设置，请勿重复添加')

@@ -58,9 +58,8 @@ class SchoolMultiSelectModal extends React.Component{
     })
   }
   confirm = () => {
-    let {all, dataSource} = this.state
+    let {dataSource} = this.state
     this.props.setSchools({
-      all: all,
       dataSource: dataSource
     })
   }
@@ -157,6 +156,11 @@ class SchoolMultiSelectModal extends React.Component{
     }
     this.setState(nextState)
   }
+  clearSchoolLimit = () => {
+    if (this.props.clearSchoolLimit) {
+      this.props.clearSchoolLimit()
+    }
+  }
   render(){
     const {dataSource, all, searchingText} = this.state
     const {showModal} = this.props
@@ -200,11 +204,16 @@ class SchoolMultiSelectModal extends React.Component{
           />
           <div>
             <Button 
+              className='mgr10'
+              onClick={this.clearSchoolLimit}
+            >
+              不限制学校
+            </Button>
+            <Button 
               className='mgr10' 
-              type='primary' 
               onClick={this.toggleAll} 
             >
-              {all ? '取消' : '全选'}
+              {all ? '取消全选' : '全选'}
             </Button>
             <Button className='rightConfirm' type='primary' onClick={this.confirm} >确定</Button>
           </div>

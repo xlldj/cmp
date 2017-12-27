@@ -851,6 +851,7 @@ button.grayBackColor:linked {
 .roleTable {
   box-sizing: border-box;
   user-select: none;
+  cursor: pointer;
 }
 .roleTable div,
 .roleTable .levelHeader,

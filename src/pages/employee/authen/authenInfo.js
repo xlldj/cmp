@@ -364,7 +364,7 @@ class AuthenInfo extends React.Component {
               disabled={id}
               className={id ? 'disabled' : ''} 
               changeOpt={this.changeMain} 
-              checkMain={this.checkMain} 
+              checkOpt={this.checkMain} 
             />
             { mainError ? <span className='checkInvalid'>请选择主导航！</span> : null }
           </li>
@@ -378,7 +378,7 @@ class AuthenInfo extends React.Component {
               disabled={id}
               className={id ? 'disabled' : ''} 
               changeOpt={this.changeSub} 
-              checkMain={this.checkSub} 
+              checkOpt={this.checkSub} 
             />
             { subError ? <span className='checkInvalid'>请选择子导航！</span> : null }
           </li>   

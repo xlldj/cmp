@@ -57,7 +57,8 @@ class Main extends React.Component {
     hasChildren: true,
     showForbidden: false,
     tiForForbid: null,
-    ti: null
+    ti: null,
+    forbiddenUrl: ''
   }
   componentDidMount () {
     // set school list globally
@@ -114,24 +115,28 @@ class Main extends React.Component {
     let {forbiddenUrls} = this.props
     try {
       let forbidden = forbiddenUrls.findIndex((r) => {
-        if (r.includes(nextLocation)) {
+        if (nextLocation.includes(r)) {
           return true
         } else {
           return false
         }
       })
+      console.log('update')
       if (forbidden !== -1) {
-        // if not showing forbidden, show it. Trigger a timer to avoid duplicate show
-        if (!this.state.showForbidden) {
+        // return false
+        // if not showing forbidden, and nextLocation !== this.state.forbiddenUrl, show it. Trigger a timer to avoid duplicate show
+        if (!this.state.showForbidden && (nextLocation !== this.forbiddenUrl)) {
           Noti.hintWarning('访问受限', '您没有访问该页面的权限')
           let tiForForbid = setTimeout(this.clearShowForbidden, 2000)
           this.setState({
             tiForForbid: tiForForbid,
             showForbidden: true
           })
+          this.forbiddenUrl = nextLocation
         }
         return false
       } else {
+        this.forbiddenUrl = ''
         return true
       }
     } catch (e) {
@@ -141,6 +146,9 @@ class Main extends React.Component {
   }
 
   clearShowForbidden = () => {
+    if (this.tiForForbid) {
+      clearTimeout(this.tiForForbid)
+    }
     this.setState({
       showForbidden: false,
       tiForForbid: null

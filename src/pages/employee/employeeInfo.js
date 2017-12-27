@@ -1,4 +1,9 @@
 /* ---------------- state description --------------- */
+/* 
+   temporary change: 
+     distinguish 'maintainer' and other roles.
+     use 'type' to differ. type: {2: maintainer,  3: other roles} 
+*/
 /* state:
     1. 'roleData' is the data for role-select-modal, before post, filter items whose 'selected' is true.
        Thus build roleData from server:'roles' when edit employee.
@@ -22,11 +27,17 @@ import MultiSelectModal from '../component/multiSelectModal'
 import SchoolMutilSelect from '../component/schoolMultiSelectModal'
 import AuthenDataTable from '../component/authenDataTable'
 import {buildAuthenBaseOnfull} from '../util/authenDataHandle'
+import BasicSelector from '../component/basicSelectorWithoutAll'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { setAuthenData, setRoleList } from '../../actions'
+
+const TYPES = {
+  2: '维修员',
+  3: '其他'
+}
 
 class EmployeeInfo extends React.Component {
   static propTypes = {
@@ -40,11 +51,11 @@ class EmployeeInfo extends React.Component {
   }
   constructor (props) {
     super(props)
-    let id='',mobile='',nickName='', mobileError=false,nameError=false,nameErrorMessage='', showSchools=false
+    let id='',contactMobile='',nickName='', mobileError=false,nameError=false,nameErrorMessage='', showSchools=false
     let mobileErrorMessage = '手机号格式不正确', originalMobile = 0, schoolError = false
     this.state = {
       id,
-      mobile,
+      contactMobile,
       nickName,mobileError,mobileErrorMessage, nameError,
       nameErrorMessage, originalMobile, 
       showSchools, schoolError,
@@ -54,10 +65,12 @@ class EmployeeInfo extends React.Component {
       showRoleModal: false,
       roleData: props.roles,
       allSchools: false,
+      schoolLimit: true,
       selectedSchools: [],
       authenStatus: [],
       posting: false,
-      checking: false
+      checking: false, 
+      type: ''
     }
     this.roleColumns = [{
       title: '身份',
@@ -96,44 +109,45 @@ class EmployeeInfo extends React.Component {
     let resource='/api/employee/one'
     const cb = (json) => {
       if(json.data){
-        let {id, mobile, roles, nickName, schools} = json.data
+        let {id, contactMobile, account, schoolLimit, roles, type, nickName, schools} = json.data
         let nextState = {
           id: id,
-          mobile: mobile,
+          account: account,
+          schoolLimit: schoolLimit,
+          contactMobile: contactMobile,
           nickName: nickName,
-          originalMobile: mobile
+          originalMobile: contactMobile,
+          type: type
         }
         let selectedSchools = [] 
         schools.forEach(s => {
-          let school = this.props.schools.find(sch => sch.id === s)
+          let school = this.props.schools.find(sch => sch.id === s.id)
           if (school) {
             selectedSchools.push(school)
           }
         })
         nextState.selectedSchools = selectedSchools
         let roleData = JSON.parse(JSON.stringify(this.props.roles))
-        roles.forEach(r => {
-          let role = roleData.find(ro => ro.id === r)
-          if (role) {
-            role.selected = true
-          }
-        })
-        nextState.roleData = roleData
+        if (roles) {
+          roles.forEach(r => {
+            let role = roleData.find(ro => ro.id === r)
+            if (role) {
+              role.selected = true
+            }
+          })
+          nextState.roleData = roleData
+          // this should always exist
+          this.buildPrivileges(roles)
+        }
 
         this.setState(nextState)
-        
-        // this should always exist
-        this.buildPrivileges(roles)
       }       
     }
     AjaxHandler.ajax(resource,body,cb)
   }
   buildPrivileges = (roles) => {
     // get all privileges from roles and privileges of roles
-    console.log(roles)
     let {rolePrivileges, originalPrivileges} = this.props
-    console.log(rolePrivileges)
-    console.log(originalPrivileges)
     let currentPrivileges = []
     if (rolePrivileges) {
       roles.forEach(r => {
@@ -187,7 +201,6 @@ class EmployeeInfo extends React.Component {
     this.props.hide(false)
     // get all the roles
     let {rolesSet, rolePrivilegesSet} = this.props
-    console.log(rolePrivilegesSet)
     if (rolesSet) {
       if (!rolePrivilegesSet) {
         this.fetchRolePrivileges()
@@ -198,7 +211,6 @@ class EmployeeInfo extends React.Component {
       this.fetchRoles()
     }
     if (this.props.full) {
-      console.log(this.props.full)
       this.setState({
         authenStatus: this.props.full
       })
@@ -211,33 +223,32 @@ class EmployeeInfo extends React.Component {
     this.props.history.goBack()
   }
   postData = () => {
-    let {account, mobile, nickName, roleData, id, selectedSchools, allSchools, posting} = this.state
+    let {account, contactMobile, nickName, roleData, id, selectedSchools, schoolLimit, posting} = this.state
+    let type = parseInt(this.state.type, 10)
     if (posting) {
       return
     }
     this.setState({
       posting: true
     })
-    let resource
+    let resource = '/api/employee/add'
     const body={
       account: account,
-      mobile: mobile,
+      contactMobile: contactMobile,
       name: nickName,
-      type: 3
+      type: type,
+      schoolLimit: schoolLimit
     }
-    if (allSchools) {
-      body.schoolLimit = false
-    } else {
-      body.schoolLimit = true
+    if (schoolLimit) {
       body.schoolIds = selectedSchools.map(s => s.id)
     }
-    let selectedRoles = roleData.filter(r => r.selected === true)
-    body.roles = selectedRoles.map(r => r.id)
+    if (type === 3) {
+      let selectedRoles = roleData.filter(r => r.selected === true)
+      body.roles = selectedRoles.map(r => r.id)
+    }
     if (id) {
       body.id = id
       resource ='/api/employee/update'
-    } else {
-      resource = '/api/employee/add'
     }
     console.log(body)
     const cb = (json) => {
@@ -265,13 +276,13 @@ class EmployeeInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
   }
   confirm = () => {
-    let {account, allSchools, selectedSchools} = this.state
+    let {account, schoolLimit, type, roleData, selectedSchools} = this.state
     if (!account) {
       return this.setState({
         accountError: true
       })
     }
-    let m = this.state.mobile
+    let m = this.state.contactMobile
     if(!/^1[3|4|5|7|8][0-9]{9}$/.test(m)){
       return this.setState({
         mobileError: true,
@@ -285,13 +296,20 @@ class EmployeeInfo extends React.Component {
         nameErrorMessage: '名字不能为空！'
       })
     }
-    let r = this.state.roleData.filter(r => r.selected === true)
-    if (!r || r.length === 0) {
+    if (!type) {
       return this.setState({
-        roleError: true
+        typeError: true
       })
     }
-    if (!allSchools && (selectedSchools.length === 0)) {
+    if (parseInt(type, 10) === 3) {
+      let r = roleData.filter(r => r.selected === true)
+      if (!r || r.length === 0) {
+        return this.setState({
+          roleError: true
+        })
+      }
+    }
+    if (schoolLimit && (selectedSchools.length === 0)) {
       return this.setState({
         schoolError: true
       })
@@ -301,21 +319,14 @@ class EmployeeInfo extends React.Component {
       return
     }
     this.postData()
-    /*
-    if (this.state.id && parseInt(m, 10) === this.state.originalMobile) {
-      this.postData()
-    } else {
-      this.checkExist(this.postData)
-    }
-    */
   }
   changeMobile = (e) => {
     this.setState({
-      mobile:e.target.value.trim()
+      contactMobile:e.target.value.trim()
     })
   }
   checkMobile = () => {
-    let m = this.state.mobile
+    let m = this.state.contactMobile
     if(!/^1[3|4|5|7|8][0-9]{9}$/.test(m)){
       return this.setState({
         mobileError: true,
@@ -326,25 +337,18 @@ class EmployeeInfo extends React.Component {
         mobileError: false
       })
     }
-    // does not need to check mobile anymore. Mobile of different account can be same.
-    /*
-    if (id && parseInt(m, 10) === this.state.originalMobile) {
-      return
-    }
-    this.checkExist()
-    */
   }
   checkExist = (callback) => {
-    let {mobile, checking} = this.state
+    let {contactMobile, checking} = this.state
     if (checking) {
       return
     }
     this.setState({
       checking: true
     })
-    let resource = '/api/user/mobile/check'
+    let resource = '/api/user/contactMobile/check'
     const body = {
-      mobile: parseInt(mobile, 10)
+      contactMobile: parseInt(contactMobile, 10)
     }
     const cb = (json) => {
       const nextState = {
@@ -388,14 +392,10 @@ class EmployeeInfo extends React.Component {
   setSchools = (data) => {
     let selectedSchools = []
     let nextState = {
-      showSchools: false
+      showSchools: false,
+      schoolLimit: true
     }
-    let {dataSource, all} = data
-    nextState.allSchools = all
-    nextState.schoolError = false
-    if (all) {
-      return this.setState(nextState)
-    }
+    let {dataSource} = data
     dataSource.forEach((r,i)=>{
       if(r.selected){
         selectedSchools.push({
@@ -420,9 +420,11 @@ class EmployeeInfo extends React.Component {
     })
   }
   closeSchool = () => {
-    this.setState({
-      showSchools: false
-    })
+    let {selectedSchools} = this.state, nextState = {showSchools: false}
+    if (selectedSchools.length === 0) {
+      nextState.schoolError = true
+    }
+    this.setState(nextState)
   }
   buildAccount = () => {
     // get an account
@@ -464,8 +466,33 @@ class EmployeeInfo extends React.Component {
     this.buildPrivileges(roleIds)
   }
   closeRoleSelect = () => {
-    this.setState({
+    let nextState = {
       showRoleModal: false
+    }
+    let {roleData} = this.state
+    let roles = roleData.filter(r => r.selected === true)
+    if (roles.length === 0) {
+      nextState.roleError = true
+    }
+    this.setState(nextState)
+  }
+  changeType = (value) => {
+    let v = parseInt(value, 10), nextState = {}
+    if (v) {
+      nextState.type = value
+      if (v === 3) {
+        nextState.showRoleModal = true
+      }
+      if (this.state.typeError) {
+        nextState.typeError = false
+      }
+    }
+    this.setState(nextState)
+  }
+  clearSchoolLimit = () => {
+    this.setState({
+      schoolLimit: false,
+      showSchools: false
     })
   }
 
@@ -473,11 +500,13 @@ class EmployeeInfo extends React.Component {
     const {id, 
       account, accountError,
       nickName,nameError,nameErrorMessage,
-      mobile, mobileError, mobileErrorMessage,
+      contactMobile, mobileError, mobileErrorMessage,
       roleError, showRoleModal, roleData,
-      showSchools, schoolError, selectedSchools,
-      allSchools, authenStatus
+      showSchools, schoolError, selectedSchools, schoolLimit,
+      authenStatus,
+      typeError
     } = this.state
+    let type = parseInt(this.state.type, 10)
     const selectedSchoolItems = selectedSchools && selectedSchools.map((r,i)=>(
       <span key={i}>{r.name}</span>
     ))
@@ -485,14 +514,23 @@ class EmployeeInfo extends React.Component {
       return (<span key={i}>{r.selected ? r.name: ''}</span>)
     })
 
+    /* formal role select:
+    <li>
+      <p>员工身份:</p>
+      <a className='mgr10' onClick={this.showRoleModal} href='' >点击选择</a>
+      <span className='value'>{selectedRoleItems}</span>
+      {roleError ? <span className='checkInvalid' >请为选择最少一个角色！</span> : null}
+    </li>
+    */
     return (
       <div className='infoList employeeInfo'>
         <ul>
           <li>
-            <p>员工账号:</p>
-            {id ? null : <Button onClick={this.buildAccount} type='primary' >生成</Button>}
+            <p>登录账号:</p>
             <span>{account}</span>
+            {id ? null : <Button type='primary' onClick={this.buildAccount} >生成账号</Button>}
             {accountError ? <span className='checkInvalid'>请先生成账号!</span> : null}
+            <span className='mgl10 hint'>(初始密码为"Xl"+登录账号)</span>
           </li>
           <li>
             <p>员工姓名:</p>
@@ -501,36 +539,41 @@ class EmployeeInfo extends React.Component {
           </li>
           <li>
             <p>员工手机号:</p>
-            <input 
-              disabled={id}
-              className={id ? 'disabled' : ''} 
+            <input
               onChange={this.changeMobile} 
               onBlur={this.checkMobile} 
-              value={mobile} 
+              value={contactMobile} 
             />
             { mobileError ? <span className='checkInvalid'>{mobileErrorMessage}</span> : null }
           </li>
           <li>
             <p>员工身份:</p>
-            <a className='mgr10' onClick={this.showRoleModal} href='' >点击选择</a>
-            <span className='value'>{selectedRoleItems}</span>
-            {roleError ? <span className='checkInvalid' >请为选择最少一个角色！</span> : null}
+            <BasicSelector
+              staticOpts={TYPES}
+              selectedOpt={type.toString()}
+              changeOpt={this.changeType}
+              checkOpt={this.checkType}
+            />
+            {type === 3 ? <span className='value mgl10'>{selectedRoleItems}</span> : null }
+            {(type === 3) && roleError ? <span className='checkInvalid' >请选择最少一个身份！</span> : null}
+            {typeError ? <span className='checkInvalid' >请选择身份！</span> : null}
           </li>
           <li>
             <p>指定学校:</p>
             <a className='mgr10' onClick={this.showSchools} href='' >点击选择</a>
-            <span className='value'>{allSchools ? '全部学校' : selectedSchoolItems}</span>
+            {schoolLimit ? selectedSchoolItems : <span>不限制学校</span>}
             {schoolError ? <span className='checkInvalid' >请为选择最少一个学校！</span> : null}
           </li>
           <li className='itemsWrapper'>
-            <AuthenDataTable
-              clickable={false}
-              authenStatus={authenStatus}
-            />
+            {parseInt(type, 10) === 3 ? 
+              <AuthenDataTable
+                clickable={false}
+                authenStatus={authenStatus}
+              />
+            : null}
           </li>
         </ul>
 
-        <div className='btnArea'>*登录账号为员工手机号，初始密码为"Xl"+手机号</div>
         <div className='btnArea'>
           <Button type='primary' onClick={this.confirm}>确认</Button>
           <Button onClick={this.back}>返回</Button>
@@ -547,11 +590,11 @@ class EmployeeInfo extends React.Component {
 
         <div>
           <SchoolMutilSelect 
-            all={allSchools} 
             closeModal={this.closeSchool} 
             setSchools={this.setSchools} 
             showModal={showSchools} 
-            selectedSchools={JSON.parse(JSON.stringify(selectedSchools))} 
+            selectedSchools={JSON.parse(JSON.stringify(selectedSchools))}
+            clearSchoolLimit={this.clearSchoolLimit} 
           />
         </div>
 

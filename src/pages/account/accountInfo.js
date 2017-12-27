@@ -11,7 +11,7 @@ class AccountInfo extends React.Component{
   constructor (props) {
     super(props)
     this.state = {
-      mobile:'',
+      account:'',
       nickName:'',
       type:'',
       visible: false,
@@ -30,7 +30,7 @@ class AccountInfo extends React.Component{
       if (json.data) {
         /*--------redirect --------*/
         this.setState({
-          mobile:json.data.mobile,
+          account:json.data.account,
           nickName:json.data.nickName,
           type:json.data.type
         })   
@@ -147,7 +147,7 @@ class AccountInfo extends React.Component{
   }
 
   render(){
-    let {mobile,type,nickName} = this.state
+    let {account,type,nickName} = this.state
     return (
       <div>
         <div className='breadc'>
@@ -158,8 +158,8 @@ class AccountInfo extends React.Component{
           <div className='infoList accountInfo'>
             <ul>
               <li>
-                <p>员工手机号:</p>
-                {mobile}
+                <p>员工账号:</p>
+                {account}
               </li>
               <li>
                 <p>登录密码:</p>

@@ -58,14 +58,15 @@ class Log extends React.Component{
       })
       this.refs.mobileBorder.classList.add('error')
       return
-    } else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(v)) {
+    }
+    /* else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(v)) {
       this.setState({
         mobileError: true,
         mobileErrorMsg: '手机号格式不正确'
       })
       this.refs.mobileBorder.classList.add('error')
       return
-    } else {
+    }*/ else {
       this.setState({
         mobileError: false,
         mobileErrorMsg: ''
@@ -118,7 +119,9 @@ class Log extends React.Component{
         })
         this.refs.mobileBorder.classList.add('error')
         return
-      } else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(mobile)) {
+      }
+      /* remove mobile format check, use account which does not comply with
+      else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(mobile)) {
         this.setState({
           mobileError: true,
           mobileErrorMsg: '手机号格式不正确'
@@ -126,6 +129,7 @@ class Log extends React.Component{
         this.refs.mobileBorder.classList.add('error')
         return
       }
+      */
       if (!password) {
         this.setState({
           pwdError: true
@@ -175,6 +179,8 @@ class Log extends React.Component{
             let currentAuthenStatus = buildCurrentAuthen(priviInfos)
 
             // get forbidden urls
+            console.log(fullPrivileges)
+            console.log(priviInfos)
             let forbiddenUrls = buildForbiddenUrl(fullPrivileges, priviInfos)
 
             // set forbidden operation, which can not be stopped by url

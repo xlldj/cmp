@@ -39,7 +39,7 @@ class RoleTable extends React.Component {
       hintDeleteModal: false
     }
     this.columns = [{
-      title: '角色',
+      title: '身份',
       dataIndex: 'name',
       width: '75%',
       className: 'firstCol'

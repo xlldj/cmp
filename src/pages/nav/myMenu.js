@@ -13,6 +13,7 @@ import { changeSchool, changeDevice, changeOrder,
   changeTask, changeEmployee, changeNotify, 
   changeVersion, changeStat, setAuthenData } from '../../actions'
 import { withRouter } from 'react-router-dom'
+import { checkObject } from '../util/checkSame';
 
 // const this.rootBlock = CONSTANTS.this.rootBlock
 
@@ -22,11 +23,32 @@ class MyMenu extends React.Component {
     schoolSet: PropTypes.bool.isRequired,
     recent: PropTypes.array.isRequired,
     full: PropTypes.array.isRequired,
-    current: PropTypes.array.isRequired
+    current: PropTypes.array.isRequired,
+    authenSet: PropTypes.bool.isRequired
   }
   constructor (props) {
     super(props)
     // let forbidden = getStore('forbidden')
+    this.state = {
+      current: '',
+      openKeys: [],
+      pathname: '',
+      currentRoot: '',
+      currentChild: ''
+    }
+    this.rootBlock = []
+  }
+  componentDidMount () {
+    let pathname = window.location.pathname
+    this.changeMenu(pathname)
+    this.setState({
+      pathname: pathname
+    })
+    if (this.props.authenSet) {
+      this.setNavs()
+    }
+  }
+  setNavs = () => {
     let {current} = this.props
     // get the main nav, COUSTANTS.rootBlock is the full nav
     let rootBlock = CONSTANTS.rootBlock.filter((r) => {
@@ -42,8 +64,8 @@ class MyMenu extends React.Component {
       let subBlock = []
       let root = current && current.find(rec => rec.name === r.name)
       // should always exist
-      if (root && root.children) {
-      subBlock = r.children.filter((sub) => {
+      if (root && root.children && r.children) {
+        subBlock = r.children.filter((sub) => {
           let found = root.children.find(rs => rs.name === sub.name)
           if (found) {
             return true
@@ -51,8 +73,8 @@ class MyMenu extends React.Component {
             return false
           }
         })
+        r.children = subBlock
       }
-      r.children = subBlock
     })
     // this.rootBlock = rootBlock
     if (rootBlock.length > 0) {
@@ -60,25 +82,22 @@ class MyMenu extends React.Component {
     } else {
       this.rootBlock = CONSTANTS.rootBlock
     }
-    this.state = {
-      current: '',
-      openKeys: [],
-      pathname: '',
-      currentRoot: '',
-      currentChild: ''
-    }
-  }
-  componentDidMount () {
-    let pathname = window.location.pathname
-    this.changeMenu(pathname)
-    this.setState({
-      pathname: pathname
-    })
+    this.changeMenu()
   }
   componentDidUpdate () {
     let pathname = window.location.pathname
     if (pathname !== this.state.pathname) {
       this.changeMenu()
+    }
+  }
+  componentWillReceiveProps (nextProps) {
+    if (checkObject(this.props, nextProps, ['authenSet'])) {
+      return
+    }
+    let {authenSet} = nextProps
+    if (authenSet) {
+      this.props = nextProps
+      this.setNavs()
     }
   }
   changeMenu = (pathname) => { // 只有在不是由导航栏点击改变url时，才会触发changemenu，因此只要打开就可以了，不用管关闭组标签
@@ -117,7 +136,7 @@ class MyMenu extends React.Component {
   }
 
   getDefaultSchool = () => {
-    let {recent, schools, schoolSet} = this.props
+    let {recent, schools} = this.props
     /* if (!schoolSet) {
       return this.setDefaultSchool()
     } */
@@ -153,6 +172,7 @@ class MyMenu extends React.Component {
       this.props.changeTask('log', {schoolId: selectedSchool})
       this.props.changeTask('complaint', {schoolId: selectedSchool})
       this.props.changeTask('feedback', {schoolId: selectedSchool})
+      this.props.changeEmployee('employeeList', {schoolId: selectedSchool})
       this.props.changeStat('overview', {schoolId: selectedSchool})
       this.props.changeStat('charts', {schoolId: selectedSchool})
       this.props.changeStat('rank', {schoolId: selectedSchool})
@@ -302,7 +322,16 @@ class MyMenu extends React.Component {
 
 
   setStatusForemployee = () => {
+    this.clearStatus4employeeIIlist()
+    // this.props.changeEmployee('employeeList', {page: 1, selectKey: ''})
+  }
+  clearStatus4employeeIIlist = () => {
+    this.getDefaultSchool()
     this.props.changeEmployee('employeeList', {page: 1, selectKey: ''})
+  }
+  clearStatus4employeeIIrole = () => {
+    this.getDefaultSchool()
+    this.props.changeEmployee('roleList', {page: 1})
   }
 
 
@@ -403,7 +432,8 @@ const mapStateToProps = (state, ownProps) => {
     schoolSet: state.setSchoolList.schoolSet,
     recent: state.setSchoolList.recent,
     full: state.setAuthenData.full,
-    current: state.setAuthenData.current
+    current: state.setAuthenData.current,
+    authenSet: state.setAuthenData.authenSet
   }
 }
 export default withRouter(connect(mapStateToProps, {

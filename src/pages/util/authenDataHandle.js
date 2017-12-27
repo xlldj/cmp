@@ -184,7 +184,7 @@ export function buildForbiddenUrl (full, current) {
     })
     let forbiddenUrls = []
     forbidden.forEach((r) => {
-      console.log(privilege2Url[r.desc])
+      // console.log(privilege2Url[r.desc])
       let urls = privilege2Url[r.desc]
       if (urls) {
         forbiddenUrls = forbiddenUrls.concat(urls)

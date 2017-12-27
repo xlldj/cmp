@@ -4,6 +4,7 @@ import Bread from '../bread'
 import './style/style.css'
 
 import {asyncComponent} from '../component/asyncComponent'
+import {getLocal} from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -29,10 +30,32 @@ const breadcrumbNameMap = {
 
 class EmployeeDisp extends React.Component {
   setStatusForemployee = () => {
+    this.clearStatus4employeeIIlist()
+  }
+  clearStatus4employeeIIlist = () => {
+    this.getDefaultSchool()
     this.props.changeEmployee('employeeList', {page: 1, selectKey: ''})
+  }
+  clearStatus4employeeIIrole = () => {
+    this.getDefaultSchool()
+    this.props.changeEmployee('roleList', {page: 1})
   }
   changeCurrentName = (nickName) => {
     this.props.changeCurrentName(nickName)
+  }
+  getDefaultSchool = () => {
+    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
+    var selectedSchool = 'all'
+    if (recentSchools) {
+      let recent = recentSchools.split(',')
+      let schoolId = recent[0]
+      selectedSchool = schoolId
+    } else if (defaultSchool) {
+      selectedSchool = defaultSchool
+    }
+    if (selectedSchool !== 'all') {
+      this.props.changeEmployee('employeeList', {schoolId: selectedSchool})
+    }
   }
   render () {
     return (
@@ -42,6 +65,8 @@ class EmployeeDisp extends React.Component {
             breadcrumbNameMap={breadcrumbNameMap} 
             parent='employee' 
             setStatusForemployee={this.setStatusForemployee}  
+            clearStatus4employeeIIlist={this.clearStatus4employeeIIlist}
+            clearStatus4employeeIIrole={this.clearStatus4employeeIIrole}
             parentName='员工管理' 
           />
         </div>

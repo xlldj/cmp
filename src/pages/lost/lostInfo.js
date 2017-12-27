@@ -222,19 +222,19 @@ class LostInfo extends React.Component {
           <li><p>联系方式:</p>{data.mobile}</li>
           <li><p>发布时间:</p>{createTimeStr}</li>
         </ul>
-        {
-          forbiddenStatus.SHIELD_LOST_INFO ? null :
           <div className='btnArea'>
-            { blocking ? 
-              <Button type='primary'>屏蔽显示</Button>
-              :
-              <Popconfirm title="确定要屏蔽显示么?" onConfirm={this.blockMessage} okText="确认" cancelText="取消">
+            {
+              forbiddenStatus.SHIELD_LOST_INFO ? null :
+              ( blocking ? 
                 <Button type='primary'>屏蔽显示</Button>
-              </Popconfirm>
+                :
+                <Popconfirm title="确定要屏蔽显示么?" onConfirm={this.blockMessage} okText="确认" cancelText="取消">
+                  <Button type='primary'>屏蔽显示</Button>
+                </Popconfirm>
+              )
             }
             <Button onClick={this.back}>返回</Button>
           </div>
-        }
 
         <Modal  visible={showImgs}  title='' closable={false} onCancel={this.closeImgs}  className='carouselModal' okText='' footer={null} >
           <div className='carouselContainer' >{carousel}</div>

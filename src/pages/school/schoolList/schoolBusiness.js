@@ -116,7 +116,6 @@ class SchoolBusiness extends React.Component{
 
   render(){
     let {businesses, schoolName, clearError, posting} = this.state
-    console.log(posting)
     return (
       <div className='infoList'>
         <ul>
