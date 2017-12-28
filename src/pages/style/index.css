@@ -907,6 +907,9 @@ button.grayBackColor:linked {
 .roleTable .editBox {
   line-height: 40px;
 }
+.roleTable .authenSelect {
+  height: 15px;
+}
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable {
   margin: 10px 40px 40px 40px;

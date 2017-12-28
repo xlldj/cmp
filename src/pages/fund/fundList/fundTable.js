@@ -58,9 +58,10 @@ class FundTable extends React.Component {
       className: 'firstCol',
       render: (text) => (text || '暂无')
     }, {
-      title: '用户',
-      dataIndex: 'mobile',
-      width: '10%'
+      title: '手机号',
+      dataIndex: 'executorMobile',
+      width: '10%',
+      render: (text) => (text || '')
     }, {
       title: '学校',
       dataIndex: 'schoolName',
@@ -76,7 +77,13 @@ class FundTable extends React.Component {
       title: '操作类型',
       dataIndex: 'operationType',
       width: '10%',
-      render: (text,record)=>(typeName[record.operationType])
+      render: (text,record) => {
+        if (record.instead) {
+          return (typeName[record.operationType]) + '(代充值)'
+        } else {
+          return (typeName[record.operationType])
+        }
+      }
     }, {
       title: '操作状态',
       dataIndex: 'status',

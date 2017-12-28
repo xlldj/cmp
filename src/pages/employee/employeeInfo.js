@@ -39,6 +39,9 @@ const TYPES = {
   3: '其他'
 }
 
+const backTitle = {
+  fromFund: '返回资金详情'
+}
 class EmployeeInfo extends React.Component {
   static propTypes = {
     schools: PropTypes.array.isRequired,
@@ -576,7 +579,7 @@ class EmployeeInfo extends React.Component {
 
         <div className='btnArea'>
           <Button type='primary' onClick={this.confirm}>确认</Button>
-          <Button onClick={this.back}>返回</Button>
+          <Button onClick={this.back}>{this.props.location.state?(backTitle[this.props.location.state.path]):'返回'}</Button>
         </div>
         <div style={{clear:'both'}}></div>
 

@@ -81,6 +81,7 @@ class Main extends React.Component {
         if (authenInfo) {
           authenInfo.authenSet = true
           this.props.setAuthenData(authenInfo)
+        // console.log(authenInfo)
         } else {
           this.hintRelog()
           // this.props.fetchPrivileges()
@@ -121,7 +122,6 @@ class Main extends React.Component {
           return false
         }
       })
-      console.log('update')
       if (forbidden !== -1) {
         // return false
         // if not showing forbidden, and nextLocation !== this.state.forbiddenUrl, show it. Trigger a timer to avoid duplicate show

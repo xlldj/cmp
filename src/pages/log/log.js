@@ -179,8 +179,8 @@ class Log extends React.Component{
             let currentAuthenStatus = buildCurrentAuthen(priviInfos)
 
             // get forbidden urls
-            console.log(fullPrivileges)
-            console.log(priviInfos)
+            // console.log(fullPrivileges)
+            // console.log(priviInfos)
             let forbiddenUrls = buildForbiddenUrl(fullPrivileges, priviInfos)
 
             // set forbidden operation, which can not be stopped by url

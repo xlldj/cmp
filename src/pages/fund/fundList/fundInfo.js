@@ -42,7 +42,8 @@ class FundInfo extends React.Component {
         "schoolId": 0,
         "schoolName": "",
         "status": "USING",
-        "usageAmount": 0
+        "usageAmount": 0,
+        instead: false // if the deposit is from manager to user
     }
     this.state = {
       data: data,
@@ -173,7 +174,7 @@ class FundInfo extends React.Component {
   }
   render () {
     let {operationType, schoolName, mobile, userId, remarks, thirdAccountType, thirdAccountName, 
-      createTime, orderNo, status, amount, csName} = this.state.data
+      createTime, orderNo, status, amount, csName, instead, executorMobile} = this.state.data
     let {failedReason, showCensor, reasonError} = this.state
     let dStr = Time.getTimeStr(createTime)
 
@@ -194,14 +195,31 @@ class FundInfo extends React.Component {
     )
     let censorPassed = (status === 2) || (status === 3) || (status === 4) || (status === 5)
 
+    // link for executor detail
+    let executorLink = instead ? `/employee/list/detail/:${userId}` : `/user/userInfo/:${userId}`
+
     return (
       <div className='infoList' >
         <ul>
           <li><p>学校:</p>{schoolName}</li>
           <li>
-            <p >手机号:</p><span className='padR20'>{mobile}</span>
-            <Link className='' to={{pathname:`/user/userInfo/:${userId}`,state:{path: 'fromFund'}}} >查看用户详情</Link>
+            <p >手机号:</p><span className='padR20'>{executorMobile}</span>
+            <Link className='' to={{pathname: executorLink,state:{path: 'fromFund'}}} >查看详情</Link>
           </li>
+          {
+            instead ? 
+            <li>
+              <p>充值目的:</p><span>代充值</span>
+            </li>
+            : null
+          }
+          {
+            instead ? 
+            <li>
+              <p>被充值账号:</p><span>{mobile}</span>
+            </li>
+            : null
+          }
           <li><p>{FUNDTYPE[operationType]}金额:</p>¥{amount}</li>
           <li><p>活动福利:</p>{remarks || '无'}</li>
           <li><p>{FUNDTYPE[operationType]}方式:</p>{ACCOUNTTYPE[thirdAccountType]} ({thirdAccountName || '暂无'})</li>
