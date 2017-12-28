@@ -217,6 +217,7 @@ class TaskList extends React.Component {
   componentDidMount(){
     this.props.hide(false)
     let {all, assigned, sourceType, pending, page, schoolId} = this.props
+    console.log(schoolId)
     const body = {
       page: page,
       size: SIZE,
@@ -248,6 +249,7 @@ class TaskList extends React.Component {
       return
     }
     let {all, assigned, sourceType, pending, page, schoolId} = nextProps
+    console.log(schoolId)
     const body = {
       page: page,
       size: SIZE,

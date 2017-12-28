@@ -181,28 +181,30 @@ class LostInfo extends React.Component {
           <li>
             <p>用户:</p>
             {data.user}
-            <div className='defriendWrapper'>
-              <Popconfirm title="确定要拉入黑名单么?" onConfirm={this.defriend} okText="确认" cancelText="取消">
-                <a href=''>拉入黑名单</a>
-              </Popconfirm>
-              {showDefriendDate ?
-                <span className='selectWrapper'>
-                  <BasicSelector
-                    width={CONSTANTS.SHORTSELECTOR}
-                    staticOpts={CONSTANTS.DEFRIENDLEVEL}
-                    selectedOpt={defriendLevel}
-                    changeOpt={this.changeLevel}
-                    invalidTitle='选择时长'
-                  />
-                  <Button type='primary' onClick={this.postLevel} >确认</Button>
-                  <Button onClick={this.cancelDefriend}>取消</Button>
-                  {
-                    defriendError ? <span className='checkInvalid'>请先选择拉入黑名单的期限!</span> : null
-                  }
-                </span>
-                : null
-              }
-            </div>
+            {forbiddenStatus.DEACTIVE_USER ? null :
+              <div className='defriendWrapper'>
+                <Popconfirm title="确定要拉入黑名单么?" onConfirm={this.defriend} okText="确认" cancelText="取消">
+                  <a href=''>拉入黑名单</a>
+                </Popconfirm>
+                {showDefriendDate ?
+                  <span className='selectWrapper'>
+                    <BasicSelector
+                      width={CONSTANTS.SHORTSELECTOR}
+                      staticOpts={CONSTANTS.DEFRIENDLEVEL}
+                      selectedOpt={defriendLevel}
+                      changeOpt={this.changeLevel}
+                      invalidTitle='选择时长'
+                    />
+                    <Button type='primary' onClick={this.postLevel} >确认</Button>
+                    <Button onClick={this.cancelDefriend}>取消</Button>
+                    {
+                      defriendError ? <span className='checkInvalid'>请先选择拉入黑名单的期限!</span> : null
+                    }
+                  </span>
+                  : null
+                }
+              </div>
+            }
           </li>
           <li><p>类型:</p>{typeName[data.type]}</li>
           { data.images && data.images.length>0 ? 

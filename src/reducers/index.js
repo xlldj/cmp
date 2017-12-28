@@ -272,15 +272,15 @@ const initialTaskState = {
     sourceType: 'all',
     pending: 'all',
     all: '1',
-    schoolId: selectedSchool
+    schoolId: 'all'
   },
   log: {
-    schoolId: selectedSchool,
+    schoolId: 'all',
     page: 1,
     all: '1'
   },
   complaint: {
-    schoolId: selectedSchool,
+    schoolId: 'all',
     page: 1,
     type: 'all',
     status: 'all',
@@ -288,7 +288,7 @@ const initialTaskState = {
   },
   feedback: {
     page: 1,
-    schoolId: selectedSchool
+    schoolId: 'all' 
   }
 }
 const changeTask = (state = initialTaskState, action) => {
@@ -296,6 +296,7 @@ const changeTask = (state = initialTaskState, action) => {
 
   if (type === ActionTypes.CHANGE_TASK) {
     const {subModule, keyValuePair} = action
+    console.log(keyValuePair)
     return merge({}, state, {[subModule]: keyValuePair})
   }
   return state

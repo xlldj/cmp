@@ -334,7 +334,7 @@ class RepairInfo extends React.Component {
 
         {status.status === 7 ? rateInfo : null}
 
-        { status.status === 3 || status.status === 4 || status.status === 5 || status.status === 7 ? 
+        { status.status === 3 || status.status === 4 || status.status === 5 || status.status === 7 || status.status === 8 ? 
           <div className='btnArea'>
             <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
           </div> 

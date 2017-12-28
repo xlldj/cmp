@@ -83,7 +83,7 @@ class Main extends React.Component {
           this.props.setAuthenData(authenInfo)
         // console.log(authenInfo)
         } else {
-          this.hintRelog()
+          // this.hintRelog()
           // this.props.fetchPrivileges()
         }
       }
@@ -210,10 +210,12 @@ class Main extends React.Component {
           this.props.changeGift('act', {schoolId: selectedSchool})
           this.props.changeLost('lostList', {schoolId: selectedSchool})
           this.props.changeUser('userList', {schoolId: selectedSchool}) 
+          /*
           this.props.changeTask('taskList', {schoolId: selectedSchool}) 
           this.props.changeTask('log', {schoolId: selectedSchool})
           this.props.changeTask('complaint', {schoolId: selectedSchool})
           this.props.changeTask('feedback', {schoolId: selectedSchool})
+          */
           this.props.changeStat('overview', {schoolId: selectedSchool})
           this.props.changeStat('charts', {schoolId: selectedSchool})
           this.props.changeStat('rank', {schoolId: selectedSchool})

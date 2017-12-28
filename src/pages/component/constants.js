@@ -491,6 +491,7 @@ const CONSTANTS = {
   DESC2STATUS: {
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     '屏蔽失物招领': 'SHIELD_LOST_INFO',
+    '拉黑用户': 'DEACTIVE_USER',
     '重置用户密码': 'RESET_USER_PWD',
     '指派客服任务': 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',

@@ -37,16 +37,16 @@ class TaskDisp extends React.Component {
     */
   }
   clearStatus4IIlog = () => {
-    this.getDefaultSchool()
-    this.props.changeTask('log', {page: 1, all: '1'})
+    // this.getDefaultSchool()
+    this.props.changeTask('log', {page: 1, all: '1', schoolId: 'all'})
   }
   clearStatus4taskIIcomplaint = () => {
-    this.getDefaultSchool()
-    this.props.changeTask('complaint', {page: 1, type: 'all', status: 'all', selectKey: ''})
+    // this.getDefaultSchool()
+    this.props.changeTask('complaint', {page: 1, type: 'all', status: 'all', selectKey: '', schoolId: 'all'})
   }
   clearStatus4taskIIfeedback = () => {
-    this.getDefaultSchool()
-    this.props.changeTask('feedback', {page: 1})
+    // this.getDefaultSchool()
+    this.props.changeTask('feedback', {page: 1, schoolId: 'all'})
   }
   getDefaultSchool = () => {
     const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')

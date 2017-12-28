@@ -51,7 +51,8 @@ class MyMenu extends React.Component {
   setNavs = () => {
     let {current} = this.props
     // get the main nav, COUSTANTS.rootBlock is the full nav
-    let rootBlock = CONSTANTS.rootBlock.filter((r) => {
+    let originalNavs = JSON.parse(JSON.stringify(CONSTANTS.rootBlock))
+    let rootBlock = originalNavs.filter((r) => {
       let found = current && current.find(rec => rec.name === r.name)
       if (found) {
         return true
@@ -60,12 +61,11 @@ class MyMenu extends React.Component {
       }
     })
     // get the sub nav
-    // console.log(rootBlock)
-    // console.log(current)
     rootBlock.forEach((r) => {
       let subBlock = []
       let root = current && current.find(rec => rec.name === r.name)
       // should always exist
+      console.log(r)
       if (root && root.children && r.children) {
         subBlock = r.children.filter((sub) => {
           let found = root.children.find(rs => rs.name === sub.name)
@@ -75,10 +75,16 @@ class MyMenu extends React.Component {
             return false
           }
         })
+        console.log(subBlock)
         r.children = subBlock
       }
     })
-    this.rootBlock = rootBlock
+    if (rootBlock.length === 0) {
+      this.rootBlock = originalNavs
+    } else {
+      this.rootBlock = rootBlock
+    }
+    console.log()
     /*
     if (rootBlock.length > 0) {
       this.rootBlock = rootBlock
@@ -173,9 +179,6 @@ class MyMenu extends React.Component {
       this.props.changeLost('lostList', {schoolId: selectedSchool})
       this.props.changeUser('userList', {schoolId: selectedSchool}) 
       // this.props.changeTask('taskList', {schoolId: selectedSchool}) 
-      this.props.changeTask('log', {schoolId: selectedSchool})
-      this.props.changeTask('complaint', {schoolId: selectedSchool})
-      this.props.changeTask('feedback', {schoolId: selectedSchool})
       this.props.changeEmployee('employeeList', {schoolId: selectedSchool})
       this.props.changeStat('overview', {schoolId: selectedSchool})
       this.props.changeStat('charts', {schoolId: selectedSchool})
@@ -304,20 +307,20 @@ class MyMenu extends React.Component {
     */
   }
   clearStatus4taskIIlog = () => {
-    this.getDefaultSchool()
-    this.props.changeTask('log', {page: 1, all: '1'})
+    // this.getDefaultSchool()
+    this.props.changeTask('log', {page: 1, all: '1', schoolId: 'all'})
   }
   clearStatus4taskIIabnormal = () => {
     this.getDefaultSchool()
     this.props.changeTask('abnormal', {page: 1, selectKey: ''})
   }
   clearStatus4taskIIcomplaint = () => {
-    this.getDefaultSchool()
-    this.props.changeTask('complaint', {page: 1, type: 'all', status: 'all', selectKey: ''})
+    // this.getDefaultSchool()
+    this.props.changeTask('complaint', {page: 1, type: 'all', status: 'all', selectKey: '', schoolId: 'all'})
   }
   clearStatus4taskIIfeedback = () => {
-    this.getDefaultSchool()
-    this.props.changeTask('feedback', {page: 1})
+    // this.getDefaultSchool()
+    this.props.changeTask('feedback', {page: 1, schoolId: 'all'})
   }
 
   setStatusForstat = () => {
@@ -396,6 +399,7 @@ class MyMenu extends React.Component {
       )
     })
     const currentRoute = this.rootBlock.find((r) => (r.key === currentRoot))
+    console.log(currentRoute)
     const secondItems = currentRoute&&currentRoute.children&&currentRoute.children.map((r, i) => {
       return (
         <li key={i} className={currentChild === r.key ? 'activeSecondItem' : ''}  onClick={(e) => {this.changeChild(e, r.key)}}>
