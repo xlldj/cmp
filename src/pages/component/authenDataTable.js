@@ -2,6 +2,8 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 import {Collapse} from 'antd'
 import {mul} from '../util/numberHandle'
+import select from '../assets/select.png'
+
 const Panel = Collapse.Panel
 const ITEMHEIGHT = 40
 const getModelNode = (status, keys) => {
@@ -78,6 +80,7 @@ export default class AuthenDataTable extends React.Component{
   }
   render(){
     const {authenStatus, edit} = this.props
+    let img = <img className='authenSelect' src={select} alt='√' />
 
     const authenPanel = authenStatus && authenStatus.map((r, i) => {
       let level2 = r.children && r.children.map((rec, ind) => {
@@ -102,7 +105,15 @@ export default class AuthenDataTable extends React.Component{
                       <a href='' onClick={(e) => {this.delete(e, item.id)}}>删除</a>
                     </span>)
                     : 
-                    (item.selected ? '√' : '')
+                    (item.selected ? 
+                      <img 
+                        className='authenSelect' 
+                        data-level={4} 
+                        data-key={item.key}  
+                        key={`img${item.key}`}
+                        src={select} alt='√' 
+                      />
+                      : '')
                   }
                 </div>
               </div>

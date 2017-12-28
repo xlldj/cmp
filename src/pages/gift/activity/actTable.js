@@ -185,6 +185,7 @@ class ActTable extends React.Component {
     const body = {
       id:id
     }
+    let schoolId = this.props.schoolId
     const cb = (json) => {
         if(json.error){
           throw new Error(json.error.displayMessage || json.error)
@@ -194,8 +195,8 @@ class ActTable extends React.Component {
               page: this.props.page,
               size: SIZE
             }
-            if(this.state.selectedSchool !== 'all'){
-              body.schoolId=parseInt(this.state.selectedSchool, 10)
+            if(schoolId !== 'all'){
+              body.schoolId=parseInt(schoolId, 10)
             }
             this.fetchData(body)
           }else{

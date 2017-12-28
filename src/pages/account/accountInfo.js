@@ -2,18 +2,25 @@ import React from 'react'
 import {Button, Popconfirm, Modal} from 'antd'
 import Noti from '../noti'
 import AjaxHandler from '../ajax'
-import CONSTANTS from '../component/constants'
 import Bread from '../bread'
 import './style/style.css'
-const ROLE = CONSTANTS.ROLE
+
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setRoleList } from '../../actions'
 
 class AccountInfo extends React.Component{
+  static propTypes = {
+    roles: PropTypes.array.isRequired,
+    rolesSet: PropTypes.bool.isRequired
+  }
   constructor (props) {
     super(props)
     this.state = {
       account:'',
       nickName:'',
-      type:'',
+      roles: [],
       visible: false,
       oldPwd: '',
       oldPwdError: false,
@@ -24,16 +31,57 @@ class AccountInfo extends React.Component{
       modalError: false
     }
   }
+  fetchRoles = () => {
+    let resource = '/role/list'
+    const body = {
+      page: 1,
+      size: 10000
+    }
+    const cb = (json) => {
+      if (json.data.roles) {
+        this.props.setRoleList({
+          roles: json.data.roles,
+          rolesSet: true
+        })
+
+        let roleName = [] 
+        this.state.roles.forEach(r => {
+          let role = json.data.roles.find(ro => ro.id === r)
+          if (role) {
+            roleName.push(role.name)
+          }
+        })
+        this.setState({
+          roleName: roleName.join('、')
+        })
+      }
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   fetchData = (body) => {
     let resource='/api/employee/one'
     const cb = (json) => {
       if (json.data) {
         /*--------redirect --------*/
-        this.setState({
+        let nextState = {
           account:json.data.account,
           nickName:json.data.nickName,
-          type:json.data.type
-        })   
+          roles:json.data.roles
+        }
+        let {rolesSet, roles} = this.props
+        if (rolesSet) {
+          let roleName = [] 
+          json.data.roles.forEach(r => {
+            let role = roles.find(ro => ro.id === r)
+            if (role) {
+              roleName.push(role.name)
+            }
+          })
+          nextState.roleName = roleName.join('、')
+        } else {
+          this.fetchRoles()
+        }
+        this.setState(nextState)
       }
     }
     AjaxHandler.ajax(resource,body,cb)
@@ -147,7 +195,7 @@ class AccountInfo extends React.Component{
   }
 
   render(){
-    let {account,type,nickName} = this.state
+    let {account, roleName, nickName} = this.state
     return (
       <div>
         <div className='breadc'>
@@ -171,7 +219,7 @@ class AccountInfo extends React.Component{
               </li>
               <li>
                 <p>员工身份:</p>
-                {ROLE[type]}
+                {roleName}
               </li>
             </ul>
             <div className='btnArea'>
@@ -212,4 +260,11 @@ class AccountInfo extends React.Component{
   }
 }
 
-export default AccountInfo
+const mapStateToProps = (state, ownProps) => ({
+  roles: state.setRoleList.roles,
+  rolesSet: state.setRoleList.rolesSet
+})
+
+export default withRouter(connect(mapStateToProps, {
+  setRoleList
+ })(AccountInfo))

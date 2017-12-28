@@ -495,6 +495,9 @@ const CONSTANTS = {
     '指派客服任务': 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
     '删除员工': 'DELETE_EMPLOYEE',
+    '发布/编辑紧急公告': 'EDIT_EMERGENCY_NOTIFY',
+    '发布/编辑系统公告': 'EDIT_SYSTEM_NOTIFY',
+    '发布/编辑客服公告': 'EDIT_CUSTOM_NOTIFY',
     '删除公告': 'DELETE_NOTIFY',
     '审核': 'CENSOR_NOTIFY'
   },
@@ -606,7 +609,7 @@ const CONSTANTS = {
     '设备配件列表/搜索/查询': ['device/components'],
     '配件类型管理/添加配件/编辑配件': ['device/components/componentType', 'device/components/addComponent', 'device/components/editComponent'],
     '设备预付列表/搜索/查询': ['device/prepay'],
-    '添加/编辑预付选项': ['device/prepay/addPrepay', 'device/prepay/addPrepay'],
+    '添加/编辑预付选项': ['device/prepay/addPrepay', 'device/prepay/editPrepay'],
     '设备供水时段列表/搜索/查询': ['device/timeset'],
     '添加/编辑供水时段': ['device/timeset/addTimeset', 'device/timeset/editTimeset'],
     '设备供应商列表/搜索/查询': ['device/suppliers'],

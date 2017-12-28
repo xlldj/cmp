@@ -86,7 +86,6 @@ class Feedback extends React.Component {
     },{
       title: '反馈时间',
       dataIndex: 'createTime',
-      width: '20%',
       render: (text, record) => (record.createTime ? Time.getTimeStr(record.createTime) : '暂无')
     }]
   }
@@ -119,7 +118,8 @@ class Feedback extends React.Component {
     this.props.hide(false)
     let {page, schoolId} = this.props
     const body = {
-      page: page
+      page: page,
+      size: SIZE
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
@@ -135,7 +135,8 @@ class Feedback extends React.Component {
     }
     let {page, schoolId} = nextProps
     const body = {
-      page: page
+      page: page,
+      size: SIZE
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
