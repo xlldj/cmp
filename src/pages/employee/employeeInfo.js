@@ -286,12 +286,18 @@ class EmployeeInfo extends React.Component {
       })
     }
     let m = this.state.contactMobile
-    if(!/^1[3|4|5|7|8][0-9]{9}$/.test(m)){
+    if (!m) {
+      return this.setState({
+        mobileError: true,
+        mobileErrorMessage: '手机号不能为空'
+      })
+    }
+    /*if(!/^1[3|4|5|7|8][0-9]{9}$/.test(m)){
       return this.setState({
         mobileError: true,
         mobileErrorMessage: '手机号格式不正确！'
       })
-    }
+    }*/
     let n = this.state.nickName
     if(!n){
       return this.setState({
@@ -456,7 +462,8 @@ class EmployeeInfo extends React.Component {
     let roleData = JSON.parse(JSON.stringify(data))
     let nextState = {
       roleData: roleData,
-      showRoleModal: false
+      showRoleModal: false,
+      schoolLimit: false
     }
     let roles = roleData.filter(r => r.selected === true)
     if (roles.length === 0) {
@@ -544,7 +551,7 @@ class EmployeeInfo extends React.Component {
             <p>员工手机号:</p>
             <input
               onChange={this.changeMobile} 
-              onBlur={this.checkMobile} 
+              // onBlur={this.checkMobile} 
               value={contactMobile} 
             />
             { mobileError ? <span className='checkInvalid'>{mobileErrorMessage}</span> : null }

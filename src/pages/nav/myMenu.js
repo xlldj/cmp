@@ -60,6 +60,8 @@ class MyMenu extends React.Component {
       }
     })
     // get the sub nav
+    // console.log(rootBlock)
+    // console.log(current)
     rootBlock.forEach((r) => {
       let subBlock = []
       let root = current && current.find(rec => rec.name === r.name)

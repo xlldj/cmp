@@ -68,7 +68,10 @@ class ActInfo extends React.Component {
 
       released: false,
       startTime: moment(),
-      startTimeError: ''
+      startTimeError: '',
+
+      posting: false,
+      checking: false
     }
   }
   fetchGifts = () => {
@@ -264,7 +267,10 @@ class ActInfo extends React.Component {
   }
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
-    let {id, selectedSchool, name, type, amount, online, releaseMethod, inventory, usedInventory, startTime, endTime, code, released, fileList, imageError} = this.state
+    let {id, selectedSchool, name, type, amount, online, releaseMethod, 
+      inventory, usedInventory, code, released, fileList, imageError,
+      posting, checking
+    } = this.state
     if(selectedSchool==='0' || !selectedSchool){
       return this.setState({
         schoolError: true
@@ -325,14 +331,18 @@ class ActInfo extends React.Component {
     /* 如果是在编辑，没有改变学校和关键字段, 执行下线操作
     (在以后的版本中，只有在有效期内才能操作online。为了兼容之前的版本，这里对是否在有效期内进行检测，只有在有效期内且是下线操作才不用查重-2017/12/6 v1.0.1)
     ，不需要查重 */
-    let start = parseInt(moment(startTime).valueOf(), 10)
-    let end = parseInt(moment(endTime).valueOf(), 10)
-    let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
-    if (id && this.checkSame() && timeValid && !online) {
+    // let start = parseInt(moment(startTime).valueOf(), 10)
+    // let end = parseInt(moment(endTime).valueOf(), 10)
+    // let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
+    if (posting || checking) {
+      return
+    }
+    if (id && this.checkSame()) {
       this.postInfo()
     } else {
       this.checkExist(this.postInfo)
     }
+    // this.postInfo()
   }
   checkSame = () => {
     let {selectedSchool, name, type, code, originalSchool, originalName, originalType, originalCode} = this.state
@@ -351,7 +361,7 @@ class ActInfo extends React.Component {
     return true
   }
   checkExist = (callback) => {
-    let {selectedSchool, type, code, name} = this.state
+    let {selectedSchool, type, code, name, checking} = this.state
     let url = '/gift/activity/check'
     const body = {
       schoolId: parseInt(selectedSchool, 10),
@@ -362,6 +372,9 @@ class ActInfo extends React.Component {
       body.code = code
     }
     const cb = (json) => {
+      this.setState({
+        checking: false
+      })
       if(json.error){
         throw new Error(json.error.displayMessage || json.error)
       }else{
@@ -374,13 +387,20 @@ class ActInfo extends React.Component {
         }
       }
     }
-    AjaxHandler.ajax(url, body, cb) 
+    if (checking) {
+      return
+    } else {
+      this.setState({
+        checking: true
+      })
+    }
+    AjaxHandler.ajax(url, body, cb, null, {clearChecking: true, thisObj: this}) 
   }
   postInfo = () => {
     let resource = '/api/gift/activity/save'
     let {gifts,type,name,selectedSchool,amount,releaseMethod,amountRandom,
-      startTime, endTime, fileList,url,inventory,code, online
-    }=this.state,items=[]
+      startTime, endTime, fileList,url,inventory,code, online, posting
+    } = this.state, items=[]
     gifts.forEach((g,i)=>{
       if(g.count){
         items.push({
@@ -418,29 +438,38 @@ class ActInfo extends React.Component {
       body.id = parseInt(this.props.match.params.id.slice(1), 10)
     }
     const cb = (json) => {
-        if(json.error){
-          Noti.hintLock('请求出错', json.error.displayMessage || '请求出错, 请稍后刷新重试')
-        } else {
-          if(json.data){
-            if(this.state.released&&!this.state.online){
-              // this.openNotificationWithIcon('info')
-              Noti.hintOk('当前活动已下线', '您可以对此活动继续编辑！')
-              this.setState({
-                released: false
-              })
-            }else{
-              let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
-              if(this.state.online && timeValid){
-                 return Noti.hintAndRoute('当前活动已上线', '将返回活动列表！', this.props.history, '/gift/act')
-              }
-              Noti.hintSuccess(this.props.history,'/gift/act')
-            }
+      let nextState = {
+        posting: false
+      }
+      if(json.error){
+        Noti.hintLock('请求出错', json.error.displayMessage || '请求出错, 请稍后刷新重试')
+      } else {
+        if(json.data){
+          if(this.state.released&&!this.state.online){
+            // this.openNotificationWithIcon('info')
+            Noti.hintOk('当前活动已下线', '您可以对此活动继续编辑！')
+            nextState.released = false
           }else{
-            Noti.hintLock('请求出错', '网络出错, 请稍后刷新重试')
+            let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
+            if(this.state.online && timeValid){
+                return Noti.hintAndRoute('当前活动已上线', '将返回活动列表！', this.props.history, '/gift/act')
+            }
+            Noti.hintSuccess(this.props.history,'/gift/act')
           }
+        }else{
+          Noti.hintLock('请求出错', '网络出错, 请稍后刷新重试')
         }
+      }
+      this.setState(nextState)
     }
-    AjaxHandler.ajax(resource, body, cb)   
+    if (posting) {
+      return
+    } else {
+      this.setState({
+        posting: true
+      })
+    }
+    AjaxHandler.ajax(resource, body, cb, null, {clearPosting: true, thisObj: this})   
   }
   openNotification = () => {
     notification.open({

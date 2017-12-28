@@ -9,10 +9,17 @@ import AddPlusAbs from '../component/addPlusAbs'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
 import CONSTANTS from '../component/constants'
 
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeNotify } from '../../actions'
+
 const VALUELENGTH = '150px'
 
-
 class NotifyInfo extends React.Component {
+  static propTypes = {
+    forbiddenStatus: PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     let schoolError=false, type='0', typeError=false
@@ -534,13 +541,24 @@ class NotifyInfo extends React.Component {
     )
     const schoolItems = schools.map((s, i) => (<span className='puncSeperated' key={i}>{s.name}</span>))
 
+    let {EDIT_EMERGENCY_NOTIFY, EDIT_SYSTEM_NOTIFY, EDIT_CUSTOM_NOTIFY} = this.props.forbiddenStatus
+    let notifyTypeList = JSON.parse(JSON.stringify(CONSTANTS.NOTIFYTYPES))
+    if (EDIT_EMERGENCY_NOTIFY) {
+      delete notifyTypeList[1]
+    }
+    if (EDIT_SYSTEM_NOTIFY) {
+      delete notifyTypeList[2]
+    }
+    if (EDIT_CUSTOM_NOTIFY) {
+      delete notifyTypeList[3]
+    }
     return (
       <div className='infoList notifyInfo'>
         <ul>
           <li>
             <p>公告类型:</p>
             <BasicSelectorWithoutAll
-              staticOpts={CONSTANTS.NOTIFYTYPES}  
+              staticOpts={notifyTypeList}  
               width={150} 
               selectedOpt={type} 
               changeOpt={this.changeType}
@@ -759,4 +777,12 @@ class SchoolMultiSelector extends React.Component{
 }
 
 
-export default NotifyInfo
+const mapStateToProps = (state, ownProps) => {
+  return {
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
+  }
+}
+
+export default withRouter(connect(mapStateToProps, {
+ changeNotify 
+})(NotifyInfo))

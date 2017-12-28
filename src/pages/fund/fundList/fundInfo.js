@@ -173,7 +173,7 @@ class FundInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   render () {
-    let {operationType, schoolName, mobile, userId, remarks, thirdAccountType, thirdAccountName, 
+    let {operationType, schoolName, mobile, executorId, remarks, thirdAccountType, thirdAccountName, 
       createTime, orderNo, status, amount, csName, instead, executorMobile} = this.state.data
     let {failedReason, showCensor, reasonError} = this.state
     let dStr = Time.getTimeStr(createTime)
@@ -196,7 +196,7 @@ class FundInfo extends React.Component {
     let censorPassed = (status === 2) || (status === 3) || (status === 4) || (status === 5)
 
     // link for executor detail
-    let executorLink = instead ? `/employee/list/detail/:${userId}` : `/user/userInfo/:${userId}`
+    let executorLink = instead ? `/employee/list/detail/:${executorId}` : `/user/userInfo/:${executorId}`
 
     return (
       <div className='infoList' >

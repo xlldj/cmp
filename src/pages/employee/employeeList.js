@@ -269,7 +269,7 @@ class EmployeeList extends React.Component {
         <SearchLine 
           addTitle='添加新员工' 
           addLink='/employee/list/add' 
-          searchInputText='身份／姓名／手机号' 
+          searchInputText='身份／姓名' 
           searchingText={searchingText} 
           pressEnter={this.pressEnter} 
           changeSearch={this.changeSearch} 
