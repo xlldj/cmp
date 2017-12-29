@@ -910,6 +910,39 @@ button.grayBackColor:linked {
 .roleTable .authenSelect {
   height: 15px;
 }
+.navLink {
+  cursor: pointer;
+  z-index: 20;
+}
+.navLink a {
+  color: #999;
+  font-size: 16px;
+  padding-bottom: 4px;
+}
+.navLink a.active {
+  color: #222;
+  border-bottom: 2px solid #148dea;
+}
+.navLink a:first-child {
+  margin-right: 20px;
+}
+.rangeSelect {
+  display: inline-flex;
+  align-items: center;
+}
+.rangeSelect .rangeSelect-seperator {
+  padding: 0 10px 0 10px;
+}
+.rangeSelect .confirm {
+  margin-left: 10px;
+}
+.checkSelect li {
+  margin: 0 5px;
+  padding: 2px 5px;
+}
+.checkSelect li.active {
+  background: #ebf4fd;
+}
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable {
   margin: 10px 40px 40px 40px;
@@ -1065,20 +1098,6 @@ button.grayBackColor:linked {
 #root .container .content .main .disp .contentArea .navLink {
   width: 50%;
   position: absolute;
-  cursor: pointer;
-  z-index: 20;
-}
-#root .container .content .main .disp .contentArea .navLink a {
-  color: #999;
-  font-size: 16px;
-  padding-bottom: 4px;
-}
-#root .container .content .main .disp .contentArea .navLink a.active {
-  color: #222;
-  border-bottom: 2px solid #148dea;
-}
-#root .container .content .main .disp .contentArea .navLink a:first-child {
-  margin-right: 20px;
 }
 #root .container .content .main .disp .contentArea .tableList .firstCol {
   padding-left: 20px;

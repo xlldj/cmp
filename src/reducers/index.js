@@ -266,6 +266,28 @@ const changeUser = (state = initialUserState, action) => {
 
 // 客服工单
 const initialTaskState = {
+  taskBlock: {
+    hintRoot: false, // if show the red point in root nav
+    countOfUnviewed: 0, // count of all tasks status changed
+
+    // state for main page
+    main_phase: 1, // '待处理'
+    main_schoolId: 'all',
+    main_mine: false, // '我的工单'
+    main_time: 1, // '时间'
+    main_startTime: '',
+    main_endTime: '',
+    main_type: 1, // 类型
+    main_selectKey: '',
+    main_total: 0, // change these parameters will clear former dataSource and reload 
+    main_page: 1, // change this will check if need to reload data
+    main_dataSource: {}, // store data of different page, use page as key. Once 'main_' select parameter (other than 'main_page') changed, clear all data. 
+    main_countOfUnviewed: 0, // count of data need to check again(status changed since last time check)
+
+    // state for detail page
+    details: {}, // like main_dataSource, user 'type+id' as key, only add when 'main_' select parameter has not changed. Clear when main_dataSource is cleard.
+    detail_tabIndex: 1, // index for detail tab. Abstracted to be independent on data of detail.
+  },
   taskList: {
     page: 1,
     assigned: false,

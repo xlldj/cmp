@@ -1,7 +1,9 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {Table, Badge} from 'antd'
+import {Table, Badge, Button} from 'antd'
 
+import RangeSelect from '../component/rangeSelect'
+import SearchInput from '../component/searchInput.js'
 import Time from '../component/time'
 import AjaxHandler from '../ajax'
 import CONSTANTS from '../component/constants'
@@ -319,7 +321,77 @@ class TaskList extends React.Component {
     const {dataSource, total, loading} = this.state
 
     return (
-      <div className='contentArea'>
+      <div className='taskPanelWrapper'>
+        <div className='phaseLine'>
+          <div className='block'>        
+            <div className='navLink'>
+              <a href='' className={assigned ? '' : 'active'} onClick={this.toNa} >待处理</a>
+              <a href='' className={assigned ? 'active' : ''} onClick={this.toAssigned} >处理中</a>
+              <a href='' className={assigned ? 'active' : ''} onClick={this.toAssigned} >已完结</a>
+            </div>
+            <div className='task-select'>
+              <SchoolSelector
+                className='select-item'
+                selectedSchool={schoolId}
+                changeSchool={this.changeSchool}
+              />
+              <BasicSelectorWithoutAll 
+                className='select-item'
+                selectedOpt={all} 
+                staticOpts={TARGETS} 
+                changeOpt={this.changeDivision} 
+              />
+            </div>
+          </div>
+          <div className='block'>
+            <Button type='primary' className='rightBtn'>创建工单</Button>
+          </div>
+        </div>
+
+        <div className='task-queryPanel'>
+          <div className='task-queryLine'>
+            <div className='block'>
+              <span>等待时间:</span>
+              <ul className='checkSelect'>
+                <li className='active'>不限</li>
+                <li>1天以内</li>
+                <li>7天以内</li>
+                <li>超过1天</li>
+                <li>超过2天</li>
+                <li>超过5天</li>
+              </ul>
+              <RangeSelect
+                className='task-rangeSelect'
+              />
+            </div>
+            <div className='block'>
+              <SearchInput
+                placeHolder='工单编号'
+                searchingText=''
+                pressEnter={this.searchEnter}
+                changeSearch={this.changeSearch}
+              />
+            </div>
+          </div>
+
+          <div className='task-queryLine'>
+            <div className='block'>
+              <span>任务类型:</span>
+              <ul  className='checkSelect'>
+                <li>不限</li>
+                <li>报修</li>
+                <li>账单投诉</li>
+                <li>意见反馈</li>
+              </ul>
+            </div>
+            <div className='block'>
+              <span>当前工单总条数:</span>
+            </div>
+          </div>
+        </div>
+
+
+
         <div className='navLink'>
           <a href='' className={assigned ? '' : 'active'} onClick={this.toNa} >待处理的任务</a>
           <a href='' className={assigned ? 'active' : ''} onClick={this.toAssigned} >已指派的任务</a>

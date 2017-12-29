@@ -135,3 +135,56 @@
 .takLogInfo{
   padding-top: 0;
 }
+.phaseLine, .task-queryLine{
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  .block{
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    .task-select{
+      margin-left: 10px;
+      .select-item{
+        width: 105px;
+        margin-right: 5px;
+      }
+      .select-item:first-child{
+        margin-left: 10px
+      }
+    }
+    .rightBtn{
+      margin-right: 30px;
+    }
+  }
+}
+.phaseLine{
+  height: 50px;
+  line-height: 40px;
+  border-bottom: 1px solid #ddd;
+  .navLink a{
+    display: inline-block;
+    line-height: 50px;
+    padding: 0 20px;
+  }
+  .navLink a:first-child{
+    margin-right: 0;
+  }
+}
+
+.task-queryPanel{
+  padding: 10px 20px;
+  .task-queryLine{
+    border: 1px solid #ddd;
+    height: 40px;
+  }
+  .task-rangeSelect{
+
+  }
+}
+.checkSelect{
+  display: inline-flex;
+  li{
+    border: 1px solid #ddd;
+  }
+}

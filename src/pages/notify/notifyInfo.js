@@ -102,7 +102,8 @@ class NotifyInfo extends React.Component {
       return
     }
 
-    let {schools, all, type, content, endTime} = this.state, mobiles=JSON.parse(JSON.stringify(this.state.mobiles))
+    let {schools, all, type, content, endTime} = this.state, 
+        mobiles=JSON.parse(JSON.stringify(this.state.mobiles))
     const body = {
       type: parseInt(type, 10),
       content: content

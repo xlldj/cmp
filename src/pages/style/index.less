@@ -820,7 +820,47 @@ button.grayBackColor:linked{
     height: 15px;
   }
 }
+// for panel change
+.navLink{
+  cursor: pointer;
+  z-index: 20;
+  a{
+    color: #999;
+    font-size: 16px;
+    padding-bottom: 4px;
+  }
+  a.active{
+    color: #222;
+    border-bottom: 2px solid #148dea;
+  }
+  a:first-child{
+    margin-right: 20px;
+  }
+}
 
+// for range select
+.rangeSelect{
+  display: inline-flex;
+  align-items: center;
+  .rangeSelect-seperator{
+    padding: 0 10px 0 10px;
+  }
+  .confirm{
+    margin-left: 10px;
+  }
+}
+
+// for checkbox-like-button select in panel
+// usually .checkSelect if a ul element
+.checkSelect{
+  li {
+    margin: 0 5px;
+    padding: 2px 5px;
+  }
+  li.active{
+    background: @blue;
+  }
+}
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable{
   margin:10px 40px 40px 40px;
@@ -976,20 +1016,6 @@ button.grayBackColor:linked{
             .navLink{
               width: 50%;
               position: absolute;
-              cursor: pointer;
-              z-index: 20;
-              a{
-                color: #999;
-                font-size: 16px;
-                padding-bottom: 4px;
-              }
-              a.active{
-                color: #222;
-                border-bottom: 2px solid #148dea;
-              }
-              a:first-child{
-                margin-right: 20px;
-              }
             }
             .tableList{
               .firstCol{

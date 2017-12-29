@@ -119,3 +119,58 @@
 .takLogInfo {
   padding-top: 0;
 }
+.phaseLine,
+.task-queryLine {
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+}
+.phaseLine .block,
+.task-queryLine .block {
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+}
+.phaseLine .block .task-select,
+.task-queryLine .block .task-select {
+  margin-left: 10px;
+}
+.phaseLine .block .task-select .select-item,
+.task-queryLine .block .task-select .select-item {
+  width: 105px;
+  margin-right: 5px;
+}
+.phaseLine .block .task-select .select-item:first-child,
+.task-queryLine .block .task-select .select-item:first-child {
+  margin-left: 10px;
+}
+.phaseLine .block .rightBtn,
+.task-queryLine .block .rightBtn {
+  margin-right: 30px;
+}
+.phaseLine {
+  height: 50px;
+  line-height: 40px;
+  border-bottom: 1px solid #ddd;
+}
+.phaseLine .navLink a {
+  display: inline-block;
+  line-height: 50px;
+  padding: 0 20px;
+}
+.phaseLine .navLink a:first-child {
+  margin-right: 0;
+}
+.task-queryPanel {
+  padding: 10px 20px;
+}
+.task-queryPanel .task-queryLine {
+  border: 1px solid #ddd;
+  height: 40px;
+}
+.checkSelect {
+  display: inline-flex;
+}
+.checkSelect li {
+  border: 1px solid #ddd;
+}
