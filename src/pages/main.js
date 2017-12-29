@@ -83,7 +83,7 @@ class Main extends React.Component {
           this.props.setAuthenData(authenInfo)
         // console.log(authenInfo)
         } else {
-          // this.hintRelog()
+          this.hintRelog()
           // this.props.fetchPrivileges()
         }
       }

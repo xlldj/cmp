@@ -79,12 +79,14 @@ class MyMenu extends React.Component {
         r.children = subBlock
       }
     })
+    /*
     if (rootBlock.length === 0) {
       this.rootBlock = originalNavs
     } else {
       this.rootBlock = rootBlock
     }
-    console.log()
+    */
+    this.rootBlock = rootBlock
     /*
     if (rootBlock.length > 0) {
       this.rootBlock = rootBlock
