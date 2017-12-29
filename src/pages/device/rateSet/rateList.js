@@ -10,6 +10,7 @@ import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 import CONSTANTS from '../../component/constants'
 import { checkObject } from '../../util/checkSame'
+import {mul} from '../../util/numberHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -51,7 +52,7 @@ class RateList extends React.Component {
       render: (text, record, index) => {
         const items = record.rateGroups.map((r, i) => (
           <li key={i}>
-            <span key={i}>扣费：{r.price ? r.price : ''}分钱 脉冲数：{r.pulse ? r.pulse : ''}个</span>
+            <span key={i}>扣费：{r.price ? mul(r.price, 100) : ''}分钱 脉冲数：{r.pulse ? r.pulse : ''}个</span>
           </li>
           )
         )
@@ -146,6 +147,9 @@ class RateList extends React.Component {
             const body={
               page: this.props.page,
               size: SIZE
+            }
+            if (this.props.schoolId !== 'all') {
+              body.schoolId = parseInt(this.props.schoolId, 10)
             }
             this.fetchData(body)
           }else{

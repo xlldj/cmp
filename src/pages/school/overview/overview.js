@@ -411,6 +411,7 @@ class Overview extends React.Component {
       page: page,
       size: SIZE
     }
+    console.log(schoolId)
     if (schoolId !== 'all') {
       let school = schools.find((r) => (r.id === parseInt(schoolId, 10)))
       if (school) {
@@ -440,18 +441,19 @@ class Overview extends React.Component {
     this.props.hide(true)
   }
   changeTable = (pageObj) => {
+    console.log(pageObj)
     let {page} = this.props
-    if (page === pageObj.page) {
+    if (page === pageObj.current) {
       return
     }
-    this.props.changeSchool(subModule, {page: pageObj.page})
+    this.props.changeSchool(subModule, {page: pageObj.current})
   }
   changeSchool = (v, name) => {
     let {schoolId} = this.props
     if (schoolId === v) {
       return
     }
-    this.props.changeSchool(subModule, {schoolId: v})
+    this.props.changeSchool(subModule, {schoolId: v, page: 1})
   }
 
   render () {

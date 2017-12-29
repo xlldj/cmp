@@ -5,6 +5,7 @@ import Noti from '../../noti'
 import AjaxHandler from '../../ajax'
 import Format from '../../component/format'
 import CONSTANTS from '../../component/constants'
+import {mul} from '../../util/numberHandle'
 
 const RadioGroup = Radio.Group
 const BUSINESS = CONSTANTS.BUSINESS
@@ -256,7 +257,7 @@ class InfoSet extends React.Component{
     let repairmansContent = repairmansSet && repairmans.map((record, index) => (<span className='inlineItem' key={`repairman${index}`}>{record}</span>))
 
     let rateContent = rateDetailsSet && rateDetails.map((record, index) => {
-      let deviceRate = record.rateGroups.map((r, i) => (<span key={i}>{r.price * 100}分钱/{r.pulse}脉冲</span>))
+      let deviceRate = record.rateGroups.map((r, i) => (<span key={i}>{mul(r.price, 100)}分钱/{r.pulse}脉冲</span>))
 
       return (
         <li key={`rateLi${index}`}>

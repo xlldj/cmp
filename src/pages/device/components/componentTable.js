@@ -138,7 +138,7 @@ class ComponentTable extends React.Component {
 
     return (
       <div className='contentArea'>
-        <SearchLine addTitle='配件类型管理' addLink='/device/components/componentType' addTitle2='添加配件' addLink2='/device/components/addComponent' addTitle3='批量导入' addLink3='/device/components' />
+        <SearchLine addTitle='配件类型管理' addLink='/device/components/componentType' addTitle2='添加配件' addLink2='/device/components/addComponent'/>
 
         <div className='tableList'>
           <Table 
