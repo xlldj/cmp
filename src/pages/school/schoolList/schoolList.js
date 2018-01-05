@@ -117,6 +117,8 @@ class SchoolList extends React.Component {
   componentDidMount(){
     /*-----------fetch data-----------*/
     let {page, schoolId} = this.props
+    console.log(this.props)
+    console.log(page)
     const body ={
       page: page,
       size: SIZE

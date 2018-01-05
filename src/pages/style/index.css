@@ -926,6 +926,12 @@ button.grayBackColor:linked {
 .navLink a:first-child {
   margin-right: 20px;
 }
+.searchInput {
+  width: 120px;
+}
+.searchInput input {
+  padding-left: 25px !important;
+}
 .rangeSelect {
   display: inline-flex;
   align-items: center;
@@ -936,11 +942,150 @@ button.grayBackColor:linked {
 .rangeSelect .confirm {
   margin-left: 10px;
 }
+.detailList li {
+  height: 22px;
+  line-height: 22px;
+}
+.detailList li label {
+  color: #aaa;
+  display: inline-block;
+  margin-right: 10px;
+}
+.detailList li span {
+  display: inline-block;
+  width: calc(100% - 80px);
+}
+.detailList li img {
+  width: 50px;
+  margin-right: 10px;
+}
+.detailList li.high {
+  height: auto;
+}
+.detailList li.high label {
+  vertical-align: top;
+}
+.loadingMask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 9999;
+}
+.loadingMask .loadingCircle {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin-top: -25%;
+}
+.loadingMask .loadingCircle span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #108EE9;
+  position: absolute;
+  animation: load 1.04s ease infinite;
+}
+.loadingMask .loadingCircle span:nth-child(1) {
+  left: 0;
+  top: 50%;
+  margin-top: -4px;
+  animation-delay: 0.13s;
+}
+.loadingMask .loadingCircle span:nth-child(2) {
+  left: 7px;
+  top: 7px;
+  animation-delay: 0.26s;
+}
+.loadingMask .loadingCircle span:nth-child(3) {
+  left: 50%;
+  top: 0;
+  margin-left: -4px;
+  animation-delay: 0.39s;
+}
+.loadingMask .loadingCircle span:nth-child(4) {
+  top: 7px;
+  right: 7px;
+  animation-delay: 0.52s;
+}
+.loadingMask .loadingCircle span:nth-child(5) {
+  right: 0;
+  top: 50%;
+  margin-top: -4px;
+  animation-delay: 0.65s;
+}
+.loadingMask .loadingCircle span:nth-child(6) {
+  right: 7px;
+  bottom: 7px;
+  animation-delay: 0.78s;
+}
+.loadingMask .loadingCircle span:nth-child(7) {
+  bottom: 0;
+  left: 50%;
+  margin-left: -4px;
+  animation-delay: 0.91s;
+}
+.loadingMask .loadingCircle span:nth-child(8) {
+  bottom: 7px;
+  left: 7px;
+  animation-delay: 1.04s;
+}
+@keyframes load {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+.checkSelect {
+  display: inline-flex;
+  cursor: pointer;
+  user-select: none;
+}
 .checkSelect li {
-  margin: 0 5px;
+  margin-left: 8px;
   padding: 2px 5px;
+  border-radius: 4px;
 }
 .checkSelect li.active {
+  color: white;
+  background: #108EE9;
+}
+.panelSelect {
+  cursor: pointer;
+  user-select: none;
+}
+.panelSelect li {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid #ddd;
+}
+.panelSelect li:first-child {
+  margin: 0;
+}
+.panelSelect li.active,
+.panelSelect li:hover {
+  color: #108EE9;
+  border: 1px solid #108EE9;
+}
+.closeBtn {
+  display: inline-block;
+  width: 80px;
+  height: 50px;
+  background: none;
+  border: none;
+  text-align: right;
+}
+.selectedRow {
   background: #ebf4fd;
 }
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */

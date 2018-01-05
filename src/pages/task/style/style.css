@@ -116,8 +116,17 @@
 .inactive * {
   cursor: not-allowed;
 }
-.takLogInfo {
+.taskLogInfo {
   padding-top: 0;
+}
+.selectedHintWraper {
+  position: relative;
+}
+.selectedImg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
 }
 .phaseLine,
 .task-queryLine {
@@ -165,12 +174,141 @@
   padding: 10px 20px;
 }
 .task-queryPanel .task-queryLine {
-  border: 1px solid #ddd;
   height: 40px;
 }
 .checkSelect {
-  display: inline-flex;
+  margin-right: 10px;
 }
-.checkSelect li {
-  border: 1px solid #ddd;
+.taskPanelWrapper .tableList {
+  padding: 0px 20px;
+}
+.hidden {
+  display: none;
+}
+.taskDetailWrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+}
+.taskDetailWrapper .taskDetail-header {
+  display: inline-flex;
+  padding: 0 30px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+}
+.taskDetailWrapper .taskDetail-content,
+.taskDetailWrapper .taskDetail-sidebar {
+  display: inline-block;
+  padding: 20px 30px;
+  height: auto;
+  border-right: 1px solid #ddd;
+}
+.taskDetailWrapper .taskDetail-content {
+  width: 70%;
+  height: calc(100% - 50px);
+  overflow-y: scroll;
+}
+.taskDetailWrapper .taskDetail-content h3 {
+  font-size: 20px;
+}
+.taskDetailWrapper .taskDetail-content .handleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.taskDetailWrapper .taskDetail-content .handleBtn button {
+  margin-right: 10px;
+}
+.taskDetailWrapper .taskDetail-content .handleBtn .hint {
+  display: inline-block;
+  margin-right: 10px;
+  color: #ddd;
+}
+.taskDetailWrapper .taskDetail-content .processLogs {
+  margin: 0px -30px;
+  padding: 15px 30px;
+  border-top: 1px solid #ddd;
+}
+.taskDetailWrapper .taskDetail-content .processLogs ul {
+  margin-top: 15px;
+  border: 1px solid #999;
+}
+.taskDetailWrapper .taskDetail-content .detailList {
+  margin: 10px 0;
+}
+.taskDetailWrapper .taskDetail-sidebar {
+  position: absolute;
+  width: 30%;
+}
+.taskDetailWrapper .taskDetail-sidebar .detailList {
+  margin: 15px 0;
+}
+.taskDetail-panelWrapper {
+  padding: 10px 0px;
+  min-height: 180px;
+}
+.taskDetail-panelWrapper .detailList {
+  padding: 15px 20px;
+  background-color: #eee;
+}
+.columnsWrapper li {
+  padding-left: 10px;
+}
+.columnsWrapper li .column {
+  line-height: 30px;
+  display: inline-block;
+  min-width: 120px;
+}
+.task-loadWrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 50px);
+  top: 50px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.buildTask ul {
+  padding: 0;
+  background-color: white !important;
+}
+.buildTask ul li p {
+  width: 100px !important;
+}
+.buildTask ul span.ant-radio + * {
+  padding-left: 0;
+}
+.buildTask .btnArea {
+  padding: 0;
+  background-color: white;
+}
+.longText {
+  width: 190px;
+  height: 150px;
+  line-height: 22px;
+}
+.menuItem {
+  display: inline-block;
+  width: 100%;
+}
+.reassign .info ul li p {
+  width: 83px !important;
+}
+.finish .info ul li p {
+  width: 53px !important;
+}
+.taskMessage {
+  width: 100%;
+}
+.taskMessage textarea {
+  margin: 15px 0 8px;
+  width: 100%;
+  height: 150px;
 }

@@ -24,7 +24,11 @@ const typeName = CONSTANTS.DEVICETYPE
 
 const STATUS = CONSTANTS.REPAIRSTATUS
 const STATUSFORSHOW = CONSTANTS.REPAIRSTATUSFORSHOW
-
+const BACKTITLE={
+  fromUser:'返回用户详情',
+  fromDevice:'返回设备详情',
+  fromTask: '返回工单'
+}
 
 class RepairList extends React.Component {
   static propTypes = {
@@ -175,7 +179,20 @@ class RepairList extends React.Component {
       statusArray.push(parseInt(status, 10))
       body.status = statusArray
     }
-    this.fetchSchools()
+
+    let {state}=this.props.history.location
+    if (state) {
+      // this.props.changeOrder('order', {schoolId: 'all'})
+      if (state.path === 'fromTask') {
+        if (state.userId) {
+          body.userId = state.userId
+        } else if (state.deviceType) {
+          body.residenceId = state.residenceId 
+          body.deviceType = state.deviceType
+        }
+      }
+    }
+    // this.fetchSchools()
     this.fetchData(body)
   }
   componentWillUnmount () {
@@ -200,6 +217,18 @@ class RepairList extends React.Component {
       let statusArray = []
       statusArray.push(parseInt(status, 10))
       body.status = statusArray
+    }
+    let {state}=this.props.history.location
+    if (state) {
+      // this.props.changeOrder('order', {schoolId: 'all'})
+      if (state.path === 'fromTask') {
+        if (state.userId) {
+          body.userId = state.userId
+        } else if (state.deviceType) {
+          body.residenceId = state.residenceId 
+          body.deviceType = state.deviceType
+        }
+      }
     }
     this.fetchData(body)
   }
@@ -228,10 +257,13 @@ class RepairList extends React.Component {
     let page = pageObj.current
     this.props.changeDevice(subModule, {page: page})
   }
+  back = () => {
+    this.props.history.goBack()
+  }
   render () {
     const {dataSource, loading, total} = this.state
     const {schoolId, deviceType, status, page} = this.props
-
+    const {state} = this.props.location
     return (
       <div className='contentArea'>
         <div className='navLink'>
@@ -254,6 +286,11 @@ class RepairList extends React.Component {
             columns={this.columns}
           />
         </div>
+        {state ?
+          <div className='btnRight'>
+            <Button onClick={this.back}>{BACKTITLE[state.path]}</Button>
+          </div>:null
+        }
       </div>
     )
   }

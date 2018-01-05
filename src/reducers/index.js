@@ -1,5 +1,5 @@
 import * as ActionTypes from '../actions'
-import merge from 'lodash/merge'
+import {merge} from 'lodash'
 import { combineReducers } from 'redux'
 import {getLocal} from '../pages/util/storage'
 import Time from '../pages/component/time'
@@ -266,29 +266,33 @@ const changeUser = (state = initialUserState, action) => {
 
 // 客服工单
 const initialTaskState = {
-  taskBlock: {
+  taskList: {
     hintRoot: false, // if show the red point in root nav
     countOfUnviewed: 0, // count of all tasks status changed
 
     // state for main page
-    main_phase: 1, // '待处理'
+    main_phase: 0, // '待处理', the first three is for all panels
     main_schoolId: 'all',
-    main_mine: false, // '我的工单'
-    main_time: 1, // '时间'
-    main_startTime: '',
-    main_endTime: '',
-    main_type: 1, // 类型
-    main_selectKey: '',
-    main_total: 0, // change these parameters will clear former dataSource and reload 
-    main_page: 1, // change this will check if need to reload data
-    main_dataSource: {}, // store data of different page, use page as key. Once 'main_' select parameter (other than 'main_page') changed, clear all data. 
-    main_countOfUnviewed: 0, // count of data need to check again(status changed since last time check)
+    main_mine: '1', // 1: '我的工单', 2: '全部'
+    selectedRowIndex: -1, // the row whose detail is being watching
+
+    panel_rangeIndex: [0, 0, 1], // '时间', time select of each panel
+    panel_startTime: ['', '', ''], // startTime of each panel
+    panel_endTime: ['', '', ''], // endTime of each panel
+    panel_type: [1, 1, 1], // 类型
+    panel_selectKey: ['', '', ''],
+    panel_total: [0, 0, 0], // change these parameters will clear former dataSource and reload
+    panel_page: [1, 1, 1], // change this will check if need to reload data
+    panel_dataSource: [{}, {}, {}], // store data of different type as element of array. For each type, use 'page' as key to save data.
+    panel_countOfUnviewed: [0, 0, 0], // count of data need to check again(status changed since last time check)
 
     // state for detail page
-    details: {}, // like main_dataSource, user 'type+id' as key, only add when 'main_' select parameter has not changed. Clear when main_dataSource is cleard.
-    detail_tabIndex: 1, // index for detail tab. Abstracted to be independent on data of detail.
+    details: {}, // like panel_dataSource, use 'id' as key, only add or update info. No need to delete.
+    detail_tabIndex: [1, 1, 1], // index for detail tab. Abstracted to be independent on data of detail.
+    showDetail: false,
+    detailLoading: false
   },
-  taskList: {
+  taskList1: {
     page: 1,
     assigned: false,
     sourceType: 'all',
@@ -310,7 +314,7 @@ const initialTaskState = {
   },
   feedback: {
     page: 1,
-    schoolId: 'all' 
+    schoolId: 'all'
   }
 }
 const changeTask = (state = initialTaskState, action) => {
@@ -318,8 +322,15 @@ const changeTask = (state = initialTaskState, action) => {
 
   if (type === ActionTypes.CHANGE_TASK) {
     const {subModule, keyValuePair} = action
+    let newState = {}
+    if (subModule === 'taskList') {
+      let taskListState = state.taskList
+      newState = Object.assign({}, taskListState, keyValuePair)
+    } else {
+      newState = keyValuePair
+    }
     console.log(keyValuePair)
-    return merge({}, state, {[subModule]: keyValuePair})
+    return Object.assign({}, state, {[subModule]: newState})
   }
   return state
 }

@@ -65,7 +65,7 @@ class MyMenu extends React.Component {
       let subBlock = []
       let root = current && current.find(rec => rec.name === r.name)
       // should always exist
-      console.log(r)
+      // console.log(r)
       if (root && root.children && r.children) {
         subBlock = r.children.filter((sub) => {
           let found = root.children.find(rs => rs.name === sub.name)
@@ -75,7 +75,7 @@ class MyMenu extends React.Component {
             return false
           }
         })
-        console.log(subBlock)
+        // console.log(subBlock)
         r.children = subBlock
       }
     })

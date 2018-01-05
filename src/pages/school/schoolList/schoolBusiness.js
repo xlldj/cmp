@@ -128,6 +128,7 @@ class SchoolBusiness extends React.Component{
             <CheckboxGroup value={businesses} onChange={this.changeBusiness} >
               <Checkbox value={1}>热水器</Checkbox>
               <Checkbox value={2}>饮水机</Checkbox>
+              <Checkbox value={3}>吹风机</Checkbox>
             </CheckboxGroup>
             {
               clearError ? <span className='checkInvalid' >功能入口不能为空！</span> : null

@@ -304,7 +304,7 @@ class TaskLogDetail extends React.Component {
 
     return (
       <div className='infoList' >
-        <div className='info takLogInfo'>
+        <div className='info taskLogInfo'>
           <ul>
             <li>
               <p>工单类型：</p>

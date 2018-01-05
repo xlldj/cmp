@@ -1,4 +1,5 @@
 export function checkObject (o1, o2, arr) {
+  // debugger
   if (o1 === o2) {
     return true
   }

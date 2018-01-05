@@ -1,6 +1,6 @@
 export function obj2arr (o) {
   if (typeof o !== 'object' || !o) {
-    return
+    return []
   }
   let result = []
   for (let key in o) {

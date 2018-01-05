@@ -12,11 +12,11 @@ const CONSTANTS = {
   NETWORKERRORMESSAGE: '网络出错，请稍后刷新重试',
 
   ACCOUNTTYPE: {1: '支付宝', 2: '微信'},
-  BUSINESS: {1: '热水器', 2: '饮水机'},
+  BUSINESS: {1: '热水器', 2: '饮水机', 3: '吹风机'},
 
   BUILDINGTYPE: {1: '宿舍楼', 2: '其他'},
 
-  DEVICETYPE: {1: '热水器', 2: '饮水机'},
+  DEVICETYPE: {1: '热水器', 2: '饮水机', 3: '吹风机'},
   WATERTYPE: {1: '热水', 2: '冷水', 3: '冰水'},
   DEVICESTATUS: {1: '正常', 2: '报修'},
   REPAIRSTATUS: {1: '待审核', 2: '待指派', 3: '已指派', 4: '正在维修', 5: '审核未通过', 6: '已拒绝', 7: '已完成', 8: '已取消'},
@@ -47,6 +47,8 @@ const CONSTANTS = {
     4: '永久'
   },
 
+  SEX: {1: '男', 2: '女'}, 
+
   ROLE: {1: '普通用户', 2: '维修员', 3: '管理员', 4: '运营', 5: '客服', 6: '研发人员'},
 
   NOTIFYTYPES: {1: '紧急公告', 2: '系统公告', 3: '客服消息'},
@@ -60,9 +62,14 @@ const CONSTANTS = {
 
   TIMESPANS: {'1': '本日', '2': '本周', '3': '本月'},
 
+  TASK_DETAIL_LIST_LENGTH: 5,
   CREATEWORKTYPE: {1: '工作记录', 2: '指派任务'},
   COMPLAINTTYPES: {1: '热水器', 2: '饮水机', 3: '充值', 4: '提现'},
   FEEDBACKTYPES: {1: '功能异常', 2: '产品建议', 3: '其它'},
+  TASKSTATUS: {1: '待处理', 2: '处理中', 3: '已完结'},
+  TASKTYPE: {1: '报修', 2: '账单投诉', 3: '意见反馈'},
+  TASK_REPAIR: 1, // type value of 'repair' in task
+  TASK_FINISHED: 3,
 
   CHARTTYPES: {1: 'order', 2: 'user', 3: 'bonus', 4: 'funds', 5: 'repair', 6: 'repair/time'},
   SETTLETYPE: {1: '消息回复', 2: '电话回复'},

@@ -1,6 +1,7 @@
 /* GLOBAL STYLE*/
 @gray: #f5f5f5;
 @blue: #ebf4fd;
+@deepBlue: #108EE9;
 @liHeight: 45px;
 @labelWidth: 130px;
 @border: #aaa;
@@ -837,7 +838,13 @@ button.grayBackColor:linked{
     margin-right: 20px;
   }
 }
-
+// for searchInput
+.searchInput{
+  width: 120px;
+  input {
+    padding-left: 25px !important;
+  }
+}
 // for range select
 .rangeSelect{
   display: inline-flex;
@@ -850,16 +857,162 @@ button.grayBackColor:linked{
   }
 }
 
+// for style like info in task/detail 
+.detailList{
+  li{
+    height: 22px;
+    line-height: 22px;
+    label{
+      color: #aaa;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    span{
+      display: inline-block;
+      width: calc(~ '100% - 80px');
+    }
+    img{
+      width: 50px;
+      margin-right: 10px;
+    }
+  }
+  li.high{
+    height: auto;
+    label{
+      vertical-align: top;
+    }
+  }
+}
+
+// for loading mask
+.loadingMask{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255 , 255, 255, 0.5);
+  z-index: 9999;
+  .loadingCircle{
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin-top: -25%;
+
+    span{
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: @deepBlue;
+      position: absolute;
+      animation: load 1.04s ease infinite;
+    }
+    span:nth-child(1){
+      left: 0;
+      top: 50%;
+      margin-top:-4px;
+      animation-delay:0.13s;
+    }
+    span:nth-child(2){
+        left: 7px;
+        top: 7px;
+        animation-delay:0.26s;
+    }
+    span:nth-child(3){
+        left: 50%;
+        top: 0;
+        margin-left: -4px;
+        animation-delay:0.39s;
+    }
+    span:nth-child(4){
+        top: 7px;
+        right:7px;
+        animation-delay:0.52s;
+    }
+    span:nth-child(5){
+        right: 0;
+        top: 50%;
+        margin-top:-4px;
+        animation-delay:0.65s;
+    }
+    span:nth-child(6){
+        right: 7px;
+        bottom:7px;
+        animation-delay:0.78s;
+    }
+    span:nth-child(7){
+        bottom: 0;
+        left: 50%;
+        margin-left: -4px;
+        animation-delay:0.91s;
+    }
+    span:nth-child(8){
+        bottom: 7px;
+        left: 7px;
+        animation-delay:1.04s;
+    }
+  }
+}
+@keyframes load{
+  0%{
+      opacity: 1;
+  }
+  100%{
+      opacity: 0.2;
+  }
+}
+
 // for checkbox-like-button select in panel
 // usually .checkSelect if a ul element
 .checkSelect{
+  display: inline-flex;
+  cursor: pointer;
+  user-select: none;
   li {
-    margin: 0 5px;
+    margin-left: 8px;
     padding: 2px 5px;
+    border-radius: 4px;
   }
   li.active{
-    background: @blue;
+    color: white;
+    background: @deepBlue;
   }
+}
+// for panel select
+.panelSelect{
+  cursor: pointer;
+  user-select: none;
+  li {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    border: 1px solid #ddd;
+  }
+  li:first-child{
+    margin: 0;
+  }
+  li.active, li:hover{
+    color: @deepBlue;
+    border: 1px solid @deepBlue;
+  } 
+}
+.closeBtn{
+  display: inline-block;
+  width: 80px;
+  height: 50px;
+  background: none;
+  border: none;
+  text-align: right;
+}
+
+// for table rows
+.selectedRow{
+  background: @blue;
 }
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable{

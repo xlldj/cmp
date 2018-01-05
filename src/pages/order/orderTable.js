@@ -24,7 +24,8 @@ const SIZE = CONSTANTS.PAGINATION
 const typeName =CONSTANTS.DEVICETYPE
 const BACKTITLE={
   fromUser:'返回用户详情',
-  fromDevice:'返回设备详情'
+  fromDevice:'返回设备详情',
+  fromTask: '返回工单'
 }
 /* state explanation */
 /* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
@@ -194,6 +195,13 @@ class OrderTable extends React.Component {
         body.deviceType = state.deviceType
       } else if (state.path === 'fromUser') {
         body.userId = state.id
+      } else if (state.path === 'fromTask') {
+        if (state.userId) {
+          body.userId = state.userId
+        } else if (state.deviceType) {
+          body.residenceId = state.residenceId 
+          body.deviceType = state.deviceType
+        }
       }
       delete body.schoolId
     }

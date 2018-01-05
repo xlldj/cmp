@@ -19,6 +19,11 @@ class RangeSelector extends React.Component{
       this.props.changeEndTime(et)
     }
   }
+  confirm = () => {
+    if (this.props.confirm) {
+      this.props.confirm()
+    }
+  }
   render(){
     const {startTime, endTime, className} = this.props
 
@@ -29,7 +34,7 @@ class RangeSelector extends React.Component{
           showTime
           allowClear={false}
           format="YYYY-MM-DD HH:mm"
-          value={moment(startTime)}
+          value={startTime ? moment(startTime) : null}
           onChange={this.changeStartTime}
         />
         <span className='rangeSelect-seperator'>至</span>
@@ -38,7 +43,7 @@ class RangeSelector extends React.Component{
           showTime
           allowClear={false}
           format="YYYY-MM-DD HH:mm"
-          value={moment(endTime)}
+          value={endTime ? moment(endTime) : null}
           onChange={this.changeEndTime}
         />
         <Button type='primary' className='confirm' onClick={this.confirm} >确认</Button>

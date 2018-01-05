@@ -1,16 +1,19 @@
 import React from 'react'
-import {Table, Button, Modal} from 'antd'
+import {Link} from 'react-router-dom'
+import {Table, Badge, Button, Modal} from 'antd'
 
 import RangeSelect from '../component/rangeSelect'
 import SearchInput from '../component/searchInput.js'
 import Time from '../component/time'
 import AjaxHandler from '../ajax'
 import CONSTANTS from '../component/constants'
+import SearchLine from '../component/searchLine'
 import SchoolSelector from '../component/schoolSelector'
+import BasicSelector from '../component/basicSelector'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
 import CheckSelect from '../component/checkSelect'
 import {checkObject} from '../util/checkSame'
-import TaskDetail from './taskDetail'
+import RepairDetail from './repairDetail'
 import BuildTask from './buildTask'
 import selectedImg from '../assets/selected.png'
 
@@ -22,23 +25,23 @@ const subModule = 'taskList'
 
 const TIMERANGESELECTS = {
   0: {
-    0: '不限',
-    1: '今日',
-    3: '近7天',
-    6: '超过1天',
-    7: '超过2天',
-    8: '超过5天'
+    1: '不限',
+    2: '1天以内',
+    3: '7天以内',
+    4: '超过1天',
+    5: '超过2天',
+    6: '超过5天'
   },
   1: {
-    0: '不限',
-    1: '今日',
-    3: '近7天',
-    6: '超过1天',
-    7: '超过2天',
-    8: '超过5天'
+    1: '不限',
+    2: '1天以内',
+    3: '7天以内',
+    4: '超过1天',
+    5: '超过2天',
+    6: '超过5天'
   },
   2: {
-    1: '今日',
+    1: '今天',
     2: '近3天',
     3: '近7天',
     4: '近14天',
@@ -49,6 +52,11 @@ const TIMELABEL = {
   0: '等待时间',
   1: '等待时间',
   2: '完结时间'
+}
+const DATASOURCENAME = {
+  0: 'unhandled',
+  1: 'handling',
+  2: 'finished'
 }
 
 const TASKTYPES = {
@@ -61,14 +69,26 @@ const TARGETS = {
   1: '我的任务',
   2: '所有客服任务'
 }
+const TYPE2LISTRESOURCE = {
+  1: '/work/sheet/list',
+  2: '/repair/list',
+  3: '/complaint/list',
+  4: '/feedback/list'
+}
+const TYPE2DETAILRESOURCE = {
+  1: '/repair/one',
+  2: '/complaint/one',
+  3: '/feedback/one'
+}
+const TYPE2KEY = {
+  1: 'workSheets',
+  2: 'repairDevices',
+  3: 'complaints',
+  4: 'feedbacks'
+}
 const ALLTAG = {
   1: false,
   2: true
-}
-const STATUS_LIST = {
-  0: [1],
-  1: [2, 3],
-  2: [4]
 }
 
 const SIZE = CONSTANTS.PAGINATION
@@ -96,24 +116,24 @@ class TaskList extends React.Component {
   }
 
   // fetch task/list 
-  fetchTasks = (body) => {
-    let resource = '/work/order/list'
-
+  fetchTasks = (type, resource, body) => {
+    // json.data has different keys according to type
+    let {main_phase, panel_page} = this.props.taskList
     const cb = (json) => {
       this.setState({
         loading: false
       })
-      let {main_phase, panel_page, panel_total} = this.props.taskList
+      // let type = panel_type[main_phase]
+      // console.log(type)
+      let jsonKeyName = TYPE2KEY[type]
+      // console.log(jsonKeyName)
       let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList.panel_dataSource))
-      let newTotal = Array.from(panel_total)
       let page = panel_page[main_phase]
       // console.log(json.data)
       // console.log(json.data[jsonKeyName])
-      panel_dataSource[main_phase][page] = json.data.workOrders
-      newTotal[main_phase] = json.data.total
+      panel_dataSource[main_phase][page] = json.data[jsonKeyName]
       this.props.changeTask(subModule, {
-        panel_dataSource: panel_dataSource, 
-        panel_total: newTotal
+        panel_dataSource: panel_dataSource
       })
     }
     this.setState({
@@ -170,44 +190,30 @@ class TaskList extends React.Component {
     this.props.hide(false)
     let {main_phase, main_schoolId, main_mine, 
       panel_rangeIndex, panel_startTime, panel_endTime, panel_type, 
-      panel_selectKey, panel_page, panel_dataSource,
+      panel_selectKey, panel_total, panel_page, panel_dataSource,
+      panel_countOfUnviewed, 
+      details, detail_tabIndex
     } = this.props.taskList
     let page = panel_page[main_phase]
-    let startTime = panel_startTime[main_phase], endTime = panel_endTime[main_phase]
-    if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) {
-      // dataSource has the data
-      if (this.state.loading) {
-        this.setState({
-          loading: false
-        })
-      }
+    if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && (panel_dataSource[main_phase][page].length > 0)) {
+      // dataSource has the data, don't need to fetch again
+
     } else {
       let type = panel_type[main_phase]
-      let day = panel_rangeIndex[main_phase]
+      let resource = TYPE2LISTRESOURCE[type]
       const body = {
         page: page, 
         size: SIZE,
-        all: ALLTAG[main_mine],
-        statusList: STATUS_LIST[main_phase]
+        all: ALLTAG[main_mine]
+        // status: main_phase
       }
       if (main_schoolId !== 'all') {
         body.schoolId = parseInt(main_schoolId, 10)
       }
-      if (day !== 0) {
-        body.day = day
+      if (type === 1) {
+        body.assigned = false
       }
-      if (startTime && endTime) {
-        body.startTime = startTime
-        body.endTime = endTime
-      }
-      if (panel_selectKey[main_phase]) {
-        body.selectKey = panel_selectKey[main_phase]
-      }
-      console.log(type)
-      if (type !== 1) {
-        body.type = type - 1
-      }
-      this.fetchTasks(body)
+      this.fetchTasks(type, resource, body)
     }
 
     // set startTime and endTime if props has no-empty value
@@ -250,8 +256,8 @@ class TaskList extends React.Component {
     try {
       let {main_phase, main_schoolId, main_mine, 
         panel_rangeIndex, panel_startTime, panel_endTime, panel_type, 
-        panel_selectKey, panel_page, panel_dataSource, 
-        details, showDetail, selectedRowIndex, detailLoading
+        panel_selectKey, panel_total, panel_page, panel_dataSource, 
+        details, detail_tabIndex, showDetail, selectedRowIndex, detailLoading
       } = nextProps.taskList
       let page = panel_page[main_phase]
 
@@ -281,42 +287,30 @@ class TaskList extends React.Component {
           } else {
             // fetch the data
             let type = panel_type[main_phase]
+            let resource = TYPE2LISTRESOURCE[type]
             let page = panel_page[main_phase]
-            let day = panel_rangeIndex[main_phase]
-            const body = {
+            let body = {
               page: page, 
-              size: SIZE,
-              all: ALLTAG[main_mine],
-              statusList: STATUS_LIST[main_phase]
+              size: SIZE
+              // status: main_phase
             }
-            if (main_schoolId !== 'all') {
-              body.schoolId = parseInt(main_schoolId, 10)
-            }
-            if (day !== 0) {
-              body.day = day
-            }
-            if (startTime && endTime) {
-              body.startTime = startTime
-              body.endTime = endTime
-            }
-            if (panel_selectKey[main_phase]) {
-              body.selectKey = panel_selectKey[main_phase]
-            }
-            if (type !== 1) {
-              body.type = type - 1
-            }
-            this.fetchTasks(body)
+            this.fetchTasks(type, resource, body)
+            this.setState({
+              loading: true
+            })
           }
         }
 
+      // If detail is not displaying, no need to check detail.
+      if (!showDetail) {
+        return
+      }
       // Check if fetch detail data. If these props change, need to check.
-      if (showDetail && !checkObject(this.props.taskList, nextProps.taskList, ['selectedRowIndex'])) {
+      if (!checkObject(this.props.taskList, nextProps.taskList, ['selectedRowIndex'])) {
         let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
-        let id = ''
+        let id = '', detail
         if (selectedItem) { // should always be true, or else it can't be clicked.
-        console.log(selectedItem)
-          id = selectedItem.id
-          console.log(id)
+          id = selectedItem[id] || 1
           if (details[id]) { 
             // if loading, toggle it
             if (detailLoading) {
@@ -326,10 +320,11 @@ class TaskList extends React.Component {
             }
           } else {
             // fetch the detail
+            let resource = '/repair/one'
             const body = {
               id: id
             }
-            this.fetchTaskDetail(body)
+            this.fetchTaskDetail(resource, body)
             if (!detailLoading) {
               this.props.changeTask(subModule, {
                 detailLoading: true
@@ -338,15 +333,44 @@ class TaskList extends React.Component {
           }
         }
       }
+
+
       this.props = nextProps
     } catch (e) {
       console.log(e)
     }
+    /*
+    if (checkObject(this.props.taskList, nextProps.taskList, ['page', 'all', 'assigned', 'sourceType', 'pending', 'schoolId'])) {
+      return
+    }
+
+    let {all, assigned, sourceType, pending, page, schoolId} = nextProps
+    console.log(schoolId)
+    const body = {
+      page: page,
+      size: SIZE,
+      assigned: assigned
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+    if (all === '1') {
+      body.all = false
+    } else {
+      body.all = true
+    }
+    if (pending !== 'all') {
+      body.pending = parseInt(pending, 10)
+    }
+    if (sourceType !== 'all') {
+      body.sourceType = parseInt(sourceType, 10)
+    }
+    this.fetchData(body)
+    */
   }
 
   // fetch task/one 
-  fetchTaskDetail = (body) => {
-    let resource = '/work/order/one'
+  fetchTaskDetail = (resource, body) => {
     const cb = (json) => {
       // only handle data here
       let data = {
@@ -538,22 +562,20 @@ class TaskList extends React.Component {
   }
   render () {
     let {main_phase, main_schoolId, main_mine, 
-      panel_rangeIndex, panel_type, 
-      panel_total, panel_page, panel_dataSource, 
+      panel_rangeIndex, panel_startTime, panel_endTime, panel_type, 
+      panel_selectKey, panel_total, panel_page, panel_dataSource, 
       panel_countOfUnviewed, 
-      showDetail, selectedRowIndex
+      details, detail_tabIndex, showDetail, selectedRowIndex
     } = this.props.taskList
     let page = panel_page[main_phase]
     let dataSource = (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) || []
-    console.log(dataSource)
     const {loading, startTime, endTime, searchingText, showBuild} = this.state
 
-    const TIMETITLE = (main_phase === 2 ? '完结时间' : '等待时间')
     const columns = [{
-      title: '工单编号',
-      dataIndex: 'id',
+      title: '学校',
       className: 'firstCol selectedHintWraper',
-      width: '8%',
+      dataIndex: 'schoolName',
+      width: '10%',
       render: (text, record, index) => (
         <span className=''>
           { index === selectedRowIndex ?
@@ -564,40 +586,112 @@ class TaskList extends React.Component {
         </span>
       )
     }, {
-      title: '学校',
-      dataIndex: 'schoolName',
-      width: '10%'
-    }, {
-      title: '工单类型',
-      dataIndex: 'type',
+      title: '任务类型',
+      dataIndex: 'sourceType',
       width: '8%',
-      render: (text) => (CONSTANTS.TASKTYPE[text])
+      render: (text) => (TASKTYPES[text])
     }, {
-      title: '发起人',
-      dataIndex: 'creatorName',
-      width: '10%'
+      title: '用户',
+      dataIndex: 'mobile',
+      width: '10%',
+      render: (text, record) => (record.mobile || '----')
     }, {
-      title: '受理人',
-      dataIndex: 'assignName',
-      width: '10%'
+      title: '设备地址',
+      dataIndex: 'location',
+      width: '10%',
+      render: (text, record) => (record.location || '----')
     }, {
-      title: '创建时间',
+      title: '任务申请时间',
       dataIndex: 'createTime',
       width: '14%',
-      render:(text,record)=>(Time.getTimeStr(text))
+      render:(text,record)=>(Time.showDate(text))
     }, {
-      title: <span>{TIMETITLE}</span>,
-      dataIndex: 'endTime',
+      title: '任务等待时间',
+      dataIndex: 'id',
       width: '14%',
-      render: (text,record,index) => {
-        if (record.status === CONSTANTS.TASK_FINISHED) {
-          return (record.endTime ? Time.getTimeStr(record.endTime) : '')
-        } else {
-          return (record.createTime ? Time.getSpan(record.createTime) : '')
+      render: (text,record,index) => (Time.getSpan(record.createTime))
+    }, {
+      title: '提醒次数',
+      dataIndex: 'remind',
+      width: '8%'
+    },{
+      title: '任务分工',
+      dataIndex: 'assignName',
+      width: '8%',
+      render: (text, record) => {
+        switch(record.status) {
+          case 1:
+          case 2:
+          case 5:
+          case 6:
+            return record.csName;
+          case 3:
+          case 4:
+          case 7:
+            return record.assignName;
+          default: 
+            return record.csName || '----'
         }
       }
+    },{
+      title: '处理状态',
+      dataIndex: 'status',
+      width: '11%',
+      render: (text,record) => {
+        if (record.sourceType === 1) {
+          switch(record.status){
+            case 1:
+              return <Badge status='error' text={CONSTANTS.WITHDRAWSTATUS[record.status]} />
+            case 2:
+            case 5:
+              return <Badge status='default' text={CONSTANTS.WITHDRAWSTATUS[record.status]} />
+            case 3: 
+              return <Badge status='warning' text={CONSTANTS.WITHDRAWSTATUS[record.status]} />
+            case 4: 
+              return <Badge status='success' text={CONSTANTS.WITHDRAWSTATUS[record.status]} />
+            default:
+              return <Badge status='warning' text='----' />
+          }
+        } else {
+          switch(record.status){
+            case 7:
+              return <Badge status='success' text='维修完成' />
+            case 3:
+              return <Badge status='warning' text={CONSTANTS.REPAIRSTATUSFORSHOW[record.status]+`(${record.assignName})`} />
+            case 4:
+              return <Badge status='warning' text={CONSTANTS.REPAIRSTATUSFORSHOW[record.status]} />
+            case 1:
+            case 2:
+            case 5:
+              return <Badge status='error' text={CONSTANTS.REPAIRSTATUSFORSHOW[record.status]} />
+            case 6:
+              return <Badge status='error' text={CONSTANTS.REPAIRSTATUSFORSHOW[record.status]+`(${record.assignName})`} />
+            default: 
+              return <Badge status='error' text='未知' />
+          }
+        }
+      }
+    }, {
+      title: '操作',
+      dataIndex: 'operation',
+      width: '10%',
+      className: 'lastCol',
+      render: (text, record, index) => {
+        let deviceAddr = '/device/repair/repairInfo/:', fundAddr = '/fund/list/fundInfo/:', addr
+        if (record.sourceType === 2) {
+          addr = deviceAddr + record.sourceId
+        } else {
+          addr = fundAddr + record.sourceId
+        }
+        return (
+          <div className='editable-row-operations'>
+            <span>
+              <Link to={{pathname: addr, state: {path: 'fromTask'}}} >详情</Link>
+            </span>
+          </div>
+        )
+      }
     }]
-
     return (
       <div className='taskPanelWrapper' ref='wrapper'>
         <div className='phaseLine'>
@@ -692,7 +786,7 @@ class TaskList extends React.Component {
         <div 
           ref='detailWrapper'
         >
-          <TaskDetail
+          <RepairDetail
             show={showDetail}
           />
         </div>
