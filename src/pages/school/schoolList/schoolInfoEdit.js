@@ -53,6 +53,9 @@ const options = [{
     value: '济南',
     label: '济南'
   }]
+}, {
+  value: '上海',
+  label: '上海'
 }]
 
 class Loc extends React.Component {

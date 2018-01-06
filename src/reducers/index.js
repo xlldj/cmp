@@ -273,10 +273,10 @@ const initialTaskState = {
     // state for main page
     main_phase: 0, // '待处理', the first three is for all panels
     main_schoolId: 'all',
-    main_mine: '1', // 1: '我的工单', 2: '全部'
+    main_mine: '2', // 1: '我的工单', 2: '全部'
     selectedRowIndex: -1, // the row whose detail is being watching
 
-    panel_rangeIndex: [0, 0, 1], // '时间', time select of each panel
+    panel_rangeIndex: [3, 3, 1], // '时间', time select of each panel
     panel_startTime: ['', '', ''], // startTime of each panel
     panel_endTime: ['', '', ''], // endTime of each panel
     panel_type: [1, 1, 1], // 类型

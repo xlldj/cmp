@@ -249,6 +249,13 @@ class OrderTable extends React.Component {
         body.deviceType = state.deviceType
       } else if (state.path === 'fromUser') {
         body.userId = state.id
+      } else if (state.path === 'fromTask') {
+        if (state.userId) {
+          body.userId = state.userId
+        } else if (state.deviceType) {
+          body.residenceId = state.residenceId 
+          body.deviceType = state.deviceType
+        }
       }
       delete body.schoolId
     }

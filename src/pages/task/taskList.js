@@ -66,9 +66,9 @@ const ALLTAG = {
   2: true
 }
 const STATUS_LIST = {
-  0: [1],
-  1: [2, 3],
-  2: [4]
+  0: [CONSTANTS.TASK_PENDING, CONSTANTS.TASK_REFUSED],
+  1: [CONSTANTS.TASK_ASSIGNED, CONSTANTS.TASK_ACCEPTED],
+  2: [CONSTANTS.TASK_FINISHED]
 }
 
 const SIZE = CONSTANTS.PAGINATION
@@ -257,6 +257,7 @@ class TaskList extends React.Component {
 
       // update state.startTime to props.startTime
       let {startTime, endTime} = this.state, nextState = {}
+      nextState.searchingText = panel_selectKey[main_phase]
       if (startTime !== panel_startTime[main_phase]) {
         nextState.startTime = panel_startTime[main_phase]
       }
@@ -370,9 +371,6 @@ class TaskList extends React.Component {
   changePhase = (e) => {
     try {
       e.preventDefault()
-      if (this.props.taskList.showDetail) {
-        return
-      }
       let key = parseInt(e.target.getAttribute('data-key'), 10)
       let {main_phase} = this.props.taskList
       if (main_phase !== key) {
@@ -383,11 +381,8 @@ class TaskList extends React.Component {
     }
   }
   changeSchool = (v) => {
-    if (this.props.taskList.showDetail) {
-      return
-    }
     let {main_schoolId} = this.props.taskList
-    if (v !== main_schoolId) {
+    if (v === main_schoolId) {
       return
     }
     this.props.changeTask(subModule, {
@@ -395,9 +390,6 @@ class TaskList extends React.Component {
     })
   }
   changeAll = (v)=> {
-    if (this.props.taskList.showDetail) {
-      return
-    }
     let {main_mine} = this.props.taskList
     if (v !== main_mine) {
       this.props.changeTask(subModule, {
@@ -406,9 +398,6 @@ class TaskList extends React.Component {
     }
   }
   changeRange = (key) => {
-    if (this.props.taskList.showDetail) {
-      return
-    }
     let panel_rangeIndex = this.props.taskList['panel_rangeIndex'].slice()
     let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList['panel_dataSource']))
     let panel_page = this.props.taskList['panel_page'].slice()
@@ -431,9 +420,6 @@ class TaskList extends React.Component {
     })
   }
   changeTaskType = (key) => {
-    if (this.props.taskList.showDetail) {
-      return
-    }
     let panel_type = JSON.parse(JSON.stringify(this.props.taskList['panel_type']))
     let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList['panel_dataSource']))
     let i = this.props.taskList.main_phase
@@ -468,7 +454,7 @@ class TaskList extends React.Component {
     panel_startTime[i] = startTime
     panel_endTime[i] = endTime
     panel_page[i] = 1
-    panel_rangeIndex[i] = 1
+    panel_rangeIndex[i] = 0
     panel_dataSource[i] = {} // clear dataSource of the corresponding panel 
     this.props.changeTask(subModule, {
       panel_startTime: panel_startTime, 
@@ -486,9 +472,6 @@ class TaskList extends React.Component {
   }
   searchEnter = () => {
     let v = this.state.searchingText.trim()
-    if (!v) {
-      return
-    }
     let panel_selectKey = JSON.parse(JSON.stringify(this.props.taskList.panel_selectKey))
     let panel_page = JSON.parse(JSON.stringify(this.props.taskList.panel_page))
     let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList['panel_dataSource']))
@@ -548,7 +531,7 @@ class TaskList extends React.Component {
     console.log(dataSource)
     const {loading, startTime, endTime, searchingText, showBuild} = this.state
 
-    const TIMETITLE = (main_phase === 2 ? '完结时间' : '等待时间')
+    const TIMETITLE = (main_phase === 2 ? '完结时间' : '用时')
     const columns = [{
       title: '工单编号',
       dataIndex: 'id',
@@ -589,13 +572,7 @@ class TaskList extends React.Component {
       title: <span>{TIMETITLE}</span>,
       dataIndex: 'endTime',
       width: '14%',
-      render: (text,record,index) => {
-        if (record.status === CONSTANTS.TASK_FINISHED) {
-          return (record.endTime ? Time.getTimeStr(record.endTime) : '')
-        } else {
-          return (record.createTime ? Time.getSpan(record.createTime) : '')
-        }
-      }
+      render: (text,record,index) => (record.createTime ? Time.getSpan(record.createTime) : '')
     }]
 
     return (
@@ -664,7 +641,7 @@ class TaskList extends React.Component {
               />
             </div>
             <div className='block'>
-              <span className='mgr10'>当前工单总条数:</span>
+              <span className='mgr10'>当前工单总条数:{panel_total[main_phase]}</span>
             </div>
           </div>
         </div>

@@ -69,7 +69,12 @@ const CONSTANTS = {
   TASKSTATUS: {1: '待处理', 2: '处理中', 3: '已完结'},
   TASKTYPE: {1: '报修', 2: '账单投诉', 3: '意见反馈'},
   TASK_REPAIR: 1, // type value of 'repair' in task
-  TASK_FINISHED: 3,
+  TASK_PENDING: 1,
+  TASK_ASSIGNED: 2,
+  TASK_ACCEPTED: 3,
+  TASK_REFUSED: 4,
+  TASK_FINISHED: 5,
+  TASK_CANCELED: 6,
 
   CHARTTYPES: {1: 'order', 2: 'user', 3: 'bonus', 4: 'funds', 5: 'repair', 6: 'repair/time'},
   SETTLETYPE: {1: '消息回复', 2: '电话回复'},
