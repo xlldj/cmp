@@ -349,6 +349,16 @@ button.grayBackColor:linked {
   background-color: rgba(9, 9, 9, 0.2);
   border: 1px solid blue;
 }
+.thumbnailWrapper {
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+}
+.thumbnailWrapper li {
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+}
 .thumbnail {
   max-width: 100px;
   max-height: 100px;
@@ -1058,6 +1068,10 @@ button.grayBackColor:linked {
   color: white;
   background: #108EE9;
 }
+.checkSelect li:hover {
+  color: white;
+  background: #108EE9;
+}
 .panelSelect {
   cursor: pointer;
   user-select: none;
@@ -1078,12 +1092,16 @@ button.grayBackColor:linked {
   border: 1px solid #108EE9;
 }
 .closeBtn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
   width: 80px;
   height: 50px;
   background: none;
   border: none;
-  text-align: right;
+}
+.closeBtn img {
+  height: 14px;
 }
 .selectedRow {
   background: #ebf4fd;

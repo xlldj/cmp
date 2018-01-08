@@ -17,7 +17,7 @@ import selectedImg from '../assets/selected.png'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeTask, fetchTasks} from '../../actions'
+import { changeTask} from '../../actions'
 const subModule = 'taskList'
 
 const TIMERANGESELECTS = {
@@ -66,8 +66,8 @@ const ALLTAG = {
   2: true
 }
 const STATUS_LIST = {
-  0: [CONSTANTS.TASK_PENDING, CONSTANTS.TASK_REFUSED],
-  1: [CONSTANTS.TASK_ASSIGNED, CONSTANTS.TASK_ACCEPTED],
+  0: [CONSTANTS.TASK_PENDING],
+  1: [CONSTANTS.TASK_ASSIGNED, CONSTANTS.TASK_ACCEPTED, CONSTANTS.TASK_REFUSED],
   2: [CONSTANTS.TASK_FINISHED]
 }
 
@@ -486,7 +486,12 @@ class TaskList extends React.Component {
     })
   }
   selectRow = (record, index, event) => {
-    this.props.changeTask(subModule, {selectedRowIndex: index, showDetail: true})
+    let {detail_tabIndex, main_phase} = this.props.taskList
+    let newTabIndex = Array.from(detail_tabIndex)
+    newTabIndex[main_phase] = 1
+    this.props.changeTask(subModule, {
+      selectedRowIndex: index, showDetail: true, detail_tabIndex: newTabIndex
+    })
   }
 
   changePage = (pageObj) => {
@@ -531,7 +536,7 @@ class TaskList extends React.Component {
     console.log(dataSource)
     const {loading, startTime, endTime, searchingText, showBuild} = this.state
 
-    const TIMETITLE = (main_phase === 2 ? '完结时间' : '用时')
+    const TIMETITLE = (main_phase === 2 ? '用时' : '等待时间')
     const columns = [{
       title: '工单编号',
       dataIndex: 'id',
@@ -572,7 +577,13 @@ class TaskList extends React.Component {
       title: <span>{TIMETITLE}</span>,
       dataIndex: 'endTime',
       width: '14%',
-      render: (text,record,index) => (record.createTime ? Time.getSpan(record.createTime) : '')
+      render: (text,record,index) => {
+        if (record.status === 5 || record.status === 6) {
+          return (record.endTime ? Time.getTimeInterval(record.createTime, record.endTime) : Time.getSpan(record.createTime))
+        } else {
+          return (record.createTime ? Time.getSpan(record.createTime) : '')
+        }
+      }
     }]
 
     return (
@@ -685,6 +696,5 @@ const mapStateToProps = (state, ownProps) => ({
 })
 
 export default withRouter(connect(mapStateToProps, {
-  changeTask,
-  fetchTasks
+  changeTask
 })(TaskList))

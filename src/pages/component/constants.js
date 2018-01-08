@@ -50,13 +50,19 @@ const CONSTANTS = {
   SEX: {1: '男', 2: '女'}, 
 
   ROLE: {1: '普通用户', 2: '维修员', 3: '管理员', 4: '运营', 5: '客服', 6: '研发人员'},
+  EMPLOYEE_TYPE: {1: '客服', 2: '维修员', 3: '研发人员'},
+  EMPLOYEE_CUSTOMER: 1,
+  EMPLOYEE_REPAIRMAN: 2,
+  EMPLOYEE_DEVELOPER: 3,
+  
 
   NOTIFYTYPES: {1: '紧急公告', 2: '系统公告', 3: '客服消息'},
   NOTIFYSTATUS: {
     1: '已发布',
     2: '已过期',
     3: '等待审核',
-    4: '审核未通过'},
+    4: '审核未通过'
+  },
 
   WEEKDAYS: {0: '日', 1: '一', 2: '二', 3: '三', 4: '四', 5: '五', 6: '六'},
 
@@ -66,8 +72,18 @@ const CONSTANTS = {
   CREATEWORKTYPE: {1: '工作记录', 2: '指派任务'},
   COMPLAINTTYPES: {1: '热水器', 2: '饮水机', 3: '充值', 4: '提现'},
   FEEDBACKTYPES: {1: '功能异常', 2: '产品建议', 3: '其它'},
-  TASKSTATUS: {1: '待处理', 2: '处理中', 3: '已完结'},
+  TASKSTATUS: {1: '待处理', 2: '处理中', 3 : '处理中', 4: '处理中', 5: '已完结'}, // real status: {2: '已指派', 3: '已接受', 4: '已拒绝'}
   TASKTYPE: {1: '报修', 2: '账单投诉', 3: '意见反馈'},
+  TASK_TYPE_REPAIR: 1,
+  TASK_TYPE_COMPLAINT: 2,
+  TASK_TYPE_FEEDBACK: 3,
+  TASKHANDLE: {1: '转接', 2: '拒绝', 3: '接受', 4: '发送消息', 5: '备注', 6: '完成'},
+  TASK_HANDLE_REFUSE: 2,
+  TASK_HANDLE_REASSIGN: 1,
+  TASK_HANDLE_ACCEPT: 3,
+  TASK_HANDLE_SENDMESSAGE: 4,
+  TASK_HANDLE_REMARK: 5,
+  TASK_HANDLE_FINISH: 6,
   TASK_REPAIR: 1, // type value of 'repair' in task
   TASK_PENDING: 1,
   TASK_ASSIGNED: 2,

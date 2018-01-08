@@ -391,6 +391,17 @@ button.grayBackColor:linked{
   background-color: rgba(9,9,9,0.2);
   border: 1px solid blue;
 }
+// for thumbnail in list
+.thumbnailWrapper{
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  li{
+    width: 30px;
+    height: 30px;
+    overflow: hidden;
+  }
+}
 .thumbnail{
   max-width: 100px;
   max-height: 100px;
@@ -981,6 +992,10 @@ button.grayBackColor:linked{
     color: white;
     background: @deepBlue;
   }
+  li:hover{
+    color: white;
+    background: @deepBlue;
+  }
 }
 // for panel select
 .panelSelect{
@@ -1002,12 +1017,16 @@ button.grayBackColor:linked{
   } 
 }
 .closeBtn{
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
   width: 80px;
   height: 50px;
   background: none;
   border: none;
-  text-align: right;
+  img{
+    height: 14px;
+  }
 }
 
 // for table rows
