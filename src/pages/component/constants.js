@@ -19,8 +19,13 @@ const CONSTANTS = {
   DEVICETYPE: {1: '热水器', 2: '饮水机', 3: '吹风机'},
   WATERTYPE: {1: '热水', 2: '冷水', 3: '冰水'},
   DEVICESTATUS: {1: '正常', 2: '报修'},
-  REPAIRSTATUS: {1: '待审核', 2: '待指派', 3: '已指派', 4: '正在维修', 5: '审核未通过', 6: '已拒绝', 7: '已完成', 8: '已取消'},
+  // REPAIRSTATUS: {1: '待审核', 2: '待指派', 3: '已指派', 4: '正在维修', 5: '审核未通过', 6: '已拒绝', 7: '已完成', 8: '已取消'},
+  REPAIRSTATUS: {1: '待处理', 2: '处理中', 3: '已完结'},
+  REPAIRSTATUS2TRUESTATUS: {1: [1], 2: [2, 3, 4], 3: [5]}, // true status for task/repair, note to keep same with task/status below  
   PRIORITY: {1: '正常处理', 2: '优先处理', 3: '紧急处理'},
+  PRIORITY_NORMAL: 1,
+  PRIORITY_PRIOR: 2,
+  PRIORITY_URGENT: 3,
   REPAIRSTATUSFORSHOW: {1: '待审核', 2: '待指派', 3: '已指派', 4: '正在维修', 5: '审核未通过', 6: '已指派被拒绝', 7: '已完成', 8: '已取消'},
   WATERUNIT: {1: '吨', 2: '升', 3: '毫升'},
   BILLINGOPTIONS: {1: '流量计费'},
@@ -54,7 +59,17 @@ const CONSTANTS = {
   EMPLOYEE_CUSTOMER: 1,
   EMPLOYEE_REPAIRMAN: 2,
   EMPLOYEE_DEVELOPER: 3,
-  
+  ROLELOGLIMIT: {1: 'CMP', 2: '运维端'},
+  LOGIN_CMP: 1,
+  LOGIN_LIGHT: 2,
+  // privileges control for mobile app of employee ('light').
+  LIGHTBLOCKS: {1: '设备管理', 2: '报修管理', 3: '订单管理', 4: '统计分析', 5: '充值管理', 6: '公告管理'},
+  LIGHT_DEVICE: 1,
+  LIGHT_REPAIR: 2,
+  LIGHT_ORDER: 3,
+  LIGHT_STAT: 4,
+  LIGHT_FUND: 5,
+  LIGHT_NOTIFY: 6,
 
   NOTIFYTYPES: {1: '紧急公告', 2: '系统公告', 3: '客服消息'},
   NOTIFYSTATUS: {
@@ -73,10 +88,20 @@ const CONSTANTS = {
   COMPLAINTTYPES: {1: '热水器', 2: '饮水机', 3: '充值', 4: '提现'},
   FEEDBACKTYPES: {1: '功能异常', 2: '产品建议', 3: '其它'},
   TASKSTATUS: {1: '待处理', 2: '处理中', 3 : '处理中', 4: '处理中', 5: '已完结'}, // real status: {2: '已指派', 3: '已接受', 4: '已拒绝'}
+  TASK_PENDING: 1, // task whose 'status' is 'pending'
+  TASK_ASSIGNED: 2,
+  TASK_ACCEPTED: 3,
+  TASK_REFUSED: 4,
+  TASK_FINISHED: 5,
+  TASK_CANCELED: 6,
+
   TASKTYPE: {1: '报修', 2: '账单投诉', 3: '意见反馈'},
-  TASK_TYPE_REPAIR: 1,
+  TASK_TYPE_REPAIR: 1, // type value of 'repair' in task
   TASK_TYPE_COMPLAINT: 2,
   TASK_TYPE_FEEDBACK: 3,
+  TASK_BUILD_ENV: {1: '用户端', 2: 'CMP'},
+  TASK_BUILD_USER: 1,
+  TASK_BUILD_CMP: 2,
   TASKHANDLE: {1: '转接', 2: '拒绝', 3: '接受', 4: '发送消息', 5: '备注', 6: '完成'},
   TASK_HANDLE_REFUSE: 2,
   TASK_HANDLE_REASSIGN: 1,
@@ -84,13 +109,6 @@ const CONSTANTS = {
   TASK_HANDLE_SENDMESSAGE: 4,
   TASK_HANDLE_REMARK: 5,
   TASK_HANDLE_FINISH: 6,
-  TASK_REPAIR: 1, // type value of 'repair' in task
-  TASK_PENDING: 1,
-  TASK_ASSIGNED: 2,
-  TASK_ACCEPTED: 3,
-  TASK_REFUSED: 4,
-  TASK_FINISHED: 5,
-  TASK_CANCELED: 6,
 
   CHARTTYPES: {1: 'order', 2: 'user', 3: 'bonus', 4: 'funds', 5: 'repair', 6: 'repair/time'},
   SETTLETYPE: {1: '消息回复', 2: '电话回复'},
@@ -260,21 +278,6 @@ const CONSTANTS = {
           name: '工单列表',
           path: 'list',
           key: 0
-        },
-        {
-          name: '工作记录',
-          path: 'log',
-          key: 1
-        },
-        {
-          name: '账单投诉',
-          path: 'complaint',
-          key: 3
-        },
-        {
-          name: '意见反馈',
-          path: 'feedback',
-          key: 4
         }
       ]
     },

@@ -1,5 +1,5 @@
 import React from 'react'
-import {Table, Button, Modal} from 'antd'
+import {Table, Button} from 'antd'
 
 import RangeSelect from '../component/rangeSelect'
 import SearchInput from '../component/searchInput.js'
@@ -13,6 +13,7 @@ import {checkObject} from '../util/checkSame'
 import TaskDetail from './taskDetail'
 import BuildTask from './buildTask'
 import selectedImg from '../assets/selected.png'
+import Noti from '../noti'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -268,10 +269,11 @@ class TaskList extends React.Component {
 
       // First, check these props to determine if to check exist.
       // Second, check if needed data exist, determine if to fetch list data.
+      // need to check 'showDetail' because if finish or transfer task, will clear all dataSource.
       if (!checkObject(this.props.taskList, nextProps.taskList, [
         'main_phase', 'main_schoolId', 'main_mine', 
         'panel_rangeIndex', 'panel_startTime', 'panel_endTime', 'panel_type',
-        'panel_selectKey', 'panel_page'])) {
+        'panel_selectKey', 'panel_page', 'showDetail'])) {
           if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) {
             // dataSource has the data
             if (this.state.loading) {
@@ -524,6 +526,12 @@ class TaskList extends React.Component {
       showBuild: false
     })
   }
+  buildTaskSuccess = () => {
+    Noti.hintOk('操作成功', '创建工单成功')
+    this.setState({
+      showBuild: false
+    })
+  }
   render () {
     let {main_phase, main_schoolId, main_mine, 
       panel_rangeIndex, panel_type, 
@@ -577,6 +585,60 @@ class TaskList extends React.Component {
       title: <span>{TIMETITLE}</span>,
       dataIndex: 'endTime',
       width: '14%',
+      render: (text,record,index) => {
+        if (record.status === 5 || record.status === 6) {
+          return (record.endTime ? Time.getTimeInterval(record.createTime, record.endTime) : Time.getSpan(record.createTime))
+        } else {
+          return (record.createTime ? Time.getSpan(record.createTime) : '')
+        }
+      }
+    }]
+
+    const handlingColumns = [{
+      title: '工单编号',
+      dataIndex: 'id',
+      className: 'firstCol selectedHintWraper',
+      width: '8%',
+      render: (text, record, index) => (
+        <span className=''>
+          { index === selectedRowIndex ?
+              <img src={selectedImg} alt='' className='selectedImg' />
+            : null 
+          }
+          {text}
+        </span>
+      )
+    }, {
+      title: '学校',
+      dataIndex: 'schoolName',
+      width: '10%'
+    }, {
+      title: '工单类型',
+      dataIndex: 'type',
+      width: '8%',
+      render: (text) => (CONSTANTS.TASKTYPE[text])
+    }, {
+      title: '发起人',
+      dataIndex: 'creatorName',
+      width: '8%'
+    }, {
+      title: '受理人',
+      dataIndex: 'assignName',
+      width: '8%'
+    }, {
+      title: '紧急程度',
+      dataIndex: 'level',
+      width: '8%',
+      render: (text) => (CONSTANTS.PRIORITY[text])
+    }, {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      width: '12%',
+      render:(text,record)=>(Time.getTimeStr(text))
+    }, {
+      title: <span>{TIMETITLE}</span>,
+      dataIndex: 'endTime',
+      width: '12%',
       render: (text,record,index) => {
         if (record.status === 5 || record.status === 6) {
           return (record.endTime ? Time.getTimeInterval(record.createTime, record.endTime) : Time.getSpan(record.createTime))
@@ -665,7 +727,7 @@ class TaskList extends React.Component {
             pagination={{pageSize: SIZE, current: page, total: panel_total[main_phase]}}  
             // dataSource={panel_dataSource[main_phase]} 
             dataSource={dataSource}
-            columns={columns} 
+            columns={main_phase === 1 ? handlingColumns : columns} 
             onChange={this.changePage}
             onRowClick={this.selectRow}
             rowClassName={this.setRowClass}
@@ -673,7 +735,7 @@ class TaskList extends React.Component {
         </div>
         {
           showBuild ? 
-            <BuildTask cancel={this.cancelBuildTask} />
+            <BuildTask cancel={this.cancelBuildTask} success={this.buildTaskSuccess} />
           : null
         }
 

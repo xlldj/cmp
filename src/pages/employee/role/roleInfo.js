@@ -4,10 +4,13 @@
       Each time changed in AuthenDataTable, change state/AuthenDataTable on hook of confirm.
 */
 
+/* ----------- add privileges control (2018/1/8)---------- */
+
 import React from 'react'
-import { Button} from 'antd'
+import { Button, Checkbox} from 'antd'
 import AjaxHandler from '../../ajax'
 import Noti from '../../noti'
+import CONSTANTS from '../../component/constants'
 import AuthenDataTable from '../../component/authenDataTable'
 import {buildAuthenBaseOnfull, buildAuthenDataForServer} from '../../util/authenDataHandle'
 
@@ -15,6 +18,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeEmployee, setAuthenData, setRoleList } from '../../../actions'
+
+const CheckboxGroup = Checkbox.Group
 
 class RoleInfo extends React.Component {
   static propTypes = {
@@ -30,7 +35,11 @@ class RoleInfo extends React.Component {
       nameError: false,
       checking: false,
       posting: false,
-      authenStatus: this.props.full || []
+      authenStatus: this.props.full || [],
+      loginLimit: [CONSTANTS.LOGIN_CMP], // default choose cmp
+      loginLimitError: false,
+      functionLimit: [],
+      functionLimitError: false
     }
   }
   fetchData = (body) => {
@@ -80,7 +89,7 @@ class RoleInfo extends React.Component {
     this.props.history.goBack()
   }
   postData = () => {
-    let {id, name, authenStatus, posting} = this.state
+    let {id, name, authenStatus, posting, loginLimit, functionLimit} = this.state
     if (posting) {
       return
     }
@@ -91,7 +100,11 @@ class RoleInfo extends React.Component {
     let privileges = buildAuthenDataForServer(authenStatus)
     const body={
       name: name,
-      privileges: privileges
+      privileges: privileges,
+      loginLimit: loginLimit
+    }
+    if (loginLimit.includes(CONSTANTS.LOGIN_LIGHT)) {
+      body.functionLimit = functionLimit
     }
     if(id){
       body.id = id
@@ -160,10 +173,20 @@ class RoleInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   confirm = () => {
-    let {name, originalName, id, checking, posting} = this.state
+    let {name, originalName, id, checking, posting, loginLimit, functionLimit} = this.state
     if (!name) {
       return this.setState({
         nameError: true
+      })
+    }
+    if (loginLimit.length < 1) { // at least one for loginLimit
+      return this.setState({
+        loginLimitError: true
+      })
+    }
+    if (loginLimit.includes(CONSTANTS.LOGIN_LIGHT) && functionLimit.length < 1) { // at least one if choosed 'light'
+      return this.setState({
+        functionLimitError: true
       })
     }
     if (checking || posting) {
@@ -230,8 +253,39 @@ class RoleInfo extends React.Component {
       authenStatus: JSON.parse(JSON.stringify(status))
     })
   }
+  
+  changeLoginLimit = (v)=>{
+    let nextState = {}
+    if (v.length === 0) {
+      return this.setState({
+        loginLimitError: true
+      })
+    } else if (this.state.loginLimitError) {
+      nextState.loginLimitError = false
+    }
+    nextState.loginLimit = v
+    this.setState(nextState)
+  }
+    
+  changeFunctionLimit = (v)=>{
+    let nextState = {}
+    if (v.length === 0) {
+      // if has right to control function block, hint error when functionLimit is empty.
+      if (this.state.loginLimit.includes(CONSTANTS.LOGIN_LIGHT)) {
+        return this.setState({
+          functionLimitError: true
+        })
+      }
+    } else if (this.state.functionLimitError) {
+      nextState.functionLimitError = false
+    }
+    nextState.functionLimit = v
+    this.setState(nextState)
+  }
   render () {
-    const {id, name, nameError, authenStatus} = this.state
+    const {id, name, nameError, authenStatus, loginLimit, loginLimitError,
+      functionLimit, functionLimitError
+    } = this.state
 
     return (
       <div className='infoList roleInfo'>
@@ -247,8 +301,35 @@ class RoleInfo extends React.Component {
             />
             { nameError ? <span className='checkInvalid'>名称不能为空！</span> : null }
           </li>
+          <li>
+            <p>可登录环境:</p>
+            <CheckboxGroup value={loginLimit} onChange={this.changeLoginLimit} >
+              <Checkbox value={CONSTANTS.LOGIN_LIGHT}>运维端APP</Checkbox>
+              <Checkbox value={CONSTANTS.LOGIN_CMP}>CMP管理后台</Checkbox>
+            </CheckboxGroup>
+            {
+              loginLimitError ? <span className='checkInvalid' >请选择至少一个环境！</span> : null
+            }
+          </li>
+          {loginLimit.includes(CONSTANTS.LOGIN_LIGHT) ?
+              <li>
+                <p>运维端功能入口:</p>
+                <CheckboxGroup value={functionLimit} onChange={this.changeFunctionLimit} >
+                  <Checkbox value={CONSTANTS.LIGHT_DEVICE}>设备管理</Checkbox>
+                  <Checkbox value={CONSTANTS.LIGHT_REPAIR}>报修管理</Checkbox>
+                  <Checkbox value={CONSTANTS.LIGHT_ORDER}>订单管理</Checkbox>
+                  <Checkbox value={CONSTANTS.LIGHT_STAT}>统计分析</Checkbox>
+                  <Checkbox value={CONSTANTS.LIGHT_FUND}>充值管理</Checkbox>
+                  <Checkbox value={CONSTANTS.LIGHT_NOTIFY}>公告管理</Checkbox>
+                </CheckboxGroup>
+                {
+                  functionLimitError ? <span className='checkInvalid' >请选择运维端权限！</span> : null
+                }
+              </li>
+              : null
+          }
           <li className='itemsWrapper'>
-            <p>权限设置:</p>
+            <p>CMP权限设置:</p>
           </li>
           <li className='itemsWrapper'>
             <AuthenDataTable

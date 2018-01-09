@@ -19,17 +19,15 @@ class RepairmanTable extends React.Component{
     }
   }
   fetchData = () => {
-    let {department, schoolId} = this.props
+    let {schoolId} = this.props
     let resource = '/api/employee/department/member/list'
     const body = {
       page: 1,
-      size: 10000
+      size: 10000,
+      department: CONSTANTS.EMPLOYEE_REPAIRMAN
     }
     if (schoolId) {
       body.schoolId = schoolId
-    }
-    if (department) {
-      body.department = department
     }
     const cb = (json) => {
       if(json.error){
@@ -46,6 +44,7 @@ class RepairmanTable extends React.Component{
     AjaxHandler.ajax(resource,body,cb)
   }
   componentDidMount () {
+    // console.log('repairman mount')
     let {schoolId, level} = this.props
     let nextState = {}
     if (schoolId) {
@@ -64,11 +63,6 @@ class RepairmanTable extends React.Component{
       })
       this.fetchData()
     }
-  }
-  changeSelect = (selectedRowKeys, selectedRows) => {
-    this.setState({
-      selectedRowKeys: [selectedRows[0].id]
-    })
   }
   changePriority = (e) => {
     let node = e.target, v = ''
@@ -118,7 +112,7 @@ class RepairmanTable extends React.Component{
     const body = {
       type: CONSTANTS.TASK_HANDLE_REASSIGN,
       id: this.props.id,
-      department: CONSTANTS.EMPLOYEE_DEVELOPER,
+      department: CONSTANTS.EMPLOYEE_REPAIRMAN,
       level: parseInt(this.state.priority, 10),
       assignId: this.state.selectedRowKeys[0],
       content: this.state.remark
@@ -140,6 +134,11 @@ class RepairmanTable extends React.Component{
     let selectedRows = [record]
     this.changeSelect(null, selectedRows)
   }
+  changeSelect = (selectedRowKeys, selectedRows) => {
+    this.setState({
+      selectedRowKeys: [selectedRows[0].id]
+    })
+  }
   render(){
     const {dataSource, priority, selectedRowKeys} = this.state
     const columns = [{
@@ -150,25 +149,29 @@ class RepairmanTable extends React.Component{
       title: '待接受的任务',
       dataIndex: 'waiting',
       width: '15%',
+      render: (text) => (text || 0)
     }, {
       title: '已接受的任务',
       dataIndex: 'accepted',
-      width: '15%'
+      width: '15%',
+      render: (text) => (text || 0)
     }, {
       title: '近7日完成任务',
       dataIndex: 'weeklyDone',
-      width: '20%'
+      width: '20%',
+      render: (text) => (text || 0)
     }, {
       title: '平均完成时间',
       dataIndex: 'avgCost',
       width: '20%',
       render: (text,record,index) => {
-        return Time.formatSpan(record.avgCost)
+        return record.avgCost ? Time.formatSpan(record.avgCost) : 0
       }
     }, {
       title: '用户评分',
       dataIndex: 'avgRating',
-      width: '15%'
+      width: '15%',
+      render: (text) => (text || '无')
     }]
     const title = (
       <span className='modalTitle' >维修员</span>
@@ -186,7 +189,14 @@ class RepairmanTable extends React.Component{
       >
         <div className='schName'>学校:{this.props.schoolName}</div>
         <div className='setRepairman'>
-          <Table rowKey={record=>record.id}  onRowClick={this.selectRow} rowSelection={{type:'radio', onChange:this.changeSelect, selectedRowKeys: selectedRowKeys}} pagination={{defaultPageSize:8}} dataSource={dataSource} columns={columns} />
+          <Table 
+            rowKey={record=>record.id}  
+            onRowClick={this.selectRow} 
+            rowSelection={{type:'radio', onChange:this.changeSelect, selectedRowKeys: selectedRowKeys}} 
+            pagination={{defaultPageSize:8}} 
+            dataSource={dataSource} 
+            columns={columns} 
+          />
           <div className='options'>
             <div className='priorityGroup'>
               <span>任务紧急程度:</span>

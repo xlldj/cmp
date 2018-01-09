@@ -231,6 +231,7 @@ button.grayBackColor:linked{
   color: #fff;
 }
 .checkInvalid{
+  line-height: 22px;
   margin-left: 5px;
   text-align: center;
   color: red !important;
@@ -257,6 +258,9 @@ button.grayBackColor:linked{
   height: auto;
   *{
     margin-right: 10px;
+  }
+  button span{
+    margin-right: 0;
   }
 }
 .customNote{
@@ -310,6 +314,12 @@ button.grayBackColor:linked{
 }
 .rightAlign{
   text-align: right;
+}
+
+// width: 100% for inline node
+.inlineWidth100{
+  display: inline-block;
+  width: 100%;
 }
 
 /* for choose gift popup. both used in deposit-activity and other */
@@ -542,6 +552,9 @@ button.grayBackColor:linked{
         display: block;
         line-height: 22px;
       }
+      textarea{
+        line-height: 22px;
+      }
     }
   }
 }
@@ -627,6 +640,10 @@ button.grayBackColor:linked{
         width: 40%;
         display: block;
         line-height: 22px;
+      }
+      textarea{
+        line-height: 22px;
+        min-height: 110px;
       }
     }
   }
@@ -845,6 +862,10 @@ button.grayBackColor:linked{
     color: #222;
     border-bottom: 2px solid #148dea;
   }
+  a:hover{
+    color: #222;
+    border-bottom: 2px solid #148dea;
+  }
   a:first-child{
     margin-right: 20px;
   }
@@ -987,6 +1008,7 @@ button.grayBackColor:linked{
     margin-left: 8px;
     padding: 2px 5px;
     border-radius: 4px;
+    transition: all 0.2s ease;
   }
   li.active{
     color: white;

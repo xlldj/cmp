@@ -1,5 +1,5 @@
 import React from 'react'
-import {Table, Badge, Button, Modal, Carousel, Menu, Dropdown, Radio, Pagination} from 'antd'
+import {Table, Badge, Button, Modal, Carousel, Menu, Dropdown, Pagination} from 'antd'
 
 import Time from '../component/time'
 import Noti from '../noti'
@@ -11,17 +11,14 @@ import EmployeeChoose from '../component/employeeChoose'
 import DepartmentChoose from '../component/departmentChoose'
 import {checkObject} from '../util/checkSame'
 import closeBtn from '../assets/close.png'
+import {mul} from '../util/numberHandle'
+import Format from '../component/format'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, changeOrder, changeDevice ,changeFund} from '../../actions'
 const subModule = 'taskList'
-
-const RadioGroup = Radio.Group
-
-const STATUS = CONSTANTS.REPAIRSTATUS
-const STATUSFORSHOW = CONSTANTS.REPAIRSTATUSFORSHOW
 
 const DETAILTAB2NAME = {
   1: 'committer',
@@ -37,29 +34,24 @@ const DETAILTAB2NAME = {
 const TABINDEX2RES = {
   1: '/user/one',
   2: '/order/list',
-  3: '/repair/list',
+  3: '/work/order/list',
   4: '/device/one',
   5: '/order/list',
-  6: '/repair/list',
+  6: '/work/order/list',
   7: '/funds/list',
   8: '/work/order/list',
   9: '/work/order/list'
 }
 const DETAILTAB2JSONNAME = {
   2: 'orders',
-  3: 'repairDevices',
+  3: 'workOrders',
   5: 'orders',
-  6: 'repairDevices',
+  6: 'workOrders',
   7: 'funds',
   8: 'workOrders',
   9: 'workOrders'
 }
 
-const REPAIRTABS = {
-  1: '用户详情',
-  2: '用户订单记录',
-  3: '用户报修记录'
-}
 const TAB2HINT = {
   2: '用户近五笔订单',
   3: '用户近五次报修记录',
@@ -82,6 +74,7 @@ const roleModalName = {
   3: 'showDeveloperModal'
 }
 const SIZE = CONSTANTS.TASK_DETAIL_LIST_LENGTH
+const {TASK_PENDING, TASK_ASSIGNED, TASK_ACCEPTED, TASK_REFUSED, TASK_FINISHED} = CONSTANTS
 /*------后端接受的all为true/false,必传，post之前将0，1转为true/false---------*/
 /*------后端接受的pending为int，不传为所有，我用0表示不传---------------------*/
 
@@ -116,6 +109,17 @@ class TaskDetail extends React.Component {
         </Menu.Item>
         <Menu.Item key={2}>
           <span className='menuItem' >维修员</span>
+        </Menu.Item>
+        <Menu.Item key={3}>
+          <span className='menuItem' >研发人员</span>
+        </Menu.Item>
+      </Menu>
+    )
+
+    this.reassignWithoutRepairman = (
+      <Menu selectable={false} onClick={this.reassign}>
+        <Menu.Item key={1}>
+          <span className='menuItem' >客服</span>
         </Menu.Item>
         <Menu.Item key={3}>
           <span className='menuItem' >研发人员</span>
@@ -181,10 +185,10 @@ class TaskDetail extends React.Component {
       title: '报修设备',
       dataIndex: 'deviceType',
       width: '12%',
-      render: (text,record,index) => (CONSTANTS.DEVICETYPE[record.deviceType])
+      render: (text,record,index) => (record.deviceType ? CONSTANTS.DEVICETYPE[record.deviceType] : '')
     }, {
       title: '报修内容',
-      dataIndex: 'content',
+      dataIndex: 'description',
       width: '23%'
     }, {
       title: '报修图片',
@@ -195,7 +199,7 @@ class TaskDetail extends React.Component {
           <li className='thumbnail' key={i} >
             <img src={CONSTANTS.FILEADDR + r} alt='' 
               onClick={() => {this.showTabImg(index, i)}} 
-              onLoad={this.setWH} 
+              onLoad={(e) => this.setWH(e, 30)} 
             />
           </li>
         ))
@@ -209,25 +213,21 @@ class TaskDetail extends React.Component {
       title: '报修时间',
       dataIndex: 'createTime',
       width: '21%',
-      render: (text, record) => (Time.getTimeStr(record.createTime))
+      render: (text, record) => (record.createTime ? Time.getTimeStr(record.createTime) : '')
     }, {
       title: '维修状态',
       dataIndex: 'status',
       width: '19%',
       render: (text,record,index) => {
         switch(record.status){
-          case 7:
+          case TASK_FINISHED:
             return <Badge status='success' text='维修完成' />
-          case 3:
-            return <Badge status='warning' text={STATUS[record.status]+`(${record.assignName})`} />
-          case 4:
-            return <Badge status='warning' text={STATUS[record.status]} />
-          case 1:
-          case 2:
-          case 5:
-            return <Badge status='error' text={STATUS[record.status]} />
-          case 6:
-            return <Badge status='error' text={STATUSFORSHOW[record.status]+`(${record.assignName})`} />
+          case TASK_PENDING:
+            return <Badge status='warning' text='待处理' />
+          case TASK_ASSIGNED:
+          case TASK_ACCEPTED:
+          case TASK_REFUSED:
+            return <Badge status='error' text={'处理中'} />
           default:
             return '已取消'
         }
@@ -288,12 +288,13 @@ class TaskDetail extends React.Component {
     }]
 
     this.deviceRepairColumns = [{
-      title: '报修用户',
-      dataIndex: 'committerName',
-      width: '12%'
+      title: '报修设备',
+      dataIndex: 'deviceType',
+      width: '12%',
+      render: (text,record,index) => (record.deviceType ? CONSTANTS.DEVICETYPE[record.deviceType] : '未知')
     }, {
       title: '报修内容',
-      dataIndex: 'content',
+      dataIndex: 'description',
       width: '23%'
     }, {
       title: '报修图片',
@@ -304,7 +305,7 @@ class TaskDetail extends React.Component {
           <li className='thumbnail' key={i} >
             <img src={CONSTANTS.FILEADDR + r} alt='' 
               onClick={() => {this.showTabImg(index, i)}} 
-              onLoad={this.setWH} 
+              onLoad={(e) => this.setWH(e, 30)} 
             />
           </li>
         ))
@@ -318,25 +319,21 @@ class TaskDetail extends React.Component {
       title: '报修时间',
       dataIndex: 'createTime',
       width: '21%',
-      render: (text, record) => (Time.getTimeStr(record.createTime))
+      render: (text, record) => (record.createTime ? Time.getTimeStr(record.createTime) : '未知')
     }, {
       title: '维修状态',
       dataIndex: 'status',
       width: '19%',
       render: (text,record,index) => {
         switch(record.status){
-          case 7:
+          case TASK_FINISHED:
             return <Badge status='success' text='维修完成' />
-          case 3:
-            return <Badge status='warning' text={STATUS[record.status]+`(${record.assignName})`} />
-          case 4:
-            return <Badge status='warning' text={STATUS[record.status]} />
-          case 1:
-          case 2:
-          case 5:
-            return <Badge status='error' text={STATUS[record.status]} />
-          case 6:
-            return <Badge status='error' text={STATUSFORSHOW[record.status]+`(${record.assignName})`} />
+          case TASK_PENDING:
+            return <Badge status='warning' text='待处理' />
+          case TASK_ASSIGNED:
+          case TASK_ACCEPTED:
+          case TASK_REFUSED:
+            return <Badge status='error' text={'处理中'} />
           default:
             return '已取消'
         }
@@ -404,7 +401,7 @@ class TaskDetail extends React.Component {
           <li className='thumbnail' key={i} >
             <img src={CONSTANTS.FILEADDR + r} alt='' 
               onClick={() => {this.showTabImg(index, i)}} 
-              onLoad={this.setWH} 
+              onLoad={(e) => this.setWH(e, 30)} 
             />
           </li>
         ))
@@ -423,12 +420,12 @@ class TaskDetail extends React.Component {
 
     this.userFeedbacksColumns = [{
       title: '反馈类型',
-      dataIndex: 'option',
+      dataIndex: 'opt',
       width: '15%',
-      render: (text,record)=>(CONSTANTS.FEEDBACKTYPES[record.option])
+      render: (text,record)=>(CONSTANTS.FEEDBACKTYPES[record.opt])
     }, {
       title: '反馈内容',
-      dataIndex: 'content',
+      dataIndex: 'description',
       width: '35%'
     }, {
       title: '反馈图片',
@@ -439,7 +436,7 @@ class TaskDetail extends React.Component {
           <li className='thumbnail' key={i} >
             <img src={CONSTANTS.FILEADDR + r} alt='' 
               onClick={() => {this.showTabImg(index, i)}} 
-              onLoad={this.setWH} 
+              onLoad={(e) => this.setWH(e, 30)} 
             />
           </li>
         ))
@@ -488,7 +485,7 @@ class TaskDetail extends React.Component {
     try {
       let {main_phase, 
         panel_page, panel_dataSource, 
-        details, detail_tabIndex, showDetail, selectedRowIndex, detailLoading
+        details, detail_tabIndex, showDetail, selectedRowIndex
       } = nextProps.taskList
       let page = panel_page[main_phase]
 
@@ -498,9 +495,9 @@ class TaskDetail extends React.Component {
       ])) {
         // get selected item.
         let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
-        let type, id = '', detail
+        let id = '', detail
         if (selectedItem) { // if not, it will be fetched in task/list
-          type = selectedItem.type
+          // let type = selectedItem.type
           id = selectedItem.id
           if (details[id]) { // if not , fetch it in task/list
             detail = details[id]
@@ -529,8 +526,9 @@ class TaskDetail extends React.Component {
               } else if (tabIndex === 3) {
                 body.page = 1
                 body.size = SIZE
-                body.userId = userId
-                body.status = [1, 2, 3, 4, 6, 7]
+                body.all = true
+                body.creatorId = userId
+                body.type = CONSTANTS.TASK_TYPE_REPAIR
               } else if (tabIndex === 4) {
                 // body.
                 if (deviceType === 2) {
@@ -548,9 +546,10 @@ class TaskDetail extends React.Component {
               } else if (tabIndex === 6) {
                 body.page = 1
                 body.size = SIZE
+                body.all = true
+                body.type = CONSTANTS.TASK_TYPE_REPAIR
                 body.residenceId = residenceId
                 body.deviceType = deviceType
-                body.status = [1, 2, 3, 4, 6, 7]
               } else if (tabIndex === 7) {
                 // user fund record
                 body.page = 1
@@ -570,6 +569,9 @@ class TaskDetail extends React.Component {
                 body.creatorId = userId
               }
               const cb = (json) => {
+                this.setState({
+                  tabLoading: false
+                })
                 let jsonDataName = DETAILTAB2JSONNAME[tabIndex], data = {}
                 if (tabIndex === 1 || tabIndex === 4) {
                   data = json.data
@@ -593,7 +595,9 @@ class TaskDetail extends React.Component {
               AjaxHandler.ajax(resource, body, cb)
 
               // set state
-              let nextState = {}
+              let nextState = {
+                tabLoading: true
+              }
               if (id && (id !== this.state.id)) {
                 nextState.id = id
               }
@@ -694,20 +698,20 @@ class TaskDetail extends React.Component {
     })
   }
   
-  showDetailModel = (i) => {
+  showDetailImgModel = (i) => {
     this.setState({
       initialSlide: i,
       showDetailImgs: true
     })
   }
-  setWH = (e) => {
+  setWH = (e, value) => {
     let img = e.target
     let w = parseInt(window.getComputedStyle(img).width, 10)
     let h = parseInt(window.getComputedStyle(img).height, 10)
     if (w < h) {
-      img.style.width = '50px'
+      img.style.width = value ? `${value}px` : '50px'
     } else {
-      img.style.height = '50px'
+      img.style.height = value ? `${value}px` : '50px'
     }
   }
   changeTabIndex = (e) => {
@@ -742,8 +746,9 @@ class TaskDetail extends React.Component {
       console.log(e)
     }
   }
-  confirmChooseRepairman = (id) => {
+  confirmChooseRepairman = () => {
     // reassign to repairman success
+    let {id} = this.state
     Noti.hintOk('转发成功', '已成功转发给该维修员')
     this.updateDetail(id)
   }
@@ -777,7 +782,7 @@ class TaskDetail extends React.Component {
       id: id
     }
     const cb = (json) => {
-      let {status, logs, endTime, level} = json.data
+      let {status, logs, endTime, level, handleLimit} = json.data
       let details = JSON.parse(JSON.stringify(this.props.taskList.details))
       if (details[id]) { // should always exist
         let detail = details[id]
@@ -789,12 +794,23 @@ class TaskDetail extends React.Component {
         if (level) {
           detail.level = level
         }
+        if (handleLimit) {
+          detail.handleLimit = handleLimit
+        }
       }
       this.props.changeTask(subModule, {
         details: details
       })
     }
     AjaxHandler.ajax(resource, body, cb)
+    /* no matter ajax success or fail, close detail and fetch list again */
+    // let {showDetail, selectedRowIndex, panel_dataSource} = this.props.taskList
+    let newProps = {
+      showDetail: false,
+      selectedRowIndex: -1, 
+      panel_dataSource: [{}, {}, {}]
+    }
+    this.props.changeTask(subModule, newProps)
   }
   finishTask = () => {
     this.setState({
@@ -870,7 +886,7 @@ class TaskDetail extends React.Component {
       } else if (currentTab === 5) {
         this.props.changeOrder('orderList', 
           {
-            page: 1, schoolId: 'all', deviceType: deviceType.toString(), status: 'all', 
+            page: 1, schoolId: 'all', deviceType: deviceType ? deviceType.toString() : 'all', status: 'all', 
             selectKey: ''
           }
         )
@@ -885,7 +901,7 @@ class TaskDetail extends React.Component {
       } else if (currentTab === 7) {
         this.props.changeFund('fundList', 
           {
-            page: 1, selectKey: userMobile.toString(), type: 'all', status: 'all', schoolId: 'all',
+            page: 1, selectKey: userMobile ? userMobile.toString() : '', type: 'all', status: 'all', schoolId: 'all',
             startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
           }
         )
@@ -958,6 +974,9 @@ class TaskDetail extends React.Component {
       body.creatorId = creatorId
 
       const cb = (json) => {
+        this.setState({
+          tabLoading: false
+        })
         let newDetails = JSON.parse(JSON.stringify(this.props.taskList.details))
         let userComplaints = newDetails[id].userComplaints
         userComplaints.page = page
@@ -967,6 +986,9 @@ class TaskDetail extends React.Component {
           details: newDetails
         })
       }
+      this.setState({
+        tabLoading: true
+      })
       AjaxHandler.ajax(resource, body, cb)
     } catch (e) {
       console.log(e)
@@ -992,6 +1014,9 @@ class TaskDetail extends React.Component {
       body.creatorId = creatorId
 
       const cb = (json) => {
+        this.setState({
+          tabLoading: false
+        })
         let newDetails = JSON.parse(JSON.stringify(this.props.taskList.details))
         let userFeedbacks = newDetails[id].userFeedbacks
         userFeedbacks.page = page
@@ -1001,6 +1026,9 @@ class TaskDetail extends React.Component {
           details: newDetails
         })
       }
+      this.setState({
+        tabLoading: true
+      })
       AjaxHandler.ajax(resource, body, cb)
     } catch (e) {
       console.log(e)
@@ -1037,9 +1065,18 @@ class TaskDetail extends React.Component {
       userFundRecord, userComplaints, userFeedbacks,
       schoolId, schoolName, deviceType, location, repairCause, description, images, 
       userMobile, logs,
-      creatorName, assignName, createTime, status, opt, orderType, orderNo, env, type
+      creatorName, assignName, createTime, status, opt, orderType, orderNo, env, type,
+      exist, handleLimit
     } = detail
-    let {bindingTime, rate, prepay, timeset} = deviceInfo || {}
+
+    // info for device detail
+    let {bindingTime, price, pulse, prepayOption, waterTimeRange} = deviceInfo || {}
+    let timeItem = waterTimeRange && waterTimeRange.items && waterTimeRange.items.map((r, i) => (
+      <span key={i} className='inlineItem'>
+        {Format.adding0(r.startTime.hour)}:{Format.adding0(r.startTime.minute)}~{Format.adding0(r.endTime.hour)}:{Format.adding0(r.endTime.minute)}
+      </span>
+    ))
+
     // current page for 'complaint' or 'feedback' page
     let complaintPage = userComplaints && userComplaints.page
     let feedbackPage = userFeedbacks && userFeedbacks.page
@@ -1051,7 +1088,7 @@ class TaskDetail extends React.Component {
       <img  
         // src='http://img02.sogoucdn.com/app/a/100520020/95cbca3276545c38a65f7827fc56b951' 
         src={CONSTANTS.FILEADDR + r}
-        onClick={() => this.showDetailModel(i)} 
+        onClick={() => this.showDetailImgModel(i)} 
         onLoad={this.setWH} 
         key={i} alt='' 
       />
@@ -1067,7 +1104,7 @@ class TaskDetail extends React.Component {
     )
 
     // for images in detail tab
-    const dataSource = detail[DETAILTAB2NAME[currentTab]] && detail[DETAILTAB2NAME[currentTab]].dataSource || detail[DETAILTAB2NAME[currentTab]]
+    const dataSource = (detail[DETAILTAB2NAME[currentTab]] && detail[DETAILTAB2NAME[currentTab]].dataSource) || detail[DETAILTAB2NAME[currentTab]]
     const tabCarouselItems = (dataSource && dataSource[indexOfImgDataInSource] && dataSource[indexOfImgDataInSource].images && dataSource[indexOfImgDataInSource].images.length > 0) && (dataSource[indexOfImgDataInSource].images.map((r, i) => {
       return <img alt='' key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
     }))
@@ -1080,7 +1117,6 @@ class TaskDetail extends React.Component {
         {tabCarouselItems}
       </Carousel>
     )
-
 
     const processLogs = logs && logs.map((l, i) => {
       let {id, createTime, assignName, processorName, content, type} = l
@@ -1119,7 +1155,6 @@ class TaskDetail extends React.Component {
       <div 
         className={showDetail ? 'taskDetailWrapper slideLeft' : 'taskDetailWrapper hidden'} 
         ref='detailWrapper'
-        // onClick={this.wrapperClicked}
       >
         {detailLoading ? 
           <div className='task-loadWrapper'>
@@ -1237,11 +1272,9 @@ class TaskDetail extends React.Component {
                       bordered 
                       loading={tabLoading}
                       rowKey={(record)=>(record.id)} 
-                      // pagination={{pageSize: SIZE, current: this.props.page, total: total}}  
                       pagination={false}
                       dataSource={committerOrder || []} 
                       columns={this.committerOrderColumns} 
-                      // onChange={this.changePage}
                     />
                   : null
                 }
@@ -1250,21 +1283,25 @@ class TaskDetail extends React.Component {
                       bordered 
                       loading={tabLoading}
                       rowKey={(record)=>(record.id)} 
-                      // pagination={{pageSize: SIZE, current: this.props.page, total: total}}  
                       pagination={false}
                       dataSource={committerRepair || []} 
                       columns={this.committerRepairColumns} 
-                      // onChange={this.changePage}
                     />
                   : null
                 }
                 {currentTab === 4 ?
+                  (exist ? 
                     <ul className='detailList'>
                       <li><label>绑定时间:</label><span>{bindingTime ? Time.getTimeStr(bindingTime) : ''}</span></li>
-                      <li><label>设备费率:</label><span>{rate ? rate : ''}</span></li>
-                      <li><label>设备预付:</label><span>{prepay ? prepay : ''}</span></li>
-                      <li><label>供水时段:</label><span>{timeset ? timeset : ''}</span></li>
+                      <li><label>设备费率:</label><span>{(pulse && price) ? `${mul(price, 100)}分钱/${pulse}脉冲` : ''}</span></li>
+                      <li><label>设备预付:</label><span>{prepayOption ? `¥${prepayOption.prepay}` : ''}</span></li>
+                      <li><label>供水时段:</label><span>{timeItem ? timeItem : ''}</span></li>
                     </ul>
+                    : 
+                    <ul className='detailList'>
+                      <li><label>绑定时间:</label><span>该设备已解绑</span></li>
+                    </ul>
+                  )
                   : null
                 }
                 {currentTab === 5 ?
@@ -1272,11 +1309,9 @@ class TaskDetail extends React.Component {
                       bordered 
                       loading={tabLoading}
                       rowKey={(record)=>(record.id)} 
-                      // pagination={{pageSize: SIZE, current: this.props.page, total: total}}  
                       pagination={false}
                       dataSource={deviceOrder || []} 
                       columns={this.deviceOrderColumns} 
-                      // onChange={this.changePage}
                     />
                   : null
                 }
@@ -1285,11 +1320,9 @@ class TaskDetail extends React.Component {
                       bordered 
                       loading={tabLoading}
                       rowKey={(record)=>(record.id)} 
-                      // pagination={{pageSize: SIZE, current: this.props.page, total: total}}  
                       pagination={false}
                       dataSource={deviceRepair || []} 
                       columns={this.deviceRepairColumns} 
-                      // onChange={this.changePage}
                     />
                   : null
                 }
@@ -1298,11 +1331,9 @@ class TaskDetail extends React.Component {
                       bordered
                       loading={tabLoading}
                       rowKey={(record)=>(record.id)} 
-                      // pagination={{pageSize: SIZE, current: this.props.page, total: total}}  
                       pagination={false}
                       dataSource={userFundRecord || []} 
                       columns={this.userFundColumns} 
-                      // onChange={this.changePage}
                     />
                   : null
                 }
@@ -1311,11 +1342,9 @@ class TaskDetail extends React.Component {
                       bordered 
                       loading={tabLoading}
                       rowKey={(record)=>(record.id)} 
-                      // pagination={{pageSize: SIZE, current: this.props.page, total: total}}  
                       pagination={false}
                       dataSource={(userComplaints && userComplaints.dataSource) || []} 
                       columns={this.userComplaintsColumns} 
-                      // onChange={this.changePage}
                     />
                   : null
                 }
@@ -1324,11 +1353,9 @@ class TaskDetail extends React.Component {
                       bordered 
                       loading={tabLoading}
                       rowKey={(record)=>(record.id)} 
-                      // pagination={{pageSize: SIZE, current: this.props.page, total: total}}  
                       pagination={false}
                       dataSource={(userFeedbacks && userFeedbacks.dataSource) || []} 
                       columns={this.userFeedbacksColumns} 
-                      // onChange={this.changePage}
                     />
                   : null
                 }
@@ -1337,12 +1364,22 @@ class TaskDetail extends React.Component {
           }
 
           <div className='handleBtn'>
-            <div className='btnArea'>
-              <Dropdown overlay={this.reassignMenu}>
-                <Button type='primary'>转接</Button>
-              </Dropdown>
-              <Button type='primary' onClick={this.finishTask}>完结</Button>
-            </div>
+            {/* only show when 'status' is not finished. */}
+            {status !== CONSTANTS.TASK_FINISHED ? 
+                <div className='btnArea'>
+                  {handleLimit !== true ?
+                      <Dropdown overlay={type === CONSTANTS.TASK_TYPE_REPAIR ? this.reassignMenu : this.reassignWithoutRepairman}>
+                        <Button type='primary'>转接</Button>
+                      </Dropdown>
+                    : null
+                  }
+                  {handleLimit !== true ?
+                      <Button type='primary' onClick={this.finishTask}>完结</Button>
+                    : null
+                  }
+                </div>
+              : <span>{/* span used to seize a seat */}</span>
+            }
             {currentTab === 2 || currentTab === 3 || currentTab === 5 || currentTab === 6 || currentTab === 7 ?
                 <div>
                   <span className='hint'>({TAB2HINT[currentTab]})</span>
@@ -1365,14 +1402,12 @@ class TaskDetail extends React.Component {
 
           <div className='processLogs'>
             <h3>处理日志</h3>
-            <ul className='columnsWrapper'>
-              {processLogs}
-              <li>
-                <label className='column'>2017-11-12</label>
-                <span className='column'>客服大帝</span>
-                <span className='column'>转接工单给李元芳</span>
-              </li>
-            </ul>
+            {logs && logs.length > 0 ?
+              <ul className='columnsWrapper'>
+                {processLogs}
+              </ul>
+              : null
+            }
           </div>
         </div>
 
@@ -1381,7 +1416,10 @@ class TaskDetail extends React.Component {
           <ul className='detailList'>
             <li><label>工单编号:</label><span>{id}</span></li>
             <li><label>发起人:</label><span>{creatorName}</span></li>
-            <li><label>受理人:</label><span>{assignName}</span></li>
+            {status !== CONSTANTS.TASK_PENDING ? 
+              <li><label>受理人:</label><span>{assignName}</span></li>
+              : null
+            }
             <li><label>创建时间:</label><span>{createTime ? Time.getTimeStr(createTime) : ''}</span></li>
             {status !== CONSTANTS.TASK_FINISHED ? 
                 <li><label>等待时间:</label><span>{createTime ? Time.getSpan(createTime) : null}</span></li>
@@ -1390,7 +1428,8 @@ class TaskDetail extends React.Component {
             <li><label>当前状态:</label><span className={statusClass}>{status ? CONSTANTS.TASKSTATUS[status] : ''}</span></li>
           </ul>
 
-          {type !== CONSTANTS.TASK_REPAIR ? 
+          {/* if not 'repair' type, not finished, has right to send message, show send message block. */}
+          {type !== CONSTANTS.TASK_TYPE_REPAIR && status !== CONSTANTS.TASK_FINISHED && handleLimit !== true ?
               <div className='taskMessage'>
                 <h3>客服消息</h3>
                 <textarea 
@@ -1453,7 +1492,7 @@ class TaskDetail extends React.Component {
         {showRepairmanModal ? 
             <RepairmanTable 
               showModal={showRepairmanModal} 
-              confirm={() => this.confirmChooseRepairman(id)} 
+              confirm={this.confirmChooseRepairman} 
               cancel={this.cancelChooseRepairman} 
               id={id} 
               level={level}
@@ -1503,5 +1542,6 @@ const mapStateToProps = (state, ownProps) => ({
 export default withRouter(connect(mapStateToProps, {
   changeTask,
   changeOrder,
-  changeDevice
+  changeDevice,
+  changeFund
 })(TaskDetail))

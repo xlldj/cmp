@@ -1,13 +1,11 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
 import AjaxHandler from '../../ajax'
-import { Button, Modal, Table, Carousel, Popconfirm } from 'antd'
+import { Button, Modal, Carousel} from 'antd'
 import Time from '../../component/time'
 import CONSTANTS from '../../component/constants'
 import Noti from '../../noti'
 const typeName = CONSTANTS.DEVICETYPE
-const STATUS = CONSTANTS.REPAIRSTATUSFORSHOW
-const PRIORITY = CONSTANTS.PRIORITY
+const {TASK_PENDING, TASK_FINISHED, TASKSTATUS} = CONSTANTS
 const BACKTITLE = {
   fromTask:'返回客服工单',
   fromDevice:'返回设备详情',
@@ -43,18 +41,16 @@ class RepairInfo extends React.Component {
     this.state = {data, showModal, showImgs, initialSlide, showCensor, failedReason}
   }
   fetchData = (body) => {
-    let resource='/api/repair/one'
+    let resource='/api/work/order/one'
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            this.setState({
-              data: json.data
-            })
-          }       
-        }
+      if(json.error){
+        throw new Error(json.error.displayMessage || json.error)
+      }else{
+        /*--------redirect --------*/
+        if(json.data){
+          this.setState(json.data)
+        }       
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   }
@@ -192,14 +188,17 @@ class RepairInfo extends React.Component {
     this.postFail()
   }
   render () {
-    const {device,content,status,repairman,repairRating} = this.state.data
-    let {failedReason} = this.state.data
+    // const {device,content,status,repairman,repairRating} = this.state.data
+    const {images, schoolName, deviceType, location, exist, 
+      cause, description, userMobile, creatorName, systemJudgment,
+      status, createTime, endTime
+    } = this.state
 
-    const images = content.images.map((r,i) => {
+    const imgs = images && images.map((r,i) => {
       return <img onClick={this.showImgs} value={i}  key={i} src={CONSTANTS.FILEADDR + r} alt='' className='repairImg' />
     })
 
-    const carouselItems = content.images.map((r,i) => {
+    const carouselItems = images && images.map((r,i) => {
       return <img value={i}  key={i} src={CONSTANTS.FILEADDR + r} alt='' className='carouselImg' />
     })
     const carousel = (<Carousel style={{backgroundColor:'red'}}  dots={true} accessibility={true}  className='carouselItem' autoplay={true} arrows={true} initialSlide={this.state.initialSlide}>
@@ -207,52 +206,28 @@ class RepairInfo extends React.Component {
                       </Carousel>)
 
     //handle the time 
-    let applyTS = Time.getTimeStr(status.commitTime)
+    let createTS = Time.getTimeStr(createTime)
+    let stopT = endTime ? endTime : Date.parse(new Date())
+    let timePassed = Time.getSpan(createTime, stopT)
 
-    let stopT = status.status===7 ? new Date(status.finishedTime) : (status.status === 5 ? new Date(status.censorTime) : new Date())
-    let timePassed = Time.getTimeInterval(status.commitTime, stopT.getTime())
+    // let levelClass = repairman && (repairman.level === 3 ? 'red' : (repairman.level === 2 ? 'yellowfc' : ''))
 
-    let levelClass = repairman && (repairman.level === 3 ? 'red' : (repairman.level === 2 ? 'yellowfc' : ''))
+    let waitingClass = (status === TASK_PENDING) ? 'waiting' : (status=== TASK_FINISHED ? 'finished' : 'repairing')
 
-    let waitingClass = (status.status === 1 || status.status === 2 || status.status === 5 || status.status === 6)?'waiting':(status.status===7?'finished':'repairing')
-
-    const repairmanInfo = (status.status===4 || status.status===3 || status.status===6 || status.status===7)&&(
+    /* 
+    const repairmanInfo = (status===4 || status===3 || status===6 || status===7)&&(
       <div className='infoBlock halfWidth rightBlock'>
         <h3>维修员信息</h3>
         <ul>
           <li><p>维修员:</p>{repairman.name}</li>
           <li><p>维修员电话:</p>{repairman.mobile}</li>
           <li><p>任务紧急程度:</p><span className={levelClass}>{PRIORITY[repairman.level]}</span></li>
-          {status.status===6?<li><p>拒绝原因:</p><span className='width200'>{repairman.refuseReason || '暂无'}</span></li>:null}
-          {status.status===7?<li><p>使用配件:</p><span className='width200'>{repairman.components || '暂无'}</span></li>:null}
-          {status.status===7?<li><p>维修结论:</p><span className='width200'>{repairman.conclusion || '暂无'}</span></li>:null}
+          {status===6?<li><p>拒绝原因:</p><span className='width200'>{repairman.refuseReason || '暂无'}</span></li>:null}
+          {status===7?<li><p>使用配件:</p><span className='width200'>{repairman.components || '暂无'}</span></li>:null}
+          {status===7?<li><p>维修结论:</p><span className='width200'>{repairman.conclusion || '暂无'}</span></li>:null}
         </ul>
       </div>)
 
-    let censorBtn = (
-      <div className='btnArea'>
-        <Button onClick={this.censorFail}>审核未通过</Button>
-        <Popconfirm title="确定要通过么?" onConfirm={this.censorSuccess} okText="确认" cancelText="取消">
-          <Button type='primary'>审核通过</Button>
-        </Popconfirm>
-        { this.props.location.state ? <span className='divider'></span> : null }
-        { this.props.location.state ? 
-            <Button onClick={this.back}>{BACKTITLE[this.props.location.state.path]}</Button>
-          : null 
-        }
-      </div>
-    )
-    let assignBtn = (
-      <div className='btnArea'>
-        {status.status===2?<Button type='primary' onClick={this.showAllocate}>指派维修员</Button>:null}
-        {status.status===6?<Button type='primary' onClick={this.showAllocate}>重新指派维修员</Button>:null}
-        { this.props.location.state ? <span className='divider'></span> : null }
-        { this.props.location.state ? 
-            <Button onClick={this.back}>{BACKTITLE[this.props.location.state.path]}</Button>
-          : null 
-        }
-      </div>
-    )
 
     let rateInfo =  repairRating && (
       <div className='infoBlock halfWidth rightBlock'>
@@ -264,48 +239,37 @@ class RepairInfo extends React.Component {
         </ul>
       </div>
     )
+    */
 
     return (
       <div className='infoBlockList repairInfo columnLayout' >
         <div className='infoBlock halfWidth'>
           <h3>设备信息</h3>
           <ul>
-            <li><p>学校名称:</p>{device.schoolName}</li>
-            <li><p>设备类型:</p>{typeName[device.deviceType]}</li>
-            <li><p>设备位置:</p><span>{device.location}</span><span>{ (device && (device.exist === 2)) ? ' (设备已解绑)' : '' }</span></li>
-            { (device && (device.exist === 1)) ?
-              <li><p>查看设备详情:</p>
-                <Link 
-                  to={{
-                    pathname: `/device/list/deviceInfo/:${device.id}`, 
-                    state: {id: device.id, deviceType: device.deviceType, residenceId: device.residenceId, path: 'fromRepair'}
-                  }}
-                >设备详情</Link>
-              </li>
-              : null
-            }
+            <li><p>学校名称:</p>{schoolName}</li>
+            <li><p>设备类型:</p>{deviceType ? typeName[deviceType] : '无'}</li>
+            <li><p>设备位置:</p><span>{location}</span><span>{exist ? '' : ' (设备已解绑)'}</span></li>
           </ul>
         </div>
 
         <div className='infoBlock halfWidth'>
           <h3>报修内容</h3>
           <ul>
-            <li className='itemsWrapper'><p>设备问题:</p><div>{content.cause || '暂无'}</div></li>
-            <li className='itemsWrapper'><p>报修内容:</p><div>{content.content || '暂无'}</div></li>
-            { images.length > 0 ?
+            <li className='itemsWrapper'><p>设备问题:</p><div>{cause || '暂无'}</div></li>
+            <li className='itemsWrapper'><p>报修内容:</p><div>{description || '暂无'}</div></li>
+            {images && images.length > 0 ?
               <li className='imgWrapper'><p>报修图片:</p>
-                {images}
+                {imgs}
               </li>
               : null
             }
-            <li><p>报修人电话:</p>{content.committerMobile || '暂无'}</li>
+            <li><p>报修人电话:</p>{userMobile || '暂无'}</li>
             <li>
               <p>报修用户:</p>
-              <span className='padR20'>{content.committerName}</span>
-              <Link to={{pathname: `/device/repair/userRepairLog/:${content.committerId}`, state: {username: content.committerName}}}>用户报修记录</Link>
+              <span className='padR20'>{creatorName}</span>
             </li>
             <li>
-              <p>系统判定:</p>{content.systemJudgment|| '暂无'}
+              <p>系统判定:</p>{systemJudgment|| '暂无'}
             </li>
           </ul>
         </div>
@@ -313,218 +277,29 @@ class RepairInfo extends React.Component {
         <div className='infoBlock halfWidth rightBlock'>
           <h3>报修状态</h3>
           <ul>
-            <li><p>报修状态:</p><span className={waitingClass}>{STATUS[status.status]}</span></li>
-            <li><p>用户申请时间:</p>{applyTS}</li>
-            <li><p>用户{status.status===7 || status.status=== 5 ? '' : '已'}等待时间:</p>{timePassed}</li>
-            {status.status > 1 ? <li><p>审核时长:</p>{Time.getTimeInterval(status.commitTime, status.censorTime) ||'信息不全'}</li>:null}
-            {status.status !== 5 && status.status > 2 ? <li><p>指派时长:</p>{Time.getTimeInterval(status.censorTime, status.assignTime) ||'信息不全'}</li>:null}
-            {status.status===4?<li><p>维修时长:</p>{Time.getSpan(status.acceptTime) ||'信息不全'}</li>:null}
-            {status.status===7?<li><p>维修用时:</p>{Time.getTimeInterval(status.acceptTime, status.finishedTime)||'信息不全'}</li>:null}
-            {status.status===7?<li><p>维修完成时间:</p>{Time.getTimeStr(status.finishedTime)||'信息不全'}</li>:null}
-            {status.status === 5 ? <li><p>未通过原因:</p>{status.remark || '暂无'}</li> : null}
+            <li><p>报修状态:</p><span className={waitingClass}>{TASKSTATUS[status]}</span></li>
+            <li><p>用户申请时间:</p>{createTS}</li>
+            {status === TASK_FINISHED ? 
+              <li><p>维修完成时间:</p><span>{endTime ? Time.getTimeStr(endTime) : '无'}</span></li>
+              : null
+            }
+            {status === TASK_FINISHED ? 
+              <li><p>维修用时:</p>{endTime ? Time.getTimeInterval(createTime, endTime) : '无'}</li>
+              :
+              <li><p>用户已等待时间:</p>{timePassed}</li>
+            }
           </ul>
         </div>
 
-        {status.status === 1 ?censorBtn:null}
-
-
-        {repairmanInfo}
-
-        {status.status === 2 || status.status === 6 ? assignBtn : null}
-
-        {status.status === 7 ? rateInfo : null}
-
-        { status.status === 3 || status.status === 4 || status.status === 5 || status.status === 7 || status.status === 8 ? 
-          <div className='btnArea'>
-            <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
-          </div> 
-          : null 
-        }
-
-        <RepairmanTable showModal={this.state.showModal} confirm={this.confirmPost} cancel={this.cancel} id={parseInt(this.props.match.params.id.slice(1), 10)} schoolId={device.schoolId} schoolName={device.schoolName} />
+        <div className='btnArea'>
+          <Button onClick={this.back}>{this.props.location.state?BACKTITLE[this.props.location.state.path]:'返回'}</Button>
+        </div> 
 
         <Modal  visible={this.state.showImgs}  title='' closable={false} onCancel={this.closeImgs} width={800} className='carouselModal' okText='' footer={null} >
           <div className='carouselContainer' >{this.state.showImgs?carousel:null}</div>
         </Modal>
-
-        <Modal wrapClassName='censorModal' title='未通过原因' maskClosable={true} visible={this.state.showCensor} onCancel={this.cancelCensor} onOk={this.confirmCensor} okText='确认'>
-          <textarea className='censorInput' value={failedReason} placeholder='此原因用于展示给用户' onChange={this.changeFailReason} />
-        </Modal>
         
       </div>
-    )
-  }
-}
-
-
-class RepairmanTable extends React.Component{
-  constructor(props){
-    super(props)
-    let dataSource = []
-    this.state = {
-      dataSource,
-      selectedRowKeys: '',
-      priority: '1',
-      remark: '',
-      schoolId: 0,
-      posting: false
-    }
-  }
-  fetchData = (body) => {
-    let resource='/api/employee/repairman/list'
-    const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            this.setState({
-              dataSource: json.data.repairmans
-            })
-          }     
-        }
-    }
-    AjaxHandler.ajax(resource,body,cb)
-  }
-  componentWillReceiveProps (nextProps) {
-    let schoolId = nextProps.schoolId
-    if (schoolId && schoolId !== this.state.schoolId) {
-      this.setState({
-        schoolId: schoolId
-      })
-      const body = {
-        schoolId: schoolId,
-        page: 1,
-        size: 10000
-      }
-      this.fetchData(body)
-    }
-  }
-  changeSelect = (selectedRowKeys, selectedRows) => {
-    this.setState({
-      selectedRowKeys: [selectedRows[0].userId]
-    })
-  }
-  changePriority = (e) => {
-    let node = e.target, v = ''
-    let priority = this.state.priority
-    try {
-      while (node.tagName.toLowerCase() !== 'button') {
-        node = node.parentNode
-      }
-      v = node.getAttribute('data-value')
-    } catch (e) {
-      console.log(e)
-    }
-    if (priority === v) {
-      return
-    }
-    this.setState({
-      priority: v
-    })
-  }
-  cancel = () => {
-    this.props.cancel()
-  }
-  postData = (body) => {
-    let resource='/api/repair/assign'
-    const cb = (json) => {
-      this.setState({
-        posting: false
-      })
-      if(json.error){
-        Noti.hintServiceError(json.error.displayMessage)
-      }else{
-        /*--------redirect --------*/
-        if(json.data){
-          this.props.confirm()
-        }       
-      }
-    }
-    AjaxHandler.ajax(resource,body,cb)
-  }
-  confirm = () => {
-    if (this.state.posting) {
-      return
-    }
-    this.setState({
-      posting: true
-    })
-    const body = {
-      id: this.props.id,
-      level: parseInt(this.state.priority, 10),
-      repairmanId: this.state.selectedRowKeys[0],
-      remark: this.state.remark
-    }
-    this.postData(body)
-  }
-  changeRemark = (e) => {
-    this.setState({
-      remark: e.target.value
-    })
-  }
-  checkRemark = (e) => {
-    let v = e.target.value.trim()
-    this.setState({
-      remark: v
-    })
-  }
-  selectRow = (record, index, event) => {
-    let selectedRows = [record]
-    this.changeSelect(null, selectedRows)
-  }
-  render(){
-    const {dataSource, priority, selectedRowKeys} = this.state
-    const columns = [{
-      title: '维修员',
-      dataIndex: 'username',
-      width: '15%'
-    }, {
-      title: '待接受的任务',
-      dataIndex: 'waiting',
-      width: '15%',
-    }, {
-      title: '已接受的任务',
-      dataIndex: 'accepted',
-      width: '15%'
-    }, {
-      title: '近7日完成任务',
-      dataIndex: 'weeklyDone',
-      width: '20%'
-    }, {
-      title: '平均完成时间',
-      dataIndex: 'avgCost',
-      width: '20%',
-      render: (text,record,index) => {
-        return Time.formatSpan(record.avgCost)
-      }
-    }, {
-      title: '用户评分',
-      dataIndex: 'avgRating',
-      width: '15%'
-    }]
-    const title = (
-      <span className='modalTitle' >指派维修员</span>
-    )
-
-    return (
-      <Modal wrapClassName='modal' width={800} title={title} visible={this.props.showModal} onCancel={this.cancel} onOk={this.confirm} okText='确认指派'>
-        <div className='schName'>当前报修设备学校:{this.props.schoolName}</div>
-        <div className='setRepairman'>
-          <Table rowKey={record=>record.userId}  onRowClick={this.selectRow} rowSelection={{type:'radio', onChange:this.changeSelect, selectedRowKeys: selectedRowKeys}} pagination={{defaultPageSize:8}} dataSource={dataSource} columns={columns} />
-          <div className='options'>
-            <div className='priorityGroup'>
-              <span>任务紧急程度:</span>
-              <Button type={priority==='1'?'primary':''} onClick={this.changePriority} data-value='1' >正常处理</Button>
-              <Button type={priority==='2'?'primary':''}  onClick={this.changePriority} data-value='2' >优先处理</Button>
-              <Button type={priority==='3'?'primary':''}  onClick={this.changePriority} data-value='3' >紧急处理</Button>
-            </div>
-            <div className='customNote'>
-              <textarea placeholder='备注信息(选填)' className='noteInput' value={this.state.remark} onChange={this.changeRemark} onBlur={this.checkRemark} />
-            </div>
-          </div>
-        </div>
-      </Modal>
     )
   }
 }

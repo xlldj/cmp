@@ -3,8 +3,8 @@ import {Button, Radio, Modal} from 'antd'
 import SchoolSelector from '../component/schoolSelectorWithoutAll'
 import BasicSelector from '../component/basicSelectorWithoutAll'
 import CONSTANTS from '../component/constants'
-import { obj2arr } from '../util/types'
 import AjaxHandler from '../ajax'
+import { locale } from 'moment';
 
 const RadioGroup = Radio.Group
 
@@ -13,16 +13,21 @@ class BuildTask extends React.Component {
     super()
     this.state = {
       schoolId: '',
-      type: 1,
+      type: CONSTANTS.TASK_TYPE_REPAIR,
       location: '',
       desc: '',
       descError: false,
       userMobile: '',
-      urgency: '',
-      maintainerType: 1,
+      urgency: CONSTANTS.PRIORITY_NORMAL,
+      maintainerType: CONSTANTS.EMPLOYEE_REPAIRMAN,
       maintainerId: '',
-      maintainers: {}
+      maintainers: {},
+      posting: false
     }
+    this.employeeTypes = {}
+    this.employeeTypes[CONSTANTS.EMPLOYEE_REPAIRMAN] = '维修员'
+    this.taskTypes = {}
+    this.taskTypes[CONSTANTS.TASK_TYPE_REPAIR] = '报修工单'
   }
   fetchData = (body) => {
     let resource='/api/employee/repairman/list'
@@ -135,6 +140,7 @@ class BuildTask extends React.Component {
     }
   }
   changeUrgency = (e) => {
+    console.log(e.target.value)
     this.setState({
       urgency: e.target.value
     })
@@ -166,6 +172,70 @@ class BuildTask extends React.Component {
     })
     // tell parent to close
     this.props.cancel()
+  }
+  confirm = () => {
+    let {schoolId, location, desc, userMobile, urgency, maintainerId, posting} = this.state
+    if (!schoolId) {
+      return this.setState({
+        schoolError: true
+      })
+    }
+    if (!location) {
+      return this.setState({
+        locationError: true
+      })
+    }
+    if (!desc) {
+      return this.setState({
+        descError: true
+      })
+    }
+    if (!/^1[3|4|5|7|8][0-9]{9}$/.test(userMobile)) {
+      return this.setState({
+        mobileFormatError: true
+      })
+    }
+    if (!urgency) {
+      return this.setState({
+        urgencyError: true
+      })
+    }
+    if (!maintainerId) {
+      return this.setState({
+        maintainerIdError: true
+      })
+    }
+    if (posting) {
+      return
+    }
+    this.postData()
+  }
+  postData = () => {
+    let {schoolId, location, desc, userMobile, urgency, maintainerType, maintainerId} = this.state
+    let resource = '/work/order/add'
+    const body = {
+      assignId: maintainerId,
+      department: parseInt(maintainerType, 10),
+      description: desc,
+      level: urgency,
+      location: location,
+      schoolId: schoolId,
+      type: maintainerType,
+      userMobile: userMobile,
+      env: CONSTANTS.TASK_BUILD_CMP
+    }
+    const cb = (json) => {
+      this.setState({
+        posting: false
+      })
+      if (json.data) {
+        this.props.success()
+      }
+    }
+    this.setState({
+      posting: true
+    })
+    AjaxHandler.ajax(resource, body, cb)
   }
   render () {
     const {schoolError, schoolId, type, location, locationError, desc, descError,
@@ -201,7 +271,7 @@ class BuildTask extends React.Component {
               <p>工单类型:</p>
               <BasicSelector
                 width={CONSTANTS.SELECTWIDTH}
-                staticOpts={{1: '报修工单'}}
+                staticOpts={this.taskTypes}
                 selectedOpt={type}
                 changeOpt={this.changeType}
               />
@@ -221,6 +291,7 @@ class BuildTask extends React.Component {
                 value={desc}
                 onChange={this.changeDesc}
                 onBlur={this.checkDesc}
+                placeholder='200字以内'
               />
               {descError && (<span className='checkInvalid'>描述不能为空</span>)}
             </li>
@@ -236,16 +307,16 @@ class BuildTask extends React.Component {
             <li>
               <p>紧急程度:</p>
               <RadioGroup value={urgency} onChange={this.changeUrgency} >
-                <Radio value={1}>普通</Radio>
-                <Radio value={2}>优先</Radio>
-                <Radio value={3}>紧急</Radio>
+                <Radio value={CONSTANTS.PRIORITY_NORMAL}>普通</Radio>
+                <Radio value={CONSTANTS.PRIORITY_PRIOR}>优先</Radio>
+                <Radio value={CONSTANTS.PRIORITY_URGENT}>紧急</Radio>
               </RadioGroup>
               {urgencyError && (<span className='checkInvalid'>紧急程度不能为空！</span>)}
             </li>
             <li>
               <p>受理人:</p>
               <BasicSelector
-                staticOpts={{1: '维修员'}}
+                staticOpts={this.employeeTypes}
                 selectedOpt={maintainerType}
                 changeOpt={this.changeMaintainerType}
               />

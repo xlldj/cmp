@@ -182,6 +182,9 @@
 .taskPanelWrapper .tableList {
   padding: 0px 20px;
 }
+.taskPanelWrapper .tableList td {
+  cursor: pointer;
+}
 .hidden {
   display: none;
 }
@@ -240,7 +243,7 @@
 }
 .taskDetailWrapper .taskDetail-content .processLogs ul {
   margin-top: 15px;
-  border: 1px solid #999;
+  border: 1px solid #ddd;
 }
 .taskDetailWrapper .taskDetail-content .detailList {
   margin: 10px 0;

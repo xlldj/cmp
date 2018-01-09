@@ -12,8 +12,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../../actions'
 
-const typeName = CONSTANTS.DEVICETYPE
-const REPAIRSTATUS = CONSTANTS.REPAIRSTATUS
+const {DEVICETYPE, TASKSTATUS} = CONSTANTS
 const BACKTITLE = {
   fromRepair: '返回报修详情'
 }
@@ -41,48 +40,56 @@ class DeviceInfo extends React.Component {
   }
   componentDidMount(){
     this.props.hide(false)
-    let {deviceType, id, residenceId, path} = this.props.location.state
-    this.setState({
-      deviceType: deviceType,
-      id: id,
-      residenceId: residenceId
-    })
-    let resource, body
-    if (path && path === 'fromRepair') {
-      resource = '/device/group/one'
-      body = {
-        id: id
+    try {
+      let {deviceType, id, residenceId, path} = this.props.location.state
+      this.setState({
+        deviceType: deviceType,
+        id: id,
+        residenceId: residenceId
+      })
+      let resource, body
+      if (path && path === 'fromRepair') {
+        resource = '/device/group/one'
+        body = {
+          id: id
+        }
+      } else if (deviceType === 2) {
+        resource = '/device/water/one'
+        body = {
+          id: residenceId
+        }
+      } else {
+        resource = '/device/query/one'
+        body = {
+          id: id
+        }
       }
-    } else if (deviceType === 2) {
-      resource = '/device/water/one'
-      body = {
-        id: residenceId
+      const cb=(json)=>{
+        if(json.error){
+          Noti.hintServiceError(json.error.displayMessage)
+        }else{
+          this.setState({
+            data: json.data
+          })
+        }
       }
-    } else {
-      resource = '/device/query/one'
-      body = {
-        id: id
-      }
-    }
-    const cb=(json)=>{
-      if(json.error){
-        Noti.hintServiceError(json.error.displayMessage)
-      }else{
-        this.setState({
-          data: json.data
-        })
-      }
-    }
-    AjaxHandler.ajax(resource,body,cb)
+      AjaxHandler.ajax(resource,body,cb)
 
-    /* fetch repair logs */
+      /* fetch repair logs */
+      /*const data = {
+        page: 1,
+        size: 100,
+        all: true,
+        type: TASK_TYPE_REPAIR,
 
-    const data = {
-      residenceId: residenceId,
-      deviceType: 2,
-      status: [1, 2, 3, 4, 6, 7]
+        residenceId: residenceId,
+        deviceType: 2,
+        status: [1, 2, 3, 4, 6, 7]
+      }
+      this.fetchRepairs(data)*/
+    } catch (e) {
+      console.log(e)
     }
-    this.fetchRepairs(data)
   }
   componentWillUnmount () {
     this.props.hide(true)
@@ -115,7 +122,7 @@ class DeviceInfo extends React.Component {
           <ul key={`ul${index}`}>
             <li key={index}>
               <p key={`status${index}`}>维修状态:</p>
-              <span key={`repairStatus${index}`} className='padR20'>{REPAIRSTATUS[record.status]}</span>
+              <span key={`repairStatus${index}`} className='padR20'>{TASKSTATUS[record.status]}</span>
               <Link key={`link${index}`} to={{pathname:`/device/repair/repairInfo/:${record.id}`,state: {path: 'fromDevice'}}} >查看详情</Link>
             </li>
             {
@@ -163,7 +170,7 @@ class DeviceInfo extends React.Component {
           <h3>设备信息</h3>
           <ul>
             <li><p>学校名称:</p>{data.schoolName}</li>
-            <li><p>设备类型:</p>{deviceType === 2 ? typeName[deviceType] : typeName[data.type]}</li>
+            <li><p>设备类型:</p>{deviceType === 2 ? DEVICETYPE[deviceType] : DEVICETYPE[data.type]}</li>
             <li><p>设备ID:</p>{deviceType === 2 ? waterMac : data.macAddress}</li>
             <li><p>设备位置:</p>{data.location||'暂无'}</li>
             <li className='itemsWrapper'>

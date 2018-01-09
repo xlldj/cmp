@@ -198,6 +198,7 @@ button.grayBackColor:linked {
   color: #fff;
 }
 .checkInvalid {
+  line-height: 22px;
   margin-left: 5px;
   text-align: center;
   color: red !important;
@@ -225,6 +226,10 @@ button.grayBackColor:linked {
 .priorityGroup *,
 .customNote * {
   margin-right: 10px;
+}
+.priorityGroup button span,
+.customNote button span {
+  margin-right: 0;
 }
 .customNote {
   text-align: right;
@@ -275,6 +280,10 @@ button.grayBackColor:linked {
 }
 .rightAlign {
   text-align: right;
+}
+.inlineWidth100 {
+  display: inline-block;
+  width: 100%;
 }
 /* for choose gift popup. both used in deposit-activity and other */
 .giftStatus {
@@ -513,6 +522,9 @@ button.grayBackColor:linked {
   display: block;
   line-height: 22px;
 }
+.infoBlock > ul .itemsWrapper textarea {
+  line-height: 22px;
+}
 .info > h3 {
   width: 140px;
   text-align: right;
@@ -599,6 +611,10 @@ button.grayBackColor:linked {
   width: 40%;
   display: block;
   line-height: 22px;
+}
+.info > ul .itemsWrapper textarea {
+  line-height: 22px;
+  min-height: 110px;
 }
 .info .btnArea {
   display: inline-flex;
@@ -722,6 +738,10 @@ button.grayBackColor:linked {
   width: 40%;
   display: block;
   line-height: 22px;
+}
+.infoList > ul .itemsWrapper textarea {
+  line-height: 22px;
+  min-height: 110px;
 }
 .infoList .btnArea {
   display: inline-flex;
@@ -933,6 +953,10 @@ button.grayBackColor:linked {
   color: #222;
   border-bottom: 2px solid #148dea;
 }
+.navLink a:hover {
+  color: #222;
+  border-bottom: 2px solid #148dea;
+}
 .navLink a:first-child {
   margin-right: 20px;
 }
@@ -1063,6 +1087,7 @@ button.grayBackColor:linked {
   margin-left: 8px;
   padding: 2px 5px;
   border-radius: 4px;
+  transition: all 0.2s ease;
 }
 .checkSelect li.active {
   color: white;

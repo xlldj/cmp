@@ -17,13 +17,14 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../../actions'
 const subModule = 'repair'
+const {TASK_TYPE_REPAIR, REPAIRSTATUS2TRUESTATUS, TASK_PENDING, TASK_ACCEPTED, TASK_ASSIGNED, TASK_FINISHED, TASK_REFUSED} = CONSTANTS
 
 const SIZE = CONSTANTS.PAGINATION
 
 const typeName = CONSTANTS.DEVICETYPE
 
 const STATUS = CONSTANTS.REPAIRSTATUS
-const STATUSFORSHOW = CONSTANTS.REPAIRSTATUSFORSHOW
+// const STATUSFORSHOW = CONSTANTS.REPAIRSTATUSFORSHOW
 const BACKTITLE={
   fromUser:'返回用户详情',
   fromDevice:'返回设备详情',
@@ -75,18 +76,14 @@ class RepairList extends React.Component {
       width: '12%',
       render: (text,record,index) => {
         switch(record.status){
-          case '7':
+          case TASK_FINISHED:
             return <Badge status='success' text='维修完成' />
-          case '3':
-            return <Badge status='warning' text={STATUS[record.status]+`(${record.assignName})`} />
-          case '4':
-            return <Badge status='warning' text={STATUS[record.status]} />
-          case '1':
-          case '2':
-          case '5':
-            return <Badge status='error' text={STATUS[record.status]} />
-          case '6':
-            return <Badge status='error' text={STATUSFORSHOW[record.status]+`(${record.assignName})`} />
+          case TASK_PENDING:
+            return <Badge status='warning' text='待处理' />
+          case TASK_ASSIGNED:
+          case TASK_ACCEPTED:
+          case TASK_REFUSED:
+            return <Badge status='error' text={'处理中'} />
           default:
             return '已取消'
         }
@@ -131,7 +128,7 @@ class RepairList extends React.Component {
       loading: true
     })
     /*------------change the resource api here-------------*/
-    let resource='/api/repair/list'
+    let resource='/api/work/order/list'
     const cb = (json) => {
       let nextState = {loading: false}
       if(json.error){
@@ -139,10 +136,7 @@ class RepairList extends React.Component {
       }else{
         /*--------redirect --------*/
         if(json.data){
-          json.data.repairDevices&&json.data.repairDevices.forEach((r,i)=>{
-            r.status = r.status.toString()
-          })
-          nextState.dataSource = json.data.repairDevices
+          nextState.dataSource = json.data.workOrders
           nextState.total = json.data.total
           if (body.page === 1) {
             nextState.page = 1
@@ -166,17 +160,19 @@ class RepairList extends React.Component {
     let {page, schoolId, deviceType, status} = this.props
     const body = {
       page: page,
-      size: SIZE
+      size: SIZE,
+      all: true,
+      type: TASK_TYPE_REPAIR
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
     if(deviceType !== 'all'){
-      body.type = deviceType
+      body.deviceType = deviceType
     }
     if(status !== 'all'){
       let statusArray = []
-      statusArray.push(parseInt(status, 10))
+      statusArray.concat(REPAIRSTATUS2TRUESTATUS[parseInt(status, 10)])
       body.status = statusArray
     }
 
@@ -185,7 +181,7 @@ class RepairList extends React.Component {
       // this.props.changeOrder('order', {schoolId: 'all'})
       if (state.path === 'fromTask') {
         if (state.userId) {
-          body.userId = state.userId
+          body.creatorId = state.userId
         } else if (state.deviceType) {
           body.residenceId = state.residenceId 
           body.deviceType = state.deviceType
@@ -215,7 +211,7 @@ class RepairList extends React.Component {
     }
     if(status !== 'all'){
       let statusArray = []
-      statusArray.push(parseInt(status, 10))
+      statusArray.concat(REPAIRSTATUS2TRUESTATUS[parseInt(status, 10)])
       body.status = statusArray
     }
     let {state}=this.props.history.location
@@ -223,7 +219,7 @@ class RepairList extends React.Component {
       // this.props.changeOrder('order', {schoolId: 'all'})
       if (state.path === 'fromTask') {
         if (state.userId) {
-          body.userId = state.userId
+          body.creatorId = state.userId
         } else if (state.deviceType) {
           body.residenceId = state.residenceId 
           body.deviceType = state.deviceType

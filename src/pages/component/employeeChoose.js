@@ -144,7 +144,7 @@ class EmployeeChoose extends React.Component{
     const {dataSource, priority, selectedRowKeys} = this.state
     const {department} = this.props
     const columns = [{
-      title: <span className='rightAlign'>名称</span>,
+      title: <span className='inlineWidth100 rightAlign'>名称</span>,
       dataIndex: 'name',
       className: 'rightAlign',
       width: '80%'
@@ -156,7 +156,7 @@ class EmployeeChoose extends React.Component{
     return (
       <Modal 
         wrapClassName='modal' 
-        width={800} 
+        width={640} 
         title={title} 
         visible={this.props.showModal} 
         onCancel={this.cancel} 
