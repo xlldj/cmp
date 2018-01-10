@@ -391,7 +391,7 @@ class TaskDetail extends React.Component {
       render: (text, record) => (CONSTANTS.COMPLAINTTYPES[record.orderType])
     }, {
       title: '投诉内容',
-      dataIndex: 'content',
+      dataIndex: 'description',
       width: '35%'
     }, {
       title: '报修图片',

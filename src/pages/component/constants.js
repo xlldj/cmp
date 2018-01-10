@@ -85,7 +85,7 @@ const CONSTANTS = {
 
   TASK_DETAIL_LIST_LENGTH: 5,
   CREATEWORKTYPE: {1: '工作记录', 2: '指派任务'},
-  COMPLAINTTYPES: {1: '热水器', 2: '饮水机', 3: '充值', 4: '提现'},
+  COMPLAINTTYPES: {1: '热水器', 2: '饮水机', 3: '充值', 4: '提现', 5: '吹风机'},
   FEEDBACKTYPES: {1: '功能异常', 2: '产品建议', 3: '其它'},
   TASKSTATUS: {1: '待处理', 2: '处理中', 3 : '处理中', 4: '处理中', 5: '已完结'}, // real status: {2: '已指派', 3: '已接受', 4: '已拒绝'}
   TASK_PENDING: 1, // task whose 'status' is 'pending'
