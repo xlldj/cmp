@@ -276,7 +276,7 @@ const initialTaskState = {
     main_mine: '2', // 1: '我的工单', 2: '全部'
     selectedRowIndex: -1, // the row whose detail is being watching
 
-    panel_rangeIndex: [3, 3, 1], // '时间', time select of each panel
+    panel_rangeIndex: [3, 3, 3], // '时间', time select of each panel
     panel_startTime: ['', '', ''], // startTime of each panel
     panel_endTime: ['', '', ''], // endTime of each panel
     panel_type: [1, 1, 1], // 类型

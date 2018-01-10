@@ -94,6 +94,7 @@ class TaskList extends React.Component {
       searchingText: '',
       showBuild: false
     }
+    this.needUpdate = false
   }
 
   // fetch task/list 
@@ -273,7 +274,11 @@ class TaskList extends React.Component {
       if (!checkObject(this.props.taskList, nextProps.taskList, [
         'main_phase', 'main_schoolId', 'main_mine', 
         'panel_rangeIndex', 'panel_startTime', 'panel_endTime', 'panel_type',
-        'panel_selectKey', 'panel_page', 'showDetail'])) {
+        'panel_selectKey', 'panel_page', 'showDetail']) || !panel_dataSource[main_phase][page]) {
+          console.log('fetch')
+          if (this.needUpdate) {
+            this.needUpdate = false
+          }
           if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) {
             // dataSource has the data
             if (this.state.loading) {
@@ -531,6 +536,20 @@ class TaskList extends React.Component {
     this.setState({
       showBuild: false
     })
+    this.updateList()
+  }
+  updateList = () => {
+    let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList.panel_dataSource))
+    let panel_page = Array.from(this.props.taskList.panel_page)
+    panel_dataSource[1] = {} // clear handling list
+    panel_page[1] = 1
+    let newProps = {
+      panel_dataSource: panel_dataSource,
+      main_phase: 1,
+      panel_page: panel_page
+    }
+    this.needUpdate = true // tell 'propsWillReceiveProps' to update dataSource
+    this.props.changeTask(subModule, newProps)
   }
   render () {
     let {main_phase, main_schoolId, main_mine, 

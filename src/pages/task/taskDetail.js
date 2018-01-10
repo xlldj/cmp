@@ -18,6 +18,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, changeOrder, changeDevice ,changeFund} from '../../actions'
+const {TASK_BUILD_CMP} = CONSTANTS
 const subModule = 'taskList'
 
 const DETAILTAB2NAME = {
@@ -749,18 +750,25 @@ class TaskDetail extends React.Component {
   confirmChooseRepairman = () => {
     // reassign to repairman success
     let {id} = this.state
+    this.setState({
+      showRepairmanModal: false
+    })
     Noti.hintOk('转发成功', '已成功转发给该维修员')
-    this.updateDetail(id)
+    this.updateList(id)
   }
   cancelChooseRepairman = () => {
     this.setState({
       showRepairmanModal: false
     })
   }
-  confirmChooseCustomer = (id) => {
+  confirmChooseCustomer = () => {
     // reassign to repairman success
+    let {id} = this.state
+    this.setState({
+      showCustomerModal: false
+    })
     Noti.hintOk('转发成功', '已成功转发给该客服')
-    this.updateDetail(id)
+    this.updateList(id)
   }
   cancelChooseCustomer = () => {
     this.setState({
@@ -769,12 +777,51 @@ class TaskDetail extends React.Component {
   }
   reassign2DeveloperSuccess = () => {
     Noti.hintOk('操作成功', '当前工单已被转接')
-    this.updateDetail(this.state.id)
+    this.setState({
+      showRepairmanModal: false
+    })
+    this.updateList(this.state.id)
   }
   cancelChooseDeveloper = () => {
     this.setState({
       showDeveloperModal: false
     })
+  }
+  updateList = (id) => {
+    let resource = '/work/order/one'
+    const body = {
+      id: id
+    }
+    const cb = (json) => {
+      let {status, logs, endTime, level, handleLimit} = json.data
+      let details = JSON.parse(JSON.stringify(this.props.taskList.details))
+      if (details[id]) { // should always exist
+        let detail = details[id]
+        detail.status = status
+        detail.logs = logs
+        if (endTime) {
+          detail.endTime = endTime
+        }
+        if (level) {
+          detail.level = level
+        }
+        if (handleLimit) {
+          detail.handleLimit = handleLimit
+        }
+      }
+      this.props.changeTask(subModule, {
+        details: details
+      })
+    }
+    AjaxHandler.ajax(resource, body, cb)
+    /* no matter ajax success or fail, close detail and fetch list again */
+    // let {showDetail, selectedRowIndex, panel_dataSource} = this.props.taskList
+    let newProps = {
+      showDetail: false,
+      selectedRowIndex: -1,
+      panel_dataSource: [{}, {}, {}]
+    }
+    this.props.changeTask(subModule, newProps)
   }
   updateDetail = (id) => {
     let resource = '/work/order/one'
@@ -807,7 +854,7 @@ class TaskDetail extends React.Component {
     // let {showDetail, selectedRowIndex, panel_dataSource} = this.props.taskList
     let newProps = {
       showDetail: false,
-      selectedRowIndex: -1, 
+      selectedRowIndex: -1,
       panel_dataSource: [{}, {}, {}]
     }
     this.props.changeTask(subModule, newProps)
@@ -827,7 +874,8 @@ class TaskDetail extends React.Component {
     let resource = '/work/order/handle'
     const body = {
       id: id,
-      type: CONSTANTS.TASK_HANDLE_FINISH // finish 
+      type: CONSTANTS.TASK_HANDLE_FINISH, // finish
+      env: TASK_BUILD_CMP
     }
     let content = note.trim()
     if (content) {
@@ -842,7 +890,7 @@ class TaskDetail extends React.Component {
         })
         Noti.hintOk('操作成功', '当前工单已完结')
         // refetch details
-        this.updateDetail(id)
+        this.updateList(id)
       } else {
         Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试')
       }
@@ -948,6 +996,7 @@ class TaskDetail extends React.Component {
       if (json.data) {
         Noti.hintOk('操作成功', '已成功发送消息')
       }
+      // this.updateDetail(id)
       this.updateDetail(id)
     }
     this.setState({
@@ -1052,7 +1101,7 @@ class TaskDetail extends React.Component {
     /* get info from 'details', 'details' is an object whose key is 'id' */
     // get type and id
     let page = panel_page[main_phase]
-    let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
+    let selectedItem = panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
     let id = '', detail = {}
     if (selectedItem) {
       id = selectedItem.id
@@ -1174,10 +1223,7 @@ class TaskDetail extends React.Component {
           <h3>{type ? TASKTYPE[type] : ''} {schoolName ? schoolName : ''}</h3>
           {type === 1 ?
               <ul className='detailList'>
-                {env === 1 ?
-                    <li><label>设备类型:</label><span>{CONSTANTS.DEVICETYPE[deviceType]}</span></li>
-                  : null
-                }
+                <li><label>设备类型:</label><span>{CONSTANTS.DEVICETYPE[deviceType]}</span></li>
                 <li><label>设备位置:</label><span>{location}</span></li>
                 {repairCause ? 
                     <li><label>设备问题:</label><span>{repairCause}</span></li>
@@ -1188,10 +1234,7 @@ class TaskDetail extends React.Component {
                     <li className='high'><label>报修图片:</label><span>{imgs}</span></li>
                   : null
                 }
-                {env === 1 ?
-                    <li><label>报修用户:</label><span>{userMobile}</span></li>
-                  : null
-                }
+                <li><label>{env === 1 ? '报修用户:' : '用户手机:'}</label><span>{userMobile}</span></li>
               </ul>
             : null
           }
@@ -1400,15 +1443,15 @@ class TaskDetail extends React.Component {
             }
           </div>
 
-          <div className='processLogs'>
-            <h3>处理日志</h3>
-            {logs && logs.length > 0 ?
-              <ul className='columnsWrapper'>
-                {processLogs}
-              </ul>
-              : null
-            }
-          </div>
+          {logs && logs.length > 0 ?
+              <div className='processLogs'>
+                <h3>处理日志</h3>
+                  <ul className='columnsWrapper'>
+                    {processLogs}
+                  </ul>
+              </div>
+            : null
+          }
         </div>
 
         <div className='taskDetail-sidebar'>
@@ -1471,6 +1514,10 @@ class TaskDetail extends React.Component {
           okText=''
         >
           <div className='info buildTask'>
+            {type === CONSTANTS.TASK_TYPE_REPAIR ?
+                <p className='red modalTitle'>该工单还未指派维修员处理，请告知用户原因</p>
+              : null
+            }
             <ul>
               <li className='itemsWrapper'>
                 <p>备注:</p>
@@ -1478,6 +1525,7 @@ class TaskDetail extends React.Component {
                   value={note}
                   className='longText'
                   onChange={this.changeNote}
+                  placeholder='200字以内'
                 />
               </li>
             </ul>

@@ -37,7 +37,7 @@ AjaxHandler.tiForOther = () => setTimeout(() => {
 }, 4000)
 AjaxHandler.tiForNet = () => setTimeout(() => {
   AjaxHandler.showingNetError = false
-}, 4000);
+}, 4000)
 AjaxHandler.tiForBug = () => setTimeout(() => {
   AjaxHandler.showingBug = false
 }, 4000)
@@ -104,7 +104,7 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                         })
                                       }
                                       let title, message
-                                      // if timeout 
+                                      // if timeout
                                       if (error === 'timeout') {
                                         title = '请求超时'
                                         message = '请稍后重试～'
@@ -122,7 +122,6 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                             hintExpire()
                                             AjaxHandler.showingExpire = true
                                           }
-                                          return
                                         } else {
                                           /* ordinary network error, just toast */
                                           if (!AjaxHandler.showingNetError) {
@@ -131,7 +130,7 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                             return AjaxHandler.tiForNet()
                                           }
                                         }
-                                      } else if (error.code) { 
+                                      } else if (error.code) {
                                         // error.code shows this is form server.
                                         title = error.title || '请求出错'
                                         if (error.code === 10008) {
@@ -172,7 +171,7 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                             AjaxHandler.tiForOther()
                                           }
                                         }
-                                      } else { 
+                                      } else {
                                         if (error.title) {
                                           // error myself throwed, need to clear
                                           Noti.hintLock(error.title, error.message)
@@ -191,7 +190,7 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
                                     })
 
   /* reject timeout promise after 5s */
-  setTimeout(() => { timeoutAction() }, 5000)
+  setTimeout(() => { timeoutAction() }, 10000)
 
   return abortable_promise
 }
@@ -204,12 +203,12 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
   }
   // 默认使用管理端账户，除非用domain字段传入
   // debugger
-  let url 
+  let url
   if (options && options.domain) {
     url = options.domain + resource
   } else {
-    // url = 'http://116.62.236.67:5080' + resource
-    url = 'http://10.0.0.4:5080' + resource
+    url = 'http://116.62.236.67:5080' + resource
+    // url = 'http://10.0.0.4:5080' + resource
     // url = 'https://api.xiaolian365.com/m' + resource
   }
 
@@ -228,8 +227,8 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
 
 /* for client ajax request */
 AjaxHandler.ajaxClient = (resource, body, cb) => {
-  // const domain = 'http://116.62.236.67:5081'
-  const domain = 'http://10.0.0.4:5081'
+  const domain = 'http://116.62.236.67:5081'
+  // const domain = 'http://10.0.0.4:5081'
   // const domain = 'https://api.xiaolian365.com/c'
   AjaxHandler.ajax(resource, body, cb, null, {domain: domain})
 }

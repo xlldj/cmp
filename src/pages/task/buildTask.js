@@ -2,9 +2,11 @@ import React from 'react'
 import {Button, Radio, Modal} from 'antd'
 import SchoolSelector from '../component/schoolSelectorWithoutAll'
 import BasicSelector from '../component/basicSelectorWithoutAll'
+import DeviceSelector from '../component/deviceWithoutAll'
 import CONSTANTS from '../component/constants'
 import AjaxHandler from '../ajax'
-import { locale } from 'moment';
+import { locale } from 'moment'
+const {EMPLOYEE_REPAIRMAN} = CONSTANTS
 
 const RadioGroup = Radio.Group
 
@@ -13,16 +15,23 @@ class BuildTask extends React.Component {
     super()
     this.state = {
       schoolId: '',
+      schoolError: false,
       type: CONSTANTS.TASK_TYPE_REPAIR,
       location: '',
+      locationError: false,
       desc: '',
       descError: false,
       userMobile: '',
+      mobileFormatError: false,
       urgency: CONSTANTS.PRIORITY_NORMAL,
+      urgencyError: false,
       maintainerType: CONSTANTS.EMPLOYEE_REPAIRMAN,
       maintainerId: '',
+      maintainerIdError: false,
       maintainers: {},
-      posting: false
+      posting: false,
+      deviceType: '',
+      deviceTypeError: false
     }
     this.employeeTypes = {}
     this.employeeTypes[CONSTANTS.EMPLOYEE_REPAIRMAN] = '维修员'
@@ -30,7 +39,7 @@ class BuildTask extends React.Component {
     this.taskTypes[CONSTANTS.TASK_TYPE_REPAIR] = '报修工单'
   }
   fetchData = (body) => {
-    let resource='/api/employee/repairman/list'
+    let resource='/api/employee/department/member/list'
     const cb = (json) => {
         if(json.error){
           throw new Error(json.error.displayMessage || json.error)
@@ -38,8 +47,8 @@ class BuildTask extends React.Component {
           /*--------redirect --------*/
           if(json.data){
             let items = {}
-            json.data.repairmans.forEach(r => {
-              items[r.userId] = r.username
+            json.data.employees.forEach(r => {
+              items[r.id] = r.name
             })
             let maintainers = Object.assign({}, this.state.maintainers)
             maintainers[body.schoolId] = items
@@ -66,7 +75,8 @@ class BuildTask extends React.Component {
         const body = {
           page: 1, 
           size: 10000,
-          schoolId: schoolId
+          schoolId: schoolId,
+          department: EMPLOYEE_REPAIRMAN
         }
         this.fetchData(body)
       }
@@ -76,6 +86,22 @@ class BuildTask extends React.Component {
     this.setState({
       type: value
     })
+  }
+  changeDevice = (value) => {
+    this.setState({
+      deviceType: value
+    })
+  }
+  checkDevice = (v) => {
+    if (!v) {
+      return this.setState({
+        deviceTypeError: true
+      })
+    } else if (this.state.deviceTypeError) {
+      this.setState({
+        deviceTypeError: false
+      })
+    }
   }
   changeLocation = (e) => {
     let v = e.target.value
@@ -174,10 +200,15 @@ class BuildTask extends React.Component {
     this.props.cancel()
   }
   confirm = () => {
-    let {schoolId, location, desc, userMobile, urgency, maintainerId, posting} = this.state
+    let {schoolId, location, desc, userMobile, urgency, maintainerId, posting, deviceType} = this.state
     if (!schoolId) {
       return this.setState({
         schoolError: true
+      })
+    }
+    if (!deviceType) {
+      return this.setState({
+        deviceTypeError: true
       })
     }
     if (!location) {
@@ -211,7 +242,7 @@ class BuildTask extends React.Component {
     this.postData()
   }
   postData = () => {
-    let {schoolId, location, desc, userMobile, urgency, maintainerType, maintainerId} = this.state
+    let {schoolId, location, desc, userMobile, urgency, maintainerType, maintainerId, deviceType} = this.state
     let resource = '/work/order/add'
     const body = {
       assignId: maintainerId,
@@ -221,6 +252,7 @@ class BuildTask extends React.Component {
       location: location,
       schoolId: schoolId,
       type: maintainerType,
+      deviceType: parseInt(deviceType, 10),
       userMobile: userMobile,
       env: CONSTANTS.TASK_BUILD_CMP
     }
@@ -240,7 +272,7 @@ class BuildTask extends React.Component {
   render () {
     const {schoolError, schoolId, type, location, locationError, desc, descError,
       userMobile, mobileFormatError, urgency, urgencyError, maintainerType, maintainerId, maintainerIdError,
-      maintainers
+      maintainers, deviceType, deviceTypeError
     } = this.state
 
     const maintainerItems = (schoolId && maintainers[schoolId]) ? maintainers[schoolId] : {}
@@ -275,6 +307,15 @@ class BuildTask extends React.Component {
                 selectedOpt={type}
                 changeOpt={this.changeType}
               />
+            </li>
+            <li>
+              <p>设备类型:</p>
+              <DeviceSelector
+                selectedDevice={deviceType}
+                changeDevice={this.changeDevice}
+                checkDevice={this.checkDevice}
+              />
+              {deviceTypeError && (<span className='checkInvalid'>请选择设备类型！</span>)}
             </li>
             <li>
               <p>设备位置:</p>

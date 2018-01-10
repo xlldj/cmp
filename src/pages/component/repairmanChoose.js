@@ -4,6 +4,7 @@ import Time from './time'
 import Noti from '../noti'
 import AjaxHandler from '../ajax'
 import CONSTANTS from './constants'
+const {TASK_BUILD_CMP} = CONSTANTS
 
 class RepairmanTable extends React.Component{
   constructor(props){
@@ -115,7 +116,8 @@ class RepairmanTable extends React.Component{
       department: CONSTANTS.EMPLOYEE_REPAIRMAN,
       level: parseInt(this.state.priority, 10),
       assignId: this.state.selectedRowKeys[0],
-      content: this.state.remark
+      content: this.state.remark,
+      env: TASK_BUILD_CMP // tell server this is from cmp, not 'light'
     }
     this.postData(body)
   }

@@ -1,3 +1,4 @@
+/* this is a version with different timeset for different building of same school */
 import React from 'react'
 import moment from 'moment';
 import TimePicker from 'rc-time-picker';
@@ -11,6 +12,7 @@ import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../component/constants'
+import BasicSelector from '../../component/basicSelector'
 
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
@@ -21,14 +23,18 @@ class TimesetInfo extends React.Component {
     let deviceType = '0', items = [{startTime:moment('1/1/2017', 'DD/MM/YYYY'),endTime: moment('1/1/2017', 'DD/MM/YYYY')}], deviceTypeError = false, selectedSchool = '0', schoolError=false
     let id = 0
     this.state = { 
-      deviceType, items, deviceTypeError, selectedSchool, schoolError, id
+      deviceType, items, deviceTypeError, selectedSchool, schoolError, id,
+      building: '',
+      initialBD: '',
+      buildingData: {},
+      buildingError: false
     }
   }
   fetchData =(body)=>{
     let resource='/api/time/range/water/one'
     const cb=(json)=>{
       if(json.error){
-        throw (json.error.displayMessage || json.error)
+        throw new Error(json.error.displayMessage || json.error)
       }else{
         if(json.data){
           json.data.items.forEach((r,i)=>{
@@ -46,7 +52,9 @@ class TimesetInfo extends React.Component {
             selectedSchool: json.data.schoolId, 
             id: json.data.id,
             initialSchool: json.data.schoolId,
-            initialDT: json.data.deviceType
+            initialDT: json.data.deviceType,
+            building: json.data.buildingId ? json.data.buildingId.toString() : '',
+            initialBD: json.data.buildingId || ''
           })
         }        
       }
@@ -67,10 +75,7 @@ class TimesetInfo extends React.Component {
     this.props.hide(true)
   }
   confirm = () => {
-    this.checkExist(this.completeEdit)
-  }
-  completeEdit = () => {
-    let {selectedSchool, deviceType} = this.state
+    let {selectedSchool, deviceType, building} = this.state
     if (!selectedSchool || selectedSchool==='0') {
       return this.setState({
         schoolError: true
@@ -81,8 +86,13 @@ class TimesetInfo extends React.Component {
         deviceTypeError: true
       })
     }
+    if (!building) {
+      return this.setState({
+        buildingError: true
+      })
+    }
     const items = JSON.parse(JSON.stringify(this.state.items))
-    for (let i=0, l = items.length; i < l; i++) {
+    for (let i=0;i<items.length;i++) {
       let r = items[i]
       if (r.timeValueError) {
         return
@@ -95,6 +105,11 @@ class TimesetInfo extends React.Component {
         })
       }
     }
+    this.checkExist(this.postData)
+  }
+  postData = () => {
+    let {selectedSchool, deviceType, building} = this.state
+    const items = JSON.parse(JSON.stringify(this.state.items))
     items.forEach((r,i)=>{
       let startTime = {
         hour:moment(r.startTime).hour(),
@@ -110,8 +125,15 @@ class TimesetInfo extends React.Component {
     })
     const body = {
       items: items,
-      deviceType: parseInt(this.state.deviceType, 10),
-      schoolId: parseInt(this.state.selectedSchool, 10)
+      deviceType: parseInt(deviceType, 10),
+      schoolId: parseInt(selectedSchool, 10)
+    }
+    console.log(building)
+    if (building !== 'all') {
+      body.buildingId = parseInt(building, 10)
+      body.type = 2 // for building
+    } else {
+      body.type = 1 // for school
     }
     let resource
     if(this.props.match.params.id){
@@ -121,14 +143,14 @@ class TimesetInfo extends React.Component {
       resource = '/api/time/range/water/add'
     }
     const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            Noti.hintSuccess(this.props.history,'/device/timeset')
-          }     
-        }
+      if(json.error){
+        throw new Error(json.error.displayMessage || json.error)
+      }else{
+        /*--------redirect --------*/
+        if(json.data){
+          Noti.hintSuccess(this.props.history,'/device/timeset')
+        }     
+      }
     }
     AjaxHandler.ajax(resource,body,cb)
   }
@@ -174,6 +196,31 @@ class TimesetInfo extends React.Component {
 
     this.setState(nextState)
   }
+  fetchBuildings = (id) => {
+    let schoolId = parseInt(id, 10)
+    const body = {
+      page: 1,
+      size: 1000,
+      schoolId: schoolId,
+      residenceLevel: 1
+    }
+    let resource='/api/residence/list'
+    const cb = (json) => {
+      try {
+        let data = json.data.residences
+        let buildingData = {}
+        data.forEach((r) => {
+          buildingData[r.id] = r.name
+        })
+        this.setState({
+          buildingData: buildingData
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    AjaxHandler.ajax(resource,body,cb)  
+  }
   changeSchool = (v) => {
     if (!v) {
       return this.setState({
@@ -186,6 +233,7 @@ class TimesetInfo extends React.Component {
     }
     nextState.selectedSchool = parseInt(v, 10)
     this.setState(nextState)
+    this.fetchBuildings(v)
   }
   checkSchool = (v) => {
     if (!v || v==='0') {
@@ -196,10 +244,10 @@ class TimesetInfo extends React.Component {
     this.setState({
       schoolError: false
     })
-    let {selectedSchool, deviceType} = this.state
+    /*let {selectedSchool, deviceType} = this.state
     if (parseInt(selectedSchool, 10) && parseInt(deviceType, 10)) {
       this.checkExist(null)
-    }
+    }*/
   }
   changeDevice = (v) => {
     if (!v) {
@@ -223,23 +271,30 @@ class TimesetInfo extends React.Component {
     this.setState({
       deviceTypeError: false
     })
-    let {selectedSchool, deviceType} = this.state
+    /*let {selectedSchool, deviceType} = this.state
     if (parseInt(selectedSchool, 10) && parseInt(deviceType, 10)) {
       this.checkExist(null)
-    }
+    }*/
   }
   checkExist = (callback) => {
-    let {selectedSchool, deviceType, id, initialSchool, initialDT} = this.state
-    if (id && (parseInt(selectedSchool, 10) === initialSchool) && (parseInt(deviceType, 10) === initialDT)) {
+    let {selectedSchool, deviceType, id, initialSchool, initialDT, building, initialBD} = this.state
+    if (id && (parseInt(selectedSchool, 10) === initialSchool) && (parseInt(deviceType, 10) === initialDT) && (parseInt(building, 10) === initialBD)) {
       if (callback) {
         callback()
       }
       return
     }
+    console.log(building)
     let resource = '/time/range/water/check'
     const body = {
       schoolId: parseInt(selectedSchool, 10),
       deviceType: parseInt(deviceType, 10)
+    }
+    if (building !== 'all') {
+      body.type = 2
+      body.buildingId = parseInt(building, 10)
+    } else {
+      body.type = 1
     }
     const cb = (json) => {
       if (json.error) {
@@ -256,9 +311,26 @@ class TimesetInfo extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
+  changeBuilding = (v) => {
+    this.setState({
+      building: v
+    })
+  }
+  checkBuilding = (v) => {
+    if (!v) {
+      return this.setState({
+        buildingError: true
+      })
+    } else if (this.state.buildingError) {
+      this.setState({
+        buildingError: false
+      })
+    }
+  }
 
   render () {
-    let {id, deviceType, items, deviceTypeError, selectedSchool, schoolError
+    let {id, deviceType, items, deviceTypeError, selectedSchool, schoolError,
+      buildingData, building, buildingError
     } = this.state
     const times = items&&items.map((r,i) => {
       return(
@@ -293,6 +365,22 @@ class TimesetInfo extends React.Component {
               className={id ? 'disabled' : ''} selectedSchool={selectedSchool.toString()} 
               changeSchool={this.changeSchool} checkSchool={this.checkSchool} /> 
             {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
+          </li>
+
+          <li>
+            <p>选择楼栋:</p>
+            <BasicSelector
+              disabled={id}
+              all={true}
+              allTitle='全部楼栋'
+              width={CONSTANTS.SELECTWIDTH}
+              className={id ? 'disabled' : ''}
+              staticOpts={buildingData}
+              selectedOpt={building}
+              changeOpt={this.changeBuilding}
+              checkOpt={this.checkBuilding}
+            /> 
+            {buildingError?<span className='checkInvalid'>楼栋不能为空！</span>:null}
           </li>
 
           <li>
