@@ -275,6 +275,7 @@ const initialTaskState = {
     main_schoolId: 'all',
     main_mine: '2', // 1: '我的工单', 2: '全部'
     selectedRowIndex: -1, // the row whose detail is being watching
+    selectedDetailId: -1, // id of showing detail
 
     panel_rangeIndex: [3, 3, 3], // '时间', time select of each panel
     panel_startTime: ['', '', ''], // startTime of each panel

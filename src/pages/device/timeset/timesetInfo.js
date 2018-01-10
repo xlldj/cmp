@@ -12,22 +12,31 @@ import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../component/constants'
-import BasicSelector from '../../component/basicSelector'
+import BasicSelector from '../../component/basicSelectorWithoutAll'
 
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
+const initialBuildingTimeset = {
+  buildingId: '',
+  items: [{startTime:moment('1/1/2017 0:0'),endTime: moment('1/1/2017 23:59')}]
+}
+const initailTimeset = {
+  startTime:moment('1/1/2017 0:0'), endTime: moment('1/1/2017 23:59')
+}
 class TimesetInfo extends React.Component {
   constructor (props) {
     super(props)
-    let deviceType = '0', items = [{startTime:moment('1/1/2017', 'DD/MM/YYYY'),endTime: moment('1/1/2017', 'DD/MM/YYYY')}], deviceTypeError = false, selectedSchool = '0', schoolError=false
+    let deviceType = '0', items = [{startTime:moment('1/1/2017 0:0'),endTime: moment('1/1/2017 23:59')}]
+    let deviceTypeError = false, selectedSchool = '', schoolError=false
     let id = 0
     this.state = { 
       deviceType, items, deviceTypeError, selectedSchool, schoolError, id,
       building: '',
       initialBD: '',
       buildingData: {},
-      buildingError: false
+      buildingError: false,
+      buildingTimesets: []
     }
   }
   fetchData =(body)=>{
@@ -46,7 +55,19 @@ class TimesetInfo extends React.Component {
             r.startTime = start
             r.endTime = end
           })
-          this.setState({
+          json.data.buildingTimesets.forEach((building, index) => {
+            let items = building.items
+            items.forEach((r, i) => {
+              let start = moment('1/1/2017', 'DD/MM/YYYY'), end = moment('1/1/2017', 'DD/MM/YYYY')
+              start.hour(r.startTime.hour)
+              start.minute(r.startTime.minute)
+              end.hour(r.endTime.hour)
+              end.minute(r.endTime.minute)
+              r.startTime = start
+              r.endTime = end 
+            })
+          })
+          let nextState = {
             deviceType: json.data.deviceType.toString(),
             items: json.data.items,
             selectedSchool: json.data.schoolId, 
@@ -55,7 +76,14 @@ class TimesetInfo extends React.Component {
             initialDT: json.data.deviceType,
             building: json.data.buildingId ? json.data.buildingId.toString() : '',
             initialBD: json.data.buildingId || ''
-          })
+          }
+          if (json.data.buildingTimesets) {
+            nextState.buildingTimesets = json.data.buildingTimesets
+          }
+          this.setState(nextState)
+          if (json.data.schoolId) {
+            this.fetchBuildings(json.data.schoolId)
+          }
         }        
       }
     }
@@ -75,7 +103,7 @@ class TimesetInfo extends React.Component {
     this.props.hide(true)
   }
   confirm = () => {
-    let {selectedSchool, deviceType, building} = this.state
+    let {selectedSchool, deviceType} = this.state
     if (!selectedSchool || selectedSchool==='0') {
       return this.setState({
         schoolError: true
@@ -84,11 +112,6 @@ class TimesetInfo extends React.Component {
     if (!deviceType || deviceType==='0') {
       return this.setState({
         deviceTypeError: true
-      })
-    }
-    if (!building) {
-      return this.setState({
-        buildingError: true
       })
     }
     const items = JSON.parse(JSON.stringify(this.state.items))
@@ -105,11 +128,47 @@ class TimesetInfo extends React.Component {
         })
       }
     }
+
+    const buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets))
+    for (let i=0; i<buildingTimesets.length; i++) {
+      let r = buildingTimesets[i]
+      if (!r.buildingId) {
+        r.buildingError = true
+        return this.setState({
+          buildingTimesets: buildingTimesets
+        })
+      }
+      for (let j=0; j < r.items.length; j++) {
+        let item = r.items[j]
+        let start = moment(item.startTime), end = moment(item.endTime)
+        if (start >= end) {
+          item.timeValueError = true
+          return this.setState({
+            buildingTimesets: buildingTimesets
+          })
+        }
+      }
+    }
+    let buildingIds = {}, dups = []
+    buildingTimesets.forEach((r, i) => {
+      if (buildingIds[r.buildingId]) {
+        dups.push(i)
+      } else {
+        buildingIds[r.buildingId] = 1
+      }
+    })
+    if (dups.length > 0) {
+      dups.reverse().forEach(r => {
+        buildingTimesets.splice(r, 1)
+      })
+    }
     this.checkExist(this.postData)
+    // this.postData()
   }
   postData = () => {
-    let {selectedSchool, deviceType, building} = this.state
+    let {selectedSchool, deviceType} = this.state
     const items = JSON.parse(JSON.stringify(this.state.items))
+    const buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets))
     items.forEach((r,i)=>{
       let startTime = {
         hour:moment(r.startTime).hour(),
@@ -126,14 +185,29 @@ class TimesetInfo extends React.Component {
     const body = {
       items: items,
       deviceType: parseInt(deviceType, 10),
-      schoolId: parseInt(selectedSchool, 10)
+      schoolId: parseInt(selectedSchool, 10),
+      type: 1
     }
-    console.log(building)
-    if (building !== 'all') {
-      body.buildingId = parseInt(building, 10)
-      body.type = 2 // for building
-    } else {
-      body.type = 1 // for school
+    if (buildingTimesets.length > 0) {
+      buildingTimesets.forEach(r => {
+        if (r.items.length > 0) {
+          r.items.forEach(item => {
+            let startTime = {
+              hour:moment(item.startTime).hour(),
+              minute: moment(item.startTime).minute()
+            }
+            let endTime = {
+              hour:moment(item.endTime).hour(),
+              minute: moment(item.endTime).minute()
+            }
+            item.startTime = startTime
+            item.endTime = endTime
+            delete item.timeValueError
+          })
+        }
+        delete r.buildingError
+      })
+      body.buildingTimesets = buildingTimesets
     }
     let resource
     if(this.props.match.params.id){
@@ -159,7 +233,7 @@ class TimesetInfo extends React.Component {
   }
   add = () => {
     const items = JSON.parse(JSON.stringify(this.state.items))
-    items.push({startTime:moment('1/1/2017', 'DD/MM/YYYY'), endTime:moment('1/1/2017', 'DD/MM/YYYY')})
+    items.push({startTime:moment('1/1/2017 0:0'), endTime:moment('1/1/2017 23:59')})
     this.setState({
       items:items 
     })
@@ -277,24 +351,18 @@ class TimesetInfo extends React.Component {
     }*/
   }
   checkExist = (callback) => {
-    let {selectedSchool, deviceType, id, initialSchool, initialDT, building, initialBD} = this.state
-    if (id && (parseInt(selectedSchool, 10) === initialSchool) && (parseInt(deviceType, 10) === initialDT) && (parseInt(building, 10) === initialBD)) {
+    let {selectedSchool, deviceType, id, initialSchool, initialDT} = this.state
+    if (id && (parseInt(selectedSchool, 10) === initialSchool) && (parseInt(deviceType, 10) === initialDT)) {
       if (callback) {
         callback()
       }
       return
     }
-    console.log(building)
     let resource = '/time/range/water/check'
     const body = {
       schoolId: parseInt(selectedSchool, 10),
-      deviceType: parseInt(deviceType, 10)
-    }
-    if (building !== 'all') {
-      body.type = 2
-      body.buildingId = parseInt(building, 10)
-    } else {
-      body.type = 1
+      deviceType: parseInt(deviceType, 10),
+      type: 1 // alwways check school
     }
     const cb = (json) => {
       if (json.error) {
@@ -311,26 +379,76 @@ class TimesetInfo extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
-  changeBuilding = (v) => {
+  addBuildingTimeset = () => {
+    let buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets))
+    buildingTimesets.push(initialBuildingTimeset)
     this.setState({
-      building: v
+      buildingTimesets: buildingTimesets
     })
   }
-  checkBuilding = (v) => {
-    if (!v) {
-      return this.setState({
-        buildingError: true
-      })
-    } else if (this.state.buildingError) {
-      this.setState({
-        buildingError: false
-      })
+  removeBuildingTimeset = () => {
+    let buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets))
+    buildingTimesets.pop()
+    this.setState({
+      buildingTimesets: buildingTimesets
+    })
+  }
+  handleBuildingStartTime = (v, i, index) => {
+    // 'i' is the index for buildingTimeset Block
+    // 'index' is the index of 'items' of each timeset in buildingTimesets
+    let buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets)), nextState = {}
+    buildingTimesets[i].items[index].startTime = v
+    nextState.buildingTimesets = buildingTimesets
+    let start = v.valueOf(), end = moment(buildingTimesets[i].items[index].endTime).valueOf()
+    if (start >= end) {
+      buildingTimesets[i].items[index].timeValueError = true
+    } else if (buildingTimesets[i].items[index].timeValueError) {
+      buildingTimesets[i].items[index].timeValueError = false
     }
+    this.setState(nextState) 
+  }
+  handleBuildingEndTime = (v, i, index) => {
+    // 'i' is the index for buildingTimeset Block
+    // 'index' is the index of 'items' of each timeset in buildingTimesets
+    let buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets)), nextState = {}
+    buildingTimesets[i].items[index].endTime = v
+    let end = v.valueOf(), start = moment(buildingTimesets[i].items[index].startTime).valueOf()
+    console.log(start)
+    console.log(end)
+    if (start >= end) {
+      buildingTimesets[i].items[index].timeValueError = true
+    } else if (buildingTimesets[i].items[index].timeValueError) {
+      buildingTimesets[i].items[index].timeValueError = false
+    }
+    nextState.buildingTimesets = buildingTimesets
+    this.setState(nextState) 
+  }
+  changeBuilding = (v, i) => {
+    let buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets))
+    buildingTimesets[i].buildingId = v
+    buildingTimesets[i].buildingError = false
+    this.setState({
+      buildingTimesets: buildingTimesets
+    })
+  }
+  addTimeset2Building = (i) => {
+    let buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets))
+    buildingTimesets[i].items.push(initailTimeset)
+    this.setState({
+      buildingTimesets: buildingTimesets
+    }) 
+  }
+  abstractTimeset2Building = (i) => {
+    let buildingTimesets = JSON.parse(JSON.stringify(this.state.buildingTimesets))
+    buildingTimesets[i].items.pop()
+    this.setState({
+      buildingTimesets: buildingTimesets
+    }) 
   }
 
   render () {
     let {id, deviceType, items, deviceTypeError, selectedSchool, schoolError,
-      buildingData, building, buildingError
+      buildingData, buildingTimesets
     } = this.state
     const times = items&&items.map((r,i) => {
       return(
@@ -354,6 +472,53 @@ class TimesetInfo extends React.Component {
           </div>
       )
     })
+
+    const buildingTimes = buildingTimesets && buildingTimesets.map((r, i) => {
+      let times = r.items && r.items.map((time, index) => (
+        <div key={`time${i}${index}`}>
+          <TimePicker
+            className='timepicker'
+            allowEmpty={false}
+            showSecond={false}
+            value={moment(time.startTime)}
+            onChange={(e)=>{this.handleBuildingStartTime(e, i, index)}}
+          />
+          至
+          <TimePicker
+            className='timepicker'
+            allowEmpty={false}
+            showSecond={false}
+            value={moment(time.endTime)}
+            onChange={(e)=>{this.handleBuildingEndTime(e, i, index)}}
+          />
+          { time.timeValueError ? <span key={`timeerror${i}${index}`} className='checkInvalid'>结束时间不能早于开始时间！</span> : null }
+        </div> 
+      ))
+      return (
+        <div className='info innerInfo' key={`wrapper${i}`}>
+          <ul key={`ul${i}`}>
+            <li key={`building${i}`}>
+              <p>选择楼栋:</p>
+              <BasicSelector
+                width={CONSTANTS.SELECTWIDTH}
+                staticOpts={buildingData}
+                selectedOpt={r.buildingId}
+                changeOpt={(v) => this.changeBuilding(v, i)}
+              /> 
+              {r.buildingError?<span key={`buildingerror${i}`} className='checkInvalid'>楼栋不能为空！</span>:null}
+            </li>
+            <li className='itemsWrapper' key={`buildingtime${i}`}>
+              <p key={`p${i}`}>楼栋供水时间:</p>
+              <div>
+                {times}
+                <AddPlusAbs count={r.items.length} add={() => this.addTimeset2Building(i)} abstract={() => this.abstractTimeset2Building(i)} /> 
+              </div>
+            </li>
+          </ul>
+        </div>
+      )
+    })
+
     return (
       <div className='infoList timeset'>
         <ul>
@@ -366,23 +531,6 @@ class TimesetInfo extends React.Component {
               changeSchool={this.changeSchool} checkSchool={this.checkSchool} /> 
             {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
           </li>
-
-          <li>
-            <p>选择楼栋:</p>
-            <BasicSelector
-              disabled={id}
-              all={true}
-              allTitle='全部楼栋'
-              width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
-              staticOpts={buildingData}
-              selectedOpt={building}
-              changeOpt={this.changeBuilding}
-              checkOpt={this.checkBuilding}
-            /> 
-            {buildingError?<span className='checkInvalid'>楼栋不能为空！</span>:null}
-          </li>
-
           <li>
             <p>设备类型:</p>
             <DeviceWithoutAll 
@@ -392,11 +540,24 @@ class TimesetInfo extends React.Component {
             {deviceTypeError?<span className='checkInvalid'>设备类型不能为空！</span>:null}        
           </li>
           <li className='itemsWrapper'>
-            <p>供水时段:</p>
+            <p>学校供水时段:</p>
             <div>
               {times}    
               <AddPlusAbs count={items.length} add={this.add} abstract={this.abstract} /> 
             </div>
+          </li>
+          {buildingTimes}
+
+          <li className='itemsWrapper'>
+            <p></p>
+            {selectedSchool ?
+                <Button type='primary' onClick={this.addBuildingTimeset}>增加楼栋设置</Button>
+              : null
+            }
+            {buildingTimesets.length > 0 ?
+                <Button type='primary' onClick={this.removeBuildingTimeset}>删除楼栋设置</Button>
+              : null
+            }
           </li>
         </ul>
 

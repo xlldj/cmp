@@ -11,7 +11,7 @@ import EmployeeChoose from '../component/employeeChoose'
 import DepartmentChoose from '../component/departmentChoose'
 import {checkObject} from '../util/checkSame'
 import closeBtn from '../assets/close.png'
-import {mul} from '../util/numberHandle'
+import {mul, add} from '../util/numberHandle'
 import Format from '../component/format'
 
 import PropTypes from 'prop-types'
@@ -101,7 +101,7 @@ class TaskDetail extends React.Component {
       showRepairmanModal: false,
       showDeveloperModal: false,
       showFinishModal: false,
-      posting2User: false
+      posting: false
     }
     this.reassignMenu = (
       <Menu selectable={false} onClick={this.reassign}>
@@ -484,22 +484,20 @@ class TaskDetail extends React.Component {
   }
   componentWillReceiveProps (nextProps) {
     try {
-      let {main_phase, 
-        panel_page, panel_dataSource, 
-        details, detail_tabIndex, showDetail, selectedRowIndex
+      let {main_phase,
+        details, detail_tabIndex, showDetail, selectedDetailId
       } = nextProps.taskList
-      let page = panel_page[main_phase]
+      // let page = panel_page[main_phase]
 
       // only care detail related props
       if (showDetail && !checkObject(this.props.taskList, nextProps.taskList, [
         'detail_tabIndex', 'selectedRowIndex', 'detailLoading'
       ])) {
         // get selected item.
-        let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
-        let id = '', detail
-        if (selectedItem) { // if not, it will be fetched in task/list
+        // let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
+        let id = selectedDetailId, detail
+        if (id) { // if not, it will be fetched in task/list
           // let type = selectedItem.type
-          id = selectedItem.id
           if (details[id]) { // if not , fetch it in task/list
             detail = details[id]
             console.log(detail)
@@ -754,7 +752,7 @@ class TaskDetail extends React.Component {
       showRepairmanModal: false
     })
     Noti.hintOk('转发成功', '已成功转发给该维修员')
-    this.updateList(id)
+    this.updateAndClose(id)
   }
   cancelChooseRepairman = () => {
     this.setState({
@@ -768,7 +766,7 @@ class TaskDetail extends React.Component {
       showCustomerModal: false
     })
     Noti.hintOk('转发成功', '已成功转发给该客服')
-    this.updateList(id)
+    this.updateAndClose(id)
   }
   cancelChooseCustomer = () => {
     this.setState({
@@ -778,16 +776,20 @@ class TaskDetail extends React.Component {
   reassign2DeveloperSuccess = () => {
     Noti.hintOk('操作成功', '当前工单已被转接')
     this.setState({
-      showRepairmanModal: false
+      showDeveloperModal: false
     })
-    this.updateList(this.state.id)
+    this.updateAndClose(this.state.id)
   }
   cancelChooseDeveloper = () => {
     this.setState({
       showDeveloperModal: false
     })
   }
-  updateList = (id) => {
+  keepAndUpdate = (id) => {
+    // this is handle process after sending message.
+    // 1. update detail.
+    // 2. if main_phase === 1, nothing to do with list.
+    // 3. if main_phase === 0, set 'selectedRowIndex' to -1,  clear list, set 'main_phase' to 1
     let resource = '/work/order/one'
     const body = {
       id: id
@@ -814,16 +816,47 @@ class TaskDetail extends React.Component {
       })
     }
     AjaxHandler.ajax(resource, body, cb)
-    /* no matter ajax success or fail, close detail and fetch list again */
-    // let {showDetail, selectedRowIndex, panel_dataSource} = this.props.taskList
-    let newProps = {
-      showDetail: false,
-      selectedRowIndex: -1,
-      panel_dataSource: [{}, {}, {}]
+    /* no matter ajax success or fail, check if fetch list again */
+    // Note to keep 'selectedDetailId'.
+    // only clear 'pending' and 'handing', because it won't be in 'finished' when sending message.
+    let {main_phase} = this.props.taskList
+    if (main_phase === 1) { // if in 'handing' module
+      return
+    } else {
+      let {panel_rangeIndex, panel_startTime, panel_endTime, 
+        panel_type, panel_selectKey, panel_page, details, selectedDetailId} = this.props.taskList
+      let type = details[selectedDetailId].type
+      let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList.panel_dataSource))
+      panel_dataSource[0] = {}
+      panel_dataSource[1] = {}
+      // set props for 'handling', make sure detail can be found in list data.
+      let newRangeIndex = Array.from(panel_rangeIndex)
+      newRangeIndex[1] = 3
+      let newStartTime = Array.from(panel_startTime)
+      newStartTime[1] = ''
+      let newEndTime = Array.from(panel_endTime)
+      newEndTime[1] = ''
+      let newType = Array.from(panel_type)
+      newType[1] = add(type, 1)
+      let newKeys = Array.from(panel_selectKey)
+      newKeys[1] = ''
+      let newPages = Array.from(panel_page)
+      newPages[1] = 1
+      let newProps = {
+        selectedRowIndex: -1,
+        panel_dataSource: panel_dataSource,
+        main_phase: 1,
+        panel_rangeIndex: newRangeIndex,
+        panel_startTime: newStartTime,
+        panel_endTime: newEndTime,
+        panel_type: newType,
+        panel_selectKey: newKeys,
+        panel_page: newPages
+      }
+      this.props.changeTask(subModule, newProps)
     }
-    this.props.changeTask(subModule, newProps)
   }
-  updateDetail = (id) => {
+  updateAndClose = (id) => {
     let resource = '/work/order/one'
     const body = {
       id: id
@@ -890,7 +923,7 @@ class TaskDetail extends React.Component {
         })
         Noti.hintOk('操作成功', '当前工单已完结')
         // refetch details
-        this.updateList(id)
+        this.updateAndClose(id)
       } else {
         Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试')
       }
@@ -972,8 +1005,8 @@ class TaskDetail extends React.Component {
   confirmPostMessage = (id, userMobile) => {
     console.log('posting message')
     // debugger
-    let {message, posting2User} = this.state
-    if (posting2User) {
+    let {message, posting} = this.state
+    if (posting) {
       return
     }
     let m = message.trim()
@@ -990,17 +1023,17 @@ class TaskDetail extends React.Component {
     }
     const cb = (json) => {
       this.setState({
-        posting2User: false,
+        posting: false,
         message: ''
       })
       if (json.data) {
         Noti.hintOk('操作成功', '已成功发送消息')
       }
-      // this.updateDetail(id)
-      this.updateDetail(id)
+      // keep detail and check if need to fetch list
+      this.keepAndUpdate(id)
     }
     this.setState({
-      posting2User: true
+      posting: true
     })
     AjaxHandler.ajax(resource, body, cb)
   }
@@ -1092,22 +1125,19 @@ class TaskDetail extends React.Component {
       initialSlide, // initial slide of img
     } = this.state
 
-    let {main_phase,panel_page, panel_dataSource, 
-      details, showDetail, selectedRowIndex, detailLoading, detail_tabIndex
+    let {main_phase,
+      details, showDetail, detailLoading, detail_tabIndex, selectedDetailId
     } = this.props.taskList
 
     let currentTab = detail_tabIndex[main_phase]
 
     /* get info from 'details', 'details' is an object whose key is 'id' */
     // get type and id
-    let page = panel_page[main_phase]
-    let selectedItem = panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
-    let id = '', detail = {}
-    if (selectedItem) {
-      id = selectedItem.id
-      if (id) {
-        detail = details[id.toString()] || {} // info of current selected item
-      }
+    // let page = panel_page[main_phase]
+    // let selectedItem = panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
+    let id = selectedDetailId, detail = {}
+    if (id) {
+      detail = details[id.toString()] || {} // info of current selected item
     }
     console.log(detail)
     let {committer, committerOrder, committerRepair, deviceInfo, deviceOrder, deviceRepair,

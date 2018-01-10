@@ -14,6 +14,7 @@ import TaskDetail from './taskDetail'
 import BuildTask from './buildTask'
 import selectedImg from '../assets/selected.png'
 import Noti from '../noti'
+import {mul, add} from '../util/numberHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -105,7 +106,7 @@ class TaskList extends React.Component {
       this.setState({
         loading: false
       })
-      let {main_phase, panel_page, panel_total} = this.props.taskList
+      let {main_phase, panel_page, panel_total, showDetail, selectedDetailId, selectedRowIndex} = this.props.taskList
       let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList.panel_dataSource))
       let newTotal = Array.from(panel_total)
       let page = panel_page[main_phase]
@@ -113,15 +114,32 @@ class TaskList extends React.Component {
       // console.log(json.data[jsonKeyName])
       panel_dataSource[main_phase][page] = json.data.workOrders
       newTotal[main_phase] = json.data.total
-      this.props.changeTask(subModule, {
+
+      /* update 'selectedDetailId' if neccesary */
+      let newProps = {
         panel_dataSource: panel_dataSource, 
         panel_total: newTotal
-      })
+      }
+      if (showDetail && selectedRowIndex === -1 && selectedDetailId !== -1) {
+        let index = -1
+        console.log(selectedDetailId)
+        json.data.workOrders.forEach((r, i) => {
+          if (r.id === selectedDetailId) {
+            index = i
+          }
+        })
+        if (index !== -1) {
+          newProps.selectedRowIndex = index
+        } else {
+        }
+        console.log(index)
+      }
+      this.props.changeTask(subModule, newProps)
     }
     this.setState({
       loading: true
     })
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.ajax(resource, body, cb, null, {clearLoading: true, thisObj: this})
   }
   fetchData = (body) => {
     let resource = '/api/work/sheet/list'
@@ -238,7 +256,8 @@ class TaskList extends React.Component {
     if (this.props.taskList.showDetail) {
       this.props.changeTask(subModule, {
         showDetail: false,
-        selectedRowIndex: -1
+        selectedRowIndex: -1,
+        selectedDetailId: -1
       })
     }
   }
@@ -275,10 +294,6 @@ class TaskList extends React.Component {
         'main_phase', 'main_schoolId', 'main_mine', 
         'panel_rangeIndex', 'panel_startTime', 'panel_endTime', 'panel_type',
         'panel_selectKey', 'panel_page', 'showDetail']) || !panel_dataSource[main_phase][page]) {
-          console.log('fetch')
-          if (this.needUpdate) {
-            this.needUpdate = false
-          }
           if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) {
             // dataSource has the data
             if (this.state.loading) {
@@ -313,7 +328,9 @@ class TaskList extends React.Component {
             if (type !== 1) {
               body.type = type - 1
             }
-            this.fetchTasks(body)
+            if (!this.state.loading) {
+              this.fetchTasks(body)
+            }
           }
         }
 
@@ -493,11 +510,16 @@ class TaskList extends React.Component {
     })
   }
   selectRow = (record, index, event) => {
-    let {detail_tabIndex, main_phase} = this.props.taskList
+    let {detail_tabIndex, main_phase, panel_dataSource, panel_page} = this.props.taskList
+    let page = panel_page[main_phase]
+    let id = panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][index] && panel_dataSource[main_phase][page][index].id
     let newTabIndex = Array.from(detail_tabIndex)
     newTabIndex[main_phase] = 1
     this.props.changeTask(subModule, {
-      selectedRowIndex: index, showDetail: true, detail_tabIndex: newTabIndex
+      selectedRowIndex: index,
+      showDetail: true,
+      detail_tabIndex: newTabIndex,
+      selectedDetailId: id
     })
   }
 
