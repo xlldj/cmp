@@ -12,7 +12,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../../actions'
 
-const {DEVICETYPE, TASKSTATUS} = CONSTANTS
+const {DEVICETYPE, TASKSTATUS, DEVICE_TYPE_BLOWER} = CONSTANTS
 const BACKTITLE = {
   fromRepair: '返回报修详情'
 }
@@ -162,6 +162,7 @@ class DeviceInfo extends React.Component {
     let time = Time.getTimeStr(data.bindingTime)
     let waterMac = data.water ? Object.keys(data.water).map((key, i) => (<span key={`water${i}`} className='waterMacItem'>{data.water[key].macAddress}</span>)) : null
     let propState = this.props.history.location.state
+    let denomination = parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
     return (
       <div 
         className={repairs && repairs.length>0 ? 'infoBlockList deviceInfo columnLayout' : 'infoBlockList deviceInfo'}
@@ -175,7 +176,7 @@ class DeviceInfo extends React.Component {
             <li><p>设备位置:</p>{data.location||'暂无'}</li>
             <li className='itemsWrapper'>
               <p>设备费率:</p>
-              {deviceType !== 2 ? `${data.price * 100}分钱/${data.pulse}个脉冲` : <div>{rateItems}</div>}
+              {deviceType !== 2 ? `${data.price * 100}分钱/${data.pulse}${denomination}` : <div>{rateItems}</div>}
             </li>
             <li><p>绑定时间:</p>{time}</li>
           </ul>

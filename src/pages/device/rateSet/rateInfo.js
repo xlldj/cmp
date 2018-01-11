@@ -10,6 +10,7 @@ import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import {mul, div} from '../../util/numberHandle'
+const {DEVICE_TYPE_BLOWER} = CONSTANTS
 
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
@@ -400,6 +401,7 @@ class RateInfo extends React.Component {
   render () {
     let {id, schoolId, schoolError, deviceType, deviceTypeError, billingMethod, 
       billError, rateGroups, closeTapGroups} = this.state
+    let denomination = parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
 
     const rateItems = rateGroups&&rateGroups.map((r,i) => {
       return(
@@ -407,7 +409,7 @@ class RateInfo extends React.Component {
             <input type='number' className='shortInput' onChange={(e) => {this.changePrice(e,i)}} onBlur={(e) => {this.checkPrice(e,i)}} key={`input${i}`} value={r.price?r.price:''} />
             <span key={`span2${i}`}>分钱/</span>
             <input type='number' className='shortInput' onChange={(e) => {this.changePulse(e,i)}} onBlur={(e) => {this.checkPulse(e,i)}} key={`pulse${i}`} value={r.pulse?r.pulse:''} />
-            <span key={`span3${i}`}>脉冲</span>
+            <span key={`span3${i}`}>{denomination}</span>
             {r.error? <span className='checkInvalid'>输入不完整</span> : null}
           </li>
       )

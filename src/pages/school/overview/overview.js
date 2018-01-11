@@ -17,6 +17,7 @@ import { changeSchool } from '../../../actions'
 const subModule = 'overview'
 
 const SIZE = 4
+const {DEVICE_TYPE_BLOWER} = CONSTANTS
 
 class EditableCell extends React.Component {
   state = {
@@ -158,9 +159,10 @@ class Overview extends React.Component {
                   </div>
                 )
               })
+              let denomination = r.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
 
               let rateGroups = r.rate&&r.rate.rateGroups&&r.rate.rateGroups.map((rate, x) => (
-                <div className='rateItem' key={`rateItem-${x}`}>{mul(rate.price, 100)}分钱/{rate.pulse}脉冲</div>
+                <div className='rateItem' key={`rateItem-${x}`}>{mul(rate.price, 100)}分钱/{rate.pulse}{denomination}</div>
               ))
 
               let waterTimeItems =r.waterTimeRange&&r.waterTimeRange.items&&r.waterTimeRange.items.map((range, y) => (

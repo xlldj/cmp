@@ -55,31 +55,30 @@ class TimesetInfo extends React.Component {
             r.startTime = start
             r.endTime = end
           })
-          json.data.buildingTimesets.forEach((building, index) => {
-            let items = building.items
-            items.forEach((r, i) => {
-              let start = moment('1/1/2017', 'DD/MM/YYYY'), end = moment('1/1/2017', 'DD/MM/YYYY')
-              start.hour(r.startTime.hour)
-              start.minute(r.startTime.minute)
-              end.hour(r.endTime.hour)
-              end.minute(r.endTime.minute)
-              r.startTime = start
-              r.endTime = end 
-            })
-          })
           let nextState = {
             deviceType: json.data.deviceType.toString(),
             items: json.data.items,
-            selectedSchool: json.data.schoolId, 
+            selectedSchool: json.data.schoolId ? json.data.schoolId.toString() : '', 
             id: json.data.id,
             initialSchool: json.data.schoolId,
-            initialDT: json.data.deviceType,
-            building: json.data.buildingId ? json.data.buildingId.toString() : '',
-            initialBD: json.data.buildingId || ''
+            initialDT: json.data.deviceType
           }
           if (json.data.buildingTimesets) {
+            json.data.buildingTimesets.forEach((building, index) => {
+              let items = building.items
+              items.forEach((r, i) => {
+                let start = moment('1/1/2017', 'DD/MM/YYYY'), end = moment('1/1/2017', 'DD/MM/YYYY')
+                start.hour(r.startTime.hour)
+                start.minute(r.startTime.minute)
+                end.hour(r.endTime.hour)
+                end.minute(r.endTime.minute)
+                r.startTime = start
+                r.endTime = end 
+              })
+            })
             nextState.buildingTimesets = json.data.buildingTimesets
           }
+          console.log(nextState)
           this.setState(nextState)
           if (json.data.schoolId) {
             this.fetchBuildings(json.data.schoolId)
@@ -185,8 +184,7 @@ class TimesetInfo extends React.Component {
     const body = {
       items: items,
       deviceType: parseInt(deviceType, 10),
-      schoolId: parseInt(selectedSchool, 10),
-      type: 1
+      schoolId: parseInt(selectedSchool, 10)
     }
     if (buildingTimesets.length > 0) {
       buildingTimesets.forEach(r => {
@@ -362,8 +360,7 @@ class TimesetInfo extends React.Component {
     let resource = '/time/range/water/check'
     const body = {
       schoolId: parseInt(selectedSchool, 10),
-      deviceType: parseInt(deviceType, 10),
-      type: 1 // alwways check school
+      deviceType: parseInt(deviceType, 10)
     }
     const cb = (json) => {
       if (json.error) {
@@ -519,6 +516,7 @@ class TimesetInfo extends React.Component {
         </div>
       )
     })
+    console.log(selectedSchool)
 
     return (
       <div className='infoList timeset'>
@@ -528,8 +526,10 @@ class TimesetInfo extends React.Component {
             <SchoolSelectWithoutAll 
               disabled={id}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''} selectedSchool={selectedSchool.toString()} 
-              changeSchool={this.changeSchool} checkSchool={this.checkSchool} /> 
+              className={id ? 'disabled' : ''} 
+              selectedSchool={selectedSchool.toString()} 
+              changeSchool={this.changeSchool} 
+              checkSchool={this.checkSchool} /> 
             {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
           </li>
           <li>

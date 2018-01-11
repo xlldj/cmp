@@ -20,7 +20,13 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask} from '../../actions'
+const {PRIORITY_NORMAL} = CONSTANTS
 const subModule = 'taskList'
+const classLevel = {
+  1: '',
+  2: 'yellowfc',
+  3: 'red'
+}
 
 const TIMERANGESELECTS = {
   0: {
@@ -113,7 +119,7 @@ class TaskList extends React.Component {
       let page = panel_page[main_phase]
       // console.log(json.data)
       // console.log(json.data[jsonKeyName])
-      panel_dataSource[main_phase][page] = json.data.workOrders
+      panel_dataSource[main_phase] = json.data.workOrders
       newTotal[main_phase] = json.data.total
 
       /* update 'selectedDetailId' if neccesary */
@@ -131,7 +137,6 @@ class TaskList extends React.Component {
         })
         if (index !== -1) {
           newProps.selectedRowIndex = index
-        } else {
         }
         console.log(index)
       }
@@ -195,7 +200,7 @@ class TaskList extends React.Component {
     } = this.props.taskList
     let page = panel_page[main_phase]
     let startTime = panel_startTime[main_phase], endTime = panel_endTime[main_phase]
-    if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) {
+    if (panel_dataSource[main_phase]) {
       // dataSource has the data
       if (this.state.loading) {
         this.setState({
@@ -258,7 +263,8 @@ class TaskList extends React.Component {
       this.props.changeTask(subModule, {
         showDetail: false,
         selectedRowIndex: -1,
-        selectedDetailId: -1
+        selectedDetailId: -1,
+        details: {}
       })
     }
   }
@@ -294,15 +300,7 @@ class TaskList extends React.Component {
       if (!checkObject(this.props.taskList, nextProps.taskList, [
         'main_phase', 'main_schoolId', 'main_mine', 
         'panel_rangeIndex', 'panel_startTime', 'panel_endTime', 'panel_type',
-        'panel_selectKey', 'panel_page', 'showDetail']) || !panel_dataSource[main_phase][page]) {
-          if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) {
-            // dataSource has the data
-            if (this.state.loading) {
-              this.setState({
-                loading: false
-              })
-            }
-          } else {
+        'panel_selectKey', 'panel_page']) || !panel_dataSource[main_phase]) {
             // fetch the data
             let type = panel_type[main_phase]
             let page = panel_page[main_phase]
@@ -329,15 +327,13 @@ class TaskList extends React.Component {
             if (type !== 1) {
               body.type = type - 1
             }
-            if (!this.state.loading) {
-              this.fetchTasks(body)
-            }
-          }
+            this.fetchTasks(body)
         }
 
       // Check if fetch detail data. If these props change, need to check.
+      /*
       if (showDetail && !checkObject(this.props.taskList, nextProps.taskList, ['selectedRowIndex'])) {
-        let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
+        let selectedItem = panel_dataSource[main_phase] && panel_dataSource[main_phase][selectedRowIndex] // selected row
         let id = ''
         if (selectedItem) { // should always be true, or else it can't be clicked.
         console.log(selectedItem)
@@ -364,6 +360,7 @@ class TaskList extends React.Component {
           }
         }
       }
+      */
       this.props = nextProps
     } catch (e) {
       console.log(e)
@@ -411,14 +408,14 @@ class TaskList extends React.Component {
       return
     }
     this.props.changeTask(subModule, {
-      'main_schoolId': v, panel_page: [1, 1, 1], panel_dataSource: [{}, {}, {}]
+      'main_schoolId': v, panel_page: [1, 1, 1], panel_dataSource: {1: [], 2: [], 3: []}
     })
   }
   changeAll = (v)=> {
     let {main_mine} = this.props.taskList
     if (v !== main_mine) {
       this.props.changeTask(subModule, {
-        'main_mine': v, 'panel_page': [1, 1, 1], panel_dataSource: [{}, {}, {}]
+        'main_mine': v, 'panel_page': [1, 1, 1], panel_dataSource: {1: [], 2: [], 3: []}
       })
     }
   }
@@ -432,7 +429,7 @@ class TaskList extends React.Component {
     let i = this.props.taskList.main_phase
     panel_rangeIndex[i] = parseInt(key, 10)
     panel_page[i] = 1
-    panel_dataSource[i] = {} // clear dataSource of the corresponding panel 
+    panel_dataSource[i + 1] = [] // clear dataSource of the corresponding panel 
     // clear startTime and endTime
     startTime[i] = ''
     endTime[i] = ''
@@ -449,7 +446,7 @@ class TaskList extends React.Component {
     let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList['panel_dataSource']))
     let i = this.props.taskList.main_phase
     panel_type[i] = parseInt(key, 10)
-    panel_dataSource[i] = {} // clear dataSource of the corresponding panel 
+    panel_dataSource[i + 1] = [] // clear dataSource of the corresponding panel 
     this.props.changeTask(subModule, {
       panel_type: panel_type, panel_dataSource: panel_dataSource
     })
@@ -480,7 +477,7 @@ class TaskList extends React.Component {
     panel_endTime[i] = endTime
     panel_page[i] = 1
     panel_rangeIndex[i] = 0
-    panel_dataSource[i] = {} // clear dataSource of the corresponding panel 
+    panel_dataSource[i + 1] = [] // clear dataSource of the corresponding panel 
     this.props.changeTask(subModule, {
       panel_startTime: panel_startTime, 
       panel_endTime: panel_endTime, 
@@ -503,7 +500,7 @@ class TaskList extends React.Component {
     let i = this.props.taskList.main_phase
     panel_selectKey[i] = v
     panel_page[i] = 1
-    panel_dataSource[i] = {}
+    panel_dataSource[i + 1] = []
     this.props.changeTask(subModule, {
       panel_selectKey: panel_selectKey,
       panel_page: panel_page,
@@ -511,9 +508,9 @@ class TaskList extends React.Component {
     })
   }
   selectRow = (record, index, event) => {
-    let {detail_tabIndex, main_phase, panel_dataSource, panel_page} = this.props.taskList
-    let page = panel_page[main_phase]
-    let id = panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][index] && panel_dataSource[main_phase][page][index].id
+    let {detail_tabIndex, main_phase, panel_dataSource} = this.props.taskList
+    // let page = panel_page[main_phase]
+    let id = panel_dataSource[main_phase] && panel_dataSource[main_phase][index] && panel_dataSource[main_phase][index].id
     let newTabIndex = Array.from(detail_tabIndex)
     newTabIndex[main_phase] = 1
     this.props.changeTask(subModule, {
@@ -564,7 +561,7 @@ class TaskList extends React.Component {
   updateList = () => {
     let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList.panel_dataSource))
     let panel_page = Array.from(this.props.taskList.panel_page)
-    panel_dataSource[1] = {} // clear handling list
+    delete panel_dataSource[1] // clear handling list
     panel_page[1] = 1
     let newProps = {
       panel_dataSource: panel_dataSource,
@@ -583,7 +580,7 @@ class TaskList extends React.Component {
     } = this.props.taskList
     const {forbiddenStatus} = this.props
     let page = panel_page[main_phase]
-    let dataSource = (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) || []
+    let dataSource = panel_dataSource[main_phase] || []
     console.log(dataSource)
     const {loading, startTime, endTime, searchingText, showBuild} = this.state
 
@@ -672,7 +669,7 @@ class TaskList extends React.Component {
       title: '紧急程度',
       dataIndex: 'level',
       width: '8%',
-      render: (text) => (CONSTANTS.PRIORITY[text])
+      render: (text, record) => (<span className={classLevel[record.level]}>{CONSTANTS.PRIORITY[text]}</span>)
     }, {
       title: '创建时间',
       dataIndex: 'createTime',

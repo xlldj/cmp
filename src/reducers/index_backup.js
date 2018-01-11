@@ -284,7 +284,7 @@ const initialTaskState = {
     panel_selectKey: ['', '', ''],
     panel_total: [0, 0, 0], // change these parameters will clear former dataSource and reload
     panel_page: [1, 1, 1], // change this will check if need to reload data
-    panel_dataSource: {1: [], 2: [], 3: []}, // store data of different type as element of array. For each type, use 'page' as key to save data.
+    panel_dataSource: [{}, {}, {}], // store data of different type as element of array. For each type, use 'page' as key to save data.
     panel_countOfUnviewed: [0, 0, 0], // count of data need to check again(status changed since last time check)
 
     // state for detail page

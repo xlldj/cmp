@@ -10,10 +10,7 @@ import { withRouter } from 'react-router-dom'
 import { changeTask } from '../../actions'
 
 import {getLocal} from '../util/storage'
-const TaskLog = asyncComponent(()=>import(/* webpackChunkName: "taskLog" */ "./log/taskLog"))
 const TaskList = asyncComponent(()=>import(/* webpackChunkName: "taskList" */ "./taskList"))
-const Complaint = asyncComponent(()=>import(/* webpackChunkName: "complaint" */ "./complaint/complaint"))
-const Feedback = asyncComponent(()=>import(/* webpackChunkName: "feedback" */ "./feedback/feedback"))
 
 const breadcrumbNameMap = {
   '/list': '工单列表',
@@ -72,19 +69,13 @@ class TaskDisp extends React.Component {
           <Bread breadcrumbNameMap={breadcrumbNameMap} single={false} parent='task'
             setStatusFortask={this.setStatusFortask}
             clearStatus4taskIIlist={this.clearStatus4taskIIlist}
-            clearStatus4taskIIlog={this.clearStatus4taskIIlog}
-            clearStatus4taskIIcomplaint={this.clearStatus4taskIIcomplaint}
-            clearStatus4taskIIfeedback={this.clearStatus4taskIIfeedback}
             parentName='客服工单' 
           />
         </div>
 
         <div className='disp'>
           <Switch >
-            <Route path='/task/log' render={(props) => (<TaskLog hide={this.props.hide} {...props} />)} />
             <Route path='/task/list' render={(props) => (<TaskList hide={this.props.hide} {...props} />)} />
-            <Route path='/task/complaint' render={(props) => (<Complaint hide={this.props.hide} {...props} />)} />
-            <Route path='/task/feedback' render={(props) => (<Feedback hide={this.props.hide} {...props} />)} />
             <Route exact path='/task' render={(props) => (<Redirect to='/task/list' />)} />
           </Switch>
         </div>

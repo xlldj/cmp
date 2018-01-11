@@ -102,8 +102,7 @@ class TaskDetail extends React.Component {
       showRepairmanModal: false,
       showDeveloperModal: false,
       showFinishModal: false,
-      posting: false,
-      loadingId: ''
+      posting: false
     }
     this.reassignMenu = (
       <Menu selectable={false} onClick={this.reassign}>
@@ -459,12 +458,24 @@ class TaskDetail extends React.Component {
     // this.props.hide(false)
     // if showing, get id.
     try {
-      let {details, selectedDetailId} = this.props.taskList
-      let id = selectedDetailId, nextState = {id}
-      if (details && details.creatorId) {
-        nextState.creatorId = details.creatorId
+      let {main_phase, panel_page, panel_dataSource, 
+        selectedRowIndex, details
+      } = this.props.taskList
+      let page = panel_page[main_phase]
+      let dataSource = {}
+      if (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) {
+        dataSource = panel_dataSource[main_phase][page]
       }
-      this.setState(nextState)
+      if (dataSource[selectedRowIndex]) {
+        let id = dataSource[selectedRowIndex].id
+        if (id) {        
+          let detail = details[id]
+          this.setState({
+            id: id,
+            creatorId: detail.creatorId
+          })
+        }
+      }
     } catch (e) {
       console.log(e)
     }
@@ -475,174 +486,145 @@ class TaskDetail extends React.Component {
   componentWillReceiveProps (nextProps) {
     try {
       let {main_phase,
-        details, detail_tabIndex, showDetail, selectedDetailId, detailLoading
+        details, detail_tabIndex, showDetail, selectedDetailId
       } = nextProps.taskList
       // let page = panel_page[main_phase]
 
       // only care detail related props
       if (showDetail && !checkObject(this.props.taskList, nextProps.taskList, [
-        'detail_tabIndex', 'selectedDetailId', 'detailLoading'
+        'detail_tabIndex', 'selectedRowIndex', 'detailLoading'
       ])) {
         // get selected item.
         // let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
-        let id = selectedDetailId, detail = details
-        if (detail.id) { // if not, fetch detail
+        let id = selectedDetailId, detail
+        if (id) { // if not, it will be fetched in task/list
           // let type = selectedItem.type
-          // detail = details
-          console.log(detail)
-          let tabIndex = detail_tabIndex[main_phase]
-          let key = DETAILTAB2NAME[tabIndex]
-          if (detail.env === 2) { // if initiated by employee, do not fetch these infos.
-            return
-          }
-          if (detail.hasOwnProperty(key)) {
-            // nothing
-          } else {
-            let resource = TABINDEX2RES[tabIndex]
-            let userId = detail.creatorId 
-            let residenceId = detail.residenceId || ''
-            let deviceType = detail.deviceType || ''
-            let {deviceId, level} = detail
+          if (details[id]) { // if not , fetch it in task/list
+            detail = details[id]
+            console.log(detail)
+            let tabIndex = detail_tabIndex[main_phase]
+            let key = DETAILTAB2NAME[tabIndex]
+            if (detail.env === 2) { // if initiated by employee, do not fetch these infos.
+              return
+            }
+            if (detail.hasOwnProperty(key)) {
+              // nothing
+            } else {
+              let resource = TABINDEX2RES[tabIndex]
+              let userId = detail.creatorId 
+              let residenceId = detail.residenceId || ''
+              let deviceType = detail.deviceType || ''
+              let {deviceId, level} = detail
 
-            const body = {}
-            if (tabIndex === 1) {
-              body.id = userId
-            } else if (tabIndex === 2) {
-              body.page = 1
-              body.size = SIZE
-              body.userId = userId
-            } else if (tabIndex === 3) {
-              body.page = 1
-              body.size = SIZE
-              body.all = true
-              body.creatorId = userId
-              body.type = CONSTANTS.TASK_TYPE_REPAIR
-            } else if (tabIndex === 4) {
-              // body.
-              if (deviceType === 2) {
-                resource = '/device/water/one'
-                body.id = residenceId
-              } else {
-                resource = '/device/group/one'
-                body.id = deviceId
+              const body = {}
+              if (tabIndex === 1) {
+                body.id = userId
+              } else if (tabIndex === 2) {
+                body.page = 1
+                body.size = SIZE
+                body.userId = userId
+              } else if (tabIndex === 3) {
+                body.page = 1
+                body.size = SIZE
+                body.all = true
+                body.creatorId = userId
+                body.type = CONSTANTS.TASK_TYPE_REPAIR
+              } else if (tabIndex === 4) {
+                // body.
+                if (deviceType === 2) {
+                  resource = '/device/water/one'
+                  body.id = residenceId
+                } else {
+                  resource = '/device/group/one'
+                  body.id = deviceId
+                }
+              } else if (tabIndex === 5) {
+                body.page = 1
+                body.size = SIZE
+                body.residenceId = residenceId
+                body.deviceType = deviceType
+              } else if (tabIndex === 6) {
+                body.page = 1
+                body.size = SIZE
+                body.all = true
+                body.type = CONSTANTS.TASK_TYPE_REPAIR
+                body.residenceId = residenceId
+                body.deviceType = deviceType
+              } else if (tabIndex === 7) {
+                // user fund record
+                body.page = 1
+                body.size = SIZE
+                body.userId = userId
+              } else if (tabIndex === 8) {
+                // user complaint
+                body.page = 1
+                body.size = SIZE
+                body.type = CONSTANTS.TASK_TYPE_COMPLAINT
+                body.creatorId = userId
+              } else if (tabIndex === 9) {
+                // user feedback
+                body.page = 1
+                body.size = SIZE
+                body.type = TASK_TYPE_FEEDBACK
+                body.creatorId = userId
               }
-            } else if (tabIndex === 5) {
-              body.page = 1
-              body.size = SIZE
-              body.residenceId = residenceId
-              body.deviceType = deviceType
-            } else if (tabIndex === 6) {
-              body.page = 1
-              body.size = SIZE
-              body.all = true
-              body.type = CONSTANTS.TASK_TYPE_REPAIR
-              body.residenceId = residenceId
-              body.deviceType = deviceType
-            } else if (tabIndex === 7) {
-              // user fund record
-              body.page = 1
-              body.size = SIZE
-              body.userId = userId
-            } else if (tabIndex === 8) {
-              // user complaint
-              body.page = 1
-              body.size = SIZE
-              body.type = CONSTANTS.TASK_TYPE_COMPLAINT
-              body.creatorId = userId
-            } else if (tabIndex === 9) {
-              // user feedback
-              body.page = 1
-              body.size = SIZE
-              body.type = TASK_TYPE_FEEDBACK
-              body.creatorId = userId
-            }
-            const cb = (json) => {
-              this.setState({
-                tabLoading: false
-              })
-              let jsonDataName = DETAILTAB2JSONNAME[tabIndex], data = {}
-              if (tabIndex === 1 || tabIndex === 4) {
-                data = json.data
-              } else {
-                data = json.data[jsonDataName]
+              const cb = (json) => {
+                this.setState({
+                  tabLoading: false
+                })
+                let jsonDataName = DETAILTAB2JSONNAME[tabIndex], data = {}
+                if (tabIndex === 1 || tabIndex === 4) {
+                  data = json.data
+                } else {
+                  data = json.data[jsonDataName]
+                }
+                let newDetails = JSON.parse(JSON.stringify(details))
+                // if 'complaint' or 'feedback', build different structure for page change.
+                if (tabIndex === 8 || tabIndex === 9) {
+                  newDetails[id][key] = {}
+                  newDetails[id][key]['dataSource'] = data
+                  newDetails[id][key]['page'] = 1
+                  newDetails[id][key]['total'] = json.data.total
+                } else {
+                  newDetails[id][key] = data
+                }
+                this.props.changeTask(subModule, {
+                  details: newDetails
+                })
               }
-              let newDetails = JSON.parse(JSON.stringify(details))
-              // if 'complaint' or 'feedback', build different structure for page change.
-              if (tabIndex === 8 || tabIndex === 9) {
-                newDetails[key] = {}
-                newDetails[key]['dataSource'] = data
-                newDetails[key]['page'] = 1
-                newDetails[key]['total'] = json.data.total
-              } else {
-                newDetails[key] = data
-              }
-              this.props.changeTask(subModule, {
-                details: newDetails
-              })
-            }
-            AjaxHandler.ajax(resource, body, cb)
+              AjaxHandler.ajax(resource, body, cb)
 
-            // set state
-            let nextState = {
-              tabLoading: true
+              // set state
+              let nextState = {
+                tabLoading: true
+              }
+              if (id && (id !== this.state.id)) {
+                nextState.id = id
+              }
+              if (userId && (userId !== this.state.userId)) {
+                nextState.userId = userId
+              }
+              if (detail.creatorId && (detail.creatorId !== this.state.creatorId)) {
+                nextState.creatorId = detail.creatorId
+              }
+              if (deviceType && deviceType !== this.state.deviceType) {
+                nextState.deviceType = deviceType
+              }
+              if (residenceId && residenceId !== this.state.residenceId) {
+                nextState.residenceId = residenceId
+              }
+              if (level && level !== this.state.level) {
+                nextState.level = level
+              }
+              this.setState(nextState)
             }
-            if (id && (id !== this.state.id)) {
-              nextState.id = id
-            }
-            if (userId && (userId !== this.state.userId)) {
-              nextState.userId = userId
-            }
-            if (detail.creatorId && (detail.creatorId !== this.state.creatorId)) {
-              nextState.creatorId = detail.creatorId
-            }
-            if (deviceType && deviceType !== this.state.deviceType) {
-              nextState.deviceType = deviceType
-            }
-            if (residenceId && residenceId !== this.state.residenceId) {
-              nextState.residenceId = residenceId
-            }
-            if (level && level !== this.state.level) {
-              nextState.level = level
-            }
-            this.setState(nextState)
           }
-        } else if (!detailLoading) {
-          const body = {
-            id: id
-          }
-          this.fetchTaskDetail(body)
         }
       }
       this.props = nextProps
     } catch (e) {
       console.log(e)
     }
-  }
-  fetchTaskDetail = (body) => {
-    if (this.props.taskList.detailLoading && body.id === this.state.loadingId) {
-      return
-    }
-    this.props.changeTask(subModule, {
-      detailLoading: true
-    })
-    let resource = '/work/order/one'
-    const cb = (json) => {
-      // only handle data here
-      let {details} = this.props.taskList
-      let newDetails = Object.assign({}, details, json.data)
-      let value = {
-        details: newDetails,
-        detailLoading: false
-      }
-      console.log(newDetails)
-      // set data into store
-      this.props.changeTask(subModule, value)
-    }
-    // console.log(resource)
-    this.setState({
-      loadingId: body.id
-    })
-    AjaxHandler.ajax(resource, body, cb)
   }
   changeDivision = (v)=> {
     let {all} = this.state
@@ -816,8 +798,8 @@ class TaskDetail extends React.Component {
     const cb = (json) => {
       let {status, logs, endTime, level, handleLimit} = json.data
       let details = JSON.parse(JSON.stringify(this.props.taskList.details))
-      if (details.id) { // should always exist
-        let detail = details
+      if (details[id]) { // should always exist
+        let detail = details[id]
         detail.status = status
         detail.logs = logs
         if (endTime) {
@@ -844,10 +826,10 @@ class TaskDetail extends React.Component {
     } else {
       let {panel_rangeIndex, panel_startTime, panel_endTime, 
         panel_type, panel_selectKey, panel_page, details, selectedDetailId} = this.props.taskList
-      let type = details.type
+      let type = details[selectedDetailId].type
       let panel_dataSource = JSON.parse(JSON.stringify(this.props.taskList.panel_dataSource))
-      delete panel_dataSource[1]
-      delete panel_dataSource[2]
+      panel_dataSource[0] = {}
+      panel_dataSource[1] = {}
       // set props for 'handling', make sure detail can be found in list data.
       let newRangeIndex = Array.from(panel_rangeIndex)
       newRangeIndex[1] = 3
@@ -876,7 +858,6 @@ class TaskDetail extends React.Component {
     }
   }
   updateAndClose = (id) => {
-    /*
     let resource = '/work/order/one'
     const body = {
       id: id
@@ -884,8 +865,8 @@ class TaskDetail extends React.Component {
     const cb = (json) => {
       let {status, logs, endTime, level, handleLimit} = json.data
       let details = JSON.parse(JSON.stringify(this.props.taskList.details))
-      if (details.id) { // should always exist
-        let detail = details
+      if (details[id]) { // should always exist
+        let detail = details[id]
         detail.status = status
         detail.logs = logs
         if (endTime) {
@@ -903,15 +884,12 @@ class TaskDetail extends React.Component {
       })
     }
     AjaxHandler.ajax(resource, body, cb)
-    */
     /* no matter ajax success or fail, close detail and fetch list again */
     // let {showDetail, selectedRowIndex, panel_dataSource} = this.props.taskList
     let newProps = {
-      details: {},
       showDetail: false,
       selectedRowIndex: -1,
-      selectedDetailId: -1,
-      panel_dataSource: {}
+      panel_dataSource: [{}, {}, {}]
     }
     this.props.changeTask(subModule, newProps)
   }
@@ -965,8 +943,10 @@ class TaskDetail extends React.Component {
       let {main_phase,
         details, detail_tabIndex
       } = this.props.taskList
-      let detail = details
-
+      let id = this.state.id, detail = {}
+      if (id) {
+        detail = details[id]
+      }
       let {deviceType, creatorId, residenceId, userMobile} = detail
 
       let currentTab = detail_tabIndex[main_phase]
@@ -1060,7 +1040,14 @@ class TaskDetail extends React.Component {
   }
   changeComplaintPage = (page, pageSize) => {
     try {
+      let {details} = this.props.taskList
       let {id, creatorId} = this.state
+      if (details[id]) {
+        let detail = details[id]
+        if (page === detail.page) {
+          return
+        }
+      }
       // fetch more 
       let resource = '/work/order/list'
       const body = {}
@@ -1074,7 +1061,7 @@ class TaskDetail extends React.Component {
           tabLoading: false
         })
         let newDetails = JSON.parse(JSON.stringify(this.props.taskList.details))
-        let userComplaints = newDetails.userComplaints
+        let userComplaints = newDetails[id].userComplaints
         userComplaints.page = page
         userComplaints.total = json.data.total
         userComplaints.dataSource = json.data.workOrders
@@ -1093,7 +1080,14 @@ class TaskDetail extends React.Component {
   changeFeedbackPage = (page, pageSize) => {
     try {
       console.log(page)
+      let {details} = this.props.taskList
       let {id, creatorId} = this.state
+      if (details[id]) {
+        let detail = details[id]
+        if (page === detail.page) {
+          return
+        }
+      }
       // fetch more 
       let resource = '/work/order/list'
       const body = {}
@@ -1107,7 +1101,7 @@ class TaskDetail extends React.Component {
           tabLoading: false
         })
         let newDetails = JSON.parse(JSON.stringify(this.props.taskList.details))
-        let userFeedbacks = newDetails.userFeedbacks
+        let userFeedbacks = newDetails[id].userFeedbacks
         userFeedbacks.page = page
         userFeedbacks.total = json.data.total
         userFeedbacks.dataSource = json.data.workOrders
@@ -1143,8 +1137,10 @@ class TaskDetail extends React.Component {
     // get type and id
     // let page = panel_page[main_phase]
     // let selectedItem = panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
-    let id = selectedDetailId
-    let detail = details || {} // info of current selected item
+    let id = selectedDetailId, detail = {}
+    if (id) {
+      detail = details[id.toString()] || {} // info of current selected item
+    }
     console.log(detail)
     let {committer, committerOrder, committerRepair, deviceInfo, deviceOrder, deviceRepair,
       userFundRecord, userComplaints, userFeedbacks,

@@ -176,9 +176,9 @@ class VersionInfo extends React.Component {
       nextState.codeErrorMsg = '版本号不能为空！'
       return this.setState(nextState)
     }
-    if (!/^[1-9]\d?\.[0-9]\d?\.[0-9]\d?$/.test(versionNo)) {
+    if (!/^[1-9]\d?\.[0-9]\d?\.[0-9]\d?(\.[0-9]\d?)?$/.test(versionNo)) {
       nextState.codeError = true
-      nextState.codeErrorMsg = '版本号格式不正确，请输入如1.1.1格式的数字,每个数字不超过两位'
+      nextState.codeErrorMsg = '版本号格式不正确，请输入如1.1.1或1.1.1.1格式的数字,每个数字不超过两位'
       return this.setState(nextState)
     }
     nextState.codeError = false
@@ -239,9 +239,9 @@ class VersionInfo extends React.Component {
       nextState.codeErrorMsg = '版本号不能为空！'
       return this.setState(nextState)
     }
-    if (!/^[1-9]\d?\.[0-9]\d?\.[0-9]\d?$/.test(v)) {
+    if (!/^[1-9]\d?\.[0-9]\d?\.[0-9]\d?(\.[0-9]\d?)?$/.test(v)) {
       nextState.codeError = true
-      nextState.codeErrorMsg = '版本号格式不正确，请输入如1.1.1格式的数字,每个数字不超过两位'
+      nextState.codeErrorMsg = '版本号格式不正确，请输入如1.1.1或1.1.1.1格式的数字,每个数字不超过两位'
       return this.setState(nextState)
     }
     nextState.codeError = false
