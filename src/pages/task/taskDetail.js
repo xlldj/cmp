@@ -700,7 +700,12 @@ class TaskDetail extends React.Component {
     }
   }
   close = (e) => {
-    this.props.changeTask(subModule, {selectedRowIndex: -1, showDetail: false})
+    this.props.changeTask(subModule, {
+      details: {},
+      showDetail: false,
+      selectedRowIndex: -1,
+      selectedDetailId: -1
+    })
   }
   showTabImg = (index, i) => {
     this.setState({
@@ -1343,7 +1348,7 @@ class TaskDetail extends React.Component {
                           <li><label>用户性别:</label><span>{CONSTANTS.SEX[committer.sex]}</span></li>
                         : null
                       }
-                      <li><label>账户余额:</label><span>{committer && committer.balance ? committer.balance : ''}</span></li>
+                      <li><label>账户余额:</label><span>{committer ? ('¥' + (committer.balance || 0)) : ''}</span></li>
                       <li><label>注册时间:</label><span>{committer && committer.createTime ? Time.getTimeStr(committer.createTime) : ''}</span></li>
                     </ul>
                   : null

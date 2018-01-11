@@ -13,7 +13,7 @@ class RepairmanTable extends React.Component{
     this.state = {
       dataSource,
       selectedRowKeys: '',
-      priority: '1',
+      priority: 1,
       remark: '',
       schoolId: 0,
       posting: false
@@ -54,6 +54,7 @@ class RepairmanTable extends React.Component{
     if (level) {
       nextState.priority = level
     }
+    this.setState(nextState)
     this.fetchData()
   }
   componentWillReceiveProps (nextProps) {
@@ -76,11 +77,11 @@ class RepairmanTable extends React.Component{
     } catch (e) {
       console.log(e)
     }
-    if (priority === v) {
+    if (priority === parseInt(v, 10)) {
       return
     }
     this.setState({
-      priority: v
+      priority: parseInt(v, 10)
     })
   }
   cancel = () => {
@@ -202,9 +203,9 @@ class RepairmanTable extends React.Component{
           <div className='options'>
             <div className='priorityGroup'>
               <span>任务紧急程度:</span>
-              <Button type={priority==='1'?'primary':''} onClick={this.changePriority} data-value='1' >正常处理</Button>
-              <Button type={priority==='2'?'primary':''}  onClick={this.changePriority} data-value='2' >优先处理</Button>
-              <Button type={priority==='3'?'primary':''}  onClick={this.changePriority} data-value='3' >紧急处理</Button>
+              <Button type={priority===1?'primary':''} onClick={this.changePriority} data-value='1' >正常处理</Button>
+              <Button type={priority===2?'primary':''}  onClick={this.changePriority} data-value='2' >优先处理</Button>
+              <Button type={priority===3?'primary':''}  onClick={this.changePriority} data-value='3' >紧急处理</Button>
             </div>
             <div className='customNote'>
               <textarea placeholder='备注信息(选填)' className='noteInput' value={this.state.remark} onChange={this.changeRemark} onBlur={this.checkRemark} />
