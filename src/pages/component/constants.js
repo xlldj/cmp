@@ -531,7 +531,9 @@ const CONSTANTS = {
     '发布/编辑系统公告': 'EDIT_SYSTEM_NOTIFY',
     '发布/编辑客服公告': 'EDIT_CUSTOM_NOTIFY',
     '删除公告': 'DELETE_NOTIFY',
-    '审核': 'CENSOR_NOTIFY'
+    '审核': 'CENSOR_NOTIFY',
+    '转接/完结/发送客服消息': 'HANDLE_TASK',
+    '创建工单': 'BUILD_TASK'
   },
   authenData: [
     {
@@ -675,8 +677,8 @@ const CONSTANTS = {
     '失物招领详情': ['lost/lostInfo'],
     '用户列表/搜索/查询': ['user'],
     '用户详情': ['user/userInfo'],
-    '工单列表/搜索/查询': ['task/list'],
-    '工单详情': ['fund/list/fundInfo', 'device/repair/repairInfo'],
+    '工单列表查询/搜索/详情': ['task/list'],
+    '转接/完结/发送客服消息': [],
     '客服工作记录列表/搜索/查询': ['task/log'],
     '客服工作记录详情': ['task/log/detail'],
     '添加工作记录': ['task/log/add'],

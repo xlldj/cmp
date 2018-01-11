@@ -1,6 +1,6 @@
 /* ---------------- state description --------------- */
 /* 
-   temporary change: 
+   temporary change: (deleted 2018/1/11)
      distinguish 'maintainer' and other roles.
      use 'type' to differ. type: {2: maintainer,  3: other roles} 
 */
@@ -27,17 +27,11 @@ import MultiSelectModal from '../component/multiSelectModal'
 import SchoolMutilSelect from '../component/schoolMultiSelectModal'
 import AuthenDataTable from '../component/authenDataTable'
 import {buildAuthenBaseOnfull} from '../util/authenDataHandle'
-import BasicSelector from '../component/basicSelectorWithoutAll'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { setAuthenData, setRoleList } from '../../actions'
-
-const TYPES = {
-  2: '维修员',
-  3: '其他'
-}
 
 const backTitle = {
   fromFund: '返回资金详情'
@@ -72,8 +66,7 @@ class EmployeeInfo extends React.Component {
       selectedSchools: [],
       authenStatus: [],
       posting: false,
-      checking: false, 
-      type: ''
+      checking: false 
     }
     this.roleColumns = [{
       title: '身份',
@@ -112,15 +105,14 @@ class EmployeeInfo extends React.Component {
     let resource='/api/employee/one'
     const cb = (json) => {
       if(json.data){
-        let {id, contactMobile, account, schoolLimit, roles, type, nickName, schools} = json.data
+        let {id, contactMobile, account, schoolLimit, roles, nickName, schools} = json.data
         let nextState = {
           id: id,
           account: account,
           schoolLimit: schoolLimit,
           contactMobile: contactMobile,
           nickName: nickName,
-          originalMobile: contactMobile,
-          type: type
+          originalMobile: contactMobile
         }
         let selectedSchools = [] 
         schools.forEach(s => {
@@ -227,7 +219,6 @@ class EmployeeInfo extends React.Component {
   }
   postData = () => {
     let {account, contactMobile, nickName, roleData, id, selectedSchools, schoolLimit, posting} = this.state
-    let type = parseInt(this.state.type, 10)
     if (posting) {
       return
     }
@@ -239,16 +230,13 @@ class EmployeeInfo extends React.Component {
       account: account,
       contactMobile: contactMobile,
       name: nickName,
-      type: type,
       schoolLimit: schoolLimit
     }
     if (schoolLimit) {
       body.schoolIds = selectedSchools.map(s => s.id)
     }
-    if (type === 3) {
-      let selectedRoles = roleData.filter(r => r.selected === true)
-      body.roles = selectedRoles.map(r => r.id)
-    }
+    let selectedRoles = roleData.filter(r => r.selected === true)
+    body.roles = selectedRoles.map(r => r.id)
     if (id) {
       body.id = id
       resource ='/api/employee/update'
@@ -279,7 +267,7 @@ class EmployeeInfo extends React.Component {
     AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
   }
   confirm = () => {
-    let {account, schoolLimit, type, roleData, selectedSchools} = this.state
+    let {account, schoolLimit, roleData, selectedSchools} = this.state
     if (!account) {
       return this.setState({
         accountError: true
@@ -305,18 +293,11 @@ class EmployeeInfo extends React.Component {
         nameErrorMessage: '名字不能为空！'
       })
     }
-    if (!type) {
+    let r = roleData.filter(r => r.selected === true)
+    if (!r || r.length === 0) {
       return this.setState({
-        typeError: true
+        roleError: true
       })
-    }
-    if (parseInt(type, 10) === 3) {
-      let r = roleData.filter(r => r.selected === true)
-      if (!r || r.length === 0) {
-        return this.setState({
-          roleError: true
-        })
-      }
     }
     if (schoolLimit && (selectedSchools.length === 0)) {
       return this.setState({
@@ -486,17 +467,10 @@ class EmployeeInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeType = (value) => {
-    let v = parseInt(value, 10), nextState = {}
-    if (v) {
-      nextState.type = value
-      if (v === 3) {
-        nextState.showRoleModal = true
-      }
-      if (this.state.typeError) {
-        nextState.typeError = false
-      }
-    }
+  changeType = (e) => {
+    e.preventDefault()
+    let nextState = {}
+    nextState.showRoleModal = true
     this.setState(nextState)
   }
   clearSchoolLimit = () => {
@@ -513,15 +487,14 @@ class EmployeeInfo extends React.Component {
       contactMobile, mobileError, mobileErrorMessage,
       roleError, showRoleModal, roleData,
       showSchools, schoolError, selectedSchools, schoolLimit,
-      authenStatus,
-      typeError
+      authenStatus
     } = this.state
-    let type = parseInt(this.state.type, 10)
     const selectedSchoolItems = selectedSchools && selectedSchools.map((r,i)=>(
       <span key={i}>{r.name}</span>
     ))
-    const selectedRoleItems = roleData && roleData.map((r, i) => {
-      return (<span key={i}>{r.selected ? r.name: ''}</span>)
+    const selectedRoles = roleData && roleData.filter(r => r.selected === true)
+    const selectedRoleItems = selectedRoles && selectedRoles.map((r, i) => {
+      return (<span key={i}>{r.name}</span>)
     })
 
     /* formal role select:
@@ -558,15 +531,9 @@ class EmployeeInfo extends React.Component {
           </li>
           <li>
             <p>员工身份:</p>
-            <BasicSelector
-              staticOpts={TYPES}
-              selectedOpt={type.toString()}
-              changeOpt={this.changeType}
-              checkOpt={this.checkType}
-            />
-            {type === 3 ? <span className='value mgl10'>{selectedRoleItems}</span> : null }
-            {(type === 3) && roleError ? <span className='checkInvalid' >请选择最少一个身份！</span> : null}
-            {typeError ? <span className='checkInvalid' >请选择身份！</span> : null}
+            <a className='mgr10' onClick={this.changeType} href='' >点击选择</a>
+            <span className='value mgl10'>{selectedRoleItems}</span>
+            {roleError ? <span className='checkInvalid' >请选择最少一个身份！</span> : null}
           </li>
           <li>
             <p>指定学校:</p>
@@ -575,12 +542,10 @@ class EmployeeInfo extends React.Component {
             {schoolError ? <span className='checkInvalid' >请为选择最少一个学校！</span> : null}
           </li>
           <li className='itemsWrapper'>
-            {parseInt(type, 10) === 3 ? 
-              <AuthenDataTable
-                clickable={false}
-                authenStatus={authenStatus}
-              />
-            : null}
+            <AuthenDataTable
+              clickable={false}
+              authenStatus={authenStatus}
+            />
           </li>
         </ul>
 
@@ -602,7 +567,8 @@ class EmployeeInfo extends React.Component {
           <SchoolMutilSelect 
             closeModal={this.closeSchool} 
             setSchools={this.setSchools} 
-            showModal={showSchools} 
+            showModal={showSchools}
+            schoolLimit={schoolLimit}
             selectedSchools={JSON.parse(JSON.stringify(selectedSchools))}
             clearSchoolLimit={this.clearSchoolLimit} 
           />

@@ -59,7 +59,8 @@ class EmployeeChoose extends React.Component{
     let {schoolId, level} = nextProps
     if (schoolId && schoolId !== this.state.schoolId) {
       this.setState({
-        schoolId: schoolId
+        schoolId: schoolId,
+        priority: level
       })
       this.fetchData()
       this.props = nextProps

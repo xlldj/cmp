@@ -37,8 +37,10 @@ class SchoolMultiSelectModal extends React.Component{
   componentWillReceiveProps (nextProps) {
     console.log(nextProps.schools)
     let nextSchools = JSON.parse(JSON.stringify(nextProps.selectedSchools))
-    let all = nextProps.all
+    let schoolLimit = nextProps.schoolLimit
     let dataSource = JSON.parse(JSON.stringify(nextProps.schools))
+    /* 
+    let all = nextProps.all
     if (all) {
       dataSource.forEach((r) => (r.selected = true))
       return this.setState({
@@ -46,15 +48,19 @@ class SchoolMultiSelectModal extends React.Component{
         all: all
       })
     }
+    */
     dataSource.forEach((r) => (r.selected = false))
-    nextSchools.forEach((r) => {
-      let s = dataSource.find((school) => (school.id === r.id))
-      if (s) {
-        s.selected = true
-      }
-    })
+    if (schoolLimit) {
+      nextSchools.forEach((r) => {
+        let s = dataSource.find((school) => (school.id === r.id))
+        if (s) {
+          s.selected = true
+        }
+      })
+    }
     this.setState({
-      dataSource: dataSource
+      dataSource: dataSource,
+      schoolLimit: schoolLimit
     })
   }
   confirm = () => {

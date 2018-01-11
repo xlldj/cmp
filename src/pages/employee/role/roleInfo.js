@@ -47,7 +47,7 @@ class RoleInfo extends React.Component {
     const cb = (json) => {
       try {
         if(json.data){
-          let {name, privileges} = json.data
+          let {name, privileges, loginLimit, functionLimit} = json.data
           let status = []
           privileges.forEach(p => {
             let r = this.props.originalPrivileges.find(o => o.id === p)
@@ -56,11 +56,18 @@ class RoleInfo extends React.Component {
             }
           })
           let authenStatus = buildAuthenBaseOnfull(this.props.full, status)
-          this.setState({
+          let nextState = {
             name: name,
             originalName: name,
             authenStatus: authenStatus 
-          })
+          }
+          if (loginLimit) {
+            nextState.loginLimit = loginLimit
+          }
+          if (functionLimit) {
+            nextState.functionLimit = functionLimit
+          }
+          this.setState(nextState)
         }  
       } catch (e) {
         console.log(e)

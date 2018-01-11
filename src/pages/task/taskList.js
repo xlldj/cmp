@@ -82,6 +82,7 @@ const SIZE = CONSTANTS.PAGINATION
 class TaskList extends React.Component {
   static propTypes = {
     taskList: PropTypes.object.isRequired,
+    forbiddenStatus: PropTypes.object.isRequired
   }
   constructor (props) {
     super(props)
@@ -580,6 +581,7 @@ class TaskList extends React.Component {
       panel_countOfUnviewed, 
       showDetail, selectedRowIndex
     } = this.props.taskList
+    const {forbiddenStatus} = this.props
     let page = panel_page[main_phase]
     let dataSource = (panel_dataSource[main_phase] && panel_dataSource[main_phase][page]) || []
     console.log(dataSource)
@@ -713,7 +715,9 @@ class TaskList extends React.Component {
             </div>
           </div>
           <div className='block'>
-            <Button type='primary' className='rightBtn' onClick={this.buildTask}>创建工单</Button>
+            {forbiddenStatus.BUILD_TASK ? null :
+                <Button type='primary' className='rightBtn' onClick={this.buildTask}>创建工单</Button>
+            }
           </div>
         </div>
 
@@ -795,7 +799,8 @@ class TaskList extends React.Component {
 // export default TaskList
 
 const mapStateToProps = (state, ownProps) => ({
-  taskList: state.changeTask[subModule]
+  taskList: state.changeTask[subModule],
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
 export default withRouter(connect(mapStateToProps, {

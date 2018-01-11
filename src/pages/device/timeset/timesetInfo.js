@@ -205,6 +205,7 @@ class TimesetInfo extends React.Component {
             delete item.timeValueError
           })
         }
+        r.buildingId = parseInt(r.buildingId, 10)
         delete r.buildingError
       })
       body.buildingTimesets = buildingTimesets
@@ -559,6 +560,12 @@ class TimesetInfo extends React.Component {
               : null
             }
           </li>
+          {buildingTimesets.length > 0 ?
+              <li><p></p>
+                <span>单独给某栋楼设置供水时段后，则这栋楼按单独设置的为准。</span>
+              </li>
+            : null
+          }
         </ul>
 
         <div className='btnArea'>

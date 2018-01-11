@@ -18,7 +18,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, changeOrder, changeDevice ,changeFund} from '../../actions'
-const {TASK_BUILD_CMP} = CONSTANTS
+const {TASK_BUILD_CMP, TASK_TYPE_FEEDBACK} = CONSTANTS
 const subModule = 'taskList'
 
 const DETAILTAB2NAME = {
@@ -82,6 +82,7 @@ const {TASK_PENDING, TASK_ASSIGNED, TASK_ACCEPTED, TASK_REFUSED, TASK_FINISHED} 
 class TaskDetail extends React.Component {
   static propTypes = {
     taskList: PropTypes.object.isRequired,
+    forbiddenStatus: PropTypes.object.isRequired
   }
   constructor (props) {
     super(props)
@@ -540,8 +541,8 @@ class TaskDetail extends React.Component {
               } else if (tabIndex === 5) {
                 body.page = 1
                 body.size = SIZE
-                body.residenceId = deviceType
-                body.deviceType = residenceId
+                body.residenceId = residenceId
+                body.deviceType = deviceType
               } else if (tabIndex === 6) {
                 body.page = 1
                 body.size = SIZE
@@ -558,13 +559,13 @@ class TaskDetail extends React.Component {
                 // user complaint
                 body.page = 1
                 body.size = SIZE
-                body.type = 2
+                body.type = CONSTANTS.TASK_TYPE_COMPLAINT
                 body.creatorId = userId
               } else if (tabIndex === 9) {
                 // user feedback
                 body.page = 1
                 body.size = SIZE
-                body.type = 3
+                body.type = TASK_TYPE_FEEDBACK
                 body.creatorId = userId
               }
               const cb = (json) => {
@@ -1118,7 +1119,7 @@ class TaskDetail extends React.Component {
   }
   render () {
     const {showDetailImgs, tabLoading, showCustomerModal, 
-      showRepairmanModal, showDeveloperModal, note, level, 
+      showRepairmanModal, showDeveloperModal, note, 
       showFinishModal, message,
       showTabImg,
       indexOfImgDataInSource, // index of [dataSource:item], shows which item's images is been viewing.  
@@ -1128,6 +1129,7 @@ class TaskDetail extends React.Component {
     let {main_phase,
       details, showDetail, detailLoading, detail_tabIndex, selectedDetailId
     } = this.props.taskList
+    const {forbiddenStatus} = this.props
 
     let currentTab = detail_tabIndex[main_phase]
 
@@ -1145,7 +1147,7 @@ class TaskDetail extends React.Component {
       schoolId, schoolName, deviceType, location, repairCause, description, images, 
       userMobile, logs,
       creatorName, assignName, createTime, status, opt, orderType, orderNo, env, type,
-      exist, handleLimit
+      exist, handleLimit, level
     } = detail
 
     // info for device detail
@@ -1437,8 +1439,8 @@ class TaskDetail extends React.Component {
           }
 
           <div className='handleBtn'>
-            {/* only show when 'status' is not finished. */}
-            {status !== CONSTANTS.TASK_FINISHED ? 
+            {/* only show when 'status' is not finished and has right to handle. */}
+            {status !== CONSTANTS.TASK_FINISHED && !forbiddenStatus.HANDLE_TASK ? 
                 <div className='btnArea'>
                   {handleLimit !== true ?
                       <Dropdown overlay={type === CONSTANTS.TASK_TYPE_REPAIR ? this.reassignMenu : this.reassignWithoutRepairman}>
@@ -1502,7 +1504,7 @@ class TaskDetail extends React.Component {
           </ul>
 
           {/* if not 'repair' type, not finished, has right to send message, show send message block. */}
-          {type !== CONSTANTS.TASK_TYPE_REPAIR && status !== CONSTANTS.TASK_FINISHED && handleLimit !== true ?
+          {type !== CONSTANTS.TASK_TYPE_REPAIR && status !== CONSTANTS.TASK_FINISHED && handleLimit !== true && !forbiddenStatus.HANDLE_TASK ?
               <div className='taskMessage'>
                 <h3>客服消息</h3>
                 <textarea 
@@ -1614,7 +1616,8 @@ class TaskDetail extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  taskList: state.changeTask[subModule]
+  taskList: state.changeTask[subModule],
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
 export default withRouter(connect(mapStateToProps, {
