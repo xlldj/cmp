@@ -279,11 +279,19 @@
 }
 .columnsWrapper{
   li{
+    display: inline-flex;
+    justify-content: space-around;
+    min-height: 30px;
     padding-left: 10px;
     .column{
       line-height: 30px;
       display: inline-block;
-      min-width: 120px;
+      min-width: 100px;
+    }
+    .column:last-child{
+      line-height: 22px;
+      padding-top: 5px;
+      padding-right: 10px;
     }
   }
 }

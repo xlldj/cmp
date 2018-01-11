@@ -18,7 +18,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, changeOrder, changeDevice ,changeFund} from '../../actions'
-const {TASK_BUILD_CMP, TASK_TYPE_FEEDBACK, DEVICE_TYPE_BLOWER} = CONSTANTS
+const {TASK_BUILD_CMP, TASK_TYPE_FEEDBACK, TASK_TYPE_REPAIR, DEVICE_TYPE_BLOWER} = CONSTANTS
 const subModule = 'taskList'
 
 const DETAILTAB2NAME = {
@@ -95,7 +95,6 @@ class TaskDetail extends React.Component {
       showDetailImgs: false,
       initialSlide: 0,
       tabLoading: false,
-      level: 1,  // default value
       reassignKey: '',
       note: '',
       showCustomerModal: false,
@@ -103,7 +102,10 @@ class TaskDetail extends React.Component {
       showDeveloperModal: false,
       showFinishModal: false,
       posting: false,
-      loadingId: ''
+      loadingId: '',
+      message: '',
+      messageError: false,
+      finishContentError: false
     }
     this.reassignMenu = (
       <Menu selectable={false} onClick={this.reassign}>
@@ -612,6 +614,11 @@ class TaskDetail extends React.Component {
           }
           this.fetchTaskDetail(body)
         }
+        if (this.state.message !== '') {
+          this.setState({
+            message: ''
+          })
+        }
       }
       this.props = nextProps
     } catch (e) {
@@ -927,18 +934,28 @@ class TaskDetail extends React.Component {
   }
   changeNote = (e) => {
     this.setState({
-      note: e.target.value
+      note: e.target.value,
+      finishContentError: false
     })
   }
   confirmFinish = () => {
     let {id, note} = this.state
+    let {type} = this.props.taskList.details
+
     let resource = '/work/order/handle'
     const body = {
       id: id,
       type: CONSTANTS.TASK_HANDLE_FINISH, // finish
       env: TASK_BUILD_CMP
     }
-    let content = note.trim()
+    let content = note.trim()    
+    console.log(type)
+    // content must not be empty when finishing repair task
+    if (type === TASK_TYPE_REPAIR && !content) {
+      return this.setState({
+        finishContentError: true
+      })
+    } 
     if (content) {
       body.content = content
     }
@@ -961,7 +978,8 @@ class TaskDetail extends React.Component {
   closeFinishModal = () => {
     this.setState({
       note: '',
-      showFinishModal: false
+      showFinishModal: false,
+      finishContentError: false
     })
   }
   goToMore = (e) => {
@@ -1025,7 +1043,8 @@ class TaskDetail extends React.Component {
   }
   changeMessage = (e) => {
     this.setState({
-      message: e.target.value
+      message: e.target.value,
+      messageError: false
     })
   }
   confirmPostMessage = (id, userMobile) => {
@@ -1036,7 +1055,7 @@ class TaskDetail extends React.Component {
       return
     }
     let m = message.trim()
-    if (!m) {
+    if (!m || m.length > 200) {
       return this.setState({
         messageError: true
       })
@@ -1061,7 +1080,7 @@ class TaskDetail extends React.Component {
     this.setState({
       posting: true
     })
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.ajax(resource, body, cb, null, {clearPosting: true, thisObj: this})
   }
   changeComplaintPage = (page, pageSize) => {
     try {
@@ -1135,6 +1154,8 @@ class TaskDetail extends React.Component {
       showTabImg,
       indexOfImgDataInSource, // index of [dataSource:item], shows which item's images is been viewing.  
       initialSlide, // initial slide of img
+      messageError,
+      finishContentError
     } = this.state
 
     let {main_phase,
@@ -1524,9 +1545,10 @@ class TaskDetail extends React.Component {
                 <textarea 
                   value={message} 
                   onChange={this.changeMessage}
-                  placeholder='可在此处发送客服消息给用户' 
+                  placeholder='可在此处发送客服消息给用户, 不超过200字' 
                 />
                 <Button onClick={() => {this.confirmPostMessage(id, userMobile)}} type='primary'>发送</Button>
+                {messageError ? <span className='checkInvalid'>消息应为1到200个字！</span> : null}
               </div>
             : null
           }
@@ -1574,6 +1596,10 @@ class TaskDetail extends React.Component {
                   placeholder='200字以内'
                 />
               </li>
+              {finishContentError ? 
+                <span className='checkInvalid'>关闭维修工单时, 内容会被发给用户，不能为空！</span>
+                : null
+              }
             </ul>
           <div className='btnArea'>
             <Button onClick={this.confirmFinish} type='primary'>确认</Button>
