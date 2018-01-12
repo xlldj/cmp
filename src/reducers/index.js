@@ -1,73 +1,70 @@
-import * as ActionTypes from '../actions'
-import {merge} from 'lodash'
-import { combineReducers } from 'redux'
-import {getLocal} from '../pages/util/storage'
-import Time from '../pages/component/time'
+import * as ActionTypes from '../actions';
+import { merge } from 'lodash';
+import { combineReducers } from 'redux';
+import { getLocal } from '../pages/util/storage';
+import Time from '../pages/component/time';
 
-const recentSchools = getLocal('recentSchools')
-var selectedSchool = 'all'
+const recentSchools = getLocal('recentSchools');
+var selectedSchool = 'all';
 if (recentSchools) {
-  let recent = recentSchools.split(',')
-  let schoolId = recent[0]
-  selectedSchool = schoolId
+  let recent = recentSchools.split(',');
+  let schoolId = recent[0];
+  selectedSchool = schoolId;
 }
 
 const initialAuthenData = {
   full: [],
   originalPrivileges: [],
-  current: [
-  ],
+  current: [],
   forbiddenUrls: [],
-  forbiddenStatus: {
-  },
+  forbiddenStatus: {},
   authenSet: false,
   mainNavs: [],
   subNavs: {}
-}
+};
 const setAuthenData = (state = initialAuthenData, action) => {
-  const {type} = action
+  const { type } = action;
   if (type === ActionTypes.SET_AUTHENDATA) {
-    const value = action.value
-    console.log(value)
-    return Object.assign({}, state, value)
+    const value = action.value;
+    return Object.assign({}, state, value);
   }
-  return state
-}
+  return state;
+};
 
 const initialRoleList = {
   roles: [],
   rolesSet: false,
   rolePrivileges: [],
   rolePrivilegesSet: false
-}
+};
 const setRoleList = (state = initialRoleList, action) => {
-  const {type} = action
+  const { type } = action;
   if (type === ActionTypes.SET_ROLE_LIST) {
-    console.log(action.value)
-    const value = action.value
+    // console.log(action.value);
+    const value = action.value;
     // console.log({...state, ...value})
-    return Object.assign({}, state, value)
+    return Object.assign({}, state, value);
   }
-  return state
-}
+  return state;
+};
 
 const initialSchools = {
   recent: [],
   schools: [],
   schoolSet: false
-}
+};
 const setSchoolList = (state = initialSchools, action) => {
-  const {type} = action
+  const { type } = action;
   if (type === ActionTypes.SET_SCHOOL_LIST) {
     if (selectedSchool === 'all' && action.value.schools.length > 0) {
-      selectedSchool = action.value.schools[0].id.toString()
+      selectedSchool = action.value.schools[0].id.toString();
     }
-    const value = action.value
+    const value = action.value;
     // console.log({...state, ...value})
-    return {...state, ...value}
+    return { ...state, ...value };
   }
-  return state
-}
+  return state;
+};
 
 const initialSchoolState = {
   schoolList: {
@@ -78,16 +75,16 @@ const initialSchoolState = {
     page: 1,
     schoolId: selectedSchool
   }
-}
+};
 const changeSchool = (state = initialSchoolState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_SCHOOL) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 const initialDeviceState = {
   deviceList: {
@@ -124,16 +121,16 @@ const initialDeviceState = {
     schoolId: selectedSchool,
     page: 1
   }
-}
+};
 const changeDevice = (state = initialDeviceState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_DEVICE) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 const initialOrderState = {
   orderList: {
@@ -155,16 +152,16 @@ const initialOrderState = {
     endTime: Time.getTodayEnd(),
     userType: 'all'
   }
-}
+};
 const changeOrder = (state = initialOrderState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_ORDER) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 // 资金管理
 const initialFundState = {
@@ -196,16 +193,16 @@ const initialFundState = {
     selectKey: '',
     userType: 'all'
   }
-}
+};
 const changeFund = (state = initialFundState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_FUND) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 // 红包管理
 const initialGiftState = {
@@ -217,16 +214,16 @@ const initialGiftState = {
     page: 1,
     schoolId: selectedSchool
   }
-}
+};
 const changeGift = (state = initialGiftState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_GIFT) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 // 失物招领
 const initialLostState = {
@@ -235,16 +232,16 @@ const initialLostState = {
     schoolId: selectedSchool,
     type: 'all'
   }
-}
+};
 const changeLost = (state = initialLostState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_LOST) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 // 用户管理
 const initialUserState = {
@@ -253,16 +250,16 @@ const initialUserState = {
     schoolId: selectedSchool,
     selectKey: ''
   }
-}
+};
 const changeUser = (state = initialUserState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_USER) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 // 客服工单
 const initialTaskState = {
@@ -284,7 +281,7 @@ const initialTaskState = {
     panel_selectKey: ['', '', ''],
     panel_total: [0, 0, 0], // change these parameters will clear former dataSource and reload
     panel_page: [1, 1, 1], // change this will check if need to reload data
-    panel_dataSource: {1: [], 2: [], 3: []}, // store data of different type as element of array. For each type, use 'page' as key to save data.
+    panel_dataSource: { 1: [], 2: [], 3: [] }, // store data of different type as element of array. For each type, use 'page' as key to save data.
     panel_countOfUnviewed: [0, 0, 0], // count of data need to check again(status changed since last time check)
 
     // state for detail page
@@ -317,24 +314,24 @@ const initialTaskState = {
     page: 1,
     schoolId: 'all'
   }
-}
+};
 const changeTask = (state = initialTaskState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_TASK) {
-    const {subModule, keyValuePair} = action
-    let newState = {}
+    const { subModule, keyValuePair } = action;
+    let newState = {};
     if (subModule === 'taskList') {
-      let taskListState = state.taskList
-      newState = Object.assign({}, taskListState, keyValuePair)
+      let taskListState = state.taskList;
+      newState = Object.assign({}, taskListState, keyValuePair);
     } else {
-      newState = keyValuePair
+      newState = keyValuePair;
     }
-    console.log(keyValuePair)
-    return Object.assign({}, state, {[subModule]: newState})
+    // console.log(keyValuePair);
+    return Object.assign({}, state, { [subModule]: newState });
   }
-  return state
-}
+  return state;
+};
 
 // 员工管理
 const initialEmployeeState = {
@@ -349,16 +346,16 @@ const initialEmployeeState = {
   roleList: {
     page: 1
   }
-}
+};
 const changeEmployee = (state = initialEmployeeState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_EMPLOYEE) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 // 公告管理
 const initialNotifyState = {
@@ -369,32 +366,32 @@ const initialNotifyState = {
   censor: {
     page: 1
   }
-}
+};
 const changeNotify = (state = initialNotifyState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_NOTIFY) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 // 版本管理
 const initialVersionState = {
   version: {
     page: 1
   }
-}
+};
 const changeVersion = (state = initialVersionState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_VERSION) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 /* 统计分析模块 */
 const initialStatState = {
@@ -417,16 +414,16 @@ const initialStatState = {
     timeSpan: 1,
     schoolName: ''
   }
-}
+};
 const changeStat = (state = initialStatState, action) => {
-  const {type} = action
+  const { type } = action;
 
   if (type === ActionTypes.CHANGE_STAT) {
-    const {subModule, keyValuePair} = action
-    return merge({}, state, {[subModule]: keyValuePair})
+    const { subModule, keyValuePair } = action;
+    return merge({}, state, { [subModule]: keyValuePair });
   }
-  return state
-}
+  return state;
+};
 
 const rootReducer = combineReducers({
   changeSchool,
@@ -444,6 +441,6 @@ const rootReducer = combineReducers({
   changeStat,
   setAuthenData,
   setRoleList
-})
+});
 
-export default rootReducer
+export default rootReducer;

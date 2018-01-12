@@ -7,9 +7,13 @@
     "babel-plugin-import": "^1.4.0",
     "babel-plugin-transform-imports": "^1.4.1",
     "enzyme": "2.4.1",
+    "eslint-plugin-prettier": "^2.4.0",
+    "husky": "^0.14.3",
     "less": "^2.7.3",
     "less-loader": "^4.0.5",
     "less-vars-to-js": "^1.2.0",
+    "lint-staged": "^6.0.0",
+    "prettier": "1.10.2",
     "react-addons-test-utils": "15.4.0",
     "webpack-bundle-analyzer": "^2.9.0"
   },
@@ -53,11 +57,11 @@
     "prop-types": "^15.6.0",
     "rc-pagination": "^1.12.9",
     "rc-select": "^6.9.1",
-    "react": "15.4.0",
+    "react": "16.2.0",
     "react-amap": "^1.0.2",
     "react-amap-plugin-geolocation": "0.0.2",
     "react-dev-utils": "^3.0.2",
-    "react-dom": "15.4.0",
+    "react-dom": "16.2.0",
     "react-error-overlay": "^1.0.9",
     "react-loadable": "^5.2.2",
     "react-redux": "^5.0.6",
@@ -67,7 +71,6 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "reqwest": "^2.0.5",
-    "semantic-ui": "^2.2.10",
     "style-loader": "0.18.2",
     "sw-precache-webpack-plugin": "0.11.3",
     "url-loader": "0.5.9",
@@ -80,15 +83,15 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,json,css,md}": ["prettier --write", "git add"]
   },
   "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}"
-    ],
-    "setupFiles": [
-      "<rootDir>/config/polyfills.js"
-    ],
+    "collectCoverageFrom": ["src/**/*.{js,jsx}"],
+    "setupFiles": ["<rootDir>/config/polyfills.js"],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.js?(x)",
       "<rootDir>/src/**/?(*.)(spec|test).js?(x)"
@@ -100,24 +103,14 @@
       "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
       "^(?!.*\\.(js|jsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
     },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
-    ],
+    "transformIgnorePatterns": ["[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"],
     "moduleNameMapper": {
       "^react-native$": "react-native-web"
     },
-    "moduleFileExtensions": [
-      "web.js",
-      "js",
-      "json",
-      "web.jsx",
-      "jsx"
-    ]
+    "moduleFileExtensions": ["web.js", "js", "json", "web.jsx", "jsx"]
   },
   "babel": {
-    "presets": [
-      "react-app"
-    ],
+    "presets": ["react-app"],
     "plugins": [
       "babel-plugin-transform-decorators-legacy",
       "react-hot-loader/babel",
@@ -132,5 +125,8 @@
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
