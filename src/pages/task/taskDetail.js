@@ -1386,7 +1386,7 @@ class TaskDetail extends React.Component {
       waterTimeRange &&
       waterTimeRange.items &&
       waterTimeRange.items.map((r, i) => (
-        <span key={i} className="inlineItem">
+        <span key={i} className="inline padR10">
           {Format.adding0(r.startTime.hour)}:{Format.adding0(
             r.startTime.minute
           )}~{Format.adding0(r.endTime.hour)}:{Format.adding0(r.endTime.minute)}

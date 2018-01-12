@@ -3,7 +3,7 @@ html {
   font-size: 12px;
 }
 body {
-  background-color: #ECECEC;
+  background-color: #ececec;
 }
 /* scroll style */
 body::-webkit-scrollbar {
@@ -37,7 +37,7 @@ a:active {
   color: #585c5e;
 }
 .outLink:hover {
-  color: #108EE9;
+  color: #108ee9;
 }
 input,
 textarea {
@@ -51,7 +51,7 @@ textarea {
   resize: none;
 }
 input:focus {
-  border-color: #108EE9;
+  border-color: #108ee9;
 }
 input.longInput {
   width: 230px !important;
@@ -94,11 +94,11 @@ button.grayBackColor:linked {
   background: none;
   outline: none;
   color: #bbb;
-  border: 1px solid  #bbb;
+  border: 1px solid #bbb;
 }
 .active {
-  color: #108EE9;
-  border-color: #108EE9;
+  color: #108ee9;
+  border-color: #108ee9;
 }
 .backBtn {
   color: #444;
@@ -117,16 +117,16 @@ button.grayBackColor:linked {
   color: #ff5555;
 }
 .yellowfc {
-  color: #FFBF00;
+  color: #ffbf00;
 }
 .greenfc {
-  color: #00A854;
+  color: #00a854;
 }
 .warning {
-  color: #FFBF00;
+  color: #ffbf00;
 }
 .success {
-  color: #00A854;
+  color: #00a854;
 }
 .shalowRed {
   color: #ff5555;
@@ -252,7 +252,7 @@ button.grayBackColor:linked {
   margin-left: 30px;
 }
 .chosen {
-  background-color: #108EE9;
+  background-color: #108ee9;
 }
 /* seems no use now, maybe used in older version task module */
 .level {
@@ -842,7 +842,7 @@ button.grayBackColor:linked {
   line-height: 95px;
   margin-top: -20px;
   font-size: 40px;
-  color: #108EE9;
+  color: #108ee9;
 }
 .nonBdr {
   outline: none;
@@ -858,6 +858,9 @@ button.grayBackColor:linked {
 }
 .padR20 {
   padding-right: 15px;
+}
+.padR10 {
+  padding-right: 10px;
 }
 .errorHint {
   color: red;
@@ -989,6 +992,9 @@ button.grayBackColor:linked {
   display: inline-block;
   width: calc(100% - 80px);
 }
+.detailList li span.inline {
+  display: inline;
+}
 .detailList li img {
   width: 50px;
   margin-right: 10px;
@@ -1022,7 +1028,7 @@ button.grayBackColor:linked {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #108EE9;
+  background: #108ee9;
   position: absolute;
   animation: load 1.04s ease infinite;
 }
@@ -1091,11 +1097,11 @@ button.grayBackColor:linked {
 }
 .checkSelect li.active {
   color: white;
-  background: #108EE9;
+  background: #108ee9;
 }
 .checkSelect li:hover {
   color: white;
-  background: #108EE9;
+  background: #108ee9;
 }
 .panelSelect {
   cursor: pointer;
@@ -1113,8 +1119,8 @@ button.grayBackColor:linked {
 }
 .panelSelect li.active,
 .panelSelect li:hover {
-  color: #108EE9;
-  border: 1px solid #108EE9;
+  color: #108ee9;
+  border: 1px solid #108ee9;
 }
 .closeBtn {
   display: inline-flex;
@@ -1151,7 +1157,7 @@ button.grayBackColor:linked {
 #root {
   width: 100%;
   height: 100vh;
-  background-color: #ECECEC;
+  background-color: #ececec;
 }
 #root .pageLoading {
   text-align: center;
