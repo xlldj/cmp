@@ -86,6 +86,9 @@
     "test": "node scripts/test.js --env=jsdom",
     "precommit": "lint-staged"
   },
+  "prettier": {
+    "singleQuote": true
+  },
   "lint-staged": {
     "*.{js,json,css,md}": ["prettier --write", "git add"]
   },
@@ -125,8 +128,5 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-  },
-  "prettier": {
-    "singleQuote": true
   }
 }
