@@ -12,14 +12,15 @@ const CONSTANTS = {
   NETWORKERRORMESSAGE: '网络出错，请稍后刷新重试',
 
   ACCOUNTTYPE: { 1: '支付宝', 2: '微信' },
-  BUSINESS: { 1: '热水器', 2: '饮水机', 3: '吹风机' },
+  BUSINESS: { 1: '热水器', 2: '饮水机', 3: '吹风机', 4: '洗衣机' },
 
   BUILDINGTYPE: { 1: '宿舍楼', 2: '其他' },
 
-  DEVICETYPE: { 1: '热水器', 2: '饮水机', 3: '吹风机' },
+  DEVICETYPE: { 1: '热水器', 2: '饮水机', 3: '吹风机', 4: '洗衣机' },
   DEVICE_TYPE_HEATER: 1,
   DEVICE_TYPE_DRINGKER: 2,
   DEVICE_TYPE_BLOWER: 3,
+  DEVICE_TYPE_WASHER: 4,
   WATERTYPE: { 1: '热水', 2: '冷水', 3: '冰水' },
   DEVICESTATUS: { 1: '正常', 2: '报修' },
   // REPAIRSTATUS: {1: '待审核', 2: '待指派', 3: '已指派', 4: '正在维修', 5: '审核未通过', 6: '已拒绝', 7: '已完成', 8: '已取消'},
@@ -123,7 +124,8 @@ const CONSTANTS = {
     2: '饮水机',
     3: '充值',
     4: '提现',
-    5: '吹风机'
+    5: '吹风机',
+    6: '洗衣机'
   },
   FEEDBACKTYPES: { 1: '功能异常', 2: '产品建议', 3: '其它' },
   TASKSTATUS: {
