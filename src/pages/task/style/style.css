@@ -4,7 +4,7 @@
   line-height: 150px;
   text-align: center;
   font-weight: 300;
-  color: #108EE9;
+  color: #108ee9;
 }
 .disabled {
   background-color: #eee;
@@ -326,4 +326,14 @@
 .modalTitle {
   font-size: 1.2em;
   margin: 10px;
+}
+.offlineWrapper {
+  background: white;
+}
+.offlineWrapper .offline {
+  width: 120px;
+  text-align: center;
+}
+.offlineWrapper .offline img {
+  width: 120px;
 }

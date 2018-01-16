@@ -4,7 +4,7 @@ import { Button } from 'antd';
 import AjaxHandler from '../ajax';
 import Noti from '../noti';
 import { setToken } from '../util/handleToken';
-import { setStore, getLocal, removeStore } from '../util/storage';
+import { setStore, getLocal } from '../util/storage';
 import { clientDetect } from '../util/clientDetect';
 import {
   buildAuthenData,
@@ -17,7 +17,7 @@ import './style/style.css';
 
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { setAuthenData } from '../../actions';
+import { setAuthenData, setUserInfo } from '../../actions';
 
 //const Form = asyncComponent(() => import(/* webpackChunkName: "form" */ "antd/lib/form"))
 //const Button = asyncComponent(() => import(/* webpackChunkName: "button" */ "antd/lib/button"))
@@ -171,7 +171,8 @@ class Log extends React.Component {
           this.handleLogError(json.error);
         } else {
           let { nickName, id, pictureUrl } = json.data.user;
-          let { fullPrivileges, privileges } = json.data;
+          let { fullPrivileges, privileges, isCs } = json.data;
+          // set global pribileges info
           if (fullPrivileges && privileges) {
             // set full privileges data
             let full = buildAuthenData(fullPrivileges);
@@ -216,20 +217,28 @@ class Log extends React.Component {
             };
             setStore('authenInfo', JSON.stringify(authenInfo));
           }
+
+          // set user and token info. Save in store and sessionStorage at the same time.
           let user = {
             name: nickName,
             id: id,
-            portrait: pictureUrl
+            portrait: pictureUrl,
+            isCs
           };
           setToken(json.data.token);
+          /* this used to be a hack for a temprary privileges-limited account
           if (json.data.forbidden) {
             setStore('forbidden', 1);
           } else {
             removeStore('forbidden');
           }
-          setStore('username', nickName);
-          setStore('userId', id);
-          this.props.login(user);
+          */
+          // setStore('username', nickName);
+          // setStore('userId', id);
+          setStore('user', JSON.stringify(user));
+          this.props.setUserInfo(user);
+          // tell app.js logged.
+          this.props.login();
           Noti.hintLog();
         }
       };
@@ -358,6 +367,7 @@ class Log extends React.Component {
 }
 export default withRouter(
   connect(null, {
-    setAuthenData
+    setAuthenData,
+    setUserInfo
   })(Log)
 );

@@ -163,6 +163,11 @@ const CONSTANTS = {
   TASK_HANDLE_SENDMESSAGE: 4,
   TASK_HANDLE_REMARK: 5,
   TASK_HANDLE_FINISH: 6,
+  // constants for task/report
+  REPORTCATE: { 1: '工作情况', 2: '投诉分析', 3: '绩效考核' },
+  REPORT_CATE_SUM: 1,
+  REPORT_CATE_COMPLAINT: 2,
+  REPORT_CATE_ASSESS: 3,
 
   CHARTTYPES: {
     1: 'order',

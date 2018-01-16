@@ -3,7 +3,7 @@ import { merge } from 'lodash';
 import { combineReducers } from 'redux';
 import { getLocal } from '../pages/util/storage';
 import Time from '../pages/component/time';
-
+console.log('reducers');
 const recentSchools = getLocal('recentSchools');
 var selectedSchool = 'all';
 if (recentSchools) {
@@ -11,6 +11,23 @@ if (recentSchools) {
   let schoolId = recent[0];
   selectedSchool = schoolId;
 }
+
+const initialUserInfo = {
+  isCs: true, // is Custom Service?
+  csOnline: false, // custom service is online?
+  name: '',
+  id: -1,
+  portrait: ''
+};
+const setUserInfo = (state = initialUserInfo, action) => {
+  const { type } = action;
+  if (type === ActionTypes.SET_USERINFO) {
+    const value = action.value;
+    console.log(value);
+    return Object.assign({}, state, value);
+  }
+  return state;
+};
 
 const initialAuthenData = {
   full: [],
@@ -290,29 +307,16 @@ const initialTaskState = {
     showDetail: false,
     detailLoading: false
   },
-  taskList1: {
-    page: 1,
-    assigned: false,
-    sourceType: 'all',
-    pending: 'all',
-    all: '1',
-    schoolId: 'all'
-  },
-  log: {
+  report: {
+    mainCate: 0, // 0: '工作情况', 1: '投诉分析', 2: '绩效考核'
     schoolId: 'all',
-    page: 1,
-    all: '1'
-  },
-  complaint: {
-    schoolId: 'all',
-    page: 1,
-    type: 'all',
-    status: 'all',
-    selectKey: ''
-  },
-  feedback: {
-    page: 1,
-    schoolId: 'all'
+
+    panel_rangeIndex: [1, 3, 3], // range for each category; 1: '今日', 2: '近3天', 3: '近7天', 5: '近30天'.
+    panel_startTime: ['', '', ''], // startTime of each panel
+    panel_endTime: ['', '', ''], // endTime of each panel
+    panel_page: [1, 1, 1],
+
+    check_dim: 1 // 考核维度，1: '学校', 2: '客服', 3: '维修员'
   }
 };
 const changeTask = (state = initialTaskState, action) => {
@@ -440,7 +444,8 @@ const rootReducer = combineReducers({
   setSchoolList,
   changeStat,
   setAuthenData,
-  setRoleList
+  setRoleList,
+  setUserInfo
 });
 
 export default rootReducer;

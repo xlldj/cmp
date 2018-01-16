@@ -14,7 +14,7 @@ const TaskList = asyncComponent(() =>
   import(/* webpackChunkName: "taskList" */ './taskList')
 );
 const TaskReport = asyncComponent(() =>
-  import(/* webpackChunkName: "taskReport" */ './report/taskReportContainer')
+  import(/* webpackChunkName: "taskReport" */ './report/taskReport')
 );
 
 const breadcrumbNameMap = {
