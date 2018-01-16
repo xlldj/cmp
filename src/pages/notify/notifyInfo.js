@@ -91,6 +91,7 @@ class NotifyInfo extends React.Component {
             nextState.schools = schools;
           }
           if (type === 1) {
+            // 如果为紧急公告，保留信息以查重.
             if (schoolRange === 1) {
               nextState.originalAll = true;
             } else {
@@ -160,9 +161,7 @@ class NotifyInfo extends React.Component {
         body.schoolRange = 2;
         body.schoolIds = schools.map(s => s.id);
       }
-      if (type === '1') {
-        body.endTime = parseInt(moment(endTime).valueOf(), 10);
-      }
+      body.endTime = parseInt(moment(endTime).valueOf(), 10);
     }
     let resource;
     if (this.props.match.params.id) {
@@ -223,7 +222,10 @@ class NotifyInfo extends React.Component {
     if (checking || posting) {
       return;
     }
-    if (type === '1') {
+    if (type === '3') {
+      this.checkMobileExistAndPost();
+    } else if (type === '1') {
+      // 如果是紧急公告，要进行查重
       if (id && originalAll) {
         // 若原来就是全部学校, 不需要查重
         this.postInfo();
@@ -245,8 +247,6 @@ class NotifyInfo extends React.Component {
       } else {
         this.checkNotifyExist(this.postInfo);
       }
-    } else if (type === '3') {
-      this.checkMobileExistAndPost();
     } else {
       this.postInfo();
     }

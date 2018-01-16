@@ -140,6 +140,10 @@ button.grayBackColor:linked {
 .hide {
   display: none !important;
 }
+/* for align */
+.inlineLeft {
+  text-align: left;
+}
 /* for time picker in gift/act and notify */
 .timePicker {
   width: 140px !important;

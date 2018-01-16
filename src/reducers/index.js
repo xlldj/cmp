@@ -13,7 +13,7 @@ if (recentSchools) {
 }
 
 const initialUserInfo = {
-  isCs: true, // is Custom Service?
+  isCs: false, // is Custom Service?
   csOnline: false, // custom service is online?
   name: '',
   id: -1,
@@ -316,7 +316,7 @@ const initialTaskState = {
     panel_endTime: ['', '', ''], // endTime of each panel
     panel_page: [1, 1, 1],
 
-    check_dim: 1 // 考核维度，1: '学校', 2: '客服', 3: '维修员'
+    assess_dim: 1 // 考核维度，1: '学校', 2: '客服', 3: '维修员'
   }
 };
 const changeTask = (state = initialTaskState, action) => {
@@ -325,12 +325,7 @@ const changeTask = (state = initialTaskState, action) => {
   if (type === ActionTypes.CHANGE_TASK) {
     const { subModule, keyValuePair } = action;
     let newState = {};
-    if (subModule === 'taskList') {
-      let taskListState = state.taskList;
-      newState = Object.assign({}, taskListState, keyValuePair);
-    } else {
-      newState = keyValuePair;
-    }
+    newState = Object.assign({}, state[subModule], keyValuePair);
     // console.log(keyValuePair);
     return Object.assign({}, state, { [subModule]: newState });
   }

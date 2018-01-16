@@ -318,6 +318,7 @@ class Main extends React.Component {
     });
   };
   render() {
+    console.log(this.props);
     let { isCs, csOnline, name } = this.props.user;
     console.log(isCs);
     return (
