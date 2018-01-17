@@ -13,8 +13,13 @@ import notworking from '../../assets/notworking.jpg';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { changeTask, setUserInfo } from '../../../actions';
+import { changeTask, setUserInfo, setTagList } from '../../../actions';
 const subModule = 'report';
+const DATANAME = {
+  1: 'workReports',
+  2: 'workAssesses',
+  3: 'tags'
+};
 const {
   REPORT_CATE_SUM,
   REPORT_CATE_COMPLAINT,
@@ -61,7 +66,9 @@ class TaskList extends React.Component {
       noteError: false,
       tagExistError: false,
       searchingText: '',
-      showBuildTag: false
+      showBuildTag: false,
+      tagLengthError: false,
+      tagId: ''
     };
     this.sumColumns = [
       {
@@ -342,7 +349,8 @@ class TaskList extends React.Component {
       let nextState = {
         loading: false
       };
-      let data = {};
+      let data = json.data[DATANAME[cate]];
+      /*
       if (cate === REPORT_CATE_SUM) {
         data = json.data.workReports;
       } else if (cate === REPORT_CATE_ASSESS) {
@@ -350,6 +358,7 @@ class TaskList extends React.Component {
       } else if (cate === REPORT_CATE_COMPLAINT) {
         data = json.data.tags;
       }
+      */
       nextState.dataSource = data;
       this.setState(nextState);
     };
@@ -373,6 +382,7 @@ class TaskList extends React.Component {
       assess_dim
     } = this.props[subModule];
 
+    // fetch reports
     let page = panel_page[mainCate];
     let startTime = panel_startTime[mainCate],
       endTime = panel_endTime[mainCate],
@@ -398,10 +408,10 @@ class TaskList extends React.Component {
       resource = '/work/condition/assess/list';
       body.type = assess_dim;
     } else if (mainCate === REPORT_CATE_COMPLAINT - 1) {
-      resource = '/complaint/tag/list';
+      resource = '/complaint/tag/stat/list';
     }
 
-    this.fetchReports(resource, body, mainCate);
+    this.fetchReports(resource, body, mainCate + 1);
 
     // set startTime and endTime if props has no-empty value
     if (panel_startTime[mainCate] && panel_endTime[mainCate]) {
@@ -428,13 +438,14 @@ class TaskList extends React.Component {
       } = nextProps[subModule];
 
       // update state.startTime to props.startTime
-      let { startTime, endTime } = this.state,
-        nextState = {};
-      if (startTime !== panel_startTime[mainCate]) {
-        nextState.startTime = panel_startTime[mainCate];
+      let startTime = panel_startTime[mainCate],
+        endTime = panel_endTime[mainCate];
+      let nextState = {};
+      if (startTime !== this.state.startTime) {
+        nextState.startTime = startTime;
       }
-      if (endTime !== panel_endTime[mainCate]) {
-        nextState.endTime = panel_endTime[mainCate];
+      if (endTime !== this.state.endTime) {
+        nextState.endTime = endTime;
       }
       this.setState(nextState);
 
@@ -472,9 +483,9 @@ class TaskList extends React.Component {
           resource = '/work/condition/assess/list';
           body.type = assess_dim;
         } else if (mainCate === REPORT_CATE_COMPLAINT - 1) {
-          resource = '/complaint/tag/list';
+          resource = '/complaint/tag/stat/list';
         }
-        this.fetchReports(resource, body, mainCate);
+        this.fetchReports(resource, body, mainCate + 1);
       }
 
       this.props = nextProps;
@@ -589,7 +600,7 @@ class TaskList extends React.Component {
     this.props.changeTask(subModule, { panel_page: newPage });
   };
 
-  buildTag = () => {
+  addTag = () => {
     this.setState({
       showBuildTag: true
     });
@@ -597,7 +608,9 @@ class TaskList extends React.Component {
   cancelBuildTag = () => {
     this.setState({
       showBuildTag: false,
-      note: ''
+      note: '',
+      originalTag: '',
+      tagId: ''
     });
   };
   buildTagSuccess = () => {
@@ -607,12 +620,17 @@ class TaskList extends React.Component {
     });
     this.updateList();
   };
-  updateList = () => {
-    this.fetchReports();
-  };
   changeNote = e => {
+    let v = e.target.value;
+    if (v.length > 10) {
+      return this.setState({
+        tagLengthError: true
+      });
+    }
     this.setState({
-      note: e.target.value
+      note: e.target.value,
+      tagLengthError: false,
+      tagExistError: false
     });
   };
   checkNote = e => {
@@ -642,8 +660,14 @@ class TaskList extends React.Component {
       return;
     }
 
-    if (tagId && tagId === originalTag) {
-      this.postTag();
+    if (tagId && description === originalTag) {
+      // nothing changed
+      return this.setState({
+        showBuildTag: false,
+        tagId: '',
+        originalTag: '',
+        note: ''
+      });
     } else {
       this.checkExist(this.postTag);
     }
@@ -690,6 +714,31 @@ class TaskList extends React.Component {
       thisObj: this
     });
   };
+  editTag = (e, index) => {
+    let { id, description } = this.state.dataSource[index];
+    this.setState({
+      tagId: id,
+      note: description,
+      originalTag: description,
+      showBuildTag: true
+    });
+  };
+  deleteTag = (e, id) => {
+    let resource = '/complaint/tag/delete';
+    const body = {
+      id: id
+    };
+    const cb = json => {
+      if (json.data.result) {
+        Noti.hintWarning('删除出错', '请稍后再尝试');
+      } else {
+        Noti.hintOk('删除成功', '已成功删除该标签');
+        this.updateList();
+        this.updateTags();
+      }
+    };
+    AjaxHandler.ajax(resource, body, cb);
+  };
   postTag = e => {
     let { tagId, note, posting } = this.state;
     if (posting) {
@@ -712,11 +761,14 @@ class TaskList extends React.Component {
         // success
         this.setState({
           showBuildTag: false,
-          note: ''
+          note: '',
+          originalTag: '',
+          tagId: ''
         });
         Noti.hintOk('操作成功', '当前标签添加成功');
         // refetch list
-        this.fetchReports();
+        this.updateList();
+        this.updateTags();
       } else {
         Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试');
       }
@@ -726,8 +778,68 @@ class TaskList extends React.Component {
       thisObj: this
     });
   };
+  updateList = () => {
+    let {
+      schoolId,
+      panel_page,
+      panel_rangeIndex,
+      panel_startTime,
+      panel_endTime,
+      mainCate
+    } = this.props[subModule];
+    let page = panel_page[mainCate];
+    let day = panel_rangeIndex[mainCate];
+    let startTime = panel_startTime[mainCate],
+      endTime = panel_endTime[mainCate];
+    const body = {
+      page: page,
+      size: SIZE
+    };
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10);
+    }
+    if (day !== 0) {
+      body.day = day;
+    }
+    if (startTime && endTime) {
+      body.startTime = startTime;
+      body.endTime = endTime;
+    }
+
+    let resource = '/complaint/tag/stat/list';
+    this.fetchReports(resource, body, REPORT_CATE_COMPLAINT);
+  };
+  updateTags = () => {
+    let resource = '/complaint/tag/list';
+    const body = {
+      page: 1,
+      size: 1000
+    };
+    const cb = json => {
+      if (json.data.tags) {
+        let tags = {};
+        json.data.tags.forEach(r => {
+          tags[r.id] = r.description;
+        });
+        this.props.setTagList(tags);
+      }
+    };
+    AjaxHandler.ajax(resource, body, cb);
+  };
   changeOnline = e => {
-    let resource = '/';
+    let resource = '/employee/cs/online';
+    const body = null;
+    const cb = json => {
+      if (json.data.result) {
+        Noti.hintOk('操作成功', '已成功上线');
+        this.props.setUserInfo({
+          csOnline: true
+        });
+      } else {
+        Noti.hintWarning('上线出错', '未成功上线，请稍后重试');
+      }
+    };
+    AjaxHandler.ajax(resource, body, cb);
   };
   render() {
     const { isCs, csOnline } = this.props.user;
@@ -749,7 +861,8 @@ class TaskList extends React.Component {
       showBuildTag,
       note,
       noteError,
-      tagExistError
+      tagExistError,
+      tagLengthError
     } = this.state;
 
     let page = panel_page[mainCate];
@@ -960,7 +1073,7 @@ class TaskList extends React.Component {
                 <Button
                   type="primary"
                   className="rightBtn"
-                  onClick={this.buildTag}
+                  onClick={this.addTag}
                 >
                   添加投诉标签
                 </Button>
@@ -1033,12 +1146,16 @@ class TaskList extends React.Component {
                   className="longInput"
                   onChange={this.changeNote}
                   onBlur={this.checkNote}
+                  placeholder="不超过10字"
                 />
                 {noteError ? (
                   <span className="checkInvalid">内容不能为空</span>
                 ) : null}
                 {tagExistError ? (
                   <span className="checkInvalid">此标签已存在！</span>
+                ) : null}
+                {tagLengthError ? (
+                  <span className="checkInvalid">标签长度不超过10个字！</span>
                 ) : null}
               </li>
             </ul>
@@ -1060,12 +1177,14 @@ class TaskList extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
   report: state.changeTask[subModule],
   user: state.setUserInfo,
-  forbiddenStatus: state.setAuthenData.forbiddenStatus
+  forbiddenStatus: state.setAuthenData.forbiddenStatus,
+  tagInfo: state.setTagList
 });
 
 export default withRouter(
   connect(mapStateToProps, {
     changeTask,
-    setUserInfo
+    setUserInfo,
+    setTagList
   })(TaskList)
 );

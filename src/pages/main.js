@@ -8,7 +8,7 @@
 import React from 'react';
 import { Route, Redirect, Link } from 'react-router-dom';
 import { asyncComponent } from './component/asyncComponent';
-import Layout from 'antd/lib/layout';
+import { Layout, Dropdown, Menu, Badge } from 'antd';
 import MyMenu from './nav/myMenu';
 import userImg from './assets/user.png';
 import logo from './assets/logo.png';
@@ -35,9 +35,9 @@ import {
   changeStat,
   setSchoolList,
   setAuthenData,
-  fetchPrivileges
+  fetchPrivileges,
+  setUserInfo
 } from '../actions';
-
 const Welcome = asyncComponent(() =>
   import(/* webpackChunkName: "welcome" */ './welcome/welcome')
 );
@@ -82,6 +82,10 @@ const VersionDisp = asyncComponent(() =>
 );
 
 const { Content } = Layout;
+const ONLINE = {
+  1: true,
+  2: false
+};
 
 class Main extends React.Component {
   static propTypes = {
@@ -92,14 +96,72 @@ class Main extends React.Component {
     authenSet: PropTypes.bool.isRequired
   };
 
-  state = {
-    hasChildren: true,
-    showForbidden: false,
-    tiForForbid: null,
-    ti: null,
-    forbiddenUrl: ''
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasChildren: true,
+      showForbidden: false,
+      tiForForbid: null,
+      ti: null,
+      forbiddenUrl: ''
+    };
+    this.onlineMenu = (
+      <Menu selectable={false} onClick={this.changeOnline}>
+        <Menu.Item className="onlineOption" key={1}>
+          <Badge className="onlineOption" status="success" text="在线" />
+        </Menu.Item>
+        <Menu.Item className="onlineOption" key={2}>
+          <Badge status="default" text="离线" />
+        </Menu.Item>
+      </Menu>
+    );
+  }
+  changeOnline = e => {
+    console.log(e);
+    if (e.key) {
+      let { csOnline } = this.props.user;
+      let online = +e.key;
+      console.log(online);
+      if (ONLINE[online] === csOnline) {
+        return;
+      }
+      this.postOnlineStatus(ONLINE[online]);
+    }
   };
+
+  postOnlineStatus = (online, hint) => {
+    let resource = '/employee/cs/online';
+    let text = online ? '上线' : '下线';
+    if (!online) {
+      resource = '/employee/cs/offline';
+    }
+    const body = null;
+    const cb = json => {
+      if (json.data.result) {
+        // Noti.hintOk('操作成功', `已成功${text}`);
+        this.props.setUserInfo({
+          csOnline: online
+        });
+      } else {
+        if (hint) {
+          Noti.hintWarning(`${text}出错`, `未成功${text}，请稍后重试`);
+        }
+      }
+    };
+    AjaxHandler.ajax(resource, body, cb);
+  };
+  clearOnline = () => {
+    // if is custom and still online, change to online.
+    let { isCs, csOnline } = this.props.user;
+    if (isCs && csOnline) {
+      this.postOnlineStatus(false, false);
+    }
+  };
+
   componentDidMount() {
+    // clear online status when window is closed.
+    window.onbeforeunload = this.clearOnline;
+
     // set school list globally
     this.props.setSchoolList({
       schoolSet: false,
@@ -145,12 +207,18 @@ class Main extends React.Component {
     );
   };
   componentWillUnmount() {
+    // Noti.hintWarning('eror', 'test');
     this.props.hide(true);
     if (this.state.ti) {
       clearTimeout(this.state.ti);
     }
     if (this.state.tiForForbid) {
       clearTimeout(this.tiForForbid);
+    }
+    // offline when 'main' will unmount, this happens when user logged out without click 'offline'
+    let { isCs, csOnline } = this.props.user;
+    if (isCs && csOnline) {
+      this.postOnlineStatus(false, false);
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
@@ -318,9 +386,7 @@ class Main extends React.Component {
     });
   };
   render() {
-    console.log(this.props);
     let { isCs, csOnline, name } = this.props.user;
-    console.log(isCs);
     return (
       <div className="container">
         <div className="nav">
@@ -337,7 +403,17 @@ class Main extends React.Component {
 
         <Layout>
           <Content className="content">
-            <span id="onlineStatus">{csOnline ? '在线' : '离线'}</span>
+            {isCs ? (
+              <Dropdown overlay={this.onlineMenu} trigger={['click']}>
+                <span id="onlineStatus">
+                  {csOnline ? (
+                    <Badge status="success" text="在线" />
+                  ) : (
+                    <Badge status="default" text="离线" />
+                  )}
+                </span>
+              </Dropdown>
+            ) : null}
             <Link id="loggedInfo" to="/account">
               <span>{name}</span>
               <img src={userImg} alt="" />
@@ -443,6 +519,7 @@ export default withRouter(
     setSchoolList,
     changeStat,
     setAuthenData,
-    fetchPrivileges
+    fetchPrivileges,
+    setUserInfo
   })(Main)
 );

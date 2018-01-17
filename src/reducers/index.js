@@ -48,6 +48,21 @@ const setAuthenData = (state = initialAuthenData, action) => {
   return state;
 };
 
+const initialTagList = {
+  tags: [],
+  tagSet: false
+};
+const setTagList = (state = initialTagList, action) => {
+  const { type } = action;
+  if (type === ActionTypes.SET_ROLE_LIST) {
+    // console.log(action.value);
+    const value = action.value;
+    // console.log({...state, ...value})
+    return Object.assign({}, state, value);
+  }
+  return state;
+};
+
 const initialRoleList = {
   roles: [],
   rolesSet: false,
@@ -440,6 +455,7 @@ const rootReducer = combineReducers({
   changeStat,
   setAuthenData,
   setRoleList,
+  setTagList,
   setUserInfo
 });
 

@@ -2,12 +2,13 @@ import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import Bread from '../bread';
 import './style/style.css';
+import AjaxHandler from '../ajax';
 
 import { asyncComponent } from '../component/asyncComponent';
 
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { changeTask } from '../../actions';
+import { changeTask, setTagList } from '../../actions';
 
 import { getLocal } from '../util/storage';
 const TaskList = asyncComponent(() =>
@@ -27,6 +28,29 @@ const breadcrumbNameMap = {
 };
 
 class TaskDisp extends React.Component {
+  componentDidMount() {
+    let { tagSet } = this.props.tagInfo;
+    if (!tagSet) {
+      this.fetchTags();
+    }
+  }
+  fetchTags = () => {
+    let resource = '/complaint/tag/list';
+    const body = {
+      page: 1,
+      size: 1000
+    };
+    const cb = json => {
+      if (json.data.tags) {
+        let tags = {};
+        json.data.tags.forEach(r => {
+          tags[r.id] = r.description;
+        });
+        this.props.setTagList(tags);
+      }
+    };
+    AjaxHandler.ajax(resource, body, cb);
+  };
   setStatusFortask = () => {
     /* 工单列表的状态不需要在离开后改变 */
     // this.clearStatus4taskIIlist()
@@ -110,9 +134,13 @@ class TaskDisp extends React.Component {
   }
 }
 
+const mapStateToProps = (state, ownProps) => ({
+  tagInfo: state.setTagList
+});
 // export default TaskDisp
 export default withRouter(
-  connect(null, {
-    changeTask
+  connect(mapStateToProps, {
+    changeTask,
+    setTagList
   })(TaskDisp)
 );

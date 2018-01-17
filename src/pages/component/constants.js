@@ -22,6 +22,12 @@ const CONSTANTS = {
   DEVICE_TYPE_BLOWER: 3,
   DEVICE_TYPE_WASHER: 4,
   WATERTYPE: { 1: '热水', 2: '冷水', 3: '冰水' },
+  WASHER_RATE_TYPES: {
+    1: '单脱水',
+    2: '一洗一漂一脱水',
+    3: '两洗一漂一脱水',
+    4: '两洗两漂一脱水'
+  },
   DEVICESTATUS: { 1: '正常', 2: '报修' },
   // REPAIRSTATUS: {1: '待审核', 2: '待指派', 3: '已指派', 4: '正在维修', 5: '审核未通过', 6: '已拒绝', 7: '已完成', 8: '已取消'},
   REPAIRSTATUS: { 1: '待处理', 2: '处理中', 3: '已完结' },
@@ -41,7 +47,11 @@ const CONSTANTS = {
     8: '已取消'
   },
   WATERUNIT: { 1: '吨', 2: '升', 3: '毫升' },
-  BILLINGOPTIONS: { 1: '流量计费', 2: '时间计费' },
+  HEATER_BILLING_OPTIONS: { 1: '流量计费' },
+  DRINKER_BILLING_OPTIONS: { 1: '流量计费' },
+  BLOWER_BILLING_OPTIONS: { 2: '时间计费' },
+  WASHER_BILLING_OPTIONS: { 3: '固定计费' },
+  BILLINGOPTIONS: { 1: '流量计费', 2: '时间计费', 3: '固定计费' },
   DEVICEPROTOCOL: { 1: '协议A', 2: '协议B' },
 
   ORDERSTATUS: { 1: '使用中', 2: '使用结束', 4: '已退单' },
@@ -60,8 +70,12 @@ const CONSTANTS = {
   DEPOSITACTTYPE: { 1: '充值优惠' },
   PAYMENTTYPE: { 1: '余额支付', 2: '红包支付' },
 
-  GIFTACTTYPE: { 1: '新人有礼', 3: '兑换码' },
+  GIFTACTTYPE: { 1: '新人有礼', 3: '兑换码', 4: 'H5活动' },
+  GIFT_ACT_NEW: 1,
+  GIFT_ACT_CODE: 3,
+  GIFT_ACT_H5: 4,
   RELEASEMETHOD: { 1: '全部发放', 2: '随机发放' },
+  RELEASE_RANDOM: 2,
   BONUSACTTYPE: { 1: '新人有礼', 2: '订单分享', 3: '兑换码' },
 
   LOSTTYPE: { 1: '失物', 2: '招领' },
@@ -104,6 +118,10 @@ const CONSTANTS = {
   LIGHT_STAT: 4,
   LIGHT_FUND: 5,
   LIGHT_NOTIFY: 6,
+  ONLINE_STATUS: {
+    1: '在线',
+    2: '离线'
+  },
 
   NOTIFYTYPES: { 1: '紧急公告', 2: '系统公告', 3: '客服消息' },
   NOTIFYSTATUS: {

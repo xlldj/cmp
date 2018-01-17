@@ -17,6 +17,7 @@ import CONSTANTS from '../component/constants';
 import LoadingMask from '../component/loadingMask';
 import RepairmanTable from '../component/repairmanChoose';
 import EmployeeChoose from '../component/employeeChoose';
+import BasicSelector from '../component/basicSelectorWithoutAll';
 import DepartmentChoose from '../component/departmentChoose';
 import { checkObject } from '../util/checkSame';
 import closeBtn from '../assets/close.png';
@@ -36,7 +37,9 @@ const {
   TASK_BUILD_CMP,
   TASK_TYPE_FEEDBACK,
   TASK_TYPE_REPAIR,
-  DEVICE_TYPE_BLOWER
+  DEVICE_TYPE_BLOWER,
+  WASHER_RATE_TYPES,
+  DEVICE_TYPE_WASHER
 } = CONSTANTS;
 const subModule = 'taskList';
 
@@ -1321,7 +1324,8 @@ class TaskDetail extends React.Component {
       indexOfImgDataInSource, // index of [dataSource:item], shows which item's images is been viewing.
       initialSlide, // initial slide of img
       messageError,
-      finishContentError
+      finishContentError,
+      tag
     } = this.state;
 
     let {
@@ -1333,6 +1337,7 @@ class TaskDetail extends React.Component {
       selectedDetailId
     } = this.props.taskList;
     const { forbiddenStatus } = this.props;
+    let { tags } = this.props.tagInfo;
 
     let currentTab = detail_tabIndex[main_phase];
 
@@ -1380,8 +1385,20 @@ class TaskDetail extends React.Component {
       parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲';
 
     // info for device detail
-    let { bindingTime, price, pulse, prepayOption, waterTimeRange } =
+    let { bindingTime, price, pulse, prepayOption, waterTimeRange, rates } =
       deviceInfo || {};
+    let rateItems =
+      deviceType === DEVICE_TYPE_WASHER
+        ? rates &&
+          rates.map((r, i) => (
+            <span key={i}>{`${WASHER_RATE_TYPES[r.pulse]}/${
+              r.price ? mul(r.price, 100) : ''
+            }分钱`}</span>
+          ))
+        : pulse &&
+          price && (
+            <span>{`${mul(price, 100)}分钱/${pulse}${denomination}`}</span>
+          );
     let timeItem =
       waterTimeRange &&
       waterTimeRange.items &&
@@ -1787,13 +1804,10 @@ class TaskDetail extends React.Component {
                         {bindingTime ? Time.getTimeStr(bindingTime) : ''}
                       </span>
                     </li>
-                    {pulse && price ? (
+                    {rates || (pulse && price) ? (
                       <li>
                         <label>设备费率:</label>
-                        <span>{`${mul(
-                          price,
-                          100
-                        )}分钱/${pulse}${denomination}`}</span>
+                        {rateItems}
                       </li>
                     ) : null}
                     {prepayOption ? (
@@ -2033,7 +2047,7 @@ class TaskDetail extends React.Component {
         {/* finish task modal */}
         <Modal
           wrapClassName="modal finish"
-          width={290}
+          width={360}
           title="工单完结"
           visible={showFinishModal}
           onCancel={this.closeFinishModal}
@@ -2047,6 +2061,17 @@ class TaskDetail extends React.Component {
               </p>
             ) : null}
             <ul>
+              <li>
+                <p>选择标签:</p>
+                <BasicSelector
+                  staticOpts={tags}
+                  width={150}
+                  selectedOpt={tag}
+                  changeOpt={this.changeTag}
+                  checkOpt={this.checkTag}
+                  invalidTitle="选择标签"
+                />
+              </li>
               <li className="itemsWrapper">
                 <p>备注:</p>
                 <textarea
@@ -2116,7 +2141,8 @@ class TaskDetail extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
   taskList: state.changeTask[subModule],
-  forbiddenStatus: state.setAuthenData.forbiddenStatus
+  forbiddenStatus: state.setAuthenData.forbiddenStatus,
+  tagInfo: state.setTagList
 });
 
 export default withRouter(

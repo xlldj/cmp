@@ -634,6 +634,22 @@ class TaskList extends React.Component {
     e.stopPropagation();
     e.preventDefault();
   };
+
+  changeOnline = e => {
+    let resource = '/employee/cs/online';
+    const body = null;
+    const cb = json => {
+      if (json.data.result) {
+        Noti.hintOk('操作成功', '已成功上线');
+        this.props.setUserInfo({
+          csOnline: true
+        });
+      } else {
+        Noti.hintWarning('上线出错', '未成功上线，请稍后重试');
+      }
+    };
+    AjaxHandler.ajax(resource, body, cb);
+  };
   render() {
     const { isCs, csOnline } = this.props.user;
     let {

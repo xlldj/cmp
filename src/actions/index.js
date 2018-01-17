@@ -50,6 +50,14 @@ export const fetchPrivileges = () => {
   };
 };
 
+export const SET_TAG_LIST = 'SET_TAG_LIST';
+export const setTagList = value => {
+  return {
+    type: SET_TAG_LIST,
+    value
+  };
+};
+
 export const SET_ROLE_LIST = 'SET_ROLE_LIST';
 export const setRoleList = value => {
   return {

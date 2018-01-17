@@ -1060,7 +1060,7 @@ export default withRouter(
   })(Charts)
 );
 
-const CustomizedTooltip = React.createClass({
+class CustomizedTooltip extends React.Component {
   render() {
     const { payload, label, active } = this.props;
     const ys =
@@ -1098,6 +1098,8 @@ const CustomizedTooltip = React.createClass({
               <span key={`span2${i}`}>{r.value}</span>
             </li>
           );
+        } else {
+          return null;
         }
       });
 
@@ -1136,6 +1138,8 @@ const CustomizedTooltip = React.createClass({
               <span key={`span2${i}`}>{r.value}</span>
             </li>
           );
+        } else {
+          return null;
         }
       });
 
@@ -1230,9 +1234,8 @@ const CustomizedTooltip = React.createClass({
       return null;
     }
   }
-});
-
-const CustomizedXAxisTick = React.createClass({
+}
+class CustomizedXAxisTick extends React.Component {
   render() {
     const { x, y, payload, timeUnit } = this.props;
 
@@ -1254,9 +1257,9 @@ const CustomizedXAxisTick = React.createClass({
       </g>
     );
   }
-});
+}
 
-const CustomizedAxisTick = React.createClass({
+class CustomizedAxisTick extends React.Component {
   render() {
     const { x, y, payload } = this.props;
 
@@ -1268,7 +1271,7 @@ const CustomizedAxisTick = React.createClass({
       </g>
     );
   }
-});
+}
 const AreaLegend = props => {
   const { payload } = props;
 
@@ -1292,7 +1295,7 @@ const AreaLegend = props => {
   );
 };
 
-const AreaTooltip = React.createClass({
+class AreaTooltip extends React.Component {
   render() {
     const { payload, label, active, monthStr } = this.props;
 
@@ -1326,18 +1329,16 @@ const AreaTooltip = React.createClass({
       return null;
     }
   }
-});
+}
 
-const AreaYAxisTick = React.createClass({
-  render() {
-    const { x, y, payload } = this.props;
+const AreaYAxisTick = props => {
+  const { x, y, payload } = this.props;
 
-    return (
-      <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={0} textAnchor="end" fill="#999">
-          {payload.value}小时
-        </text>
-      </g>
-    );
-  }
-});
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={0} textAnchor="end" fill="#999">
+        {payload.value}小时
+      </text>
+    </g>
+  );
+};
