@@ -914,7 +914,7 @@ class TaskList extends React.Component {
                 range={false}
                 disabled={true}
               />
-              <span key={record.id}>{`${record.amount}%`}</span>
+              <span key={record.id}>{`${record.amount}次`}</span>
             </span>
           );
         }
