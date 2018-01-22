@@ -17,7 +17,6 @@ import { setSchoolList } from '../../../actions';
 
 const FILEADDR = CONSTANTS.FILEADDR;
 const RadioGroup = Radio.Group;
-
 const options = [
   {
     value: '浙江',
@@ -72,6 +71,74 @@ const options = [
   {
     value: '上海',
     label: '上海'
+  },
+  {
+    value: '重庆',
+    label: '重庆'
+  },
+  {
+    value: '广东',
+    label: '广东',
+    children: [
+      {
+        value: '广州',
+        label: '广州'
+      },
+      {
+        value: '深圳',
+        label: '深圳'
+      }
+    ]
+  },
+  {
+    value: '江苏',
+    label: '江苏',
+    children: [
+      {
+        value: '南京',
+        label: '南京'
+      }
+    ]
+  },
+  {
+    value: '湖南',
+    label: '湖南',
+    children: [
+      {
+        value: '长沙',
+        label: '长沙'
+      }
+    ]
+  },
+  {
+    value: '安徽',
+    label: '安徽',
+    children: [
+      {
+        value: '合肥',
+        label: '合肥'
+      }
+    ]
+  },
+  {
+    value: '四川',
+    label: '四川',
+    children: [
+      {
+        value: '成都',
+        label: '成都'
+      }
+    ]
+  },
+  {
+    value: '陕西',
+    label: '陕西',
+    children: [
+      {
+        value: '西安',
+        label: '西安'
+      }
+    ]
   }
 ];
 

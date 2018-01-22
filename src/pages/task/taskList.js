@@ -487,12 +487,15 @@ class TaskList extends React.Component {
     let panel_dataSource = JSON.parse(
       JSON.stringify(this.props.taskList['panel_dataSource'])
     );
+    let panel_page = Array.from(this.props.taskList['panel_page']);
     let i = this.props.taskList.main_phase;
     panel_type[i] = parseInt(key, 10);
     panel_dataSource[i + 1] = []; // clear dataSource of the corresponding panel
+    panel_page[i] = 1; // clear page also
     this.props.changeTask(subModule, {
       panel_type: panel_type,
-      panel_dataSource: panel_dataSource
+      panel_dataSource: panel_dataSource,
+      panel_page: panel_page
     });
   };
   changeStartTime = time => {

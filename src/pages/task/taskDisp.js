@@ -35,7 +35,7 @@ class TaskDisp extends React.Component {
     }
   }
   fetchTags = () => {
-    let resource = '/complaint/tag/list';
+    let resource = '/work/order/tag/list';
     const body = {
       page: 1,
       size: 1000

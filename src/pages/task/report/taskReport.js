@@ -137,30 +137,40 @@ class TaskList extends React.Component {
         children: [
           {
             title: '已完成工单量',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'csFinished',
             width: '8%',
-            render: (text, record) => record.csWorkAssess.finished,
+            render: (text, record) =>
+              record.csWorkAssess && record.csWorkAssess.finished
+                ? record.csWorkAssess.finished
+                : '',
             sorter: (a, b) => a.csWorkAssess.finished - b.csWorkAssess.finished
           },
           {
             title: '创建工单量',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'build',
             width: '8%',
-            render: (text, record) => record.csWorkAssess.create
+            render: (text, record) =>
+              record.csWorkAssess && record.csWorkAssess.create
+                ? record.csWorkAssess.create
+                : ''
           },
           {
             title: '平均响应时长',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'csResponseTime',
             width: '8%',
-            render: (text, record) => record.csWorkAssess.responseTime,
+            render: (text, record) =>
+              (record.csWorkAssess && record.csWorkAssess.responseTime) || '',
             sorter: (a, b) =>
               a.csWorkAssess.responseTime - b.csWorkAssess.responseTime
           },
           {
             title: '指派成功率',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'success',
             width: '8%',
-            render: (text, record) => record.csWorkAssess.success + '%'
+            render: (text, record) =>
+              record.csWorkAssess && record.csWorkAssess.success
+                ? record.csWorkAssess.success + '%'
+                : ''
           }
         ]
       },
@@ -169,52 +179,70 @@ class TaskList extends React.Component {
         children: [
           {
             title: '已完成工单量',
-            dataIndex: 'repairmanWorkAssess',
+            dataIndex: 'repairFinished',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.finished,
+            render: (text, record) =>
+              (record.repairmanWorkAssess &&
+                record.repairmanWorkAssess.finished) ||
+              '',
             sorter: (a, b) =>
               a.repairmanWorkAssess.finished - b.repairmanWorkAssess.finished
           },
           {
             title: '一天内完成率',
-            dataIndex: 'repairmanWorkAssess',
+            dataIndex: 'ratioInOne',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.finishedRate,
+            render: (text, record) =>
+              (record.repairmanWorkAssess &&
+                record.repairmanWorkAssess.finishedRate) ||
+              '',
             sorter: (a, b) =>
               a.repairmanWorkAssess.finishedRate -
               b.repairmanWorkAssess.finishedRate
           },
           {
             title: '平均响应时长',
-            dataIndex: 'repairmanWorkAssess',
+            dataIndex: 'repairResponseTime',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.responseTime,
+            render: (text, record) =>
+              (record.repairmanWorkAssess &&
+                record.repairmanWorkAssess.responseTime) ||
+              '',
             sorter: (a, b) =>
               a.repairmanWorkAssess.responseTime -
               b.repairmanWorkAssess.responseTime
           },
           {
             title: '平均维修时长',
-            dataIndex: 'repairmanWorkAssess',
+            dataIndex: 'repairTime',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.repairTime,
+            render: (text, record) =>
+              (record.repairmanWorkAssess &&
+                record.repairmanWorkAssess.repairTime) ||
+              '',
             sorter: (a, b) =>
               a.repairmanWorkAssess.repairTime -
               b.repairmanWorkAssess.repairTime
           },
           {
             title: '二次维修次数',
-            dataIndex: 'repairmanWorkAssess',
+            dataIndex: 'second',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.second,
+            render: (text, record) =>
+              (record.repairmanWorkAssess &&
+                record.repairmanWorkAssess.second) ||
+              '',
             sorter: (a, b) =>
               a.repairmanWorkAssess.second - b.repairmanWorkAssess.second
           },
           {
             title: '用户评价',
-            dataIndex: 'repairmanWorkAssess',
+            dataIndex: 'rating',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.rating,
+            render: (text, record) =>
+              (record.repairmanWorkAssess &&
+                record.repairmanWorkAssess.rating) ||
+              '',
             sorter: (a, b) =>
               a.repairmanWorkAssess.rating - b.repairmanWorkAssess.rating
           }
@@ -232,20 +260,20 @@ class TaskList extends React.Component {
           },
           {
             title: '学校',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'schoolName',
             width: '10%',
             render: (text, record) => record.schools.join('、')
           },
           {
             title: '已完成工单量',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'finished',
             width: '8%',
             render: (text, record) => record.csWorkAssess.finished,
             sorter: (a, b) => a.csWorkAssess.finished - b.csWorkAssess.finished
           },
           {
             title: '平均响应时长',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'responseTime',
             width: '8%',
             render: (text, record) => record.csWorkAssess.responseTime,
             sorter: (a, b) =>
@@ -253,19 +281,19 @@ class TaskList extends React.Component {
           },
           {
             title: '创建工单量',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'build',
             width: '8%',
             render: (text, record) => record.csWorkAssess.create
           },
           {
             title: '指派成功率',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'success',
             width: '8%',
             render: (text, record) => record.csWorkAssess.success + '%'
           },
           {
             title: '发送客服消息数量',
-            dataIndex: 'csWorkAssess',
+            dataIndex: 'send',
             width: '8%',
             render: (text, record) => record.csWorkAssess.send
           }
@@ -408,7 +436,7 @@ class TaskList extends React.Component {
       resource = '/work/condition/assess/list';
       body.type = assess_dim;
     } else if (mainCate === REPORT_CATE_COMPLAINT - 1) {
-      resource = '/complaint/tag/stat/list';
+      resource = '/work/order/tag/stat/list';
     }
 
     this.fetchReports(resource, body, mainCate + 1);
@@ -483,7 +511,7 @@ class TaskList extends React.Component {
           resource = '/work/condition/assess/list';
           body.type = assess_dim;
         } else if (mainCate === REPORT_CATE_COMPLAINT - 1) {
-          resource = '/complaint/tag/stat/list';
+          resource = '/work/order/tag/stat/list';
         }
         this.fetchReports(resource, body, mainCate + 1);
       }
@@ -543,6 +571,7 @@ class TaskList extends React.Component {
   };
 
   changeAssessDim = key => {
+    console.log(key);
     let { assess_dim } = this.props[subModule];
     if (assess_dim === key) {
       return;
@@ -681,7 +710,7 @@ class TaskList extends React.Component {
       checking: true
     });
     let description = note.trim();
-    let resource = '/complaint/tag/check';
+    let resource = '/work/order/tag/check';
     const body = {
       description: description
     };
@@ -724,7 +753,7 @@ class TaskList extends React.Component {
     });
   };
   deleteTag = (e, id) => {
-    let resource = '/complaint/tag/delete';
+    let resource = '/work/order/tag/delete';
     const body = {
       id: id
     };
@@ -748,12 +777,12 @@ class TaskList extends React.Component {
       posting: true
     });
     let description = note.trim();
-    let resource = '/complaint/tag/add';
+    let resource = '/work/order/tag/add';
     const body = {
       description: description
     };
     if (tagId) {
-      resource = '/complaint/tag/update';
+      resource = '/work/order/tag/update';
       body.id = tagId;
     }
     const cb = json => {
@@ -806,11 +835,11 @@ class TaskList extends React.Component {
       body.endTime = endTime;
     }
 
-    let resource = '/complaint/tag/stat/list';
+    let resource = '/work/order/tag/stat/list';
     this.fetchReports(resource, body, REPORT_CATE_COMPLAINT);
   };
   updateTags = () => {
-    let resource = '/complaint/tag/list';
+    let resource = '/work/order/tag/list';
     const body = {
       page: 1,
       size: 1000
@@ -869,6 +898,7 @@ class TaskList extends React.Component {
     let max = 0;
     let unused =
       mainCate === REPORT_CATE_COMPLAINT &&
+      dataSource &&
       dataSource.length > 0 &&
       dataSource.forEach(r => {
         if (r.amount > max) {
@@ -979,7 +1009,7 @@ class TaskList extends React.Component {
         />
       );
 
-    const assessCustomTable = mainCate === REPORT_CATE_COMPLAINT - 1 &&
+    const assessCustomTable = mainCate === REPORT_CATE_ASSESS - 1 &&
       assess_dim === ASSESS_CUSTOM && (
         <Table
           bordered
@@ -999,7 +1029,7 @@ class TaskList extends React.Component {
         />
       );
 
-    const assessRepairmanTable = mainCate === REPORT_CATE_COMPLAINT - 1 &&
+    const assessRepairmanTable = mainCate === REPORT_CATE_ASSESS - 1 &&
       assess_dim === ASSESS_REPAIRMAN && (
         <Table
           bordered
@@ -1067,7 +1097,7 @@ class TaskList extends React.Component {
               />
             </div>
           </div>
-          {mainCate === REPORT_CATE_COMPLAINT ? (
+          {mainCate === REPORT_CATE_ASSESS - 1 ? (
             <div className="block">
               {forbiddenStatus.BUILD_COMPLAINT_TAG ? null : (
                 <Button
