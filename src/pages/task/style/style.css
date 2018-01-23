@@ -290,8 +290,9 @@
   padding: 0;
   background-color: white !important;
 }
-.buildTask ul li p {
-  width: 100px !important;
+.buildTask ul li p,
+.buildTask ul li.itemsWrapper p {
+  width: 100px;
 }
 .buildTask ul span.ant-radio + * {
   padding-left: 0;

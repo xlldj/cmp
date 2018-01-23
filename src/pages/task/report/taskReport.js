@@ -358,7 +358,7 @@ class TaskList extends React.Component {
               record.repairmanWorkAssess &&
               record.repairmanWorkAssess.responseTime
                 ? Time.formatSpan(record.repairmanWorkAssess.responseTime)
-                : '',
+                : 0,
             sorter: true
           },
           {
@@ -392,7 +392,8 @@ class TaskList extends React.Component {
     const cb = json => {
       console.log(json.data)
       let nextState = {
-        loading: false
+        loading: false,
+        total: json.data.total
       }
       let data = json.data[DATANAME[cate]]
       /*
@@ -443,8 +444,9 @@ class TaskList extends React.Component {
         endTime: panel_endTime[mainCate]
       })
     }
-    let csOnline = this.props.user.csOnline
-    if (!csOnline) {
+    // if customer is offline, wait until online to fetch.
+    let { csOnline, isCs } = this.props.user
+    if (!csOnline && isCs) {
       return
     }
     const body = {
@@ -695,7 +697,9 @@ class TaskList extends React.Component {
       note: '',
       originalTag: '',
       tagId: '',
-      noteError: false
+      noteError: false,
+      tagExistError: false,
+      tagLengthError: false
     })
   }
   buildTagSuccess = () => {
@@ -715,7 +719,8 @@ class TaskList extends React.Component {
     this.setState({
       note: e.target.value,
       tagLengthError: false,
-      tagExistError: false
+      tagExistError: false,
+      noteError: false
     })
   }
   checkNote = e => {
@@ -741,6 +746,7 @@ class TaskList extends React.Component {
         noteError: true
       })
     }
+    console.log('build', posting, checking)
     if (posting || checking) {
       return
     }
@@ -790,7 +796,6 @@ class TaskList extends React.Component {
             callback()
           }
         }
-        this.setState(nextState)
       }
       this.setState(nextState)
     }
@@ -816,11 +821,11 @@ class TaskList extends React.Component {
     }
     const cb = json => {
       if (json.data.result) {
-        Noti.hintWarning('删除出错', '请稍后再尝试')
-      } else {
         Noti.hintOk('删除成功', '已成功删除该标签')
-        this.updateList()
         this.updateTags()
+        this.updateList()
+      } else {
+        Noti.hintWarning('删除出错', '请稍后再尝试')
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -843,21 +848,23 @@ class TaskList extends React.Component {
       body.id = tagId
     }
     const cb = json => {
+      let nextState = {
+        posting: false
+      }
       if (json.data.result) {
         // success
-        this.setState({
-          showBuildTag: false,
-          note: '',
-          originalTag: '',
-          tagId: ''
-        })
+        nextState.showBuildTag = false
+        nextState.note = ''
+        nextState.originalTag = ''
+        nextState.tagId = ''
         Noti.hintOk('操作成功', '当前标签添加成功')
         // refetch list
-        this.updateList()
         this.updateTags()
+        this.updateList()
       } else {
         Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试')
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb, null, {
       clearPosting: true,
@@ -1233,7 +1240,7 @@ class TaskList extends React.Component {
 
         <Modal
           wrapClassName="modal finish"
-          width={350}
+          width={450}
           title="添加标签"
           visible={showBuildTag}
           onCancel={this.cancelBuildTag}
@@ -1243,7 +1250,7 @@ class TaskList extends React.Component {
           <div className="info buildTask">
             <ul>
               <li>
-                <p>标签:</p>
+                <p style={{ width: '65px' }}>标签:</p>
                 <input
                   value={note}
                   className="longInput"
@@ -1258,7 +1265,7 @@ class TaskList extends React.Component {
                   <span className="checkInvalid">此标签已存在！</span>
                 ) : null}
                 {tagLengthError ? (
-                  <span className="checkInvalid">标签长度不超过10个字！</span>
+                  <span className="checkInvalid">请勿超过10字！</span>
                 ) : null}
               </li>
             </ul>

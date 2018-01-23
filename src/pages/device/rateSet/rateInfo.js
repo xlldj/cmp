@@ -245,10 +245,13 @@ class RateInfo extends React.Component {
       checking: true
     })
     let resource = '/rate/check'
-    const { deviceType, schoolId } = this.state
+    const { deviceType, schoolId, supplierId } = this.state
     const body = {
       deviceType: parseInt(deviceType, 10),
       schoolId: parseInt(schoolId, 10)
+    }
+    if (supplierId) {
+      body.supplierId = supplierId
     }
     const cb = json => {
       this.setState({
