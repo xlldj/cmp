@@ -87,7 +87,8 @@
     "precommit": "lint-staged"
   },
   "prettier": {
-    "singleQuote": true
+    "singleQuote": true,
+    "semi": false
   },
   "lint-staged": {
     "*.{js,json,css,md}": ["prettier --write", "git add"]

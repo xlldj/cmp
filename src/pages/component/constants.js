@@ -16,6 +16,7 @@ const CONSTANTS = {
 
   BUILDINGTYPE: { 1: '宿舍楼', 2: '其他' },
 
+  /* DEVICE */
   DEVICETYPE: { 1: '热水器', 2: '饮水机', 3: '吹风机', 4: '洗衣机' },
   DEVICE_TYPE_HEATER: 1,
   DEVICE_TYPE_DRINGKER: 2,
@@ -54,9 +55,11 @@ const CONSTANTS = {
   BILLINGOPTIONS: { 1: '流量计费', 2: '时间计费', 3: '固定计费' },
   DEVICEPROTOCOL: { 1: '协议A', 2: '协议B' },
 
+  /* ORDER */
   ORDERSTATUS: { 1: '使用中', 2: '使用结束', 4: '已退单' },
   ORDERUSERTYPES: { 1: '学生', 2: '员工' },
 
+  /* FUND */
   FUNDTYPE: { 2: '提现', 1: '充值' },
   WITHDRAWSTATUS: {
     1: '待审核',
@@ -70,6 +73,7 @@ const CONSTANTS = {
   DEPOSITACTTYPE: { 1: '充值优惠' },
   PAYMENTTYPE: { 1: '余额支付', 2: '红包支付' },
 
+  /* GIFT */
   GIFTACTTYPE: { 1: '新人有礼', 3: '兑换码', 4: 'H5活动' },
   GIFT_ACT_NEW: 1,
   GIFT_ACT_CODE: 3,
@@ -78,6 +82,7 @@ const CONSTANTS = {
   RELEASE_RANDOM: 2,
   BONUSACTTYPE: { 1: '新人有礼', 2: '订单分享', 3: '兑换码' },
 
+  /* LOST */
   LOSTTYPE: { 1: '失物', 2: '招领' },
   DEFRIENDLEVEL: {
     1: '3天',
@@ -86,8 +91,10 @@ const CONSTANTS = {
     4: '永久'
   },
 
+  /* USER */
   SEX: { 1: '男', 2: '女' },
 
+  /* EMPLOYEE */
   ROLE: {
     1: '普通用户',
     2: '维修员',
@@ -123,6 +130,7 @@ const CONSTANTS = {
     2: '离线'
   },
 
+  /* NOTIFY */
   NOTIFYTYPES: { 1: '紧急公告', 2: '系统公告', 3: '客服消息' },
   NOTIFYSTATUS: {
     1: '已发布',
@@ -135,6 +143,7 @@ const CONSTANTS = {
 
   TIMESPANS: { '1': '本日', '2': '本周', '3': '本月' },
 
+  /* TASK */
   TASK_DETAIL_LIST_LENGTH: 5,
   CREATEWORKTYPE: { 1: '工作记录', 2: '指派任务' },
   COMPLAINTTYPES: {
@@ -173,7 +182,8 @@ const CONSTANTS = {
     3: '接受',
     4: '发送消息',
     5: '备注',
-    6: '完成'
+    6: '完成',
+    7: '创建'
   },
   TASK_HANDLE_REFUSE: 2,
   TASK_HANDLE_REASSIGN: 1,
@@ -181,6 +191,7 @@ const CONSTANTS = {
   TASK_HANDLE_SENDMESSAGE: 4,
   TASK_HANDLE_REMARK: 5,
   TASK_HANDLE_FINISH: 6,
+  TASK_HANDLE_BUILD: 7,
   // constants for task/report
   REPORTCATE: { 1: '工作情况', 2: '投诉分析', 3: '绩效考核' },
   REPORT_CATE_SUM: 1,
@@ -190,6 +201,22 @@ const CONSTANTS = {
   ASSESS_SCHOOL: 1,
   ASSESS_CUSTOM: 2,
   ASSESS_REPAIRMAN: 3,
+  // order userd in task/report
+  ORDER: { descend: 1, ascend: 2 },
+  ORDER_DESCEND: 1,
+  ORDER_ASCEND: 2,
+  ORDERBYS: {
+    csFinished: 3,
+    csResponseTime: 5,
+    repairFinished: 11,
+    ratioInOne: 12,
+    repairResponseTime: 13,
+    repairTime: 14,
+    repairSecondRepair: 15,
+    repairRating: 16
+  },
+  // for heart beat check of online status
+  HEARTBEATTIMEOUT: 5 * 60 * 1000,
 
   CHARTTYPES: {
     1: 'order',
@@ -810,6 +837,6 @@ const CONSTANTS = {
     版本更新列表: ['version'],
     '添加/编辑版本更新': ['version/add', 'version/detail']
   }
-};
+}
 
-export default CONSTANTS;
+export default CONSTANTS

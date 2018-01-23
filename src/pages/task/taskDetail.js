@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   Table,
   Badge,
@@ -8,40 +8,41 @@ import {
   Menu,
   Dropdown,
   Pagination
-} from 'antd';
+} from 'antd'
 
-import Time from '../component/time';
-import Noti from '../noti';
-import AjaxHandler from '../ajax';
-import CONSTANTS from '../component/constants';
-import LoadingMask from '../component/loadingMask';
-import RepairmanTable from '../component/repairmanChoose';
-import EmployeeChoose from '../component/employeeChoose';
-import BasicSelector from '../component/basicSelectorWithoutAll';
-import DepartmentChoose from '../component/departmentChoose';
-import { checkObject } from '../util/checkSame';
-import closeBtn from '../assets/close.png';
-import { mul, add } from '../util/numberHandle';
-import Format from '../component/format';
+import Time from '../component/time'
+import Noti from '../noti'
+import AjaxHandler from '../ajax'
+import CONSTANTS from '../component/constants'
+import LoadingMask from '../component/loadingMask'
+import RepairmanTable from '../component/repairmanChoose'
+import EmployeeChoose from '../component/employeeChoose'
+import BasicSelector from '../component/basicSelectorWithoutAll'
+import DepartmentChoose from '../component/departmentChoose'
+import { checkObject } from '../util/checkSame'
+import closeBtn from '../assets/close.png'
+import { mul, add } from '../util/numberHandle'
+import Format from '../component/format'
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import {
   changeTask,
   changeOrder,
   changeDevice,
   changeFund
-} from '../../actions';
+} from '../../actions'
 const {
   TASK_BUILD_CMP,
   TASK_TYPE_FEEDBACK,
   TASK_TYPE_REPAIR,
   DEVICE_TYPE_BLOWER,
   WASHER_RATE_TYPES,
-  DEVICE_TYPE_WASHER
-} = CONSTANTS;
-const subModule = 'taskList';
+  DEVICE_TYPE_WASHER,
+  TASK_HANDLE_BUILD
+} = CONSTANTS
+const subModule = 'taskList'
 
 const DETAILTAB2NAME = {
   1: 'committer',
@@ -53,7 +54,7 @@ const DETAILTAB2NAME = {
   7: 'userFundRecord',
   8: 'userComplaints',
   9: 'userFeedbacks'
-};
+}
 const TABINDEX2RES = {
   1: '/user/one',
   2: '/order/list',
@@ -64,7 +65,7 @@ const TABINDEX2RES = {
   7: '/funds/list',
   8: '/work/order/list',
   9: '/work/order/list'
-};
+}
 const DETAILTAB2JSONNAME = {
   2: 'orders',
   3: 'workOrders',
@@ -73,7 +74,7 @@ const DETAILTAB2JSONNAME = {
   7: 'funds',
   8: 'workOrders',
   9: 'workOrders'
-};
+}
 
 const TAB2HINT = {
   2: '用户近五笔订单',
@@ -83,27 +84,27 @@ const TAB2HINT = {
   7: '用户近五次充值提现',
   8: '用户近五次投诉',
   9: '用户近五次反馈'
-};
+}
 
 const TASKTYPE = {
   1: '报修工单',
   2: '投诉工单',
   3: '意见反馈'
-};
+}
 
 const roleModalName = {
   1: 'showCustomerModal',
   2: 'showRepairmanModal',
   3: 'showDeveloperModal'
-};
-const SIZE = CONSTANTS.TASK_DETAIL_LIST_LENGTH;
+}
+const SIZE = CONSTANTS.TASK_DETAIL_LIST_LENGTH
 const {
   TASK_PENDING,
   TASK_ASSIGNED,
   TASK_ACCEPTED,
   TASK_REFUSED,
   TASK_FINISHED
-} = CONSTANTS;
+} = CONSTANTS
 /*------后端接受的all为true/false,必传，post之前将0，1转为true/false---------*/
 /*------后端接受的pending为int，不传为所有，我用0表示不传---------------------*/
 
@@ -111,9 +112,9 @@ class TaskDetail extends React.Component {
   static propTypes = {
     taskList: PropTypes.object.isRequired,
     forbiddenStatus: PropTypes.object.isRequired
-  };
+  }
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       id: '', // if for the task
       creatorId: '',
@@ -134,7 +135,7 @@ class TaskDetail extends React.Component {
       message: '',
       messageError: false,
       finishContentError: false
-    };
+    }
     this.reassignMenu = (
       <Menu selectable={false} onClick={this.reassign}>
         <Menu.Item key={1}>
@@ -147,7 +148,7 @@ class TaskDetail extends React.Component {
           <span className="menuItem">研发人员</span>
         </Menu.Item>
       </Menu>
-    );
+    )
 
     this.reassignWithoutRepairman = (
       <Menu selectable={false} onClick={this.reassign}>
@@ -158,7 +159,7 @@ class TaskDetail extends React.Component {
           <span className="menuItem">研发人员</span>
         </Menu.Item>
       </Menu>
-    );
+    )
 
     this.committerOrderColumns = [
       {
@@ -177,7 +178,7 @@ class TaskDetail extends React.Component {
         dataIndex: 'createTime',
         width: '21%',
         render: (text, record, index) => {
-          return Time.getTimeStr(record.createTime);
+          return Time.getTimeStr(record.createTime)
         }
       },
       {
@@ -185,7 +186,7 @@ class TaskDetail extends React.Component {
         dataIndex: 'finishTime',
         width: '21%',
         render: (text, record, index) => {
-          return record.finishTime ? Time.getTimeStr(record.finishTime) : '';
+          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
         }
       },
       {
@@ -194,15 +195,15 @@ class TaskDetail extends React.Component {
         render: (text, record, index) => {
           switch (record.status) {
             case 1:
-              return <Badge status="warning" text="使用中" />;
+              return <Badge status="warning" text="使用中" />
             case 2:
-              return <Badge status="success" text="使用结束" />;
+              return <Badge status="success" text="使用结束" />
             case 4:
-              return <Badge status="default" text="已退单" />;
+              return <Badge status="default" text="已退单" />
             case 3:
-              return <Badge status="warning" text="异常" />;
+              return <Badge status="warning" text="异常" />
             default:
-              return <Badge status="warning" text="异常" />;
+              return <Badge status="warning" text="异常" />
           }
         }
       },
@@ -213,13 +214,13 @@ class TaskDetail extends React.Component {
         className: 'shalowRed',
         render: (text, record, index) => {
           if (record.status !== 1) {
-            return `${record.consume}` || '暂无';
+            return `${record.consume}` || '暂无'
           } else if (record.prepay) {
-            return `${record.prepay}`;
+            return `${record.prepay}`
           }
         }
       }
-    ];
+    ]
 
     this.committerRepairColumns = [
       {
@@ -247,13 +248,13 @@ class TaskDetail extends React.Component {
                   src={CONSTANTS.FILEADDR + r}
                   alt=""
                   onClick={() => {
-                    this.showTabImg(index, i);
+                    this.showTabImg(index, i)
                   }}
                   onLoad={e => this.setWH(e, 30)}
                 />
               </li>
-            ));
-          return <ul className="thumbnailWrapper">{imagelis}</ul>;
+            ))
+          return <ul className="thumbnailWrapper">{imagelis}</ul>
         }
       },
       {
@@ -270,19 +271,19 @@ class TaskDetail extends React.Component {
         render: (text, record, index) => {
           switch (record.status) {
             case TASK_FINISHED:
-              return <Badge status="success" text="维修完成" />;
+              return <Badge status="success" text="维修完成" />
             case TASK_PENDING:
-              return <Badge status="warning" text="待处理" />;
+              return <Badge status="warning" text="待处理" />
             case TASK_ASSIGNED:
             case TASK_ACCEPTED:
             case TASK_REFUSED:
-              return <Badge status="error" text={'处理中'} />;
+              return <Badge status="error" text={'处理中'} />
             default:
-              return '已取消';
+              return '已取消'
           }
         }
       }
-    ];
+    ]
 
     this.deviceOrderColumns = [
       {
@@ -300,7 +301,7 @@ class TaskDetail extends React.Component {
         dataIndex: 'createTime',
         width: '21%',
         render: (text, record, index) => {
-          return Time.getTimeStr(record.createTime);
+          return Time.getTimeStr(record.createTime)
         }
       },
       {
@@ -308,7 +309,7 @@ class TaskDetail extends React.Component {
         dataIndex: 'finishTime',
         width: '21%',
         render: (text, record, index) => {
-          return record.finishTime ? Time.getTimeStr(record.finishTime) : '';
+          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
         }
       },
       {
@@ -317,15 +318,15 @@ class TaskDetail extends React.Component {
         render: (text, record, index) => {
           switch (record.status) {
             case 1:
-              return <Badge status="warning" text="使用中" />;
+              return <Badge status="warning" text="使用中" />
             case 2:
-              return <Badge status="success" text="使用结束" />;
+              return <Badge status="success" text="使用结束" />
             case 4:
-              return <Badge status="default" text="已退单" />;
+              return <Badge status="default" text="已退单" />
             case 3:
-              return <Badge status="warning" text="异常" />;
+              return <Badge status="warning" text="异常" />
             default:
-              return <Badge status="warning" text="异常" />;
+              return <Badge status="warning" text="异常" />
           }
         }
       },
@@ -336,13 +337,13 @@ class TaskDetail extends React.Component {
         className: 'shalowRed',
         render: (text, record, index) => {
           if (record.status !== 1) {
-            return `${record.consume}` || '暂无';
+            return `${record.consume}` || '暂无'
           } else if (record.prepay) {
-            return `${record.prepay}`;
+            return `${record.prepay}`
           }
         }
       }
-    ];
+    ]
 
     this.deviceRepairColumns = [
       {
@@ -370,13 +371,13 @@ class TaskDetail extends React.Component {
                   src={CONSTANTS.FILEADDR + r}
                   alt=""
                   onClick={() => {
-                    this.showTabImg(index, i);
+                    this.showTabImg(index, i)
                   }}
                   onLoad={e => this.setWH(e, 30)}
                 />
               </li>
-            ));
-          return <ul className="thumbnailWrapper">{imagelis}</ul>;
+            ))
+          return <ul className="thumbnailWrapper">{imagelis}</ul>
         }
       },
       {
@@ -393,19 +394,19 @@ class TaskDetail extends React.Component {
         render: (text, record, index) => {
           switch (record.status) {
             case TASK_FINISHED:
-              return <Badge status="success" text="维修完成" />;
+              return <Badge status="success" text="维修完成" />
             case TASK_PENDING:
-              return <Badge status="warning" text="待处理" />;
+              return <Badge status="warning" text="待处理" />
             case TASK_ASSIGNED:
             case TASK_ACCEPTED:
             case TASK_REFUSED:
-              return <Badge status="error" text={'处理中'} />;
+              return <Badge status="error" text={'处理中'} />
             default:
-              return '已取消';
+              return '已取消'
           }
         }
       }
-    ];
+    ]
 
     this.userFundColumns = [
       {
@@ -420,9 +421,9 @@ class TaskDetail extends React.Component {
         width: '25%',
         render: (text, record) => {
           if (record.instead) {
-            return CONSTANTS.FUNDTYPE[record.operationType] + '(代充值)';
+            return CONSTANTS.FUNDTYPE[record.operationType] + '(代充值)'
           } else {
-            return CONSTANTS.FUNDTYPE[record.operationType];
+            return CONSTANTS.FUNDTYPE[record.operationType]
           }
         }
       },
@@ -438,7 +439,7 @@ class TaskDetail extends React.Component {
                   status="error"
                   text={CONSTANTS.WITHDRAWSTATUS[record.status]}
                 />
-              );
+              )
             case 2:
             case 5:
             case 6:
@@ -447,23 +448,23 @@ class TaskDetail extends React.Component {
                   status="default"
                   text={CONSTANTS.WITHDRAWSTATUS[record.status]}
                 />
-              );
+              )
             case 3:
               return (
                 <Badge
                   status="warning"
                   text={CONSTANTS.WITHDRAWSTATUS[record.status]}
                 />
-              );
+              )
             case 4:
               return (
                 <Badge
                   status="success"
                   text={CONSTANTS.WITHDRAWSTATUS[record.status]}
                 />
-              );
+              )
             default:
-              return <Badge status="warning" text="未知" />;
+              return <Badge status="warning" text="未知" />
           }
         }
       },
@@ -473,7 +474,7 @@ class TaskDetail extends React.Component {
         className: 'shalowRed',
         render: text => `¥${text}`
       }
-    ];
+    ]
 
     this.userComplaintsColumns = [
       {
@@ -500,13 +501,13 @@ class TaskDetail extends React.Component {
                   src={CONSTANTS.FILEADDR + r}
                   alt=""
                   onClick={() => {
-                    this.showTabImg(index, i);
+                    this.showTabImg(index, i)
                   }}
                   onLoad={e => this.setWH(e, 30)}
                 />
               </li>
-            ));
-          return <ul className="thumbnailWrapper">{imagelis}</ul>;
+            ))
+          return <ul className="thumbnailWrapper">{imagelis}</ul>
         }
       },
       {
@@ -515,7 +516,7 @@ class TaskDetail extends React.Component {
         width: '20%',
         render: (text, record) => Time.getTimeStr(record.createTime)
       }
-    ];
+    ]
 
     this.userFeedbacksColumns = [
       {
@@ -542,13 +543,13 @@ class TaskDetail extends React.Component {
                   src={CONSTANTS.FILEADDR + r}
                   alt=""
                   onClick={() => {
-                    this.showTabImg(index, i);
+                    this.showTabImg(index, i)
                   }}
                   onLoad={e => this.setWH(e, 30)}
                 />
               </li>
-            ));
-          return <ul className="thumbnailWrapper">{imagelis}</ul>;
+            ))
+          return <ul className="thumbnailWrapper">{imagelis}</ul>
         }
       },
       {
@@ -557,21 +558,21 @@ class TaskDetail extends React.Component {
         render: (text, record) =>
           record.createTime ? Time.getTimeStr(record.createTime) : '暂无'
       }
-    ];
+    ]
   }
   componentDidMount() {
     // this.props.hide(false)
     // if showing, get id.
     try {
-      let { details, selectedDetailId } = this.props.taskList;
+      let { details, selectedDetailId } = this.props.taskList
       let id = selectedDetailId,
-        nextState = { id };
+        nextState = { id }
       if (details && details.creatorId) {
-        nextState.creatorId = details.creatorId;
+        nextState.creatorId = details.creatorId
       }
-      this.setState(nextState);
+      this.setState(nextState)
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
   }
   componentWillUnmount() {
@@ -586,7 +587,7 @@ class TaskDetail extends React.Component {
         showDetail,
         selectedDetailId,
         detailLoading
-      } = nextProps.taskList;
+      } = nextProps.taskList
       // let page = panel_page[main_phase]
 
       // only care detail related props
@@ -601,377 +602,377 @@ class TaskDetail extends React.Component {
         // get selected item.
         // let selectedItem = panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
         let id = selectedDetailId,
-          detail = details;
+          detail = details
         if (detail.id) {
           // if not, fetch detail
           // let type = selectedItem.type
           // detail = details
-          console.log(detail);
-          let tabIndex = detail_tabIndex[main_phase];
-          let key = DETAILTAB2NAME[tabIndex];
+          console.log(detail)
+          let tabIndex = detail_tabIndex[main_phase]
+          let key = DETAILTAB2NAME[tabIndex]
           if (detail.env === 2) {
             // if initiated by employee, do not fetch these infos.
-            return;
+            return
           }
           if (detail.hasOwnProperty(key)) {
             // nothing
           } else {
-            let resource = TABINDEX2RES[tabIndex];
-            let userId = detail.creatorId;
-            let residenceId = detail.residenceId || '';
-            let deviceType = detail.deviceType || '';
-            let { deviceId, level } = detail;
+            let resource = TABINDEX2RES[tabIndex]
+            let userId = detail.creatorId
+            let residenceId = detail.residenceId || ''
+            let deviceType = detail.deviceType || ''
+            let { deviceId, level } = detail
 
-            const body = {};
+            const body = {}
             if (tabIndex === 1) {
-              body.id = userId;
+              body.id = userId
             } else if (tabIndex === 2) {
-              body.page = 1;
-              body.size = SIZE;
-              body.userId = userId;
+              body.page = 1
+              body.size = SIZE
+              body.userId = userId
             } else if (tabIndex === 3) {
-              body.page = 1;
-              body.size = SIZE;
-              body.all = true;
-              body.creatorId = userId;
-              body.type = CONSTANTS.TASK_TYPE_REPAIR;
+              body.page = 1
+              body.size = SIZE
+              body.all = true
+              body.creatorId = userId
+              body.type = CONSTANTS.TASK_TYPE_REPAIR
             } else if (tabIndex === 4) {
               // body.
               if (deviceType === 2) {
-                resource = '/device/water/one';
-                body.id = residenceId;
+                resource = '/device/water/one'
+                body.id = residenceId
               } else {
-                resource = '/device/group/one';
-                body.id = deviceId;
+                resource = '/device/group/one'
+                body.id = deviceId
               }
             } else if (tabIndex === 5) {
-              body.page = 1;
-              body.size = SIZE;
-              body.residenceId = residenceId;
-              body.deviceType = deviceType;
+              body.page = 1
+              body.size = SIZE
+              body.residenceId = residenceId
+              body.deviceType = deviceType
             } else if (tabIndex === 6) {
-              body.page = 1;
-              body.size = SIZE;
-              body.all = true;
-              body.type = CONSTANTS.TASK_TYPE_REPAIR;
-              body.residenceId = residenceId;
-              body.deviceType = deviceType;
+              body.page = 1
+              body.size = SIZE
+              body.all = true
+              body.type = CONSTANTS.TASK_TYPE_REPAIR
+              body.residenceId = residenceId
+              body.deviceType = deviceType
             } else if (tabIndex === 7) {
               // user fund record
-              body.page = 1;
-              body.size = SIZE;
-              body.userId = userId;
+              body.page = 1
+              body.size = SIZE
+              body.userId = userId
             } else if (tabIndex === 8) {
               // user complaint
-              body.page = 1;
-              body.size = SIZE;
-              body.type = CONSTANTS.TASK_TYPE_COMPLAINT;
-              body.creatorId = userId;
+              body.page = 1
+              body.size = SIZE
+              body.type = CONSTANTS.TASK_TYPE_COMPLAINT
+              body.creatorId = userId
             } else if (tabIndex === 9) {
               // user feedback
-              body.page = 1;
-              body.size = SIZE;
-              body.type = TASK_TYPE_FEEDBACK;
-              body.creatorId = userId;
+              body.page = 1
+              body.size = SIZE
+              body.type = TASK_TYPE_FEEDBACK
+              body.creatorId = userId
             }
             const cb = json => {
               this.setState({
                 tabLoading: false
-              });
+              })
               let jsonDataName = DETAILTAB2JSONNAME[tabIndex],
-                data = {};
+                data = {}
               if (tabIndex === 1 || tabIndex === 4) {
-                data = json.data;
+                data = json.data
               } else {
-                data = json.data[jsonDataName];
+                data = json.data[jsonDataName]
               }
-              let newDetails = JSON.parse(JSON.stringify(details));
+              let newDetails = JSON.parse(JSON.stringify(details))
               // if 'complaint' or 'feedback', build different structure for page change.
               if (tabIndex === 8 || tabIndex === 9) {
-                newDetails[key] = {};
-                newDetails[key]['dataSource'] = data;
-                newDetails[key]['page'] = 1;
-                newDetails[key]['total'] = json.data.total;
+                newDetails[key] = {}
+                newDetails[key]['dataSource'] = data
+                newDetails[key]['page'] = 1
+                newDetails[key]['total'] = json.data.total
               } else {
-                newDetails[key] = data;
+                newDetails[key] = data
               }
               this.props.changeTask(subModule, {
                 details: newDetails
-              });
-            };
-            AjaxHandler.ajax(resource, body, cb);
+              })
+            }
+            AjaxHandler.ajax(resource, body, cb)
 
             // set state
             let nextState = {
               tabLoading: true
-            };
+            }
             if (id && id !== this.state.id) {
-              nextState.id = id;
+              nextState.id = id
             }
             if (userId && userId !== this.state.userId) {
-              nextState.userId = userId;
+              nextState.userId = userId
             }
             if (detail.creatorId && detail.creatorId !== this.state.creatorId) {
-              nextState.creatorId = detail.creatorId;
+              nextState.creatorId = detail.creatorId
             }
             if (deviceType && deviceType !== this.state.deviceType) {
-              nextState.deviceType = deviceType;
+              nextState.deviceType = deviceType
             }
             if (residenceId && residenceId !== this.state.residenceId) {
-              nextState.residenceId = residenceId;
+              nextState.residenceId = residenceId
             }
             if (level && level !== this.state.level) {
-              nextState.level = level;
+              nextState.level = level
             }
-            this.setState(nextState);
+            this.setState(nextState)
           }
         } else if (!detailLoading) {
           const body = {
             id: id
-          };
-          this.fetchTaskDetail(body);
+          }
+          this.fetchTaskDetail(body)
         }
         if (this.state.message !== '') {
           this.setState({
             message: ''
-          });
+          })
         }
       }
-      this.props = nextProps;
+      this.props = nextProps
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
   }
   fetchTaskDetail = body => {
     if (this.props.taskList.detailLoading && body.id === this.state.loadingId) {
-      return;
+      return
     }
     this.props.changeTask(subModule, {
       detailLoading: true
-    });
-    let resource = '/work/order/one';
+    })
+    let resource = '/work/order/one'
     const cb = json => {
       // only handle data here
-      let { details } = this.props.taskList;
-      let newDetails = Object.assign({}, details, json.data);
+      let { details } = this.props.taskList
+      let newDetails = Object.assign({}, details, json.data)
       let value = {
         details: newDetails,
         detailLoading: false
-      };
-      console.log(newDetails);
+      }
+      console.log(newDetails)
       // set data into store
-      this.props.changeTask(subModule, value);
-    };
+      this.props.changeTask(subModule, value)
+    }
     // console.log(resource)
     this.setState({
       loadingId: body.id
-    });
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    })
+    AjaxHandler.ajax(resource, body, cb)
+  }
   changeDivision = v => {
-    let { all } = this.state;
+    let { all } = this.state
     if (v !== all) {
-      this.props.changeTask(subModule, { all: v, page: 1 });
+      this.props.changeTask(subModule, { all: v, page: 1 })
     }
-  };
+  }
   changeType = v => {
-    let { type } = this.props;
+    let { type } = this.props
     if (type !== v) {
-      this.props.changeTask(subModule, { sourceType: v, page: 1 });
+      this.props.changeTask(subModule, { sourceType: v, page: 1 })
     }
-  };
+  }
   changePending = v => {
-    let { assigned } = this.props;
+    let { assigned } = this.props
     if (v !== assigned) {
-      this.props.changeTask(subModule, { pending: v, page: 1 });
+      this.props.changeTask(subModule, { pending: v, page: 1 })
     }
-  };
+  }
   toNa = e => {
-    e.preventDefault();
-    let { assigned } = this.props;
+    e.preventDefault()
+    let { assigned } = this.props
     if (assigned) {
-      this.props.changeTask(subModule, { assigned: false, page: 1 });
+      this.props.changeTask(subModule, { assigned: false, page: 1 })
     }
-  };
+  }
   toAssigned = e => {
-    e.preventDefault();
-    let { assigned } = this.props;
+    e.preventDefault()
+    let { assigned } = this.props
     if (!assigned) {
-      this.props.changeTask(subModule, { assigned: true, page: 1 });
+      this.props.changeTask(subModule, { assigned: true, page: 1 })
     }
-  };
+  }
   changePage = pageObj => {
-    let page = pageObj.current;
-    this.props.changeTask(subModule, { page: page });
-  };
+    let page = pageObj.current
+    this.props.changeTask(subModule, { page: page })
+  }
   changeSchool = v => {
-    let { schoolId } = this.props;
+    let { schoolId } = this.props
     if (v === schoolId) {
-      return;
+      return
     }
-    this.props.changeTask(subModule, { schoolId: v });
-  };
+    this.props.changeTask(subModule, { schoolId: v })
+  }
   changePhase = e => {
     try {
-      e.preventDefault();
-      let key = parseInt(e.target.getAttribute('data-key'), 10);
-      let { main_phase } = this.props.taskList;
+      e.preventDefault()
+      let key = parseInt(e.target.getAttribute('data-key'), 10)
+      let { main_phase } = this.props.taskList
       if (main_phase !== key) {
-        this.props.changeTask(subModule, { main_phase: key });
+        this.props.changeTask(subModule, { main_phase: key })
       }
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
   close = e => {
     this.props.changeTask(subModule, {
       details: {},
       showDetail: false,
       selectedRowIndex: -1,
       selectedDetailId: -1
-    });
-  };
+    })
+  }
   showTabImg = (index, i) => {
     this.setState({
       indexOfImgDataInSource: index,
       initialSlide: i,
       showTabImg: true
-    });
-  };
+    })
+  }
   closeTabImgs = () => {
     this.setState({
       initialSlide: 1,
       showTabImg: false
-    });
-  };
+    })
+  }
 
   showDetailImgModel = i => {
     this.setState({
       initialSlide: i,
       showDetailImgs: true
-    });
-  };
+    })
+  }
   setWH = (e, value) => {
-    let img = e.target;
-    let w = parseInt(window.getComputedStyle(img).width, 10);
-    let h = parseInt(window.getComputedStyle(img).height, 10);
+    let img = e.target
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
     if (w < h) {
-      img.style.width = value ? `${value}px` : '50px';
+      img.style.width = value ? `${value}px` : '50px'
     } else {
-      img.style.height = value ? `${value}px` : '50px';
+      img.style.height = value ? `${value}px` : '50px'
     }
-  };
+  }
   changeTabIndex = e => {
     try {
-      let key = parseInt(e.target.getAttribute('data-key'), 10);
+      let key = parseInt(e.target.getAttribute('data-key'), 10)
       if (key) {
-        let { main_phase, detail_tabIndex } = this.props.taskList;
-        let current = detail_tabIndex[main_phase];
+        let { main_phase, detail_tabIndex } = this.props.taskList
+        let current = detail_tabIndex[main_phase]
         if (key !== current) {
-          let newTabIndex = Array.from(detail_tabIndex);
-          newTabIndex[main_phase] = key;
+          let newTabIndex = Array.from(detail_tabIndex)
+          newTabIndex[main_phase] = key
           this.props.changeTask(subModule, {
             detail_tabIndex: newTabIndex
-          });
+          })
         }
       }
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
   reassign = m => {
     try {
-      let { key } = m;
+      let { key } = m
       // open different modal according to role
       let nextState = {
         reassignKey: key
-      };
-      let modalStateName = roleModalName[key];
-      nextState[modalStateName] = true;
-      this.setState(nextState);
+      }
+      let modalStateName = roleModalName[key]
+      nextState[modalStateName] = true
+      this.setState(nextState)
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
   confirmChooseRepairman = () => {
     // reassign to repairman success
-    let { id } = this.state;
+    let { id } = this.state
     this.setState({
       showRepairmanModal: false
-    });
-    Noti.hintOk('转发成功', '已成功转发给该维修员');
-    this.updateAndClose(id);
-  };
+    })
+    Noti.hintOk('转发成功', '已成功转发给该维修员')
+    this.updateAndClose(id)
+  }
   cancelChooseRepairman = () => {
     this.setState({
       showRepairmanModal: false
-    });
-  };
+    })
+  }
   confirmChooseCustomer = () => {
     // reassign to repairman success
-    let { id } = this.state;
+    let { id } = this.state
     this.setState({
       showCustomerModal: false
-    });
-    Noti.hintOk('转发成功', '已成功转发给该客服');
-    this.updateAndClose(id);
-  };
+    })
+    Noti.hintOk('转发成功', '已成功转发给该客服')
+    this.updateAndClose(id)
+  }
   cancelChooseCustomer = () => {
     this.setState({
       showCustomerModal: false
-    });
-  };
+    })
+  }
   reassign2DeveloperSuccess = () => {
-    Noti.hintOk('操作成功', '当前工单已被转接');
+    Noti.hintOk('操作成功', '当前工单已被转接')
     this.setState({
       showDeveloperModal: false
-    });
-    this.updateAndClose(this.state.id);
-  };
+    })
+    this.updateAndClose(this.state.id)
+  }
   cancelChooseDeveloper = () => {
     this.setState({
       showDeveloperModal: false
-    });
-  };
+    })
+  }
   keepAndUpdate = id => {
     // this is handle process after sending message.
     // 1. update detail.
     // 2. if main_phase === 1, nothing to do with list.
     // 3. if main_phase === 0, set 'selectedRowIndex' to -1,  clear list, set 'main_phase' to 1
-    let resource = '/work/order/one';
+    let resource = '/work/order/one'
     const body = {
       id: id
-    };
+    }
     const cb = json => {
-      let { status, logs, endTime, level, handleLimit } = json.data;
-      let details = JSON.parse(JSON.stringify(this.props.taskList.details));
+      let { status, logs, endTime, level, handleLimit } = json.data
+      let details = JSON.parse(JSON.stringify(this.props.taskList.details))
       if (details.id) {
         // should always exist
-        let detail = details;
-        detail.status = status;
-        detail.logs = logs;
+        let detail = details
+        detail.status = status
+        detail.logs = logs
         if (endTime) {
-          detail.endTime = endTime;
+          detail.endTime = endTime
         }
         if (level) {
-          detail.level = level;
+          detail.level = level
         }
         if (handleLimit) {
-          detail.handleLimit = handleLimit;
+          detail.handleLimit = handleLimit
         }
       }
       this.props.changeTask(subModule, {
         details: details
-      });
-    };
-    AjaxHandler.ajax(resource, body, cb);
+      })
+    }
+    AjaxHandler.ajax(resource, body, cb)
     /* no matter ajax success or fail, check if fetch list again */
     // Note to keep 'selectedDetailId'.
     // only clear 'pending' and 'handing', because it won't be in 'finished' when sending message.
-    let { main_phase } = this.props.taskList;
+    let { main_phase } = this.props.taskList
     if (main_phase === 1) {
       // if in 'handing' module
-      return;
+      return
     } else {
       let {
         panel_rangeIndex,
@@ -981,26 +982,26 @@ class TaskDetail extends React.Component {
         panel_selectKey,
         panel_page,
         details
-      } = this.props.taskList;
-      let type = details.type;
+      } = this.props.taskList
+      let type = details.type
       let panel_dataSource = JSON.parse(
         JSON.stringify(this.props.taskList.panel_dataSource)
-      );
-      delete panel_dataSource[1];
-      delete panel_dataSource[2];
+      )
+      delete panel_dataSource[1]
+      delete panel_dataSource[2]
       // set props for 'handling', make sure detail can be found in list data.
-      let newRangeIndex = Array.from(panel_rangeIndex);
-      newRangeIndex[1] = 3;
-      let newStartTime = Array.from(panel_startTime);
-      newStartTime[1] = '';
-      let newEndTime = Array.from(panel_endTime);
-      newEndTime[1] = '';
-      let newType = Array.from(panel_type);
-      newType[1] = add(type, 1);
-      let newKeys = Array.from(panel_selectKey);
-      newKeys[1] = '';
-      let newPages = Array.from(panel_page);
-      newPages[1] = 1;
+      let newRangeIndex = Array.from(panel_rangeIndex)
+      newRangeIndex[1] = 3
+      let newStartTime = Array.from(panel_startTime)
+      newStartTime[1] = ''
+      let newEndTime = Array.from(panel_endTime)
+      newEndTime[1] = ''
+      let newType = Array.from(panel_type)
+      newType[1] = add(type, 1)
+      let newKeys = Array.from(panel_selectKey)
+      newKeys[1] = ''
+      let newPages = Array.from(panel_page)
+      newPages[1] = 1
       let newProps = {
         selectedRowIndex: -1,
         panel_dataSource: panel_dataSource,
@@ -1011,10 +1012,10 @@ class TaskDetail extends React.Component {
         panel_type: newType,
         panel_selectKey: newKeys,
         panel_page: newPages
-      };
-      this.props.changeTask(subModule, newProps);
+      }
+      this.props.changeTask(subModule, newProps)
     }
-  };
+  }
   updateAndClose = id => {
     /*
     let resource = '/work/order/one'
@@ -1052,40 +1053,40 @@ class TaskDetail extends React.Component {
       selectedRowIndex: -1,
       selectedDetailId: -1,
       panel_dataSource: {}
-    };
-    this.props.changeTask(subModule, newProps);
-  };
+    }
+    this.props.changeTask(subModule, newProps)
+  }
   finishTask = () => {
     this.setState({
       showFinishModal: true
-    });
-  };
+    })
+  }
   changeNote = e => {
     this.setState({
       note: e.target.value,
       finishContentError: false
-    });
-  };
+    })
+  }
   confirmFinish = () => {
-    let { id, note } = this.state;
-    let { type } = this.props.taskList.details;
+    let { id, note } = this.state
+    let { type } = this.props.taskList.details
 
-    let resource = '/work/order/handle';
+    let resource = '/work/order/handle'
     const body = {
       id: id,
       type: CONSTANTS.TASK_HANDLE_FINISH, // finish
       env: TASK_BUILD_CMP
-    };
-    let content = note.trim();
-    console.log(type);
+    }
+    let content = note.trim()
+    console.log(type)
     // content must not be empty when finishing repair task
     if (type === TASK_TYPE_REPAIR && !content) {
       return this.setState({
         finishContentError: true
-      });
+      })
     }
     if (content) {
-      body.content = content;
+      body.content = content
     }
     const cb = json => {
       if (json.data.result) {
@@ -1093,32 +1094,32 @@ class TaskDetail extends React.Component {
         this.setState({
           showFinishModal: false,
           note: ''
-        });
-        Noti.hintOk('操作成功', '当前工单已完结');
+        })
+        Noti.hintOk('操作成功', '当前工单已完结')
         // refetch details
-        this.updateAndClose(id);
+        this.updateAndClose(id)
       } else {
-        Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试');
+        Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试')
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   closeFinishModal = () => {
     this.setState({
       note: '',
       showFinishModal: false,
       finishContentError: false
-    });
-  };
+    })
+  }
   goToMore = e => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      let { main_phase, details, detail_tabIndex } = this.props.taskList;
-      let detail = details;
+      let { main_phase, details, detail_tabIndex } = this.props.taskList
+      let detail = details
 
-      let { deviceType, creatorId, residenceId, userMobile } = detail;
+      let { deviceType, creatorId, residenceId, userMobile } = detail
 
-      let currentTab = detail_tabIndex[main_phase];
+      let currentTab = detail_tabIndex[main_phase]
       if (currentTab === 2) {
         this.props.changeOrder('orderList', {
           page: 1,
@@ -1126,22 +1127,22 @@ class TaskDetail extends React.Component {
           deviceType: 'all',
           status: 'all',
           selectKey: ''
-        });
+        })
         this.props.history.push({
           pathname: '/order/list',
           state: { path: 'fromTask', userId: creatorId }
-        });
+        })
       } else if (currentTab === 3) {
         this.props.changeDevice('repair', {
           page: 1,
           schoolId: 'all',
           deviceType: 'all',
           status: 'all'
-        });
+        })
         this.props.history.push({
           pathname: '/device/repair',
           state: { path: 'fromTask', userId: creatorId }
-        });
+        })
       } else if (currentTab === 5) {
         this.props.changeOrder('orderList', {
           page: 1,
@@ -1149,7 +1150,7 @@ class TaskDetail extends React.Component {
           deviceType: deviceType ? deviceType.toString() : 'all',
           status: 'all',
           selectKey: ''
-        });
+        })
         this.props.history.push({
           pathname: '/order/list',
           state: {
@@ -1157,14 +1158,14 @@ class TaskDetail extends React.Component {
             deviceType: deviceType,
             residenceId: residenceId
           }
-        });
+        })
       } else if (currentTab === 6) {
         this.props.changeDevice('repair', {
           page: 1,
           schoolId: 'all',
           deviceType: 'all',
           status: 'all'
-        });
+        })
         this.props.history.push({
           pathname: '/device/repair',
           state: {
@@ -1172,7 +1173,7 @@ class TaskDetail extends React.Component {
             deviceType: deviceType,
             residenceId: residenceId
           }
-        });
+        })
       } else if (currentTab === 7) {
         this.props.changeFund('fundList', {
           page: 1,
@@ -1182,134 +1183,130 @@ class TaskDetail extends React.Component {
           schoolId: 'all',
           startTime: Time.get7DaysAgoStart(),
           endTime: Time.getTodayEnd()
-        });
+        })
         this.props.history.push({
           pathname: '/fund/list',
           state: { path: 'fromTask', mobile: userMobile }
-        });
+        })
       }
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
   closeDetailImgs = () => {
     this.setState({
       showDetailImgs: false
-    });
-  };
+    })
+  }
   changeMessage = e => {
     this.setState({
       message: e.target.value,
       messageError: false
-    });
-  };
+    })
+  }
   confirmPostMessage = (id, userMobile) => {
-    console.log('posting message');
+    console.log('posting message')
     // debugger
-    let { message, posting } = this.state;
+    let { message, posting } = this.state
     if (posting) {
-      return;
+      return
     }
-    let m = message.trim();
+    let m = message.trim()
     if (!m || m.length > 200) {
       return this.setState({
         messageError: true
-      });
+      })
     }
-    let resource = '/work/order/handle';
+    let resource = '/work/order/handle'
     const body = {
       id: id,
       content: m,
       type: CONSTANTS.TASK_HANDLE_SENDMESSAGE
-    };
+    }
     const cb = json => {
       this.setState({
         posting: false,
         message: ''
-      });
+      })
       if (json.data) {
-        Noti.hintOk('操作成功', '已成功发送消息');
+        Noti.hintOk('操作成功', '已成功发送消息')
       }
       // keep detail and check if need to fetch list
-      this.keepAndUpdate(id);
-    };
+      this.keepAndUpdate(id)
+    }
     this.setState({
       posting: true
-    });
+    })
     AjaxHandler.ajax(resource, body, cb, null, {
       clearPosting: true,
       thisObj: this
-    });
-  };
+    })
+  }
   changeComplaintPage = (page, pageSize) => {
     try {
-      let { creatorId } = this.state;
+      let { creatorId } = this.state
       // fetch more
-      let resource = '/work/order/list';
-      const body = {};
-      body.page = page;
-      body.size = SIZE;
-      body.type = CONSTANTS.TASK_TYPE_COMPLAINT;
-      body.creatorId = creatorId;
+      let resource = '/work/order/list'
+      const body = {}
+      body.page = page
+      body.size = SIZE
+      body.type = CONSTANTS.TASK_TYPE_COMPLAINT
+      body.creatorId = creatorId
 
       const cb = json => {
         this.setState({
           tabLoading: false
-        });
-        let newDetails = JSON.parse(
-          JSON.stringify(this.props.taskList.details)
-        );
-        let userComplaints = newDetails.userComplaints;
-        userComplaints.page = page;
-        userComplaints.total = json.data.total;
-        userComplaints.dataSource = json.data.workOrders;
+        })
+        let newDetails = JSON.parse(JSON.stringify(this.props.taskList.details))
+        let userComplaints = newDetails.userComplaints
+        userComplaints.page = page
+        userComplaints.total = json.data.total
+        userComplaints.dataSource = json.data.workOrders
         this.props.changeTask(subModule, {
           details: newDetails
-        });
-      };
+        })
+      }
       this.setState({
         tabLoading: true
-      });
-      AjaxHandler.ajax(resource, body, cb);
+      })
+      AjaxHandler.ajax(resource, body, cb)
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
   changeFeedbackPage = (page, pageSize) => {
     try {
-      console.log(page);
-      let { creatorId } = this.state;
+      console.log(page)
+      let { creatorId } = this.state
       // fetch more
-      let resource = '/work/order/list';
-      const body = {};
-      body.page = page;
-      body.size = SIZE;
-      body.type = CONSTANTS.TASK_TYPE_FEEDBACK;
-      body.creatorId = creatorId;
+      let resource = '/work/order/list'
+      const body = {}
+      body.page = page
+      body.size = SIZE
+      body.type = CONSTANTS.TASK_TYPE_FEEDBACK
+      body.creatorId = creatorId
 
       const cb = json => {
         this.setState({
           tabLoading: false
-        });
-        let newDetails = JSON.parse(
-          JSON.stringify(this.props.taskList.details)
-        );
-        let userFeedbacks = newDetails.userFeedbacks;
-        userFeedbacks.page = page;
-        userFeedbacks.total = json.data.total;
-        userFeedbacks.dataSource = json.data.workOrders;
+        })
+        let newDetails = JSON.parse(JSON.stringify(this.props.taskList.details))
+        let userFeedbacks = newDetails.userFeedbacks
+        userFeedbacks.page = page
+        userFeedbacks.total = json.data.total
+        userFeedbacks.dataSource = json.data.workOrders
         this.props.changeTask(subModule, {
           details: newDetails
-        });
-      };
+        })
+      }
       this.setState({
         tabLoading: true
-      });
-      AjaxHandler.ajax(resource, body, cb);
+      })
+      AjaxHandler.ajax(resource, body, cb)
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
   render() {
     const {
       showDetailImgs,
@@ -1326,7 +1323,7 @@ class TaskDetail extends React.Component {
       messageError,
       finishContentError,
       tag
-    } = this.state;
+    } = this.state
 
     let {
       main_phase,
@@ -1335,18 +1332,18 @@ class TaskDetail extends React.Component {
       detailLoading,
       detail_tabIndex,
       selectedDetailId
-    } = this.props.taskList;
-    const { forbiddenStatus } = this.props;
-    let { tags } = this.props.tagInfo;
+    } = this.props.taskList
+    const { forbiddenStatus } = this.props
+    let { tags } = this.props.tagInfo
 
-    let currentTab = detail_tabIndex[main_phase];
+    let currentTab = detail_tabIndex[main_phase]
 
     /* get info from 'details', 'details' is an object whose key is 'id' */
     // get type and id
     // let page = panel_page[main_phase]
     // let selectedItem = panel_dataSource[main_phase] && panel_dataSource[main_phase][page] && panel_dataSource[main_phase][page][selectedRowIndex] // selected row
-    let id = selectedDetailId;
-    let detail = details || {}; // info of current selected item
+    let id = selectedDetailId
+    let detail = details || {} // info of current selected item
     // console.log(detail);
     let {
       committer,
@@ -1379,26 +1376,24 @@ class TaskDetail extends React.Component {
       exist,
       handleLimit,
       level
-    } = detail;
+    } = detail
 
     let denomination =
-      parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲';
+      parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
 
     // info for device detail
     let { bindingTime, price, pulse, prepayOption, waterTimeRange, rates } =
-      deviceInfo || {};
+      deviceInfo || {}
     let rateItems =
       deviceType === DEVICE_TYPE_WASHER
         ? rates &&
           rates.map((r, i) => (
             <span key={i}>{`${WASHER_RATE_TYPES[r.pulse]}/${
-              r.price ? mul(r.price, 100) : ''
-            }分钱`}</span>
+              r.price ? r.price : ''
+            }元`}</span>
           ))
         : pulse &&
-          price && (
-            <span>{`${mul(price, 100)}分钱/${pulse}${denomination}`}</span>
-          );
+          price && <span>{`${mul(price, 100)}元/${pulse}${denomination}`}</span>
     let timeItem =
       waterTimeRange &&
       waterTimeRange.items &&
@@ -1408,13 +1403,13 @@ class TaskDetail extends React.Component {
             r.startTime.minute
           )}~{Format.adding0(r.endTime.hour)}:{Format.adding0(r.endTime.minute)}
         </span>
-      ));
+      ))
 
     // current page for 'complaint' or 'feedback' page
-    let complaintPage = userComplaints && userComplaints.page;
-    let feedbackPage = userFeedbacks && userFeedbacks.page;
-    let complaintTotal = userComplaints && userComplaints.total;
-    let feedbackTotal = userFeedbacks && userFeedbacks.total;
+    let complaintPage = userComplaints && userComplaints.page
+    let feedbackPage = userFeedbacks && userFeedbacks.page
+    let complaintTotal = userComplaints && userComplaints.total
+    let feedbackTotal = userFeedbacks && userFeedbacks.total
 
     // for detail images, not images in detail tab
     const imgs =
@@ -1428,7 +1423,7 @@ class TaskDetail extends React.Component {
           key={i}
           alt=""
         />
-      ));
+      ))
     const carouselItems =
       images &&
       images.map((r, i) => {
@@ -1439,8 +1434,8 @@ class TaskDetail extends React.Component {
             src={CONSTANTS.FILEADDR + r}
             className="carouselImg"
           />
-        );
-      });
+        )
+      })
     const carousel = (
       <Carousel
         dots={true}
@@ -1452,13 +1447,13 @@ class TaskDetail extends React.Component {
       >
         {carouselItems}
       </Carousel>
-    );
+    )
 
     // for images in detail tab
     const dataSource =
       (detail[DETAILTAB2NAME[currentTab]] &&
         detail[DETAILTAB2NAME[currentTab]].dataSource) ||
-      detail[DETAILTAB2NAME[currentTab]];
+      detail[DETAILTAB2NAME[currentTab]]
     const tabCarouselItems =
       dataSource &&
       dataSource[indexOfImgDataInSource] &&
@@ -1472,8 +1467,8 @@ class TaskDetail extends React.Component {
             src={CONSTANTS.FILEADDR + r}
             className="carouselImg"
           />
-        );
-      });
+        )
+      })
 
     const tabCarousel = (
       <Carousel
@@ -1486,31 +1481,34 @@ class TaskDetail extends React.Component {
       >
         {tabCarouselItems}
       </Carousel>
-    );
+    )
 
     const processLogs =
       logs &&
       logs.map((l, i) => {
-        let { id, createTime, assignName, processorName, content, type } = l;
-        let message = '';
+        let { id, createTime, assignName, processorName, content, type } = l
+        let message = ''
         switch (type) {
+          case TASK_HANDLE_BUILD:
+            message = '创建工单'
+            break
           case CONSTANTS.TASK_HANDLE_REASSIGN:
-            message = '转接工单' + (assignName ? `给${assignName}` : '');
-            break;
+            message = '转接工单' + (assignName ? `给${assignName}` : '')
+            break
           case CONSTANTS.TASK_HANDLE_ACCEPT:
-            message = (assignName ? assignName : '') + '接受工单';
-            break;
+            message = (assignName ? assignName : '') + '接受工单'
+            break
           case CONSTANTS.TASK_HANDLE_REFUSE:
-            message = '拒绝工单';
-            break;
+            message = '拒绝工单'
+            break
           case CONSTANTS.TASK_HANDLE_SENDMESSAGE:
-            message = '发送客服消息给用户: ' + (content ? content : '');
-            break;
+            message = '发送客服消息给用户: ' + (content ? content : '')
+            break
           case CONSTANTS.TASK_HANDLE_FINISH:
-            message = '完结工单';
-            break;
+            message = '完结工单'
+            break
           default:
-            message = '';
+            message = ''
         }
         return (
           <li key={`li${id}`}>
@@ -1524,10 +1522,10 @@ class TaskDetail extends React.Component {
               {message}
             </span>
           </li>
-        );
-      });
+        )
+      })
 
-    const statusClass = status === CONSTANTS.TASK_FINISHED ? '' : 'shalowRed';
+    const statusClass = status === CONSTANTS.TASK_FINISHED ? '' : 'shalowRed'
 
     return (
       <div
@@ -2001,7 +1999,7 @@ class TaskDetail extends React.Component {
               />
               <Button
                 onClick={() => {
-                  this.confirmPostMessage(id, userMobile);
+                  this.confirmPostMessage(id, userMobile)
                 }}
                 type="primary"
               >
@@ -2135,7 +2133,7 @@ class TaskDetail extends React.Component {
           />
         ) : null}
       </div>
-    );
+    )
   }
 }
 
@@ -2143,7 +2141,7 @@ const mapStateToProps = (state, ownProps) => ({
   taskList: state.changeTask[subModule],
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   tagInfo: state.setTagList
-});
+})
 
 export default withRouter(
   connect(mapStateToProps, {
@@ -2152,4 +2150,4 @@ export default withRouter(
     changeDevice,
     changeFund
   })(TaskDetail)
-);
+)

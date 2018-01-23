@@ -1,16 +1,16 @@
-import React from 'react';
+import React from 'react'
 
-import { Button } from 'antd';
+import { Button } from 'antd'
 
-import AjaxHandler from '../../ajax';
-import Noti from '../../noti';
-import AddPlusAbs from '../../component/addPlusAbs';
-import CONSTANTS from '../../component/constants';
-import SchoolSelector from '../../component/schoolSelectorWithoutAll';
-import DeviceWithoutAll from '../../component/deviceWithoutAll';
-import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll';
-import { mul, div } from '../../util/numberHandle';
-const Fragment = React.Fragment;
+import AjaxHandler from '../../ajax'
+import Noti from '../../noti'
+import AddPlusAbs from '../../component/addPlusAbs'
+import CONSTANTS from '../../component/constants'
+import SchoolSelector from '../../component/schoolSelectorWithoutAll'
+import DeviceWithoutAll from '../../component/deviceWithoutAll'
+import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
+import { mul, div } from '../../util/numberHandle'
+const Fragment = React.Fragment
 const {
   DEVICE_TYPE_HEATER,
   DEVICE_TYPE_DRINGKER,
@@ -21,31 +21,31 @@ const {
   BLOWER_BILLING_OPTIONS,
   WASHER_BILLING_OPTIONS,
   SELECTWIDTH
-} = CONSTANTS;
+} = CONSTANTS
 
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
-};
-const billingOptions = {};
-billingOptions[DEVICE_TYPE_HEATER] = HEATER_BILLING_OPTIONS;
-billingOptions[DEVICE_TYPE_DRINGKER] = DRINKER_BILLING_OPTIONS;
-billingOptions[DEVICE_TYPE_BLOWER] = BLOWER_BILLING_OPTIONS;
-billingOptions[DEVICE_TYPE_WASHER] = WASHER_BILLING_OPTIONS;
+}
+const billingOptions = {}
+billingOptions[DEVICE_TYPE_HEATER] = HEATER_BILLING_OPTIONS
+billingOptions[DEVICE_TYPE_DRINGKER] = DRINKER_BILLING_OPTIONS
+billingOptions[DEVICE_TYPE_BLOWER] = BLOWER_BILLING_OPTIONS
+billingOptions[DEVICE_TYPE_WASHER] = WASHER_BILLING_OPTIONS
 
 class RateInfo extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     let id = 0,
       deviceType = '',
       schoolId = '',
       billingMethod = '',
       originalDT = 0,
-      originalSchool = 0;
+      originalSchool = 0
     let rateGroups = [{}],
       deviceTypeError = false,
       schoolError = false,
       billError = false,
-      closeTapGroups = [{}];
+      closeTapGroups = [{}]
     this.state = {
       id,
       deviceType,
@@ -68,7 +68,7 @@ class RateInfo extends React.Component {
       twoWashPricePriceError: false,
       twoCleanPrice: '',
       twoCleanPriceError: false
-    };
+    }
   }
   /*
   fetchSuppliers = ()=>{
@@ -98,15 +98,15 @@ class RateInfo extends React.Component {
   }
   */
   fetchData = body => {
-    let resource = '/api/rate/one';
+    let resource = '/api/rate/one'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         try {
           if (json.data) {
-            let r = json.data;
-            const taps = r.timeLimit && r.timeLimit.map(r => ({ value: r }));
+            let r = json.data
+            const taps = r.timeLimit && r.timeLimit.map(r => ({ value: r }))
 
             let nextState = {
               deviceType: r.deviceType.toString(),
@@ -114,94 +114,89 @@ class RateInfo extends React.Component {
               schoolId: r.schoolId,
               originalSchool: r.schoolId,
               billingMethod: r.billingMethod.toString()
-            };
+            }
             if (r.deviceType === DEVICE_TYPE_WASHER) {
               let dryPrice =
                 r.rateGroups &&
-                r.rateGroups.find(rate => rate.pulse === 1).price;
+                r.rateGroups.find(rate => rate.pulse === 1).price
               let oneWashPrice =
                 r.rateGroups &&
-                r.rateGroups.find(rate => rate.pulse === 2).price;
+                r.rateGroups.find(rate => rate.pulse === 2).price
               let twoWashPrice =
                 r.rateGroups &&
-                r.rateGroups.find(rate => rate.pulse === 3).price;
+                r.rateGroups.find(rate => rate.pulse === 3).price
               let twoCleanPrice =
                 r.rateGroups &&
-                r.rateGroups.find(rate => rate.pulse === 4).price;
-              nextState.dryPrice = dryPrice ? mul(dryPrice, 100) : '';
-              nextState.oneWashPrice = oneWashPrice
-                ? mul(oneWashPrice, 100)
-                : '';
-              nextState.twoWashPrice = twoWashPrice
-                ? mul(twoWashPrice, 100)
-                : '';
-              nextState.twoCleanPrice = twoCleanPrice
-                ? mul(twoCleanPrice, 100)
-                : '';
+                r.rateGroups.find(rate => rate.pulse === 4).price
+              nextState.dryPrice = dryPrice ? dryPrice : ''
+              nextState.oneWashPrice = oneWashPrice ? oneWashPrice : ''
+              nextState.twoWashPrice = twoWashPrice ? twoWashPrice : ''
+              nextState.twoCleanPrice = twoCleanPrice ? twoCleanPrice : ''
             } else {
               const rateGroups =
                 r.rateGroups &&
                 r.rateGroups.map(rate => ({
                   price: mul(rate.price, 100),
                   pulse: rate.pulse
-                }));
-              nextState.rateGroups = rateGroups;
+                }))
+              nextState.rateGroups = rateGroups
             }
             if (taps) {
-              nextState.closeTapGroups = taps;
+              nextState.closeTapGroups = taps
             }
-            this.setState(nextState);
+            this.setState(nextState)
           }
         } catch (e) {
-          console.log(e);
+          console.log(e)
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
   componentDidMount() {
-    this.props.hide(false);
+    this.props.hide(false)
     if (this.props.match.params.id) {
-      let id = parseInt(this.props.match.params.id.slice(1), 10);
+      let id = parseInt(this.props.match.params.id.slice(1), 10)
       const body = {
         id: id
-      };
-      this.fetchData(body);
+      }
+      this.fetchData(body)
       this.setState({
         id: id
-      });
+      })
     }
   }
   componentWillUnmount() {
-    this.props.hide(true);
+    this.props.hide(true)
   }
 
   changeDevice = v => {
-    let nextState = { deviceType: v };
-    let rateGroups = [{}];
+    let nextState = { deviceType: v }
+    nextState.billingMethod = '' // clear 'billingMethod' also
+    let rateGroups = [{}]
     if (v === '2') {
-      rateGroups.push({});
-      rateGroups.push({});
-      nextState.rateGroups = rateGroups;
+      rateGroups.push({})
+      rateGroups.push({})
+      nextState.rateGroups = rateGroups
     } else {
-      nextState.rateGroups = rateGroups;
+      nextState.rateGroups = rateGroups
     }
-    this.setState(nextState);
-  };
+    this.setState(nextState)
+  }
   checkDevice = v => {
     if (v === '0' || !v) {
       return this.setState({
         deviceTypeError: true
-      });
+      })
     }
     this.setState({
       deviceTypeError: false
-    });
-    let { id, deviceType, originalDT, schoolId, originalSchool } = this.state;
+    })
+    let { id, deviceType, originalDT, schoolId, originalSchool } = this.state
     if (!schoolId) {
       // 如果没有供应商选项，不去查重
-      return;
+      return
     }
     if (
       !(
@@ -210,27 +205,27 @@ class RateInfo extends React.Component {
         parseInt(schoolId, 10) === originalSchool
       )
     ) {
-      this.checkExist(null);
+      this.checkExist(null)
     }
-  };
+  }
   changeSchool = v => {
     this.setState({
       schoolId: v
-    });
-  };
+    })
+  }
   checkSchool = v => {
     if (!v) {
       return this.setState({
         schoolError: true
-      });
+      })
     }
     this.setState({
       schoolError: false
-    });
-    let { id, deviceType, originalDT, schoolId, originalSchool } = this.state;
+    })
+    let { id, deviceType, originalDT, schoolId, originalSchool } = this.state
     if (!deviceType) {
       // 如果没有供应商选项，不去查重
-      return;
+      return
     }
     if (
       !(
@@ -239,83 +234,83 @@ class RateInfo extends React.Component {
         parseInt(schoolId, 10) === originalSchool
       )
     ) {
-      this.checkExist(null);
+      this.checkExist(null)
     }
-  };
+  }
   checkExist = callback => {
     if (this.state.checking) {
-      return;
+      return
     }
     this.setState({
       checking: true
-    });
-    let resource = '/rate/check';
-    const { deviceType, schoolId } = this.state;
+    })
+    let resource = '/rate/check'
+    const { deviceType, schoolId } = this.state
     const body = {
       deviceType: parseInt(deviceType, 10),
       schoolId: parseInt(schoolId, 10)
-    };
+    }
     const cb = json => {
       this.setState({
         checking: false
-      });
+      })
       if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage);
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           Noti.hintLock(
             '添加出错',
             '当前学校的该类型设备已有费率选项，请勿重复添加'
-          );
+          )
         } else {
           if (callback) {
-            callback();
+            callback()
           }
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   changePrice = (e, i) => {
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups));
-    rateGroups[i].price = parseInt(e.target.value, 10);
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
+    rateGroups[i].price = parseInt(e.target.value, 10)
     this.setState({
       rateGroups: rateGroups
-    });
-  };
+    })
+  }
   checkPrice = (e, i) => {
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups));
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
     if (!rateGroups[i].price) {
-      rateGroups[i].error = true;
+      rateGroups[i].error = true
       return this.setState({
         rateGroups: rateGroups
-      });
+      })
     }
-    rateGroups[i].error = false;
+    rateGroups[i].error = false
     this.setState({
       rateGroups: rateGroups
-    });
-  };
+    })
+  }
   changePulse = (e, i) => {
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups));
-    rateGroups[i].pulse = parseInt(e.target.value, 10);
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
+    rateGroups[i].pulse = parseInt(e.target.value, 10)
     this.setState({
       rateGroups: rateGroups
-    });
-  };
+    })
+  }
   checkPulse = (e, i) => {
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups));
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
     if (!rateGroups[i].pulse) {
-      rateGroups[i].error = true;
+      rateGroups[i].error = true
       return this.setState({
         rateGroups: rateGroups
-      });
+      })
     }
-    rateGroups[i].error = false;
+    rateGroups[i].error = false
     this.setState({
       rateGroups: rateGroups
-    });
-  };
+    })
+  }
   checkInput = () => {
     let {
       rateGroups,
@@ -327,81 +322,81 @@ class RateInfo extends React.Component {
       oneWashPrice,
       twoWashPrice,
       twoCleanPrice
-    } = this.state;
+    } = this.state
     if (!deviceType || deviceType === '0') {
       this.setState({
         deviceTypeError: true
-      });
-      return false;
+      })
+      return false
     }
-    let nextState = { deviceTypeError: false };
+    let nextState = { deviceTypeError: false }
     if (!schoolId || schoolId === '0') {
-      nextState.schoolError = true;
-      this.setState(nextState);
-      return false;
+      nextState.schoolError = true
+      this.setState(nextState)
+      return false
     }
-    nextState.schoolError = false;
+    nextState.schoolError = false
     if (!billingMethod || billingMethod === '0') {
-      nextState.billError = true;
-      this.setState(nextState);
-      return false;
+      nextState.billError = true
+      this.setState(nextState)
+      return false
     }
-    nextState.billError = false;
-    console.log(deviceType);
+    nextState.billError = false
+    console.log(deviceType)
     if (deviceType === DEVICE_TYPE_WASHER.toString()) {
-      console.log('why');
+      console.log('why')
       if (!dryPrice) {
         return this.setState({
           dryPriceError: true
-        });
+        })
       }
       if (!oneWashPrice) {
         return this.setState({
           oneWashPriceError: true
-        });
+        })
       }
       if (!twoWashPrice) {
         return this.setState({
           twoWashPriceError: true
-        });
+        })
       }
       if (!twoCleanPrice) {
         return this.setState({
           twoCleanPriceError: true
-        });
+        })
       }
     } else {
-      let rates = JSON.parse(JSON.stringify(rateGroups));
+      let rates = JSON.parse(JSON.stringify(rateGroups))
       for (let i = 0; i < rates.length; i++) {
         if (!rates[i].price || !rates[i].pulse) {
-          rates[i].error = true;
-          nextState.rateGroups = rates;
-          this.setState(nextState);
-          return false;
+          rates[i].error = true
+          nextState.rateGroups = rates
+          this.setState(nextState)
+          return false
         }
-        delete rates[i].error;
+        delete rates[i].error
       }
-      let taps = JSON.parse(JSON.stringify(closeTapGroups));
+      let taps = JSON.parse(JSON.stringify(closeTapGroups))
       for (let i = 0; i < taps.length; i++) {
         if (!taps[i].value) {
-          taps[i].error = true;
-          nextState.closeTapGroups = taps;
-          this.setState(nextState);
-          return false;
+          taps[i].error = true
+          nextState.closeTapGroups = taps
+          this.setState(nextState)
+          return false
         }
         if (taps[i].error) {
-          delete taps[i].error;
+          delete taps[i].error
         }
       }
     }
-    this.setState(nextState);
-    return true;
-  };
+    this.setState(nextState)
+    return true
+  }
   comleteEdit = () => {
     if (!this.checkInput()) {
-      return;
+      return
     }
-    console.log('complete');
+    console.log('complete')
 
     let {
       id,
@@ -411,9 +406,9 @@ class RateInfo extends React.Component {
       originalSchool,
       checking,
       posting
-    } = this.state;
+    } = this.state
     if (checking || posting) {
-      return;
+      return
     }
     if (
       !(
@@ -422,20 +417,20 @@ class RateInfo extends React.Component {
         parseInt(schoolId, 10) === originalSchool
       )
     ) {
-      this.checkExist(this.postInfo);
+      this.checkExist(this.postInfo)
     } else {
-      this.postInfo();
+      this.postInfo()
     }
-  };
+  }
   postInfo = () => {
     if (this.state.posting) {
-      return;
+      return
     }
     this.setState({
       posting: true
-    });
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups));
-    const taps = this.state.closeTapGroups.map(r => r.value);
+    })
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
+    const taps = this.state.closeTapGroups.map(r => r.value)
     let {
       id,
       deviceType,
@@ -445,13 +440,14 @@ class RateInfo extends React.Component {
       oneWashPrice,
       twoWashPrice,
       twoCleanPrice
-    } = this.state;
+    } = this.state
     const body = {
       billingMethod: parseInt(billingMethod, 10),
       deviceType: parseInt(deviceType, 10),
       schoolId: parseInt(schoolId, 10)
-    };
+    }
     if (deviceType === DEVICE_TYPE_WASHER.toString()) {
+      // washer's denomination is 'YUAN', does not need to div by 100.
       let rates = [
         {
           pulse: 1,
@@ -469,188 +465,186 @@ class RateInfo extends React.Component {
           pulse: 4,
           price: +twoCleanPrice
         }
-      ];
-      body.rates = rates;
+      ]
+      body.rates = rates
     } else {
       rateGroups.forEach(r => {
-        r.price = div(r.price, 100);
-      });
-      body.rates = rateGroups;
-      body.timeLimit = taps;
+        r.price = div(r.price, 100)
+      })
+      body.rates = rateGroups
+      body.timeLimit = taps
     }
     if (id) {
-      body.id = parseInt(id, 10);
+      body.id = parseInt(id, 10)
     }
-    let resource = '/api/rate/save';
+    let resource = '/api/rate/save'
     const cb = json => {
       this.setState({
         posting: false
-      });
+      })
       if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage);
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         /*--------redirect --------*/
         if (json.data) {
-          Noti.hintSuccess(this.props.history, '/device/rateSet');
+          Noti.hintSuccess(this.props.history, '/device/rateSet')
         } else {
-          Noti.hintServiceError();
+          Noti.hintServiceError()
         }
       }
-    };
+    }
     AjaxHandler.ajax(resource, body, cb, null, {
       clearPosting: true,
       thisObj: this
-    });
-  };
+    })
+  }
   back = () => {
-    this.props.history.goBack();
-  };
+    this.props.history.goBack()
+  }
   add = () => {
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups));
-    rateGroups.push({});
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
+    rateGroups.push({})
     this.setState({
       rateGroups: rateGroups
-    });
-  };
+    })
+  }
   abstract = () => {
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups));
-    rateGroups.pop();
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
+    rateGroups.pop()
     this.setState({
       rateGroups: rateGroups
-    });
-  };
+    })
+  }
   changeBilling = v => {
     this.setState({
       billingMethod: v
-    });
-  };
+    })
+  }
   checkBilling = v => {
     if (!v || v === '0') {
       return this.setState({
         billError: true
-      });
+      })
     }
     this.setState({
       billError: false
-    });
-  };
+    })
+  }
   addTime = e => {
-    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups));
-    closeTapGroups.push({});
+    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
+    closeTapGroups.push({})
     this.setState({
       closeTapGroups: closeTapGroups
-    });
-  };
+    })
+  }
   abstractTime = e => {
-    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups));
-    closeTapGroups.pop();
+    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
+    closeTapGroups.pop()
     this.setState({
       closeTapGroups: closeTapGroups
-    });
-  };
+    })
+  }
   changeTime = (e, i) => {
-    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups));
-    closeTapGroups[i].value = parseInt(e.target.value, 10);
+    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
+    closeTapGroups[i].value = parseInt(e.target.value, 10)
     this.setState({
       closeTapGroups: closeTapGroups
-    });
-  };
+    })
+  }
   checkTime = (e, i) => {
-    const closeTapGroups = JSON.parse(
-      JSON.stringify(this.state.closeTapGroups)
-    );
+    const closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
     if (!closeTapGroups[i].value) {
-      closeTapGroups[i].error = true;
+      closeTapGroups[i].error = true
       return this.setState({
         closeTapGroups: closeTapGroups
-      });
+      })
     }
-    closeTapGroups[i].error = false;
+    closeTapGroups[i].error = false
     this.setState({
       closeTapGroups: closeTapGroups
-    });
-  };
+    })
+  }
 
   changePriceForDryer = e => {
     this.setState({
       dryPrice: e.target.value
-    });
-  };
+    })
+  }
   checkPriceForDryer = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         dryPriceError: true,
         dryPrice: v
-      });
+      })
     }
     if (this.state.dryPriceError) {
       this.setState({
         dryPriceError: false,
         dryPrice: v
-      });
+      })
     }
-  };
+  }
   changePriceForOneWash = e => {
     this.setState({
       oneWashPrice: e.target.value
-    });
-  };
+    })
+  }
   checkPriceForOneWash = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         oneWashPriceError: true,
         oneWashPrice: v
-      });
+      })
     }
     if (this.state.oneWashPriceError) {
       this.setState({
         oneWashPriceError: false,
         oneWashPrice: v
-      });
+      })
     }
-  };
+  }
   changePriceForTwoWash = e => {
     this.setState({
       twoWashPrice: e.target.value
-    });
-  };
+    })
+  }
   checkPriceForTwoWash = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         twoWashPriceError: true,
         twoWashPrice: v
-      });
+      })
     }
     if (this.state.twoWashPrice) {
       this.setState({
         twoWashPriceError: false,
         twoWashPrice: v
-      });
+      })
     }
-  };
+  }
   changePriceForTwoClean = e => {
     this.setState({
       twoCleanPrice: e.target.value
-    });
-  };
+    })
+  }
   checkPriceForTwoClean = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         twoCleanPriceError: true,
         twoCleanPrice: v
-      });
+      })
     }
     if (this.state.twoCleanPriceError) {
       this.setState({
         twoCleanPriceError: false,
         twoCleanPrice: v
-      });
+      })
     }
-  };
+  }
 
   render() {
     let {
@@ -671,9 +665,9 @@ class RateInfo extends React.Component {
       twoWashPriceError,
       twoCleanPrice,
       twoCleanPriceError
-    } = this.state;
+    } = this.state
     let denomination =
-      parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲';
+      parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
 
     const rateItems =
       rateGroups &&
@@ -684,10 +678,10 @@ class RateInfo extends React.Component {
               type="number"
               className="shortInput"
               onChange={e => {
-                this.changePrice(e, i);
+                this.changePrice(e, i)
               }}
               onBlur={e => {
-                this.checkPrice(e, i);
+                this.checkPrice(e, i)
               }}
               key={`input${i}`}
               value={r.price ? r.price : ''}
@@ -697,10 +691,10 @@ class RateInfo extends React.Component {
               type="number"
               className="shortInput"
               onChange={e => {
-                this.changePulse(e, i);
+                this.changePulse(e, i)
               }}
               onBlur={e => {
-                this.checkPulse(e, i);
+                this.checkPulse(e, i)
               }}
               key={`pulse${i}`}
               value={r.pulse ? r.pulse : ''}
@@ -708,8 +702,8 @@ class RateInfo extends React.Component {
             <span key={`span3${i}`}>{denomination}</span>
             {r.error ? <span className="checkInvalid">输入不完整</span> : null}
           </li>
-        );
-      });
+        )
+      })
     const tapItems =
       closeTapGroups &&
       closeTapGroups.map((r, i) => {
@@ -719,10 +713,10 @@ class RateInfo extends React.Component {
               type="number"
               className="shortInput"
               onChange={e => {
-                this.changeTime(e, i);
+                this.changeTime(e, i)
               }}
               onBlur={e => {
-                this.checkTime(e, i);
+                this.checkTime(e, i)
               }}
               key={`input${i}`}
               value={r.value ? r.value : ''}
@@ -730,8 +724,8 @@ class RateInfo extends React.Component {
             <span key={`time${i}`}>分钟</span>
             {r.error ? <span className="checkInvalid">输入不完整</span> : null}
           </li>
-        );
-      });
+        )
+      })
     return (
       <div className="infoList rateInfo">
         <ul>
@@ -876,8 +870,8 @@ class RateInfo extends React.Component {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default RateInfo;
+export default RateInfo

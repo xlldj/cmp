@@ -1,83 +1,83 @@
-import React from 'react';
-import { Table, Icon } from 'antd';
-import AjaxHandler from '../../ajax';
-import Time from '../../component/time';
-import Format from '../../component/format';
-import CONSTANTS from '../../component/constants';
-import SearchLine from '../../component/searchLine';
-import SchoolSelector from '../../component/schoolSelector';
-import Noti from '../../noti';
-import { checkObject } from '../../util/checkSame';
-import { mul } from '../../util/numberHandle';
+import React from 'react'
+import { Table, Icon } from 'antd'
+import AjaxHandler from '../../ajax'
+import Time from '../../component/time'
+import Format from '../../component/format'
+import CONSTANTS from '../../component/constants'
+import SearchLine from '../../component/searchLine'
+import SchoolSelector from '../../component/schoolSelector'
+import Noti from '../../noti'
+import { checkObject } from '../../util/checkSame'
+import { mul } from '../../util/numberHandle'
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { changeSchool } from '../../../actions';
-const subModule = 'overview';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeSchool } from '../../../actions'
+const subModule = 'overview'
 
-const SIZE = 4;
-const { DEVICE_TYPE_BLOWER, DEVICE_TYPE_WASHER, WASHER_RATE_TYPES } = CONSTANTS;
+const SIZE = 4
+const { DEVICE_TYPE_BLOWER, DEVICE_TYPE_WASHER, WASHER_RATE_TYPES } = CONSTANTS
 
 class EditableCell extends React.Component {
   state = {
     value: this.props.value,
     editable: false,
     ti: null
-  };
+  }
   handleChange = e => {
-    const value = e.target.value;
-    this.setState({ value });
+    const value = e.target.value
+    this.setState({ value })
     /* post the data to server */
-  };
+  }
   check = () => {
     if (this.ti) {
-      clearTimeout(this.ti);
-      this.ti = null;
+      clearTimeout(this.ti)
+      this.ti = null
     }
-    let v = this.state.value;
+    let v = this.state.value
     this.setState({
       editable: false,
       value: this.props.value
-    });
+    })
     if (this.props.onChange) {
-      this.props.onChange(v);
+      this.props.onChange(v)
     }
-  };
+  }
   edit = () => {
     if (!this.state.editable) {
-      this.setState({ editable: true });
+      this.setState({ editable: true })
     }
-  };
+  }
   closeEdit = () => {
     if (this.state.editable) {
       this.setState({
         editable: false,
         value: this.props.value
-      });
+      })
     }
-  };
+  }
   componentDidUpdate() {
     if (this.refs.input) {
-      this.refs.input.focus();
+      this.refs.input.focus()
     }
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.value !== this.state.value) {
-      this.state.value = nextProps.value;
+      this.state.value = nextProps.value
     }
   }
   cancel = e => {
-    this.ti = setTimeout(this.closeEdit, 200);
-  };
+    this.ti = setTimeout(this.closeEdit, 200)
+  }
   pressEnter = e => {
-    let key = e.key;
+    let key = e.key
     if (key.toLowerCase() === 'enter') {
-      this.check();
+      this.check()
     }
-  };
+  }
   render() {
-    const { value, editable } = this.state;
+    const { value, editable } = this.state
     return (
       <div className="editableCell" onClick={this.edit} onBlur={this.cancel}>
         {editable ? (
@@ -95,7 +95,7 @@ class EditableCell extends React.Component {
           <div className="textWrapper">{value || ' '}</div>
         )}
       </div>
-    );
+    )
   }
 }
 
@@ -104,20 +104,20 @@ class Overview extends React.Component {
     schools: PropTypes.array.isRequired,
     schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
-  };
+  }
 
   constructor(props) {
-    super(props);
+    super(props)
     // request for schools list
-    const dataSource = [];
+    const dataSource = []
     let total = 0,
-      loading = true;
+      loading = true
     this.state = {
       dataSource,
       total,
       loading,
       namePrefix: ''
-    };
+    }
 
     const deviceHeader = (
       <div className="deviceHeader">
@@ -126,7 +126,7 @@ class Overview extends React.Component {
         <p>费率</p>
         <p>供水时段</p>
       </div>
-    );
+    )
 
     this.columns = [
       {
@@ -134,7 +134,7 @@ class Overview extends React.Component {
         dataIndex: 'name',
         className: 'schoolName',
         render: text => {
-          return <div className="pad10">{text}</div>;
+          return <div className="pad10">{text}</div>
         }
       },
       {
@@ -142,7 +142,7 @@ class Overview extends React.Component {
         dataIndex: 'registerAmount',
         className: 'userCount',
         render: text => {
-          return <div className="pad10">{text}</div>;
+          return <div className="pad10">{text}</div>
         }
       },
       {
@@ -150,7 +150,7 @@ class Overview extends React.Component {
         dataIndex: 'devices',
         className: 'deviceWrapper',
         render: (text, record, index) => {
-          let deviceContent;
+          let deviceContent
           if (record.devices) {
             deviceContent =
               record.devices &&
@@ -167,20 +167,20 @@ class Overview extends React.Component {
                           {rec.name}
                         </div>
                       </div>
-                    );
-                  });
+                    )
+                  })
                 let denomination =
-                  r.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲';
+                  r.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
 
                 let rateGroups =
                   r.rate &&
                   r.rate.rateGroups &&
                   r.rate.rateGroups.map((rate, x) => (
                     <div className="rateItem" key={`rateItem-${x}`}>
-                      {mul(rate.price, 100)}分钱/{rate.pulse}
+                      {mul(rate.price, 100)}分/{rate.pulse}
                       {denomination}
                     </div>
-                  ));
+                  ))
 
                 let washerRates =
                   r.rate &&
@@ -188,9 +188,9 @@ class Overview extends React.Component {
                   r.rateGroups &&
                   r.rateGroups.map((r, i) => (
                     <span key={i}>{`${WASHER_RATE_TYPES[r.pulse]}/${
-                      r.price ? mul(r.price, 100) : ''
-                    }分钱`}</span>
-                  ));
+                      r.price ? r.price : ''
+                    }元`}</span>
+                  ))
 
                 let waterTimeItems =
                   r.waterTimeRange &&
@@ -199,13 +199,13 @@ class Overview extends React.Component {
                     <div key={`range-${y}`} className="waterTimeRange">
                       {Format.rangeToHour(range)}
                     </div>
-                  ));
+                  ))
 
                 const backupSupplier = (
                   <div className="supplierItem">
                     <div className="supplierName">暂无</div>
                   </div>
-                );
+                )
 
                 return (
                   <div key={`device-${i}`} className="deviceItem">
@@ -224,8 +224,8 @@ class Overview extends React.Component {
                       {waterTimeItems || '暂无'}
                     </div>
                   </div>
-                );
-              });
+                )
+              })
           } else {
             deviceContent = (
               <div className="deviceItem">
@@ -238,15 +238,15 @@ class Overview extends React.Component {
                 </div>
                 <div className="waterWrapper">暂无</div>
               </div>
-            );
+            )
           }
-          const child = <div className="deviceContent">{deviceContent}</div>;
+          const child = <div className="deviceContent">{deviceContent}</div>
           return {
             children: child,
             props: {
               colSpan: 4
             }
-          };
+          }
         }
       },
       {
@@ -255,7 +255,7 @@ class Overview extends React.Component {
         className: 'repairmans',
         render: (text, record, index) => {
           if (!record.repairmans.length) {
-            return <div className="pad10">暂无</div>;
+            return <div className="pad10">暂无</div>
           }
           let mans =
             record.repairmans &&
@@ -264,8 +264,8 @@ class Overview extends React.Component {
                 <p key={`repairmanName-${i}`}>{r.username}</p>
                 <p key={`repairmanMobile=${i}`}>({r.mobile})</p>
               </div>
-            ));
-          return <div className="pad10">{mans}</div>;
+            ))
+          return <div className="pad10">{mans}</div>
         }
       },
       {
@@ -274,7 +274,7 @@ class Overview extends React.Component {
         className: 'bonusAct',
         render: (text, record, index) => {
           if (!record.bonusActivity) {
-            return <div className="pad10">暂无</div>;
+            return <div className="pad10">暂无</div>
           }
           let bonus =
             record.bonusActivity &&
@@ -283,7 +283,7 @@ class Overview extends React.Component {
                 record.bonusActivity.gifts &&
                 record.bonusActivity.gifts.map((r, i) => (
                   <span key={`giftName-${i}`}>{r.amount}元红包/</span>
-                ));
+                ))
               return (
                 <div key={`bonus-${i}`}>
                   <p key={`bonusType-${i}`}>{CONSTANTS.BONUSACTTYPE[r.type]}</p>
@@ -295,13 +295,13 @@ class Overview extends React.Component {
                     截止日期{Time.getDayFormat(r.endTime)})
                   </span>
                 </div>
-              );
-            });
+              )
+            })
           return (
             <div key={`bonusAct-${index}`} className="bonusActs pad10">
               {bonus}
             </div>
-          );
+          )
         }
       },
       {
@@ -310,9 +310,9 @@ class Overview extends React.Component {
         className: 'depositAct',
         render: (text, record, index) => {
           let act = record.depositActivity,
-            str;
+            str
           if (!act) {
-            return <div className="pad10">暂无</div>;
+            return <div className="pad10">暂无</div>
           }
           if (act.type === 1) {
             str =
@@ -322,8 +322,8 @@ class Overview extends React.Component {
                   <p key={`real-${i}`}>
                     {r.denomination}元面额实际充值{r.realAmount}元
                   </p>
-                );
-              });
+                )
+              })
           } else {
             str =
               act.items &&
@@ -331,21 +331,21 @@ class Overview extends React.Component {
                 let gifts =
                   r.gifts &&
                   r.gifts.map((rec, ind) => {
-                    return `${rec.value}元红包,`;
-                  });
+                    return `${rec.value}元红包,`
+                  })
                 return (
                   <p key={`gift-${i}`}>
                     充值{r.denomination}元送{gifts}
                   </p>
-                );
-              });
+                )
+              })
           }
           return (
             <div className="pad10">
               <p>{CONSTANTS.DEPOSITACTTYPE[act.type]}</p>
               <p>{str}</p>
             </div>
-          );
+          )
         }
       },
       {
@@ -354,9 +354,9 @@ class Overview extends React.Component {
         className: 'withdrawTime',
         render: (text, r, index) => {
           let record = r.withdrawTimeRange,
-            result;
+            result
           if (!record) {
-            result = '暂无';
+            result = '暂无'
           } else if (record.type === 1) {
             result = (
               <span>
@@ -366,7 +366,7 @@ class Overview extends React.Component {
                 }
                 {Format.hourMinute(record.fixedTime.endTime.time)}
               </span>
-            );
+            )
           } else {
             result = (
               <span>
@@ -374,9 +374,9 @@ class Overview extends React.Component {
                   record.specificTime.endTime
                 )}
               </span>
-            );
+            )
           }
-          return <div className="pad10">{result}</div>;
+          return <div className="pad10">{result}</div>
         }
       },
       {
@@ -384,7 +384,7 @@ class Overview extends React.Component {
         dataIndex: 'notify',
         className: 'notify',
         render: text => {
-          return <div className="pad10">{text || '暂无'}</div>;
+          return <div className="pad10">{text || '暂无'}</div>
         }
       },
       {
@@ -399,124 +399,124 @@ class Overview extends React.Component {
                 onChange={this.onCellChange(record.id, 'remark')}
               />
             </div>
-          );
+          )
         }
       }
-    ];
+    ]
   }
 
   onCellChange = (id, dataIndex) => {
     return value => {
-      const dataSource = [...this.state.dataSource];
-      const target = dataSource.find(item => item.id === id);
+      const dataSource = [...this.state.dataSource]
+      const target = dataSource.find(item => item.id === id)
       if (target) {
-        this.postRemarks(id, value);
+        this.postRemarks(id, value)
       }
-    };
-  };
+    }
+  }
   postRemarks = (id, v) => {
-    let resource = '/school/save';
+    let resource = '/school/save'
     const body = {
       id: id,
       remark: v
-    };
+    }
     const cb = json => {
       if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage);
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data.id) {
-          const dataSource = JSON.parse(JSON.stringify(this.state.dataSource));
-          const target = dataSource.find(item => item.id === id);
-          target.remark = v;
+          const dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+          const target = dataSource.find(item => item.id === id)
+          target.remark = v
           this.setState({
             dataSource: dataSource
-          });
+          })
         } else {
-          Noti.hintServiceError();
+          Noti.hintServiceError()
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
   fetchData = body => {
-    let resource = '/school/full/list';
+    let resource = '/school/full/list'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         /*--------redirect --------*/
         if (json.data) {
           const ds = json.data.schools.map((record, index) => {
-            record.key = record.id;
-            return record;
-          });
+            record.key = record.id
+            return record
+          })
           this.setState({
             dataSource: ds,
             total: json.data.total,
             loading: false
-          });
+          })
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   componentDidMount() {
-    this.props.hide(false);
+    this.props.hide(false)
     /*-----------fetch data-----------*/
-    let { schoolId, page, schools } = this.props;
+    let { schoolId, page, schools } = this.props
     const body = {
       page: page,
       size: SIZE
-    };
-    console.log(schoolId);
+    }
+    console.log(schoolId)
     if (schoolId !== 'all') {
-      let school = schools.find(r => r.id === parseInt(schoolId, 10));
+      let school = schools.find(r => r.id === parseInt(schoolId, 10))
       if (school) {
-        body.namePrefix = school.name;
+        body.namePrefix = school.name
       }
     }
-    this.fetchData(body);
+    this.fetchData(body)
   }
   componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
-      return;
+      return
     }
-    let { schoolId, page, schools } = nextProps;
+    let { schoolId, page, schools } = nextProps
     const body = {
       page: page,
       size: SIZE
-    };
+    }
     if (schoolId !== 'all') {
-      let school = schools.find(r => r.id === parseInt(schoolId, 10));
+      let school = schools.find(r => r.id === parseInt(schoolId, 10))
       if (school) {
-        body.namePrefix = school.name;
+        body.namePrefix = school.name
       }
     }
-    this.fetchData(body);
+    this.fetchData(body)
   }
   componentWillUnmount() {
-    this.props.hide(true);
+    this.props.hide(true)
   }
   changeTable = pageObj => {
-    console.log(pageObj);
-    let { page } = this.props;
+    console.log(pageObj)
+    let { page } = this.props
     if (page === pageObj.current) {
-      return;
+      return
     }
-    this.props.changeSchool(subModule, { page: pageObj.current });
-  };
+    this.props.changeSchool(subModule, { page: pageObj.current })
+  }
   changeSchool = (v, name) => {
-    let { schoolId } = this.props;
+    let { schoolId } = this.props
     if (schoolId === v) {
-      return;
+      return
     }
-    this.props.changeSchool(subModule, { schoolId: v, page: 1 });
-  };
+    this.props.changeSchool(subModule, { schoolId: v, page: 1 })
+  }
 
   render() {
-    const { dataSource, loading, total } = this.state;
-    const { schoolId, page } = this.props;
+    const { dataSource, loading, total } = this.state
+    const { schoolId, page } = this.props
 
     return (
       <div className="contentArea">
@@ -542,7 +542,7 @@ class Overview extends React.Component {
           />
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -552,10 +552,10 @@ const mapStateToProps = (state, ownProps) => ({
   schoolId: state.changeSchool[subModule].schoolId,
   page: state.changeSchool[subModule].page,
   schools: state.setSchoolList.schools
-});
+})
 
 export default withRouter(
   connect(mapStateToProps, {
     changeSchool
   })(Overview)
-);
+)

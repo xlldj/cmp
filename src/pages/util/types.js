@@ -1,4 +1,4 @@
-export function obj2arr (o) {
+export function obj2arr(o) {
   if (typeof o !== 'object' || !o) {
     return []
   }
@@ -12,4 +12,8 @@ export function obj2arr (o) {
     }
   }
   return result
+}
+
+export function isNumber(n) {
+  return n === +n
 }

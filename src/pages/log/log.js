@@ -1,23 +1,23 @@
-import React from 'react';
-import { Button } from 'antd';
+import React from 'react'
+import { Button } from 'antd'
 //import Form from 'antd/lib/form'
-import AjaxHandler from '../ajax';
-import Noti from '../noti';
-import { setToken } from '../util/handleToken';
-import { setStore, getLocal } from '../util/storage';
-import { clientDetect } from '../util/clientDetect';
+import AjaxHandler from '../ajax'
+import Noti from '../noti'
+import { setToken } from '../util/handleToken'
+import { setStore, getLocal, getStore, removeStore } from '../util/storage'
+import { clientDetect } from '../util/clientDetect'
 import {
   buildAuthenData,
   buildForbiddenUrl,
   buildCurrentAuthen,
   buildForbiddenStatus
-} from '../util/authenDataHandle';
-import logLogo from '../assets/log_logo.png';
-import './style/style.css';
+} from '../util/authenDataHandle'
+import logLogo from '../assets/log_logo.png'
+import './style/style.css'
 
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { setAuthenData, setUserInfo } from '../../actions';
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setAuthenData, setUserInfo } from '../../actions'
 
 //const Form = asyncComponent(() => import(/* webpackChunkName: "form" */ "antd/lib/form"))
 //const Button = asyncComponent(() => import(/* webpackChunkName: "button" */ "antd/lib/button"))
@@ -35,36 +35,36 @@ class Log extends React.Component {
     pwdError: false,
     pwdErrorMsg: '',
     posting: false
-  };
+  }
   componentDidMount() {
     let mobile = getLocal('xl_mobile') || '',
       password = getLocal('xl_pwd') || '',
-      nextState = {};
+      nextState = {}
     if (!mobile || !password) {
-      nextState.mobile = mobile;
-      nextState.password = password;
-      this.setState(nextState);
+      nextState.mobile = mobile
+      nextState.password = password
+      this.setState(nextState)
     }
   }
   changeRemember = e => {
     this.setState({
       remember: !this.state.remember
-    });
-  };
+    })
+  }
   changeMobile = e => {
     this.setState({
       mobile: e.target.value
-    });
-  };
+    })
+  }
   checkMobile = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       this.setState({
         mobileError: true,
         mobileErrorMsg: '手机号不能为空'
-      });
-      this.refs.mobileBorder.classList.add('error');
-      return;
+      })
+      this.refs.mobileBorder.classList.add('error')
+      return
     } else {
       /* else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(v)) {
       this.setState({
@@ -78,44 +78,44 @@ class Log extends React.Component {
           mobileError: false,
           mobileErrorMsg: ''
         }
-      );
-      this.refs.mobileBorder.classList.remove('error');
-      this.refs.mobileBorder.classList.remove('activeBorder');
+      )
+      this.refs.mobileBorder.classList.remove('error')
+      this.refs.mobileBorder.classList.remove('activeBorder')
     }
-  };
+  }
   changePwd = e => {
     this.setState({
       password: e.target.value
-    });
-  };
+    })
+  }
   checkPwd = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       this.setState({
         pwdError: true,
         pwdErrorMsg: '密码不能为空'
-      });
-      this.refs.pwdBorder.classList.add('error');
-      return;
+      })
+      this.refs.pwdBorder.classList.add('error')
+      return
     } else {
       this.setState({
         pwdError: false,
         pwdErrorMsg: ''
-      });
-      this.refs.pwdBorder.classList.remove('error');
-      this.refs.pwdBorder.classList.remove('activeBorder');
+      })
+      this.refs.pwdBorder.classList.remove('error')
+      this.refs.pwdBorder.classList.remove('activeBorder')
     }
-  };
+  }
   focus = e => {
-    let ref = e.target.getAttribute('data-ref');
-    this.refs[ref].classList.add('activeBorder');
+    let ref = e.target.getAttribute('data-ref')
+    this.refs[ref].classList.add('activeBorder')
     /* if (ref === 'pwdBorder') {
       this.refs.pwd.type = 'password'
     } */
-  };
+  }
   handleSubmit = () => {
     try {
-      let { mobile, password, posting } = this.state;
+      let { mobile, password, posting } = this.state
       /* if (!remember) {
         this.refs.pwd.type = 'text'
         console.log(this.refs.pwd)
@@ -124,9 +124,9 @@ class Log extends React.Component {
         this.setState({
           mobileError: true,
           mobileErrorMsg: '手机号不能为空'
-        });
-        this.refs.mobileBorder.classList.add('error');
-        return;
+        })
+        this.refs.mobileBorder.classList.add('error')
+        return
       }
       /* remove mobile format check, use account which does not comply with
       else if (!/^1[3|4|5|7|8][0-9]{9}$/.test(mobile)) {
@@ -141,64 +141,64 @@ class Log extends React.Component {
       if (!password) {
         this.setState({
           pwdError: true
-        });
-        this.refs.pwdBorder.classList.add('error');
-        return;
+        })
+        this.refs.pwdBorder.classList.add('error')
+        return
       }
 
       if (posting) {
-        return;
+        return
       }
       this.setState({
         posting: true
-      });
+      })
 
-      const { brand, model } = clientDetect();
+      const { brand, model } = clientDetect()
 
-      const resource = '/cmp/login';
+      const resource = '/cmp/login'
       const body = {
         mobile: parseInt(mobile, 10),
         password: password,
         system: 3, // from cmp
         brand: brand, // operating system
         model: model // browser type
-      };
+      }
       const cb = json => {
         this.setState({
           posting: false
-        });
+        })
         if (json.error) {
-          this.handleLogError(json.error);
+          this.handleLogError(json.error)
         } else {
-          let { nickName, id, pictureUrl } = json.data.user;
-          let { fullPrivileges, privileges, isCs } = json.data;
+          let { nickName, id, pictureUrl } = json.data.user
+          let { fullPrivileges, privileges, isCs } = json.data
           // set global pribileges info
           if (fullPrivileges && privileges) {
             // set full privileges data
-            let full = buildAuthenData(fullPrivileges);
+            let full = buildAuthenData(fullPrivileges)
 
             // set privileges for the current user
-            let priviInfos = [];
+            let priviInfos = []
             privileges.forEach(p => {
-              let info = fullPrivileges.find(f => f.id === p);
+              let info = fullPrivileges.find(f => f.id === p)
               if (info) {
-                priviInfos.push(info);
+                priviInfos.push(info)
               }
-            });
+            })
             // console.log(privileges)
-            let currentAuthenStatus = buildCurrentAuthen(priviInfos);
+            let currentAuthenStatus = buildCurrentAuthen(priviInfos)
             // console.log(currentAuthenStatus)
 
             // get forbidden urls
             // console.log(fullPrivileges)
             // console.log(priviInfos)
-            let forbiddenUrls = buildForbiddenUrl(fullPrivileges, priviInfos);
+            let forbiddenUrls = buildForbiddenUrl(fullPrivileges, priviInfos)
 
             // set forbidden operation, which can not be stopped by url
             let forbiddenStatus = buildForbiddenStatus(
               fullPrivileges,
               priviInfos
-            );
+            )
 
             this.props.setAuthenData({
               full: full || [],
@@ -207,15 +207,15 @@ class Log extends React.Component {
               forbiddenUrls: forbiddenUrls || [],
               forbiddenStatus: forbiddenStatus || {},
               authenSet: true
-            });
+            })
             let authenInfo = {
               full: full,
               originalPrivileges: fullPrivileges,
               current: currentAuthenStatus,
               forbiddenUrls: forbiddenUrls,
               forbiddenStatus: forbiddenStatus
-            };
-            setStore('authenInfo', JSON.stringify(authenInfo));
+            }
+            setStore('authenInfo', JSON.stringify(authenInfo))
           }
 
           // set user and token info. Save in store and sessionStorage at the same time.
@@ -223,65 +223,62 @@ class Log extends React.Component {
             name: nickName,
             id: id,
             portrait: pictureUrl,
+            csOnline: false, // always offline when user is logged.
             isCs
-          };
-          setToken(json.data.token);
-          /* this used to be a hack for a temprary privileges-limited account
-          if (json.data.forbidden) {
-            setStore('forbidden', 1);
-          } else {
-            removeStore('forbidden');
           }
-          */
-          // setStore('username', nickName);
-          // setStore('userId', id);
-          setStore('user', JSON.stringify(user));
-          this.props.setUserInfo(user);
+          setToken(json.data.token)
+
+          setStore('user', JSON.stringify(user))
+          // if sessionStorage/online exist, clear it.
+          if (getStore('online')) {
+            removeStore('online')
+          }
+          this.props.setUserInfo(user)
           // tell app.js logged.
-          this.props.login();
-          Noti.hintLog();
+          this.props.login()
+          Noti.hintLog()
         }
-      };
+      }
       AjaxHandler.ajax(resource, body, cb, this.handleLogError, {
         clearPosting: true,
         thisObj: this
-      });
+      })
     } catch (e) {
-      Noti.hintProgramError();
+      Noti.hintProgramError()
     }
-  };
+  }
 
   pressEnter = e => {
-    let key = e.key;
+    let key = e.key
     if (key.toLowerCase() === 'enter') {
-      this.handleSubmit();
+      this.handleSubmit()
     }
-  };
+  }
   handleLogError = error => {
     if (this.state.posting) {
       this.setState({
         posting: false
-      });
+      })
     }
-    let { code, displayMessage } = error;
+    let { code, displayMessage } = error
     if (code === 30004 || code === 30006) {
-      this.refs.mobileBorder.classList.add('activeBorder');
-      this.refs.mobileBorder.classList.add('error');
+      this.refs.mobileBorder.classList.add('activeBorder')
+      this.refs.mobileBorder.classList.add('error')
       return this.setState({
         mobileError: true,
         mobileErrorMsg: displayMessage
-      });
+      })
     } else if (code === 30005) {
-      this.refs.pwdBorder.classList.add('error');
-      this.refs.pwdBorder.classList.add('activeBorder');
+      this.refs.pwdBorder.classList.add('error')
+      this.refs.pwdBorder.classList.add('activeBorder')
       return this.setState({
         pwdError: true,
         pwdErrorMsg: displayMessage
-      });
+      })
     } else {
-      Noti.hintServiceError(error.displayMessage);
+      Noti.hintServiceError(error.displayMessage)
     }
-  };
+  }
   render() {
     let {
       mobile,
@@ -290,7 +287,7 @@ class Log extends React.Component {
       password,
       pwdError,
       pwdErrorMsg
-    } = this.state;
+    } = this.state
     /* 
       <div className='remember'>
         <p onClick={this.changeRemember}>
@@ -362,7 +359,7 @@ class Log extends React.Component {
           </section>
         </div>
       </div>
-    );
+    )
   }
 }
 export default withRouter(
@@ -370,4 +367,4 @@ export default withRouter(
     setAuthenData,
     setUserInfo
   })(Log)
-);
+)

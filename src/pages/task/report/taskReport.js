@@ -1,25 +1,33 @@
-import React from 'react';
-import { Table, Button, Slider, Popconfirm, Modal } from 'antd';
+import React, { Fragment } from 'react'
+import { Table, Button, Popconfirm, Modal } from 'antd'
 
-import RangeSelect from '../../component/rangeSelect';
-import AjaxHandler from '../../ajax';
-import CONSTANTS from '../../component/constants';
-import SchoolSelector from '../../component/schoolSelector';
-import CheckSelect from '../../component/checkSelect';
-import { checkObject } from '../../util/checkSame';
-import Noti from '../../noti';
-import notworking from '../../assets/notworking.jpg';
+import ProgressBar from '../../component/progressBar'
+import RangeSelect from '../../component/rangeSelect'
+import AjaxHandler from '../../ajax'
+import CONSTANTS from '../../component/constants'
+import SchoolSelector from '../../component/schoolSelector'
+import CheckSelect from '../../component/checkSelect'
+import { checkObject } from '../../util/checkSame'
+import Noti from '../../noti'
+import Time from '../../component/time'
+import notworking from '../../assets/notworking.jpg'
+import { mul, div } from '../../util/numberHandle'
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { changeTask, setUserInfo, setTagList } from '../../../actions';
-const subModule = 'report';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import {
+  changeTask,
+  setUserInfo,
+  setTagList,
+  changeOnline
+} from '../../../actions'
+const subModule = 'report'
 const DATANAME = {
   1: 'workReports',
-  2: 'workAssesses',
-  3: 'tags'
-};
+  2: 'tags',
+  3: 'workAssesses'
+}
 const {
   REPORT_CATE_SUM,
   REPORT_CATE_COMPLAINT,
@@ -27,21 +35,23 @@ const {
   REPORT_ASSESS_TYPE,
   ASSESS_SCHOOL,
   ASSESS_CUSTOM,
-  ASSESS_REPAIRMAN
-} = CONSTANTS;
-const SIZE = CONSTANTS.PAGINATION;
+  ASSESS_REPAIRMAN,
+  ORDER,
+  ORDERBYS
+} = CONSTANTS
+const SIZE = CONSTANTS.PAGINATION
 
 const TIMERANGESELECTS = {
   1: '今日',
   2: '近3天',
   3: '近7天',
   5: '近30天'
-};
+}
 const TIMELABEL = {
   0: '等待时间',
   1: '等待时间',
   2: '完结时间'
-};
+}
 
 /*------后端接受的all为true/false,必传，post之前将0，1转为true/false---------*/
 /*------后端接受的pending为int，不传为所有，我用0表示不传---------------------*/
@@ -52,10 +62,10 @@ class TaskList extends React.Component {
   static propTypes = {
     report: PropTypes.object.isRequired,
     forbiddenStatus: PropTypes.object.isRequired
-  };
+  }
   constructor(props) {
-    super(props);
-    let dataSource = [];
+    super(props)
+    let dataSource = []
     this.state = {
       dataSource,
       loading: false,
@@ -69,7 +79,7 @@ class TaskList extends React.Component {
       showBuildTag: false,
       tagLengthError: false,
       tagId: ''
-    };
+    }
     this.sumColumns = [
       {
         title: '客服工作情况',
@@ -82,11 +92,14 @@ class TaskList extends React.Component {
           {
             title: '学校',
             dataIndex: 'schoolName',
-            width: '17%'
+            width: '17%',
+            render: (text, record) =>
+              record.schoolNames ? record.schoolNames.join('、') : ''
           },
           {
             title: '当前状态',
-            dataIndex: 'status'
+            dataIndex: 'status',
+            render: (text, record) => (record.status ? '在线' : '离线')
           },
           {
             title: '待处理工单',
@@ -106,7 +119,9 @@ class TaskList extends React.Component {
           {
             title: '平均响应时长',
             dataIndex: 'responseTime',
-            width: '10%'
+            width: '10%',
+            render: (text, record) =>
+              record.responseTime ? Time.formatSpan(record.responseTime) : ''
           },
           {
             title: '发送客服消息数量',
@@ -120,14 +135,14 @@ class TaskList extends React.Component {
           }
         ]
       }
-    ];
+    ]
     this.assessSchoolColumns = [
       {
         title: <span className="leftHeader">学校考核</span>,
         children: [
           {
             title: '学校',
-            dataIndex: 'schoolName',
+            dataIndex: 'name',
             width: '8%'
           }
         ]
@@ -137,13 +152,14 @@ class TaskList extends React.Component {
         children: [
           {
             title: '已完成工单量',
-            dataIndex: 'csFinished',
+            dataIndex: 'schoolCsFinished',
+            orderBy: 'csFinished',
             width: '8%',
             render: (text, record) =>
               record.csWorkAssess && record.csWorkAssess.finished
                 ? record.csWorkAssess.finished
-                : '',
-            sorter: (a, b) => a.csWorkAssess.finished - b.csWorkAssess.finished
+                : 0,
+            sorter: true
           },
           {
             title: '创建工单量',
@@ -152,16 +168,18 @@ class TaskList extends React.Component {
             render: (text, record) =>
               record.csWorkAssess && record.csWorkAssess.create
                 ? record.csWorkAssess.create
-                : ''
+                : 0
           },
           {
             title: '平均响应时长',
-            dataIndex: 'csResponseTime',
+            dataIndex: 'schoolCsResponseTime',
+            orderBy: 'csResponseTime',
             width: '8%',
             render: (text, record) =>
-              (record.csWorkAssess && record.csWorkAssess.responseTime) || '',
-            sorter: (a, b) =>
-              a.csWorkAssess.responseTime - b.csWorkAssess.responseTime
+              record.csWorkAssess && record.csWorkAssess.responseTime
+                ? Time.formatSpan(record.csWorkAssess.responseTime)
+                : 0,
+            sorter: true
           },
           {
             title: '指派成功率',
@@ -170,7 +188,7 @@ class TaskList extends React.Component {
             render: (text, record) =>
               record.csWorkAssess && record.csWorkAssess.success
                 ? record.csWorkAssess.success + '%'
-                : ''
+                : 0
           }
         ]
       },
@@ -179,76 +197,74 @@ class TaskList extends React.Component {
         children: [
           {
             title: '已完成工单量',
-            dataIndex: 'repairFinished',
+            dataIndex: 'schoolRepairFinished',
+            orderBy: 'repairFinished',
             width: '8%',
             render: (text, record) =>
-              (record.repairmanWorkAssess &&
-                record.repairmanWorkAssess.finished) ||
-              '',
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.finished - b.repairmanWorkAssess.finished
+              record.repairmanWorkAssess && record.repairmanWorkAssess.finished
+                ? record.repairmanWorkAssess.finished
+                : 0,
+            sorter: true
           },
           {
             title: '一天内完成率',
-            dataIndex: 'ratioInOne',
+            dataIndex: 'schoolRatioInOne',
+            orderby: 'ratioInOne',
             width: '8%',
             render: (text, record) =>
               (record.repairmanWorkAssess &&
                 record.repairmanWorkAssess.finishedRate) ||
-              '',
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.finishedRate -
-              b.repairmanWorkAssess.finishedRate
+              0,
+            sorter: true
           },
           {
             title: '平均响应时长',
-            dataIndex: 'repairResponseTime',
+            dataIndex: 'schoolRepairResponseTime',
+            orderBy: 'repairResponseTime',
             width: '8%',
             render: (text, record) =>
-              (record.repairmanWorkAssess &&
-                record.repairmanWorkAssess.responseTime) ||
-              '',
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.responseTime -
-              b.repairmanWorkAssess.responseTime
+              record.repairmanWorkAssess &&
+              record.repairmanWorkAssess.responseTime
+                ? Time.formatSpan(record.repairmanWorkAssess.responseTime)
+                : 0,
+            sorter: true
           },
           {
             title: '平均维修时长',
-            dataIndex: 'repairTime',
+            dataIndex: 'schoolRepairTime',
+            orderBy: 'repairTime',
             width: '8%',
             render: (text, record) =>
               (record.repairmanWorkAssess &&
                 record.repairmanWorkAssess.repairTime) ||
-              '',
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.repairTime -
-              b.repairmanWorkAssess.repairTime
+              0,
+            sorter: true
           },
           {
             title: '二次维修次数',
-            dataIndex: 'second',
+            dataIndex: 'schoolRepairSecondRepair',
+            orderby: 'repairSecondRepair',
             width: '8%',
             render: (text, record) =>
               (record.repairmanWorkAssess &&
                 record.repairmanWorkAssess.second) ||
-              '',
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.second - b.repairmanWorkAssess.second
+              0,
+            sorter: true
           },
           {
             title: '用户评价',
-            dataIndex: 'rating',
+            dataIndex: 'schoolRepairRating',
+            orderBy: 'repairRating',
             width: '8%',
             render: (text, record) =>
               (record.repairmanWorkAssess &&
                 record.repairmanWorkAssess.rating) ||
-              '',
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.rating - b.repairmanWorkAssess.rating
+              0,
+            sorter: true
           }
         ]
       }
-    ];
+    ]
     this.assessCustomColumns = [
       {
         title: <span className="leftHeader">客服考核</span>,
@@ -262,22 +278,26 @@ class TaskList extends React.Component {
             title: '学校',
             dataIndex: 'schoolName',
             width: '10%',
-            render: (text, record) => record.schools.join('、')
+            render: (text, record) => {
+              return record.schoolNames ? record.schoolNames.join('、') : ''
+            }
           },
           {
             title: '已完成工单量',
-            dataIndex: 'finished',
+            dataIndex: 'csFinished',
             width: '8%',
             render: (text, record) => record.csWorkAssess.finished,
-            sorter: (a, b) => a.csWorkAssess.finished - b.csWorkAssess.finished
+            sorter: true
           },
           {
             title: '平均响应时长',
-            dataIndex: 'responseTime',
+            dataIndex: 'csResponseTime',
             width: '8%',
-            render: (text, record) => record.csWorkAssess.responseTime,
-            sorter: (a, b) =>
-              a.csWorkAssess.responseTime - b.csWorkAssess.responseTime
+            render: (text, record) =>
+              record.csWorkAssess && record.csWorkAssess.responseTime
+                ? Time.formatSpan(record.csWorkAssess.responseTime)
+                : 0,
+            sorter: true
           },
           {
             title: '创建工单量',
@@ -299,7 +319,7 @@ class TaskList extends React.Component {
           }
         ]
       }
-    ];
+    ]
     this.assessRepairmanColumns = [
       {
         title: <span className="leftHeader">维修员考核</span>,
@@ -313,71 +333,68 @@ class TaskList extends React.Component {
             title: '学校',
             dataIndex: 'schools',
             width: '10%',
-            render: (text, record) => record.schools.join('、')
+            render: (text, record) =>
+              record.schoolNames ? record.schoolNames.join('、') : ''
           },
           {
             title: '已完成工单量',
-            dataIndex: 'finished',
+            dataIndex: 'repairFinished',
             width: '8%',
             render: (text, record) => record.repairmanWorkAssess.finished,
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.finished - b.repairmanWorkAssess.finished
+            sorter: true
           },
           {
             title: '一天内完成率',
-            dataIndex: 'finishedRate',
+            dataIndex: 'ratioInOne',
             width: '8%',
             render: (text, record) => record.repairmanWorkAssess.finishedRate,
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.finishedRate -
-              b.repairmanWorkAssess.finishedRate
+            sorter: true
           },
           {
             title: '平均响应时长',
-            dataIndex: 'responseTime',
+            dataIndex: 'repairResponseTime',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.responseTime,
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.responseTime -
-              b.repairmanWorkAssess.responseTime
+            render: (text, record) =>
+              record.repairmanWorkAssess &&
+              record.repairmanWorkAssess.responseTime
+                ? Time.formatSpan(record.repairmanWorkAssess.responseTime)
+                : '',
+            sorter: true
           },
           {
             title: '平均维修时长',
             dataIndex: 'repairTime',
             width: '8%',
             render: (text, record) => record.repairmanWorkAssess.repairTime,
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.repairTime -
-              b.repairmanWorkAssess.repairTime
+            sorter: true
           },
           {
             title: '二次维修次数',
-            dataIndex: 'second',
+            dataIndex: 'repairSecondRepair',
             width: '8%',
             render: (text, record) => record.repairmanWorkAssess.second,
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.second - b.repairmanWorkAssess.second
+            sorter: true
           },
           {
             title: '用户评价(5分)',
-            dataIndex: 'rating',
+            dataIndex: 'repairRating',
             width: '8%',
             render: (text, record) => record.repairmanWorkAssess.rating,
-            sorter: (a, b) =>
-              a.repairmanWorkAssess.rating - b.repairmanWorkAssess.rating
+            sorter: true
           }
         ]
       }
-    ];
+    ]
   }
 
   // fetch task/list
   fetchReports = (resource, body, cate) => {
     const cb = json => {
+      console.log(json.data)
       let nextState = {
         loading: false
-      };
-      let data = json.data[DATANAME[cate]];
+      }
+      let data = json.data[DATANAME[cate]]
       /*
       if (cate === REPORT_CATE_SUM) {
         data = json.data.workReports;
@@ -387,19 +404,20 @@ class TaskList extends React.Component {
         data = json.data.tags;
       }
       */
-      nextState.dataSource = data;
-      this.setState(nextState);
-    };
+      nextState.dataSource = data
+      this.setState(nextState)
+    }
     this.setState({
-      loading: true
-    });
+      loading: true,
+      dataSource: []
+    })
     AjaxHandler.ajax(resource, body, cb, null, {
       clearLoading: true,
       thisObj: this
-    });
-  };
+    })
+  }
   componentDidMount() {
-    this.props.hide(false);
+    this.props.hide(false)
     let {
       mainCate,
       schoolId,
@@ -407,50 +425,60 @@ class TaskList extends React.Component {
       panel_startTime,
       panel_endTime,
       panel_page,
-      assess_dim
-    } = this.props[subModule];
+      assess_dim,
+      order,
+      orderBy
+    } = this.props[subModule]
 
     // fetch reports
-    let page = panel_page[mainCate];
+    let page = panel_page[mainCate]
     let startTime = panel_startTime[mainCate],
       endTime = panel_endTime[mainCate],
-      day = panel_rangeIndex[mainCate];
-    const body = {
-      page: page,
-      size: SIZE
-    };
-    if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10);
-    }
-    if (day !== 0) {
-      // 0 means selected startTime and endTime
-      body.day = day;
-    }
-    if (startTime && endTime) {
-      body.startTime = startTime;
-      body.endTime = endTime;
-    }
-
-    let resource = '/work/condition/list';
-    if (mainCate === REPORT_CATE_ASSESS - 1) {
-      resource = '/work/condition/assess/list';
-      body.type = assess_dim;
-    } else if (mainCate === REPORT_CATE_COMPLAINT - 1) {
-      resource = '/work/order/tag/stat/list';
-    }
-
-    this.fetchReports(resource, body, mainCate + 1);
+      day = panel_rangeIndex[mainCate]
 
     // set startTime and endTime if props has no-empty value
     if (panel_startTime[mainCate] && panel_endTime[mainCate]) {
       this.setState({
         startTime: panel_startTime[mainCate],
         endTime: panel_endTime[mainCate]
-      });
+      })
     }
+    let csOnline = this.props.user.csOnline
+    if (!csOnline) {
+      return
+    }
+    const body = {
+      page: page,
+      size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+    if (day !== 0) {
+      // 0 means selected startTime and endTime
+      body.day = day
+    }
+    if (startTime && endTime) {
+      body.startTime = startTime
+      body.endTime = endTime
+    }
+    if (mainCate === REPORT_CATE_ASSESS - 1 && orderBy[assess_dim - 1] !== 0) {
+      body.order = order[assess_dim - 1]
+      body.orderBy = orderBy[assess_dim - 1]
+    }
+
+    let resource = '/work/condition/list'
+    if (mainCate === REPORT_CATE_ASSESS - 1) {
+      resource = '/work/condition/assess/list'
+      body.lat = assess_dim
+    } else if (mainCate === REPORT_CATE_COMPLAINT - 1) {
+      resource = '/work/order/tag/stat/list'
+    }
+
+    this.fetchReports(resource, body, mainCate + 1)
   }
   componentWillUnmount() {
-    this.props.hide(true);
+    this.props.hide(true)
   }
   componentWillReceiveProps(nextProps) {
     /* distinguish data fetch of 'list' from 'detail' , or else it will cause mutual chaos. */
@@ -462,22 +490,25 @@ class TaskList extends React.Component {
         panel_startTime,
         panel_endTime,
         panel_page,
-        assess_dim
-      } = nextProps[subModule];
+        assess_dim,
+        order,
+        orderBy
+      } = nextProps[subModule]
 
       // update state.startTime to props.startTime
       let startTime = panel_startTime[mainCate],
-        endTime = panel_endTime[mainCate];
-      let nextState = {};
+        endTime = panel_endTime[mainCate]
+      let nextState = {}
       if (startTime !== this.state.startTime) {
-        nextState.startTime = startTime;
+        nextState.startTime = startTime
       }
       if (endTime !== this.state.endTime) {
-        nextState.endTime = endTime;
+        nextState.endTime = endTime
       }
-      this.setState(nextState);
+      this.setState(nextState)
 
       // Check props to determine if need to fetch.
+      // Fetch also when csOnline changed to 'true' from 'false'
       if (
         !checkObject(this.props[subModule], nextProps[subModule], [
           'mainCate',
@@ -486,207 +517,232 @@ class TaskList extends React.Component {
           'panel_startTime',
           'panel_endTime',
           'panel_page',
-          'assess_dim'
-        ])
+          'assess_dim',
+          'order',
+          'orderBy'
+        ]) ||
+        (nextProps.user.csOnline && !this.props.user.csOnline)
       ) {
-        let page = panel_page[mainCate];
-        let day = panel_rangeIndex[mainCate];
+        let page = panel_page[mainCate]
+        let day = panel_rangeIndex[mainCate]
         const body = {
           page: page,
           size: SIZE
-        };
+        }
         if (schoolId !== 'all') {
-          body.schoolId = parseInt(schoolId, 10);
+          body.schoolId = parseInt(schoolId, 10)
         }
         if (day !== 0) {
-          body.day = day;
+          body.day = day
         }
         if (startTime && endTime) {
-          body.startTime = startTime;
-          body.endTime = endTime;
+          body.startTime = startTime
+          body.endTime = endTime
+        }
+        if (
+          mainCate === REPORT_CATE_ASSESS - 1 &&
+          orderBy[assess_dim - 1] !== 0
+        ) {
+          body.order = order[assess_dim - 1]
+          body.orderBy = orderBy[assess_dim - 1]
         }
 
-        let resource = '/work/condition/list';
+        let resource = '/work/condition/list'
         if (mainCate === REPORT_CATE_ASSESS - 1) {
-          resource = '/work/condition/assess/list';
-          body.type = assess_dim;
+          resource = '/work/condition/assess/list'
+          body.lat = assess_dim
         } else if (mainCate === REPORT_CATE_COMPLAINT - 1) {
-          resource = '/work/order/tag/stat/list';
+          resource = '/work/order/tag/stat/list'
         }
-        this.fetchReports(resource, body, mainCate + 1);
+        this.fetchReports(resource, body, mainCate + 1)
       }
 
-      this.props = nextProps;
+      this.props = nextProps
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
   }
 
   changeCate = e => {
     try {
-      e.preventDefault();
-      let key = parseInt(e.target.getAttribute('data-key'), 10);
-      let { mainCate } = this.props[subModule];
+      e.preventDefault()
+      let key = parseInt(e.target.getAttribute('data-key'), 10)
+      let { mainCate } = this.props[subModule]
       if (mainCate !== key) {
-        this.props.changeTask(subModule, { mainCate: key });
+        this.props.changeTask(subModule, { mainCate: key })
       }
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
 
   changeSchool = v => {
-    let { schoolId } = this.props[subModule];
+    let { schoolId } = this.props[subModule]
     if (v === schoolId) {
-      return;
+      return
     }
     this.props.changeTask(subModule, {
       schoolId: v,
       panel_page: [1, 1, 1]
-    });
-  };
+    })
+  }
 
   changeRange = key => {
-    let panel_rangeIndex = this.props[subModule]['panel_rangeIndex'].slice();
-    let i = this.props[subModule].mainCate;
+    let panel_rangeIndex = this.props[subModule]['panel_rangeIndex'].slice()
+    let i = this.props[subModule].mainCate
+    console.log(i)
     if (panel_rangeIndex[i] === key) {
-      return;
+      return
     }
 
-    let panel_page = this.props[subModule]['panel_page'].slice();
-    let startTime = this.props[subModule]['panel_startTime'].slice();
-    let endTime = this.props[subModule]['panel_endTime'].slice();
+    let panel_page = this.props[subModule]['panel_page'].slice()
+    let startTime = this.props[subModule]['panel_startTime'].slice()
+    let endTime = this.props[subModule]['panel_endTime'].slice()
 
-    panel_rangeIndex[i] = parseInt(key, 10);
-    panel_page[i] = 1;
+    panel_rangeIndex[i] = parseInt(key, 10)
+    panel_page[i] = 1
     // clear startTime and endTime
-    startTime[i] = '';
-    endTime[i] = '';
+    startTime[i] = ''
+    endTime[i] = ''
     this.props.changeTask(subModule, {
       panel_rangeIndex: panel_rangeIndex,
       panel_page: panel_page,
       panel_startTime: startTime,
       panel_endTime: endTime
-    });
-  };
+    })
+  }
 
   changeAssessDim = key => {
-    console.log(key);
-    let { assess_dim } = this.props[subModule];
+    console.log(key)
+    let { assess_dim } = this.props[subModule]
     if (assess_dim === key) {
-      return;
+      return
     }
     this.props.changeTask(subModule, {
       assess_dim: key
-    });
-  };
+    })
+  }
   changeStartTime = time => {
     this.setState({
       startTime: time
-    });
-  };
+    })
+  }
   changeEndTime = time => {
     this.setState({
       endTime: time
-    });
-  };
+    })
+  }
   confirmTimeRange = () => {
-    let { startTime, endTime } = this.state;
+    let { startTime, endTime } = this.state
     if (!startTime || !endTime) {
-      return;
+      return
     }
     let panel_startTime = JSON.parse(
       JSON.stringify(this.props[subModule].panel_startTime)
-    );
+    )
     let panel_endTime = JSON.parse(
       JSON.stringify(this.props[subModule].panel_endTime)
-    );
-    let panel_page = this.props[subModule].panel_page.slice();
-    let panel_rangeIndex = this.props[subModule].panel_rangeIndex.slice();
+    )
+    let panel_page = this.props[subModule].panel_page.slice()
+    let panel_rangeIndex = this.props[subModule].panel_rangeIndex.slice()
     // let panel_total = JSON.parse(JSON.stringify(this.props[subModule].panel_total))
-    let i = this.props[subModule].mainCate;
-    panel_startTime[i] = startTime;
-    panel_endTime[i] = endTime;
-    panel_page[i] = 1;
-    panel_rangeIndex[i] = 0;
+    let i = this.props[subModule].mainCate
+    panel_startTime[i] = startTime
+    panel_endTime[i] = endTime
+    panel_page[i] = 1
+    panel_rangeIndex[i] = 0
     this.props.changeTask(subModule, {
       panel_startTime: panel_startTime,
       panel_endTime: panel_endTime,
       panel_page: panel_page,
       panel_rangeIndex: panel_rangeIndex
-    });
-  };
+    })
+  }
 
-  changePage = pageObj => {
-    let page = pageObj.current;
-    let { panel_page, mainCate } = this.props[subModule];
-    let former = panel_page[mainCate];
-    if (former === page) {
-      return;
+  changeTable = (pageObj, filters, sorter) => {
+    console.log(sorter)
+    let { order, field, column } = sorter
+    let data = {}
+    if (order) {
+      let { orderBy, assess_dim } = this.props[subModule]
+      let newOrder = Array.from(this.props[subModule].order),
+        newOrderBy = Array.from(orderBy)
+      newOrder[assess_dim - 1] = ORDER[order]
+      newOrderBy[assess_dim - 1] =
+        ORDERBYS[column.orderBy ? column.orderBy : field]
+      data.order = newOrder
+      data.orderBy = newOrderBy
     }
-    let newPage = Array.from(panel_page);
-    newPage.splice(mainCate, 1, page);
-    this.props.changeTask(subModule, { panel_page: newPage });
-  };
+    let page = pageObj.current
+    let { panel_page, mainCate } = this.props[subModule]
+    let former = panel_page[mainCate]
+    if (former !== page) {
+      let newPage = Array.from(panel_page)
+      newPage.splice(mainCate, 1, page)
+      data.panel_page = newPage
+    }
+    this.props.changeTask(subModule, data)
+  }
 
   addTag = () => {
     this.setState({
       showBuildTag: true
-    });
-  };
+    })
+  }
   cancelBuildTag = () => {
     this.setState({
       showBuildTag: false,
       note: '',
       originalTag: '',
-      tagId: ''
-    });
-  };
+      tagId: '',
+      noteError: false
+    })
+  }
   buildTagSuccess = () => {
-    Noti.hintOk('操作成功', '创建标签成功');
+    Noti.hintOk('操作成功', '创建标签成功')
     this.setState({
       showBuildTag: false
-    });
-    this.updateList();
-  };
+    })
+    this.updateList()
+  }
   changeNote = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (v.length > 10) {
       return this.setState({
         tagLengthError: true
-      });
+      })
     }
     this.setState({
       note: e.target.value,
       tagLengthError: false,
       tagExistError: false
-    });
-  };
+    })
+  }
   checkNote = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         noteError: true,
         note: v
-      });
+      })
     }
     if (this.state.noteError) {
       this.setState({
         noteError: false,
         note: v
-      });
+      })
     }
-  };
+  }
   confirmBuildTag = () => {
-    let { tagId, note, posting, checking, originalTag } = this.state;
-    let description = note.trim();
+    let { tagId, note, posting, checking, originalTag } = this.state
+    let description = note.trim()
     if (!description) {
       return this.setState({
         noteError: true
-      });
+      })
     }
     if (posting || checking) {
-      return;
+      return
     }
 
     if (tagId && description === originalTag) {
@@ -696,94 +752,95 @@ class TaskList extends React.Component {
         tagId: '',
         originalTag: '',
         note: ''
-      });
+      })
     } else {
-      this.checkExist(this.postTag);
+      this.checkExist(this.postTag)
     }
-  };
+  }
   checkExist = callback => {
-    let { note, checking } = this.state;
+    let { note, checking } = this.state
     if (checking) {
-      return;
+      return
     }
     this.setState({
       checking: true
-    });
-    let description = note.trim();
-    let resource = '/work/order/tag/check';
+    })
+    let description = note.trim()
+    let resource = '/work/order/tag/check'
     const body = {
       description: description
-    };
+    }
     const cb = json => {
       const nextState = {
         checking: false
-      };
+      }
       if (json.error) {
-        this.hintError();
+        this.hintError()
       } else {
         if (json.data.result) {
-          Noti.hintLock('请求出错', '该标签已被添加！');
+          Noti.hintLock('请求出错', '该标签已被添加！')
           this.setState({
             tagExistError: true
-          });
+          })
         } else {
           if (this.state.tagExistError) {
-            nextState.tagExistError = false;
+            nextState.tagExistError = false
           }
           if (callback) {
-            callback();
+            callback()
           }
         }
-        this.setState(nextState);
+        this.setState(nextState)
       }
-      this.setState(nextState);
-    };
+      this.setState(nextState)
+    }
     AjaxHandler.ajax(resource, body, cb, null, {
       clearChecking: true,
       thisObj: this
-    });
-  };
+    })
+  }
   editTag = (e, index) => {
-    let { id, description } = this.state.dataSource[index];
+    e.preventDefault()
+    let { id, description } = this.state.dataSource[index]
     this.setState({
       tagId: id,
       note: description,
       originalTag: description,
       showBuildTag: true
-    });
-  };
+    })
+  }
   deleteTag = (e, id) => {
-    let resource = '/work/order/tag/delete';
+    let resource = '/work/order/tag/delete'
     const body = {
       id: id
-    };
+    }
     const cb = json => {
       if (json.data.result) {
-        Noti.hintWarning('删除出错', '请稍后再尝试');
+        Noti.hintWarning('删除出错', '请稍后再尝试')
       } else {
-        Noti.hintOk('删除成功', '已成功删除该标签');
-        this.updateList();
-        this.updateTags();
+        Noti.hintOk('删除成功', '已成功删除该标签')
+        this.updateList()
+        this.updateTags()
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   postTag = e => {
-    let { tagId, note, posting } = this.state;
+    let { tagId, note, posting } = this.state
     if (posting) {
-      return;
+      return
     }
     this.setState({
       posting: true
-    });
-    let description = note.trim();
-    let resource = '/work/order/tag/add';
+    })
+    let description = note.trim()
+    let resource = '/work/order/tag/add'
     const body = {
       description: description
-    };
+    }
     if (tagId) {
-      resource = '/work/order/tag/update';
-      body.id = tagId;
+      resource = '/work/order/tag/update'
+      body.id = tagId
     }
     const cb = json => {
       if (json.data.result) {
@@ -793,20 +850,20 @@ class TaskList extends React.Component {
           note: '',
           originalTag: '',
           tagId: ''
-        });
-        Noti.hintOk('操作成功', '当前标签添加成功');
+        })
+        Noti.hintOk('操作成功', '当前标签添加成功')
         // refetch list
-        this.updateList();
-        this.updateTags();
+        this.updateList()
+        this.updateTags()
       } else {
-        Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试');
+        Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试')
       }
-    };
+    }
     AjaxHandler.ajax(resource, body, cb, null, {
       clearPosting: true,
       thisObj: this
-    });
-  };
+    })
+  }
   updateList = () => {
     let {
       schoolId,
@@ -814,48 +871,58 @@ class TaskList extends React.Component {
       panel_rangeIndex,
       panel_startTime,
       panel_endTime,
-      mainCate
-    } = this.props[subModule];
-    let page = panel_page[mainCate];
-    let day = panel_rangeIndex[mainCate];
+      mainCate,
+      order,
+      orderBy,
+      assess_dim
+    } = this.props[subModule]
+    let page = panel_page[mainCate]
+    let day = panel_rangeIndex[mainCate]
     let startTime = panel_startTime[mainCate],
-      endTime = panel_endTime[mainCate];
+      endTime = panel_endTime[mainCate]
     const body = {
       page: page,
       size: SIZE
-    };
+    }
     if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10);
+      body.schoolId = parseInt(schoolId, 10)
     }
     if (day !== 0) {
-      body.day = day;
+      body.day = day
     }
     if (startTime && endTime) {
-      body.startTime = startTime;
-      body.endTime = endTime;
+      body.startTime = startTime
+      body.endTime = endTime
     }
 
-    let resource = '/work/order/tag/stat/list';
-    this.fetchReports(resource, body, REPORT_CATE_COMPLAINT);
-  };
+    if (mainCate === REPORT_CATE_ASSESS - 1 && orderBy[assess_dim - 1] !== 0) {
+      body.order = order[assess_dim - 1]
+      body.orderBy = orderBy[assess_dim - 1]
+    }
+
+    let resource = '/work/order/tag/stat/list'
+    this.fetchReports(resource, body, REPORT_CATE_COMPLAINT)
+  }
   updateTags = () => {
-    let resource = '/work/order/tag/list';
+    let resource = '/work/order/tag/list'
     const body = {
       page: 1,
       size: 1000
-    };
+    }
     const cb = json => {
       if (json.data.tags) {
-        let tags = {};
+        let tags = {}
         json.data.tags.forEach(r => {
-          tags[r.id] = r.description;
-        });
-        this.props.setTagList(tags);
+          tags[r.id] = r.description
+        })
+        this.props.setTagList(tags)
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   changeOnline = e => {
+    this.props.changeOnline()
+    /*
     let resource = '/employee/cs/online';
     const body = null;
     const cb = json => {
@@ -869,17 +936,18 @@ class TaskList extends React.Component {
       }
     };
     AjaxHandler.ajax(resource, body, cb);
-  };
+    */
+  }
   render() {
-    const { isCs, csOnline } = this.props.user;
+    const { isCs, csOnline } = this.props.user
     let {
       mainCate,
       schoolId,
       panel_rangeIndex,
       panel_page,
       assess_dim
-    } = this.props[subModule];
-    const { forbiddenStatus } = this.props;
+    } = this.props[subModule]
+    const { forbiddenStatus } = this.props
     // console.log(dataSource)
     const {
       loading,
@@ -892,19 +960,19 @@ class TaskList extends React.Component {
       noteError,
       tagExistError,
       tagLengthError
-    } = this.state;
+    } = this.state
 
-    let page = panel_page[mainCate];
-    let max = 0;
+    let page = panel_page[mainCate]
+    let max = 0
     let unused =
-      mainCate === REPORT_CATE_COMPLAINT &&
+      mainCate === REPORT_CATE_COMPLAINT - 1 &&
       dataSource &&
       dataSource.length > 0 &&
       dataSource.forEach(r => {
         if (r.amount > max) {
-          max = r.amount;
+          max = r.amount
         }
-      });
+      })
 
     const sumTable = mainCate === REPORT_CATE_SUM - 1 && (
       <Table
@@ -912,16 +980,18 @@ class TaskList extends React.Component {
         loading={loading}
         rowKey={record => record.id}
         pagination={{
-          pageSize: SIZE
+          pageSize: SIZE,
+          current: page,
+          total: total
         }}
         // dataSource={panel_dataSource[mainCate]}
         dataSource={dataSource}
         columns={this.sumColumns}
-        onChange={this.changePage}
+        onChange={this.changeTable}
         onRowClick={this.selectRow}
         rowClassName={this.setRowClass}
       />
-    );
+    )
 
     const complaintColumns = [
       {
@@ -934,19 +1004,21 @@ class TaskList extends React.Component {
         width: '50%',
         dataIndex: 'amount',
         render: (text, record, index) => {
+          let indexOfAll = (page - 1) * SIZE + index + 1
           return (
-            <span key={record.id}>
-              <Slider
-                key={record.id}
-                value={record.amount}
-                max={max}
-                min={0}
-                range={false}
-                disabled={true}
-              />
-              <span key={record.id}>{`${record.amount}次`}</span>
-            </span>
-          );
+            <Fragment key={`fragment${index}`}>
+              <span key={`wrapper${record.id}`} className="sliderWrapper">
+                <ProgressBar
+                  key={`slider${record.id}`}
+                  value={record.amount ? div(mul(record.amount, 100), max) : 0}
+                  bgColor={indexOfAll > 3 ? '#108EE9' : '#ff5555'}
+                />
+              </span>
+              <span className="amountHint mgl10" key={`amount${record.id}`}>{`${
+                record.amount
+              }次`}</span>
+            </Fragment>
+          )
         }
       },
       {
@@ -962,7 +1034,7 @@ class TaskList extends React.Component {
             <Popconfirm
               title="确定要删除此标签么?"
               onConfirm={e => {
-                this.deleteTag(e, record.id);
+                this.deleteTag(e, record.id)
               }}
               okText="确认"
               cancelText="取消"
@@ -972,22 +1044,24 @@ class TaskList extends React.Component {
           </div>
         )
       }
-    ];
+    ]
     const complaintTable = mainCate === REPORT_CATE_COMPLAINT - 1 && (
       <Table
         bordered
         loading={loading}
         rowKey={record => record.id}
         pagination={{
-          pageSize: SIZE
+          pageSize: SIZE,
+          current: page,
+          total: total
         }}
         dataSource={dataSource}
         columns={complaintColumns}
-        onChange={this.changePage}
+        onChange={this.changeTable}
         onRowClick={this.selectRow}
         rowClassName={this.setRowClass}
       />
-    );
+    )
 
     const assessSchoolTable = mainCate === REPORT_CATE_ASSESS - 1 &&
       assess_dim === ASSESS_SCHOOL && (
@@ -1003,11 +1077,11 @@ class TaskList extends React.Component {
           // dataSource={panel_dataSource[mainCate]}
           dataSource={dataSource}
           columns={this.assessSchoolColumns}
-          onChange={this.changePage}
+          onChange={this.changeTable}
           onRowClick={this.selectRow}
           rowClassName={this.setRowClass}
         />
-      );
+      )
 
     const assessCustomTable = mainCate === REPORT_CATE_ASSESS - 1 &&
       assess_dim === ASSESS_CUSTOM && (
@@ -1023,11 +1097,11 @@ class TaskList extends React.Component {
           // dataSource={panel_dataSource[mainCate]}
           dataSource={dataSource}
           columns={this.assessCustomColumns}
-          onChange={this.changePage}
+          onChange={this.changeTable}
           onRowClick={this.selectRow}
           rowClassName={this.setRowClass}
         />
-      );
+      )
 
     const assessRepairmanTable = mainCate === REPORT_CATE_ASSESS - 1 &&
       assess_dim === ASSESS_REPAIRMAN && (
@@ -1042,19 +1116,18 @@ class TaskList extends React.Component {
           }}
           dataSource={dataSource}
           columns={this.assessRepairmanColumns}
-          onChange={this.changePage}
+          onChange={this.changeTable}
           onRowClick={this.selectRow}
           rowClassName={this.setRowClass}
         />
-      );
+      )
 
     return (
       <div className="taskPanelWrapper" ref="wrapper">
+        {loading ? <div className="loadingMask" /> : null}
+
         {isCs && !csOnline ? (
-          <div
-            className="loadingMask offlineWrapper"
-            onClick={this.changeOnline}
-          >
+          <div className="loadingMask offlineWrapper">
             <div className="offline">
               <img src={notworking} alt="offline" />
               <span>未进入工作状态</span>
@@ -1097,7 +1170,7 @@ class TaskList extends React.Component {
               />
             </div>
           </div>
-          {mainCate === REPORT_CATE_ASSESS - 1 ? (
+          {mainCate === REPORT_CATE_COMPLAINT - 1 ? (
             <div className="block">
               {forbiddenStatus.BUILD_COMPLAINT_TAG ? null : (
                 <Button
@@ -1198,7 +1271,7 @@ class TaskList extends React.Component {
           </div>
         </Modal>
       </div>
-    );
+    )
   }
 }
 
@@ -1209,12 +1282,13 @@ const mapStateToProps = (state, ownProps) => ({
   user: state.setUserInfo,
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   tagInfo: state.setTagList
-});
+})
 
 export default withRouter(
   connect(mapStateToProps, {
     changeTask,
     setUserInfo,
-    setTagList
+    setTagList,
+    changeOnline
   })(TaskList)
-);
+)

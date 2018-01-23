@@ -1,24 +1,24 @@
-import React from 'react';
-import { obj2arr } from '../util/types';
+import React from 'react'
+import { obj2arr, isNumber } from '../util/types'
 
 class CheckSelector extends React.Component {
   constructor(props) {
-    super();
+    super()
   }
   onClick = e => {
     try {
-      e.preventDefault();
-      let key = parseInt(e.target.getAttribute('data-key'), 10);
-      if (key && this.props.onClick) {
-        this.props.onClick(key);
+      e.preventDefault()
+      let key = parseInt(e.target.getAttribute('data-key'), 10)
+      if (isNumber(key) && this.props.onClick) {
+        this.props.onClick(key)
       }
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-  };
+  }
   render() {
-    let { options, value } = this.props;
-    let optionArr = obj2arr(options);
+    let { options, value } = this.props
+    let optionArr = obj2arr(options)
     const optionItems =
       optionArr &&
       optionArr.map((o, i) => (
@@ -29,14 +29,14 @@ class CheckSelector extends React.Component {
         >
           {o.value}
         </li>
-      ));
+      ))
 
     return (
       <ul className="checkSelect" onClick={this.onClick}>
         {optionItems}
       </ul>
-    );
+    )
   }
 }
 
-export default CheckSelector;
+export default CheckSelector
