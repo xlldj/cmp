@@ -134,7 +134,9 @@ class TaskDetail extends React.Component {
       loadingId: '',
       message: '',
       messageError: false,
-      finishContentError: false
+      finishContentError: false,
+      tag: '',
+      tagError: false
     }
     this.reassignMenu = (
       <Menu selectable={false} onClick={this.reassign}>
@@ -1068,45 +1070,60 @@ class TaskDetail extends React.Component {
     })
   }
   confirmFinish = () => {
-    let { id, note } = this.state
+    let { id, note, tag, posting } = this.state
     let { type } = this.props.taskList.details
+    if (posting) {
+      return
+    }
 
-    let resource = '/work/order/handle'
-    const body = {
-      id: id,
-      type: CONSTANTS.TASK_HANDLE_FINISH, // finish
-      env: TASK_BUILD_CMP
+    if (!tag) {
+      return this.setState({
+        tagError: true
+      })
     }
     let content = note.trim()
-    console.log(type)
     // content must not be empty when finishing repair task
     if (type === TASK_TYPE_REPAIR && !content) {
       return this.setState({
         finishContentError: true
       })
     }
+
+    let resource = '/work/order/handle'
+    const body = {
+      id: id,
+      type: CONSTANTS.TASK_HANDLE_FINISH, // finish
+      env: TASK_BUILD_CMP,
+      tag: +tag
+    }
+    console.log(type)
     if (content) {
       body.content = content
     }
     const cb = json => {
+      let nextState = {
+        posting: false
+      }
       if (json.data.result) {
         // success
-        this.setState({
-          showFinishModal: false,
-          note: ''
-        })
+        nextState.showFinishModal = false
+        nextState.note = ''
+        nextState.tag = ''
         Noti.hintOk('操作成功', '当前工单已完结')
         // refetch details
         this.updateAndClose(id)
       } else {
         Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试')
       }
+      this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
   closeFinishModal = () => {
     this.setState({
       note: '',
+      tag: '',
+      tagError: false,
       showFinishModal: false,
       finishContentError: false
     })
@@ -1307,6 +1324,19 @@ class TaskDetail extends React.Component {
       console.log(e)
     }
   }
+  changeTag = v => {
+    this.setState({
+      tag: v,
+      tagError: false
+    })
+  }
+  checkTag = v => {
+    if (!v) {
+      this.setState({
+        tagError: true
+      })
+    }
+  }
   render() {
     const {
       showDetailImgs,
@@ -1322,7 +1352,8 @@ class TaskDetail extends React.Component {
       initialSlide, // initial slide of img
       messageError,
       finishContentError,
-      tag
+      tag,
+      tagError
     } = this.state
 
     let {
@@ -1333,8 +1364,7 @@ class TaskDetail extends React.Component {
       detail_tabIndex,
       selectedDetailId
     } = this.props.taskList
-    const { forbiddenStatus } = this.props
-    let { tags } = this.props.tagInfo
+    const { forbiddenStatus, tags } = this.props
 
     let currentTab = detail_tabIndex[main_phase]
 
@@ -2045,7 +2075,7 @@ class TaskDetail extends React.Component {
         {/* finish task modal */}
         <Modal
           wrapClassName="modal finish"
-          width={360}
+          width={450}
           title="工单完结"
           visible={showFinishModal}
           onCancel={this.closeFinishModal}
@@ -2069,6 +2099,9 @@ class TaskDetail extends React.Component {
                   checkOpt={this.checkTag}
                   invalidTitle="选择标签"
                 />
+                {tagError ? (
+                  <span className="checkInvalid">请选择标签！</span>
+                ) : null}
               </li>
               <li className="itemsWrapper">
                 <p>备注:</p>
@@ -2140,7 +2173,7 @@ class TaskDetail extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
   taskList: state.changeTask[subModule],
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
-  tagInfo: state.setTagList
+  tags: state.setTagList
 })
 
 export default withRouter(
