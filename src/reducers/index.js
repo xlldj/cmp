@@ -1,9 +1,8 @@
 import * as ActionTypes from '../actions'
 import { merge } from 'lodash'
 import { combineReducers } from 'redux'
-import { getLocal } from '../pages/util/storage'
-import Time from '../pages/component/time'
-console.log('reducers')
+import { getLocal } from '../util/storage'
+import Time from '../util/time'
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
 if (recentSchools) {

@@ -1,6 +1,6 @@
 import React from 'react'
 import AjaxHandler from '../../util/ajax'
-import { getStore, getLocal, setLocal } from '../util/storage'
+import { getStore, getLocal, setLocal } from '../../util/storage'
 import CONSTANTS from './constants'
 import Select from './select'
 

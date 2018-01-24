@@ -7,7 +7,7 @@ import Noti from '../../../util/noti'
 import CONSTANTS from '../../component/constants'
 import Format from '../../component/format'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
-import { getStore } from '../../util/storage'
+import { getStore } from '../../../util/storage'
 
 const BUILDINGTYPE = CONSTANTS.BUILDINGTYPE
 

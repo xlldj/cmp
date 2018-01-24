@@ -4,7 +4,7 @@ import AjaxHandler from '../../util/ajax'
 import Time from '../component/time'
 import Noti from '../../util/noti'
 import moment from 'moment'
-import { getLocal } from '../util/storage'
+import { getLocal } from '../../util/storage'
 import SchoolSelector from '../component/schoolSelector'
 
 import { checkObject } from '../util/checkSame'

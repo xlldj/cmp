@@ -2,7 +2,7 @@ import React from 'react'
 //import Form from 'antd/lib/form'
 import homePic from '../assets/homePic.jpg'
 import './style/style.css'
-import { setLocal } from '../util/storage'
+import { setLocal } from '../../util/storage'
 import AjaxHandler from '../../util/ajax'
 
 class Welcome extends React.Component {

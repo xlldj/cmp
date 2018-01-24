@@ -5,7 +5,7 @@ import { asyncComponent } from '../component/asyncComponent'
 
 import Bread from '../component/bread'
 import './style/style.css'
-import { getLocal } from '../util/storage'
+import { getLocal } from '../../util/storage'
 import Time from '../component/time'
 
 import { connect } from 'react-redux'

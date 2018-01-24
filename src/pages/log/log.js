@@ -3,8 +3,8 @@ import { Button } from 'antd'
 //import Form from 'antd/lib/form'
 import AjaxHandler from '../../util/ajax'
 import Noti from '../../util/noti'
-import { setToken } from '../util/handleToken'
-import { setStore, getLocal, getStore, removeStore } from '../util/storage'
+import { setToken } from '../../util/handleToken'
+import { setStore, getLocal, getStore, removeStore } from '../../util/storage'
 import { clientDetect } from '../util/clientDetect'
 import {
   buildAuthenData,

@@ -6,7 +6,7 @@ import './style/style.css'
 //import LostInfo from './lostInfo'
 //import LostTable from './lostTable'
 import Bread from '../component/bread'
-import { getLocal } from '../util/storage'
+import { getLocal } from '../../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'

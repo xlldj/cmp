@@ -5,7 +5,7 @@ import { Button, Popconfirm, Tabs, Collapse } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
-import { setStore, getStore } from '../../util/storage'
+import { setStore, getStore } from '../../../util/storage'
 
 const Panel = Collapse.Panel
 const TabPane = Tabs.TabPane

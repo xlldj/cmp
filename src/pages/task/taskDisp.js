@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, setTagList } from '../../actions'
 
-import { getLocal } from '../util/storage'
+import { getLocal } from '../../util/storage'
 const TaskList = asyncComponent(() =>
   import(/* webpackChunkName: "taskList" */ './taskList')
 )

@@ -1,7 +1,7 @@
 import { heartBeat, stopBeat } from '../tasks/heartBeat'
 import AjaxHandler from '../util/ajax'
-import { buildAuthenData } from '../pages/util/authenDataHandle'
-import { getStore, setStore, removeStore } from '../pages/util/storage'
+import { buildAuthenData } from '../util/authenDataHandle'
+import { getStore, setStore, removeStore } from '../util/storage'
 
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {

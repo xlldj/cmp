@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom'
 import Bread from '../component/bread'
 import './style/style.css'
 import Stat from './stat'
-import { getLocal } from '../util/storage'
+import { getLocal } from '../../util/storage'
 
 const breadcrumbNameMap = {}
 
