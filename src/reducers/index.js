@@ -49,13 +49,10 @@ const setAuthenData = (state = initialAuthenData, action) => {
   return state
 }
 
-const initialTagList = {
-  tags: [],
-  tagSet: false
-}
+const initialTagList = {}
 const setTagList = (state = initialTagList, action) => {
   const { type } = action
-  if (type === ActionTypes.SET_ROLE_LIST) {
+  if (type === ActionTypes.SET_TAG_LIST) {
     // console.log(action.value);
     const value = action.value
     // console.log({...state, ...value})
