@@ -1,23 +1,39 @@
 import React from 'react'
-import {Route, Redirect} from 'react-router-dom'
-import {asyncComponent} from '../component/asyncComponent'
+import { Route, Redirect } from 'react-router-dom'
+import { asyncComponent } from '../component/asyncComponent'
 import './style/style.css'
 
-import Bread from '../bread'
-import {getLocal} from '../util/storage'
+import Bread from '../component/bread'
+import { getLocal } from '../util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../actions'
 
-const DeviceContainer = asyncComponent(() => import(/* webpackChunkName: "deviceContainer" */ "./deviceList/deviceContainer"))
-const ComponentContainer = asyncComponent(() => import(/* webpackChunkName: "componentContainer" */ "./components/componentContainer"))
-const SupplierContainer = asyncComponent(() => import(/* webpackChunkName: "supplierList" */ "./supplier/supplierContainer"))
-const RateSet = asyncComponent(() => import(/* webpackChunkName: "rateSet" */ "./rateSet/rateSet"))
-const Repair = asyncComponent(() => import(/* webpackChunkName: "repair" */ "./repair/repair"))
-const PrepayContainer = asyncComponent(() => import(/* webpackChunkName: "prepay" */ "./prepay/prepayContainer"))
-const TimesetContainer = asyncComponent(() => import(/* webpackChunkName: "timeset" */ "./timeset/timesetContainer"))
-const RateLimitContainer = asyncComponent(() => import(/* webpackChunkName: "rateLimit" */ "./rateLimit/rateLimitContainer"))
+const DeviceContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "deviceContainer" */ './deviceList/deviceContainer')
+)
+const ComponentContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "componentContainer" */ './components/componentContainer')
+)
+const SupplierContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "supplierList" */ './supplier/supplierContainer')
+)
+const RateSet = asyncComponent(() =>
+  import(/* webpackChunkName: "rateSet" */ './rateSet/rateSet')
+)
+const Repair = asyncComponent(() =>
+  import(/* webpackChunkName: "repair" */ './repair/repair')
+)
+const PrepayContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "prepay" */ './prepay/prepayContainer')
+)
+const TimesetContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "timeset" */ './timeset/timesetContainer')
+)
+const RateLimitContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "rateLimit" */ './rateLimit/rateLimitContainer')
+)
 
 const breadcrumbNameMap = {
   '/list': '设备列表',
@@ -50,17 +66,17 @@ const breadcrumbNameMap = {
   '/rateLimit': '扣费速率',
   '/rateLimit/addRateLimit': '添加扣费速率',
   '/rateLimit/editRateLimit': '编辑扣费速率'
-};
+}
 
-class DeviceDisp extends React.Component{
-  changeSchool = (i) => {
-    let deviceInfo={}
+class DeviceDisp extends React.Component {
+  changeSchool = i => {
+    let deviceInfo = {}
     this.setState({
       selectedSchoolId: i,
       deviceInfo
     })
   }
-  changeEditingBlock = (i) => {
+  changeEditingBlock = i => {
     this.setState({
       editingBlock: i
     })
@@ -70,36 +86,45 @@ class DeviceDisp extends React.Component{
   }
   clearStatus4deviceIIlist = () => {
     this.getDefaultSchool()
-    this.props.changeDevice('deviceList', {page: 1, deviceType: 'all', selectKey: ''})
+    this.props.changeDevice('deviceList', {
+      page: 1,
+      deviceType: 'all',
+      selectKey: ''
+    })
   }
   clearStatus4deviceIIcomponents = () => {
-    this.props.changeDevice('components', {page: 1})
+    this.props.changeDevice('components', { page: 1 })
   }
   clearStatus4deviceIIprepay = () => {
     this.getDefaultSchool()
-    this.props.changeDevice('prepay', {page: 1})
+    this.props.changeDevice('prepay', { page: 1 })
   }
   clearStatus4deviceIItimeset = () => {
     this.getDefaultSchool()
-    this.props.changeDevice('timeset', {page: 1})
+    this.props.changeDevice('timeset', { page: 1 })
   }
   clearStatus4deviceIIsuppliers = () => {
-    this.props.changeDevice('suppliers', {page: 1})
+    this.props.changeDevice('suppliers', { page: 1 })
   }
   clearStatus4deviceIIrateSet = () => {
     this.getDefaultSchool()
-    this.props.changeDevice('rateSet', {page: 1})
+    this.props.changeDevice('rateSet', { page: 1 })
   }
   clearStatus4deviceIIrepair = () => {
     this.getDefaultSchool()
-    this.props.changeDevice('repair', {page: 1, deviceType: 'all', status: 'all'})
+    this.props.changeDevice('repair', {
+      page: 1,
+      deviceType: 'all',
+      status: 'all'
+    })
   }
   clearStatus4deviceIIrateLimit = () => {
     this.getDefaultSchool()
-    this.props.changeDevice('rateLimit', {page: 1})
+    this.props.changeDevice('rateLimit', { page: 1 })
   }
   getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
+    const recentSchools = getLocal('recentSchools'),
+      defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
@@ -109,51 +134,93 @@ class DeviceDisp extends React.Component{
       selectedSchool = defaultSchool
     }
     if (selectedSchool !== 'all') {
-      this.props.changeDevice('deviceList', {schoolId: selectedSchool})
-      this.props.changeDevice('prepay', {schoolId: selectedSchool})
-      this.props.changeDevice('timeset', {schoolId: selectedSchool})
-      this.props.changeDevice('rateSet', {schoolId: selectedSchool})
-      this.props.changeDevice('rateLimit', {schoolId: selectedSchool})
-      this.props.changeDevice('repair', {schoolId: selectedSchool})
+      this.props.changeDevice('deviceList', { schoolId: selectedSchool })
+      this.props.changeDevice('prepay', { schoolId: selectedSchool })
+      this.props.changeDevice('timeset', { schoolId: selectedSchool })
+      this.props.changeDevice('rateSet', { schoolId: selectedSchool })
+      this.props.changeDevice('rateLimit', { schoolId: selectedSchool })
+      this.props.changeDevice('repair', { schoolId: selectedSchool })
     }
   }
-  render(){
-    return(
+  render() {
+    return (
       <div>
-        <div className='breadc'>
-          <Bread 
+        <div className="breadc">
+          <Bread
             breadcrumbNameMap={breadcrumbNameMap}
-            parent='device'
+            parent="device"
             setStatusFordevice={this.setStatusFordevice}
-            clearStatus4deviceIIlist={this.clearStatus4deviceIIlist}  
-            clearStatus4deviceIIcomponents={this.clearStatus4deviceIIcomponents}  
-            clearStatus4deviceIIprepay={this.clearStatus4deviceIIprepay} 
-            clearStatus4deviceIItimeset={this.clearStatus4deviceIItimeset}  
-            clearStatus4deviceIIsuppliers={this.clearStatus4deviceIIsuppliers}  
-            clearStatus4deviceIIrateSet={this.clearStatus4deviceIIrateSet}   
-            clearStatus4deviceIIrepair={this.clearStatus4deviceIIrepair} 
+            clearStatus4deviceIIlist={this.clearStatus4deviceIIlist}
+            clearStatus4deviceIIcomponents={this.clearStatus4deviceIIcomponents}
+            clearStatus4deviceIIprepay={this.clearStatus4deviceIIprepay}
+            clearStatus4deviceIItimeset={this.clearStatus4deviceIItimeset}
+            clearStatus4deviceIIsuppliers={this.clearStatus4deviceIIsuppliers}
+            clearStatus4deviceIIrateSet={this.clearStatus4deviceIIrateSet}
+            clearStatus4deviceIIrepair={this.clearStatus4deviceIIrepair}
             clearStatus4deviceIIrateLimit={this.clearStatus4deviceIIrateLimit}
-            parentName='设备管理' 
+            parentName="设备管理"
           />
         </div>
 
-        <div className='disp'>
-          <Route path="/device/list" render={(props) => (<DeviceContainer hide={this.props.hide} {...props} />)}  />
-          <Route path="/device/suppliers" render={(props) => (<SupplierContainer hide={this.props.hide} {...props} />)}  />
-          <Route path='/device/rateSet' render={(props) => (<RateSet hide={this.props.hide} {...props} />)} />
-          <Route path='/device/repair' render={(props) => (<Repair hide={this.props.hide} {...props} />)} />
-          <Route path='/device/components' render={(props) => (<ComponentContainer hide={this.props.hide} {...props} />)} />
-          <Route path='/device/prepay' render={(props) => (<PrepayContainer hide={this.props.hide} {...props} />)} />
-          <Route path='/device/timeset' render={(props) => (<TimesetContainer hide={this.props.hide} {...props} />)} />
-          <Route path='/device/rateLimit' render={(props) => (<RateLimitContainer hide={this.props.hide} {...props} />)} />
-          <Route exact path='/device' render={(props) => (<Redirect to='/device/list' />)}  />
+        <div className="disp">
+          <Route
+            path="/device/list"
+            render={props => (
+              <DeviceContainer hide={this.props.hide} {...props} />
+            )}
+          />
+          <Route
+            path="/device/suppliers"
+            render={props => (
+              <SupplierContainer hide={this.props.hide} {...props} />
+            )}
+          />
+          <Route
+            path="/device/rateSet"
+            render={props => <RateSet hide={this.props.hide} {...props} />}
+          />
+          <Route
+            path="/device/repair"
+            render={props => <Repair hide={this.props.hide} {...props} />}
+          />
+          <Route
+            path="/device/components"
+            render={props => (
+              <ComponentContainer hide={this.props.hide} {...props} />
+            )}
+          />
+          <Route
+            path="/device/prepay"
+            render={props => (
+              <PrepayContainer hide={this.props.hide} {...props} />
+            )}
+          />
+          <Route
+            path="/device/timeset"
+            render={props => (
+              <TimesetContainer hide={this.props.hide} {...props} />
+            )}
+          />
+          <Route
+            path="/device/rateLimit"
+            render={props => (
+              <RateLimitContainer hide={this.props.hide} {...props} />
+            )}
+          />
+          <Route
+            exact
+            path="/device"
+            render={props => <Redirect to="/device/list" />}
+          />
         </div>
       </div>
     )
   }
-} 
+}
 
 // export default DeviceDisp
-export default withRouter(connect(null, {
-  changeDevice
-})(DeviceDisp))
+export default withRouter(
+  connect(null, {
+    changeDevice
+  })(DeviceDisp)
+)

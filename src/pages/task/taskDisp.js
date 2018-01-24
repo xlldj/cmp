@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import Bread from '../bread'
+import Bread from '../component/bread'
 import './style/style.css'
 import AjaxHandler from '../../util/ajax'
 

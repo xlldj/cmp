@@ -1,24 +1,24 @@
-import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
-import Bread from '../bread';
-import './style/style.css';
+import React from 'react'
+import { Route, Redirect } from 'react-router-dom'
+import Bread from '../component/bread'
+import './style/style.css'
 
-import { asyncComponent } from '../component/asyncComponent';
-import { getLocal } from '../util/storage';
+import { asyncComponent } from '../component/asyncComponent'
+import { getLocal } from '../util/storage'
 
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { changeEmployee } from '../../actions';
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeEmployee } from '../../actions'
 
 const EmployeeContainer = asyncComponent(() =>
   import(/* webpackChunkName: "employeeContainer" */ './employeeContainer')
-);
+)
 const AuthenContainer = asyncComponent(() =>
   import(/* webpackChunkName: "authenContainer" */ './authen/authenContainer')
-);
+)
 const RoleContainer = asyncComponent(() =>
   import(/* webpackChunkName: "roleContainer" */ './role/roleContainer')
-);
+)
 
 const breadcrumbNameMap = {
   '/list': '员工列表',
@@ -32,35 +32,35 @@ const breadcrumbNameMap = {
   '/role/add': '添加身份',
   '/role/list': '身份列表',
   '/role/detail': '详情'
-};
+}
 
 class EmployeeDisp extends React.Component {
   setStatusForemployee = () => {
-    this.clearStatus4employeeIIlist();
-  };
+    this.clearStatus4employeeIIlist()
+  }
   clearStatus4employeeIIlist = () => {
-    this.getDefaultSchool();
-    this.props.changeEmployee('employeeList', { page: 1, selectKey: '' });
-  };
+    this.getDefaultSchool()
+    this.props.changeEmployee('employeeList', { page: 1, selectKey: '' })
+  }
   clearStatus4employeeIIrole = () => {
-    this.getDefaultSchool();
-    this.props.changeEmployee('roleList', { page: 1 });
-  };
+    this.getDefaultSchool()
+    this.props.changeEmployee('roleList', { page: 1 })
+  }
   getDefaultSchool = () => {
     const recentSchools = getLocal('recentSchools'),
-      defaultSchool = getLocal('defaultSchool');
-    var selectedSchool = 'all';
+      defaultSchool = getLocal('defaultSchool')
+    var selectedSchool = 'all'
     if (recentSchools) {
-      let recent = recentSchools.split(',');
-      let schoolId = recent[0];
-      selectedSchool = schoolId;
+      let recent = recentSchools.split(',')
+      let schoolId = recent[0]
+      selectedSchool = schoolId
     } else if (defaultSchool) {
-      selectedSchool = defaultSchool;
+      selectedSchool = defaultSchool
     }
     if (selectedSchool !== 'all') {
-      this.props.changeEmployee('employeeList', { schoolId: selectedSchool });
+      this.props.changeEmployee('employeeList', { schoolId: selectedSchool })
     }
-  };
+  }
   render() {
     return (
       <div>
@@ -101,7 +101,7 @@ class EmployeeDisp extends React.Component {
           />
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -109,4 +109,4 @@ export default withRouter(
   connect(null, {
     changeEmployee
   })(EmployeeDisp)
-);
+)

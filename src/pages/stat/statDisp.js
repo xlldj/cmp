@@ -1,19 +1,19 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
-import Bread from '../bread'
+import Bread from '../component/bread'
 import './style/style.css'
 import Stat from './stat'
-import {getLocal} from '../util/storage'
+import { getLocal } from '../util/storage'
 
-const breadcrumbNameMap = {
-}
+const breadcrumbNameMap = {}
 
-class StatDisp extends React.Component {  
+class StatDisp extends React.Component {
   setStatusFortask = () => {
     this.getDefaultSchool()
   }
   getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools'), defaultSchool = getLocal('defaultSchool')
+    const recentSchools = getLocal('recentSchools'),
+      defaultSchool = getLocal('defaultSchool')
     var selectedSchool = 'all'
     if (recentSchools) {
       let recent = recentSchools.split(',')
@@ -24,22 +24,30 @@ class StatDisp extends React.Component {
     }
     if (selectedSchool !== 'all') {
       // this.props.changeTask('taskList', {schoolId: selectedSchool})
-      this.props.changeStat('overview', {schoolId: selectedSchool})
-      this.props.changeStat('charts', {schoolId: selectedSchool})
-      this.props.changeStat('rank', {schoolId: selectedSchool})
+      this.props.changeStat('overview', { schoolId: selectedSchool })
+      this.props.changeStat('charts', { schoolId: selectedSchool })
+      this.props.changeStat('rank', { schoolId: selectedSchool })
     }
   }
-  render () {
+  render() {
     return (
       <div>
-        <div className='breadc'>
-          <Bread breadcrumbNameMap={breadcrumbNameMap} single parent='stat' parentName='统计分析'
+        <div className="breadc">
+          <Bread
+            breadcrumbNameMap={breadcrumbNameMap}
+            single
+            parent="stat"
+            parentName="统计分析"
             setStatusFortask={this.setStatusFortask}
           />
         </div>
 
-        <div >
-          <Route exact path='/stat' render={(props) => (<Stat hide={this.props.hide} {...props} />)} />
+        <div>
+          <Route
+            exact
+            path="/stat"
+            render={props => <Stat hide={this.props.hide} {...props} />}
+          />
         </div>
       </div>
     )

@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Popconfirm, Modal } from 'antd'
 import Noti from '../../util/noti'
 import AjaxHandler from '../../util/ajax'
-import Bread from '../bread'
+import Bread from '../component/bread'
 import './style/style.css'
 
 import PropTypes from 'prop-types'

@@ -5,7 +5,7 @@ import './style/style.css'
 
 //import LostInfo from './lostInfo'
 //import LostTable from './lostTable'
-import Bread from '../bread'
+import Bread from '../component/bread'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
