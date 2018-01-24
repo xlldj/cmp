@@ -1,22 +1,22 @@
-import React from 'react';
-import { Button, Popconfirm, Modal } from 'antd';
-import Noti from '../noti';
-import AjaxHandler from '../ajax';
-import Bread from '../bread';
-import './style/style.css';
+import React from 'react'
+import { Button, Popconfirm, Modal } from 'antd'
+import Noti from '../../util/noti'
+import AjaxHandler from '../../util/ajax'
+import Bread from '../bread'
+import './style/style.css'
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { setRoleList } from '../../actions';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setRoleList } from '../../actions'
 
 class AccountInfo extends React.Component {
   static propTypes = {
     roles: PropTypes.array.isRequired,
     rolesSet: PropTypes.bool.isRequired
-  };
+  }
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       account: '',
       nickName: '',
@@ -29,37 +29,37 @@ class AccountInfo extends React.Component {
       new2: '',
       new2Error: false,
       modalError: false
-    };
+    }
   }
   fetchRoles = () => {
-    let resource = '/role/list';
+    let resource = '/role/list'
     const body = {
       page: 1,
       size: 10000
-    };
+    }
     const cb = json => {
       if (json.data.roles) {
         this.props.setRoleList({
           roles: json.data.roles,
           rolesSet: true
-        });
+        })
 
-        let roleName = [];
+        let roleName = []
         this.state.roles.forEach(r => {
-          let role = json.data.roles.find(ro => ro.id === r);
+          let role = json.data.roles.find(ro => ro.id === r)
           if (role) {
-            roleName.push(role.name);
+            roleName.push(role.name)
           }
-        });
+        })
         this.setState({
           roleName: roleName.join('、')
-        });
+        })
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   fetchData = body => {
-    let resource = '/api/employee/one';
+    let resource = '/api/employee/one'
     const cb = json => {
       if (json.data) {
         /*--------redirect --------*/
@@ -67,136 +67,136 @@ class AccountInfo extends React.Component {
           account: json.data.account,
           nickName: json.data.nickName,
           roles: json.data.roles
-        };
-        let { rolesSet, roles } = this.props;
-        if (rolesSet) {
-          let roleName = [];
-          json.data.roles.forEach(r => {
-            let role = roles.find(ro => ro.id === r);
-            if (role) {
-              roleName.push(role.name);
-            }
-          });
-          nextState.roleName = roleName.join('、');
-        } else {
-          this.fetchRoles();
         }
-        this.setState(nextState);
+        let { rolesSet, roles } = this.props
+        if (rolesSet) {
+          let roleName = []
+          json.data.roles.forEach(r => {
+            let role = roles.find(ro => ro.id === r)
+            if (role) {
+              roleName.push(role.name)
+            }
+          })
+          nextState.roleName = roleName.join('、')
+        } else {
+          this.fetchRoles()
+        }
+        this.setState(nextState)
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   componentDidMount() {
-    this.props.hide(false);
-    let { id } = this.props.user;
+    this.props.hide(false)
+    let { id } = this.props.user
     const body = {
       id: id
-    };
-    this.fetchData(body);
+    }
+    this.fetchData(body)
   }
   componentWillUnmount() {
     // this.props.hide(true)
   }
 
   changePwd = e => {
-    e.preventDefault();
+    e.preventDefault()
     this.setState({
       visible: true
-    });
-  };
+    })
+  }
   logout = () => {
-    this.props.logout();
-    this.props.history.push('/');
-  };
+    this.props.logout()
+    this.props.history.push('/')
+  }
   cancel = () => {
     this.setState({
       visible: false
-    });
-  };
+    })
+  }
   changePassport = () => {
-    let { new1, new2, oldPwd } = this.state;
+    let { new1, new2, oldPwd } = this.state
     if (!new1 || !new2 || !oldPwd) {
       return this.setState({
         modalError: true
-      });
+      })
     }
     if (new1 === new2 && new1 !== oldPwd) {
-      this.postPwd();
+      this.postPwd()
       if (this.state.modalError) {
         this.setState({
           modalError: false
-        });
+        })
       }
     } else {
       this.setState({
         modalError: true
-      });
+      })
     }
-  };
+  }
   postPwd = () => {
-    let resource = '/user/password/update';
+    let resource = '/user/password/update'
     const body = {
       newPassword: this.state.new1,
       oldPassword: this.state.oldPwd
-    };
+    }
     const cb = json => {
       if (json.data) {
-        Noti.hintOk('密码重置成功', '您可以继续其他操作');
+        Noti.hintOk('密码重置成功', '您可以继续其他操作')
         this.setState({
           visible: false
-        });
+        })
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   changeOldPwd = e => {
     this.setState({
       oldPwd: e.target.value
-    });
-  };
+    })
+  }
   checkOldPwd = () => {
     if (!this.state.oldPwd) {
       return this.setState({
         oldPwdError: true
-      });
+      })
     }
     this.setState({
       oldPwdError: false
-    });
-  };
+    })
+  }
   changeNew1 = e => {
     this.setState({
       new1: e.target.value
-    });
-  };
+    })
+  }
   checkNew1 = () => {
     if (!this.state.new1) {
       return this.setState({
         new1Error: true
-      });
+      })
     }
     this.setState({
       new1Error: false
-    });
-  };
+    })
+  }
   changeNew2 = e => {
     this.setState({
       new2: e.target.value
-    });
-  };
+    })
+  }
   checkNew2 = () => {
     if (!this.state.new2) {
       return this.setState({
         new2Error: true
-      });
+      })
     }
     this.setState({
       new2Error: false
-    });
-  };
+    })
+  }
 
   render() {
-    let { account, roleName, nickName } = this.state;
+    let { account, roleName, nickName } = this.state
     return (
       <div>
         <div className="breadc">
@@ -310,7 +310,7 @@ class AccountInfo extends React.Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -318,10 +318,10 @@ const mapStateToProps = (state, ownProps) => ({
   roles: state.setRoleList.roles,
   rolesSet: state.setRoleList.rolesSet,
   user: state.setUserInfo
-});
+})
 
 export default withRouter(
   connect(mapStateToProps, {
     setRoleList
   })(AccountInfo)
-);
+)

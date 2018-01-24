@@ -1,6 +1,6 @@
 import Noti from './noti'
-import { getToken } from './util/handleToken'
-import { removeStore } from './util/storage'
+import { getToken } from './handleToken'
+import { removeStore } from './storage'
 
 const AjaxHandler = {
   showingError: false

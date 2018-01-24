@@ -1,13 +1,13 @@
 import React from 'react'
-import {Modal, Table, Button} from 'antd'
+import { Modal, Table, Button } from 'antd'
 import Time from './time'
-import Noti from '../noti'
-import AjaxHandler from '../ajax'
+import Noti from '../../util/noti'
+import AjaxHandler from '../../util/ajax'
 import CONSTANTS from './constants'
-const {TASK_BUILD_CMP} = CONSTANTS
+const { TASK_BUILD_CMP } = CONSTANTS
 
-class RepairmanTable extends React.Component{
-  constructor(props){
+class RepairmanTable extends React.Component {
+  constructor(props) {
     super(props)
     let dataSource = []
     this.state = {
@@ -20,7 +20,7 @@ class RepairmanTable extends React.Component{
     }
   }
   fetchData = () => {
-    let {schoolId} = this.props
+    let { schoolId } = this.props
     let resource = '/api/employee/department/member/list'
     const body = {
       page: 1,
@@ -30,34 +30,34 @@ class RepairmanTable extends React.Component{
     if (schoolId) {
       body.schoolId = schoolId
     }
-    const cb = (json) => {
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           this.setState({
             dataSource: json.data.employees
           })
-        }     
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  componentDidMount () {
+  componentDidMount() {
     // console.log('repairman mount')
-    let {schoolId, level} = this.props
+    let { schoolId, level } = this.props
     let nextState = {}
     if (schoolId) {
       nextState.schoolId = schoolId
-    } 
+    }
     if (level) {
       nextState.priority = level
     }
     this.setState(nextState)
     this.fetchData()
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     let schoolId = nextProps.schoolId
     if (schoolId && schoolId !== this.state.schoolId) {
       this.setState({
@@ -66,8 +66,9 @@ class RepairmanTable extends React.Component{
       this.fetchData()
     }
   }
-  changePriority = (e) => {
-    let node = e.target, v = ''
+  changePriority = e => {
+    let node = e.target,
+      v = ''
     let priority = this.state.priority
     try {
       while (node.tagName.toLowerCase() !== 'button') {
@@ -87,22 +88,25 @@ class RepairmanTable extends React.Component{
   cancel = () => {
     this.props.cancel()
   }
-  postData = (body) => {
-    let resource='/work/order/handle'
-    const cb = (json) => {
+  postData = body => {
+    let resource = '/work/order/handle'
+    const cb = json => {
       this.setState({
         posting: false
       })
-      if(json.error){
+      if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           this.props.confirm()
-        }       
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
+    AjaxHandler.ajax(resource, body, cb, null, {
+      clearPosting: true,
+      thisObj: this
+    })
   }
   confirm = () => {
     if (this.state.posting) {
@@ -122,12 +126,12 @@ class RepairmanTable extends React.Component{
     }
     this.postData(body)
   }
-  changeRemark = (e) => {
+  changeRemark = e => {
     this.setState({
       remark: e.target.value
     })
   }
-  checkRemark = (e) => {
+  checkRemark = e => {
     let v = e.target.value.trim()
     this.setState({
       remark: v
@@ -142,73 +146,106 @@ class RepairmanTable extends React.Component{
       selectedRowKeys: [selectedRows[0].id]
     })
   }
-  render(){
-    const {dataSource, priority, selectedRowKeys} = this.state
-    const columns = [{
-      title: '维修员',
-      dataIndex: 'name',
-      width: '15%'
-    }, {
-      title: '待接受的任务',
-      dataIndex: 'waiting',
-      width: '15%',
-      render: (text) => (text || 0)
-    }, {
-      title: '已接受的任务',
-      dataIndex: 'accepted',
-      width: '15%',
-      render: (text) => (text || 0)
-    }, {
-      title: '近7日完成任务',
-      dataIndex: 'weeklyDone',
-      width: '20%',
-      render: (text) => (text || 0)
-    }, {
-      title: '平均完成时间',
-      dataIndex: 'avgCost',
-      width: '20%',
-      render: (text,record,index) => {
-        return record.avgCost ? Time.formatSpan(record.avgCost) : 0
+  render() {
+    const { dataSource, priority, selectedRowKeys } = this.state
+    const columns = [
+      {
+        title: '维修员',
+        dataIndex: 'name',
+        width: '15%'
+      },
+      {
+        title: '待接受的任务',
+        dataIndex: 'waiting',
+        width: '15%',
+        render: text => text || 0
+      },
+      {
+        title: '已接受的任务',
+        dataIndex: 'accepted',
+        width: '15%',
+        render: text => text || 0
+      },
+      {
+        title: '近7日完成任务',
+        dataIndex: 'weeklyDone',
+        width: '20%',
+        render: text => text || 0
+      },
+      {
+        title: '平均完成时间',
+        dataIndex: 'avgCost',
+        width: '20%',
+        render: (text, record, index) => {
+          return record.avgCost ? Time.formatSpan(record.avgCost) : 0
+        }
+      },
+      {
+        title: '用户评分',
+        dataIndex: 'avgRating',
+        width: '15%',
+        render: text => text || '无'
       }
-    }, {
-      title: '用户评分',
-      dataIndex: 'avgRating',
-      width: '15%',
-      render: (text) => (text || '无')
-    }]
-    const title = (
-      <span className='modalTitle' >维修员</span>
-    )
+    ]
+    const title = <span className="modalTitle">维修员</span>
 
     return (
-      <Modal 
-        wrapClassName='modal' 
-        width={800} 
-        title={title} 
-        visible={this.props.showModal} 
-        onCancel={this.cancel} 
-        onOk={this.confirm} 
-        okText='确认'
+      <Modal
+        wrapClassName="modal"
+        width={800}
+        title={title}
+        visible={this.props.showModal}
+        onCancel={this.cancel}
+        onOk={this.confirm}
+        okText="确认"
       >
-        <div className='schName'>学校:{this.props.schoolName}</div>
-        <div className='setRepairman'>
-          <Table 
-            rowKey={record=>record.id}  
-            onRowClick={this.selectRow} 
-            rowSelection={{type:'radio', onChange:this.changeSelect, selectedRowKeys: selectedRowKeys}} 
-            pagination={{defaultPageSize:8}} 
-            dataSource={dataSource} 
-            columns={columns} 
+        <div className="schName">学校:{this.props.schoolName}</div>
+        <div className="setRepairman">
+          <Table
+            rowKey={record => record.id}
+            onRowClick={this.selectRow}
+            rowSelection={{
+              type: 'radio',
+              onChange: this.changeSelect,
+              selectedRowKeys: selectedRowKeys
+            }}
+            pagination={{ defaultPageSize: 8 }}
+            dataSource={dataSource}
+            columns={columns}
           />
-          <div className='options'>
-            <div className='priorityGroup'>
+          <div className="options">
+            <div className="priorityGroup">
               <span>任务紧急程度:</span>
-              <Button type={priority===1?'primary':''} onClick={this.changePriority} data-value='1' >正常处理</Button>
-              <Button type={priority===2?'primary':''}  onClick={this.changePriority} data-value='2' >优先处理</Button>
-              <Button type={priority===3?'primary':''}  onClick={this.changePriority} data-value='3' >紧急处理</Button>
+              <Button
+                type={priority === 1 ? 'primary' : ''}
+                onClick={this.changePriority}
+                data-value="1"
+              >
+                正常处理
+              </Button>
+              <Button
+                type={priority === 2 ? 'primary' : ''}
+                onClick={this.changePriority}
+                data-value="2"
+              >
+                优先处理
+              </Button>
+              <Button
+                type={priority === 3 ? 'primary' : ''}
+                onClick={this.changePriority}
+                data-value="3"
+              >
+                紧急处理
+              </Button>
             </div>
-            <div className='customNote'>
-              <textarea placeholder='备注信息(选填)' className='noteInput' value={this.state.remark} onChange={this.changeRemark} onBlur={this.checkRemark} />
+            <div className="customNote">
+              <textarea
+                placeholder="备注信息(选填)"
+                className="noteInput"
+                value={this.state.remark}
+                onChange={this.changeRemark}
+                onBlur={this.checkRemark}
+              />
             </div>
           </div>
         </div>

@@ -1,22 +1,22 @@
-import React from 'react';
+import React from 'react'
 
-import AjaxHandler from '../../ajax';
-import { Map, Marker } from 'react-amap';
-import Noti from '../../noti';
-import PicturesWall from '../../component/picturesWall';
+import AjaxHandler from '../../../util/ajax'
+import { Map, Marker } from 'react-amap'
+import Noti from '../../../util/noti'
+import PicturesWall from '../../component/picturesWall'
 
-import Cascader from 'antd/lib/cascader';
-import Button from 'antd/lib/button';
-import Radio from 'antd/lib/radio';
-import CONSTANTS from '../../component/constants';
+import Cascader from 'antd/lib/cascader'
+import Button from 'antd/lib/button'
+import Radio from 'antd/lib/radio'
+import CONSTANTS from '../../component/constants'
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { setSchoolList } from '../../../actions';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { setSchoolList } from '../../../actions'
 
-const FILEADDR = CONSTANTS.FILEADDR;
-const RadioGroup = Radio.Group;
+const FILEADDR = CONSTANTS.FILEADDR
+const RadioGroup = Radio.Group
 const options = [
   {
     value: '浙江',
@@ -140,28 +140,28 @@ const options = [
       }
     ]
   }
-];
+]
 
 class Loc extends React.Component {
   constructor() {
-    super();
-    const _this = this;
-    this.map = null;
-    this.marker = null;
-    this.geocoder = null;
+    super()
+    const _this = this
+    this.map = null
+    this.marker = null
+    this.geocoder = null
     this.mapEvents = {
       created(map) {
-        _this.map = map;
+        _this.map = map
         window.AMap.plugin('AMap.Geocoder', () => {
-          _this.geocoder = new window.AMap.Geocoder({});
-        });
+          _this.geocoder = new window.AMap.Geocoder({})
+        })
       }
-    };
-    this.markerEvents = {};
+    }
+    this.markerEvents = {}
     this.state = {
       position: { longitude: 120, latitude: 30 },
       zoom: 10
-    };
+    }
   }
   componentWillReceiveProps(nextProps) {
     if (this.props.searchAddr !== nextProps.searchAddr) {
@@ -171,16 +171,16 @@ class Loc extends React.Component {
             this.props.setLngLat({
               longitude: result.geocodes[0].location.lng,
               latitude: result.geocodes[0].location.lat
-            });
+            })
             this.setState({
               position: {
                 longitude: result.geocodes[0].location.lng,
                 latitude: result.geocodes[0].location.lat
               },
               zoom: 13
-            });
+            })
           }
-        });
+        })
     }
     if (
       this.props.lnglat.longitude !== nextProps.lnglat.longitude ||
@@ -188,7 +188,7 @@ class Loc extends React.Component {
     ) {
       this.setState({
         position: nextProps.lnglat
-      });
+      })
     }
   }
   render() {
@@ -203,16 +203,16 @@ class Loc extends React.Component {
           <Marker position={this.state.position} events={this.markerEvents} />
         </Map>
       </div>
-    );
+    )
   }
 }
 
 class SchoolInfoEdit extends React.Component {
   static propTypes = {
     schools: PropTypes.array.isRequired
-  };
+  }
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       name: '',
       nameError: false,
@@ -268,13 +268,13 @@ class SchoolInfoEdit extends React.Component {
       clientReloaded: false,
 
       initialAccount: false // when edit a school info, show the account info has not been changed
-    };
+    }
   }
   fetchData = body => {
-    let resource = '/api/school/one';
+    let resource = '/api/school/one'
     const cb = json => {
       if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage);
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         let {
           name,
@@ -285,7 +285,7 @@ class SchoolInfoEdit extends React.Component {
           logo,
           accountName,
           accountType
-        } = json.data;
+        } = json.data
         let nextState = {
           name: name,
           city: city.split('-'),
@@ -299,7 +299,7 @@ class SchoolInfoEdit extends React.Component {
           appPrivateKey: '********',
           appPublicKey: '********',
           alipayPublicKey: '********'
-        };
+        }
         if (logo) {
           nextState.fileList = [
             {
@@ -307,32 +307,32 @@ class SchoolInfoEdit extends React.Component {
               url: FILEADDR + logo,
               status: 'done'
             }
-          ];
+          ]
         }
-        nextState.accountEditing = false;
-        nextState.validateSuccess = true;
-        nextState.initialAccount = true;
-        this.setState(nextState);
+        nextState.accountEditing = false
+        nextState.validateSuccess = true
+        nextState.initialAccount = true
+        this.setState(nextState)
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   componentDidMount() {
-    this.props.hide(false);
+    this.props.hide(false)
     /*----------fetch after mount , avoid state chaos-------------------------------------------------------------*/
     /*----------if params.id exists, this is a edit ,else is a add----------*/
     if (this.props.match.params.id) {
       let body = {
         id: parseInt(this.props.match.params.id.slice(1), 10)
-      };
-      this.fetchData(body);
+      }
+      this.fetchData(body)
       this.setState({
         id: parseInt(this.props.match.params.id.slice(1), 10)
-      });
+      })
     }
   }
   componentWillUnmount() {
-    this.props.hide(true);
+    this.props.hide(true)
   }
   postInfo = () => {
     let {
@@ -349,15 +349,15 @@ class SchoolInfoEdit extends React.Component {
       appPrivateKey,
       appPublicKey,
       alipayPublicKey
-    } = this.state;
+    } = this.state
     if (posting) {
-      return;
+      return
     }
     this.setState({
       posting: true
-    });
+    })
 
-    let url = '/school/save';
+    let url = '/school/save'
     const body = {
       name: name,
       city: city.join('-'),
@@ -366,26 +366,26 @@ class SchoolInfoEdit extends React.Component {
       location: location,
       accountName: accountName,
       accountType: accountType
-    };
+    }
     if (appId !== '********') {
-      body.appId = appId;
-      body.pid = pid;
-      body.appPrivateKey = appPrivateKey;
-      body.appPublicKey = appPublicKey;
-      body.alipayPublicKey = alipayPublicKey;
+      body.appId = appId
+      body.pid = pid
+      body.appPrivateKey = appPrivateKey
+      body.appPublicKey = appPublicKey
+      body.alipayPublicKey = alipayPublicKey
     }
     if (this.state.fileList.length > 0 && this.state.fileList[0].url) {
-      body.logo = this.state.fileList[0].url.replace(FILEADDR, '');
+      body.logo = this.state.fileList[0].url.replace(FILEADDR, '')
     }
     if (id) {
-      body.id = parseInt(id, 10);
+      body.id = parseInt(id, 10)
     }
     const cb = json => {
       this.setState({
         posting: false
-      });
+      })
       if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage);
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         /* tell server to reload account */
         if (json.data) {
@@ -393,30 +393,30 @@ class SchoolInfoEdit extends React.Component {
           let school = {
             id: json.data.id,
             name: name
-          };
-          this.addSchoolToReducer(school);
+          }
+          this.addSchoolToReducer(school)
           if (appId !== '********') {
-            this.tellServerReload();
-            this.tellClientReload();
+            this.tellServerReload()
+            this.tellClientReload()
           } else {
-            this.hintSuccess();
+            this.hintSuccess()
           }
         } else {
-          Noti.hintServiceError();
+          Noti.hintServiceError()
         }
       }
-    };
+    }
     AjaxHandler.ajax(url, body, cb, null, {
       clearPosting: true,
       thisObj: this
-    });
-  };
+    })
+  }
 
   addSchoolToReducer = school => {
-    let { schools } = this.props;
-    schools.push(school);
-    this.props.setSchoolList({ schools });
-  };
+    let { schools } = this.props
+    schools.push(school)
+    this.props.setSchoolList({ schools })
+  }
 
   clearReloadStatus = () => {
     this.setState({
@@ -425,79 +425,79 @@ class SchoolInfoEdit extends React.Component {
       serverReloaded: false,
       clientResponsed: false,
       clientReloaded: false
-    });
-  };
+    })
+  }
 
   tellServerReload = () => {
-    let resource = '/alipay/trade/client/reload';
-    const body = null;
+    let resource = '/alipay/trade/client/reload'
+    const body = null
     const cb = json => {
       const nextState = {
         serverResponsed: true
-      };
-      let { clientResponsed, clientReloaded } = this.state;
+      }
+      let { clientResponsed, clientReloaded } = this.state
       if (json.data.result) {
-        nextState.serverReloaded = true;
+        nextState.serverReloaded = true
         if (clientResponsed) {
-          nextState.posting = false;
+          nextState.posting = false
           if (clientReloaded) {
-            this.hintSuccess();
+            this.hintSuccess()
           } else {
-            this.clearReloadStatus();
+            this.clearReloadStatus()
             Noti.hintServiceError(
               '学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～'
-            );
+            )
           }
         }
       } else {
         if (clientResponsed) {
-          this.clearReloadStatus();
+          this.clearReloadStatus()
           Noti.hintServiceError(
             '学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～'
-          );
+          )
         }
       }
-      this.setState(nextState);
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+      this.setState(nextState)
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
   tellClientReload = () => {
-    let resource = '/alipay/trade/client/reload';
-    const body = null;
+    let resource = '/alipay/trade/client/reload'
+    const body = null
     const cb = json => {
       const nextState = {
         clientResponsed: true
-      };
-      let { serverResponsed, serverReloaded } = this.state;
+      }
+      let { serverResponsed, serverReloaded } = this.state
       if (json.data.result) {
-        nextState.clientReloaded = true;
+        nextState.clientReloaded = true
         if (serverResponsed) {
           if (serverReloaded) {
-            this.hintSuccess();
+            this.hintSuccess()
           } else {
-            this.clearReloadStatus();
+            this.clearReloadStatus()
             Noti.hintServiceError(
               '学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～'
-            );
+            )
           }
         }
       } else {
         if (serverResponsed) {
-          this.clearReloadStatus();
+          this.clearReloadStatus()
           Noti.hintServiceError(
             '学校账号绑定未完成，请稍后点击确认重试或联系相关人员咨询～'
-          );
+          )
         }
       }
-      this.setState(nextState);
-    };
-    AjaxHandler.ajaxClient(resource, body, cb);
-  };
+      this.setState(nextState)
+    }
+    AjaxHandler.ajaxClient(resource, body, cb)
+  }
   hintSuccess = () => {
-    this.clearReloadStatus();
-    Noti.hintSuccess(this.props.history, '/school');
-  };
+    this.clearReloadStatus()
+    Noti.hintSuccess(this.props.history, '/school')
+  }
 
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
@@ -515,217 +515,217 @@ class SchoolInfoEdit extends React.Component {
         alipayPublicKey,
         validateSuccess
       } = this.state,
-      nextState = {};
+      nextState = {}
     if (!name) {
-      nextState.nameError = true;
-      nextState.nameErrorMessage = '学校名字不能为空';
-      return this.setState(nextState);
+      nextState.nameError = true
+      nextState.nameErrorMessage = '学校名字不能为空'
+      return this.setState(nextState)
     }
     if (!city) {
-      nextState.cityError = true;
-      return this.setState(nextState);
+      nextState.cityError = true
+      return this.setState(nextState)
     }
     if (!location) {
-      nextState.locationError = true;
-      return this.setState(nextState);
+      nextState.locationError = true
+      return this.setState(nextState)
     }
     if (!accountName) {
-      nextState.accountNameError = true;
-      nextState.accountNameErrorMsg = '学校账号不能为空';
-      return this.setState(nextState);
+      nextState.accountNameError = true
+      nextState.accountNameErrorMsg = '学校账号不能为空'
+      return this.setState(nextState)
     }
     if (!appId) {
-      nextState.appIdError = true;
-      nextState.appIdErrorMsg = 'app_id不能为空！';
-      return this.setState(nextState);
+      nextState.appIdError = true
+      nextState.appIdErrorMsg = 'app_id不能为空！'
+      return this.setState(nextState)
     }
     if (!pid) {
-      nextState.pidError = true;
-      nextState.pidErrorMsg = 'pid不能为空！';
-      return this.setState(nextState);
+      nextState.pidError = true
+      nextState.pidErrorMsg = 'pid不能为空！'
+      return this.setState(nextState)
     }
     if (!appPrivateKey) {
-      nextState.appPrivateKeyError = true;
-      nextState.appPrivateKeyErrorMsg = 'app_private_key不能为空！';
-      return this.setState(nextState);
+      nextState.appPrivateKeyError = true
+      nextState.appPrivateKeyErrorMsg = 'app_private_key不能为空！'
+      return this.setState(nextState)
     }
     if (!appPublicKey) {
-      nextState.appPublicKeyError = true;
-      nextState.appPublicKeyErrorMsg = 'app_public_key不能为空！';
-      return this.setState(nextState);
+      nextState.appPublicKeyError = true
+      nextState.appPublicKeyErrorMsg = 'app_public_key不能为空！'
+      return this.setState(nextState)
     }
     if (!alipayPublicKey) {
-      nextState.alipayPublicKeyError = true;
-      nextState.alipayPublicKeyErrorMsg = 'alipay_public_key不能为空！';
-      return this.setState(nextState);
+      nextState.alipayPublicKeyError = true
+      nextState.alipayPublicKeyErrorMsg = 'alipay_public_key不能为空！'
+      return this.setState(nextState)
     }
     /* 验证未通过，不予处理 */
     if (!validateSuccess) {
-      return Noti.hintWarning('', '请先验证收款账号再提交！');
+      return Noti.hintWarning('', '请先验证收款账号再提交！')
     }
 
     if (id && initialName === name) {
-      this.postInfo();
+      this.postInfo()
     } else {
-      this.checkExist(this.postInfo);
+      this.checkExist(this.postInfo)
     }
-  };
+  }
   changeName = e => {
     this.setState({
       name: e.target.value
-    });
-  };
+    })
+  }
   checkName = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       return this.setState({
         name: v,
         nameError: true,
         nameErrorMessage: '学校名称不能为空'
-      });
+      })
     }
-    let nextState = { name: v };
+    let nextState = { name: v }
     if (this.state.nameError) {
-      nextState.nameError = false;
-      nextState.nameErrorMessage = '';
+      nextState.nameError = false
+      nextState.nameErrorMessage = ''
     }
-    this.setState(nextState);
+    this.setState(nextState)
     if (this.state.id && this.state.initialName === e.target.value) {
-      return;
+      return
     } else {
-      this.checkExist(null);
+      this.checkExist(null)
     }
-  };
+  }
   checkExist = callback => {
-    let url = '/api/school/check';
+    let url = '/api/school/check'
     const body = {
       name: this.state.name
-    };
+    }
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         if (!json.data) {
-          Noti.hintOccupied();
+          Noti.hintOccupied()
           this.setState({
             nameError: true,
             nameErrorMessage: '学校名称已被占用'
-          });
+          })
         } else {
           if (this.state.nameError) {
             this.setState({
               nameError: false,
               nameErrorMessage: ''
-            });
+            })
           }
           if (callback) {
-            callback();
+            callback()
           }
         }
       }
-    };
-    AjaxHandler.ajax(url, body, cb);
-  };
+    }
+    AjaxHandler.ajax(url, body, cb)
+  }
   setLocation = e => {
     this.setState({
       location: e.target.value
-    });
-  };
+    })
+  }
   checkLocation = e => {
     let v = e.target.value.trim(),
-      location = this.state.location;
+      location = this.state.location
     if (v !== location) {
       this.setState({
         location: v
-      });
+      })
     }
-  };
+  }
   setLngLat = l => {
     this.setState({
       lnglat: l
-    });
-  };
+    })
+  }
   changeCity = v => {
     this.setState({
       city: v
-    });
-  };
+    })
+  }
   changeLoc = e => {
-    let addr = this.state.location;
+    let addr = this.state.location
     this.setState({
       searchAddr: addr
-    });
-  };
+    })
+  }
   enterSearch = e => {
-    let k = e.key.toLowerCase();
+    let k = e.key.toLowerCase()
     if (k.toLowerCase() === 'enter') {
-      this.changeLoc();
+      this.changeLoc()
     }
-  };
+  }
   handleBack = () => {
-    this.props.history.push('/school/list');
-  };
+    this.props.history.push('/school/list')
+  }
   add = () => {
-    const tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts));
-    tradeAccounts.push({});
+    const tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts))
+    tradeAccounts.push({})
     this.setState({
       tradeAccounts: tradeAccounts
-    });
-  };
+    })
+  }
   abstract = () => {
-    const tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts));
-    tradeAccounts.pop();
+    const tradeAccounts = JSON.parse(JSON.stringify(this.state.tradeAccounts))
+    tradeAccounts.pop()
     this.setState({
       tradeAccounts: tradeAccounts
-    });
-  };
+    })
+  }
   setImages = fileList => {
     this.setState({
       fileList: JSON.parse(JSON.stringify(fileList))
-    });
-  };
+    })
+  }
   changeAccount = e => {
     this.setState({
       accountName: e.target.value
-    });
+    })
     let state = {
       accountName: e.target.value
-    };
+    }
     if (this.checkAccountComplete(state)) {
       this.setState({
         accountComplete: true
-      });
+      })
     } else if (this.state.accountComplete) {
       this.setState({
         accountComplete: false
-      });
+      })
     }
     if (this.state.validateFailure) {
       this.setState({
         validateFailure: false
-      });
+      })
     }
-  };
+  }
   checkAccount = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         accountNameError: true,
         accountName: v,
         accountNameErrorMsg: '学校账号不能为空'
-      });
+      })
     }
 
-    let { accountNameError } = this.state;
+    let { accountNameError } = this.state
     const nextState = {
       accountName: v,
       accountNameErrorMsg: ''
-    };
-    if (accountNameError) {
-      nextState.accountNameError = false;
     }
-    this.setState(nextState);
-  };
+    if (accountNameError) {
+      nextState.accountNameError = false
+    }
+    this.setState(nextState)
+  }
   checkAccountComplete = state => {
     let {
       accountName,
@@ -734,7 +734,7 @@ class SchoolInfoEdit extends React.Component {
       appPrivateKey,
       appPublicKey,
       alipayPublicKey
-    } = { ...this.state, ...state };
+    } = { ...this.state, ...state }
     if (
       accountName &&
       pid &&
@@ -743,216 +743,216 @@ class SchoolInfoEdit extends React.Component {
       appPublicKey &&
       alipayPublicKey
     ) {
-      return true;
+      return true
     } else {
-      return false;
+      return false
     }
-  };
+  }
   changeAppId = e => {
     this.setState({
       appId: e.target.value
-    });
+    })
     let state = {
       appId: e.target.value
-    };
+    }
     if (this.checkAccountComplete(state)) {
       this.setState({
         accountComplete: true
-      });
+      })
     } else if (this.state.accountComplete) {
       this.setState({
         accountComplete: false
-      });
+      })
     }
     if (this.state.validateFailure) {
       this.setState({
         validateFailure: false
-      });
+      })
     }
-  };
+  }
   checkAppId = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         appIdError: true,
         appId: v,
         appIdErrorMsg: 'appId不能为空'
-      });
+      })
     }
-    let { appIdError } = this.state;
+    let { appIdError } = this.state
     const nextState = {
       appId: v,
       appIdErrorMsg: ''
-    };
-    if (appIdError) {
-      nextState.appIdError = false;
     }
-    this.setState(nextState);
-  };
+    if (appIdError) {
+      nextState.appIdError = false
+    }
+    this.setState(nextState)
+  }
   changePid = e => {
     this.setState({
       pid: e.target.value
-    });
+    })
     let state = {
       pid: e.target.value
-    };
+    }
     if (this.checkAccountComplete(state)) {
       this.setState({
         accountComplete: true
-      });
+      })
     } else if (this.state.accountComplete) {
       this.setState({
         accountComplete: false
-      });
+      })
     }
     if (this.state.validateFailure) {
       this.setState({
         validateFailure: false
-      });
+      })
     }
-  };
+  }
   checkPid = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         pidError: true,
         pid: v,
         pidErrorMsg: 'pid不能为空'
-      });
+      })
     }
-    let { pidError } = this.state;
+    let { pidError } = this.state
     const nextState = {
       pid: v,
       pidErrorMsg: ''
-    };
-    if (pidError) {
-      nextState.pidError = false;
     }
-    this.setState(nextState);
-  };
+    if (pidError) {
+      nextState.pidError = false
+    }
+    this.setState(nextState)
+  }
   changePrivateKey = e => {
     this.setState({
       appPrivateKey: e.target.value
-    });
+    })
     let state = {
       appPrivateKey: e.target.value
-    };
+    }
     if (this.checkAccountComplete(state)) {
       this.setState({
         accountComplete: true
-      });
+      })
     } else if (this.state.accountComplete) {
       this.setState({
         accountComplete: false
-      });
+      })
     }
     if (this.state.validateFailure) {
       this.setState({
         validateFailure: false
-      });
+      })
     }
-  };
+  }
   checkPrivateKey = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         appPrivateKeyError: true,
         appPrivateKey: v,
         appPrivateKeyErrorMsg: 'app_private_key不能为空'
-      });
+      })
     }
-    let { appPrivateKeyError } = this.state;
+    let { appPrivateKeyError } = this.state
     const nextState = {
       appPrivateKey: v,
       appPrivateKeyErrorMsg: ''
-    };
-    if (appPrivateKeyError) {
-      nextState.appPrivateKeyError = false;
     }
-    this.setState(nextState);
-  };
+    if (appPrivateKeyError) {
+      nextState.appPrivateKeyError = false
+    }
+    this.setState(nextState)
+  }
   changePublicKey = e => {
     this.setState({
       appPublicKey: e.target.value
-    });
+    })
     let state = {
       appPublicKey: e.target.value
-    };
+    }
     if (this.checkAccountComplete(state)) {
       this.setState({
         accountComplete: true
-      });
+      })
     } else if (this.state.accountComplete) {
       this.setState({
         accountComplete: false
-      });
+      })
     }
     if (this.state.validateFailure) {
       this.setState({
         validateFailure: false
-      });
+      })
     }
-  };
+  }
   checkPublicKey = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         appPublicKeyError: true,
         appPublicKey: v,
         appPublicKeyErrorMsg: 'app_public_key不能为空'
-      });
+      })
     }
-    let { appPublicKeyError } = this.state;
+    let { appPublicKeyError } = this.state
     const nextState = {
       appPublicKey: v,
       appPublicKeyErrorMsg: ''
-    };
-    if (appPublicKeyError) {
-      nextState.appPublicKeyError = false;
     }
-    this.setState(nextState);
-  };
+    if (appPublicKeyError) {
+      nextState.appPublicKeyError = false
+    }
+    this.setState(nextState)
+  }
   changeAlipayPublicKey = e => {
     this.setState({
       alipayPublicKey: e.target.value
-    });
+    })
     let state = {
       alipayPublicKey: e.target.value
-    };
+    }
     if (this.checkAccountComplete(state)) {
       this.setState({
         accountComplete: true
-      });
+      })
     } else if (this.state.accountComplete) {
       this.setState({
         accountComplete: false
-      });
+      })
     }
     if (this.state.validateFailure) {
       this.setState({
         validateFailure: false
-      });
+      })
     }
-  };
+  }
   checkAlipayPublicKey = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         alipayPublicKeyError: true,
         alipayPublicKey: v,
         alipayPublicKeyMsg: 'alipay_public_key不能为空'
-      });
+      })
     }
-    let { alipayPublicKeyError } = this.state;
+    let { alipayPublicKeyError } = this.state
     const nextState = {
       alipayPublicKey: v,
       alipayPublicKeyErrorMsg: ''
-    };
-    if (alipayPublicKeyError) {
-      nextState.alipayPublicKeyError = false;
     }
-    this.setState(nextState);
-  };
+    if (alipayPublicKeyError) {
+      nextState.alipayPublicKeyError = false
+    }
+    this.setState(nextState)
+  }
 
   validateAccount = () => {
     let {
@@ -964,43 +964,43 @@ class SchoolInfoEdit extends React.Component {
       appPublicKey,
       alipayPublicKey,
       checking
-    } = this.state;
+    } = this.state
     if (!accountComplete || !accountEditing || checking) {
-      return;
+      return
     }
     this.setState({
       checking: true
-    });
+    })
 
-    let resource = '/alipay/trade/verification';
+    let resource = '/alipay/trade/verification'
     const body = {
       appId: appId,
       pid: pid,
       appPrivateKey: appPrivateKey,
       appPublicKey: appPublicKey,
       alipayPublicKey: alipayPublicKey
-    };
+    }
     const cb = json => {
       const nextState = {
         checking: false
-      };
+      }
       if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage);
+        Noti.hintServiceError(json.error.displayMessage)
       } else if (json.data) {
         if (json.data.result) {
-          nextState.validateSuccess = true;
-          nextState.accountEditing = false;
+          nextState.validateSuccess = true
+          nextState.accountEditing = false
         } else {
-          nextState.validateFailure = true;
+          nextState.validateFailure = true
         }
       }
-      this.setState(nextState);
-    };
+      this.setState(nextState)
+    }
     AjaxHandler.ajax(resource, body, cb, null, {
       clearChecking: true,
       thisObj: this
-    });
-  };
+    })
+  }
   editAccount = () => {
     /* 置位validateSuccess, validateFailure, accountComplete, accountEditing, 以及账户相关信息 */
     const nextState = {
@@ -1014,12 +1014,12 @@ class SchoolInfoEdit extends React.Component {
       appPrivateKey: '',
       appPublicKey: '',
       alipayPublicKey: ''
-    };
-    if (this.state.initialAccount) {
-      nextState.initialAccount = false;
     }
-    this.setState(nextState);
-  };
+    if (this.state.initialAccount) {
+      nextState.initialAccount = false
+    }
+    this.setState(nextState)
+  }
   render() {
     const {
       id,
@@ -1057,7 +1057,7 @@ class SchoolInfoEdit extends React.Component {
       validateSuccess,
       validateFailure,
       initialAccount
-    } = this.state;
+    } = this.state
 
     return (
       <div className="infoList schoolInfoEdit">
@@ -1261,7 +1261,7 @@ class SchoolInfoEdit extends React.Component {
           <Button onClick={this.handleBack}>返回</Button>
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -1270,11 +1270,11 @@ class SchoolInfoEdit extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     schools: state.setSchoolList.schools
-  };
-};
+  }
+}
 
 export default withRouter(
   connect(mapStateToProps, {
     setSchoolList
   })(SchoolInfoEdit)
-);
+)

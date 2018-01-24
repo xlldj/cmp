@@ -1,7 +1,7 @@
 import React from 'react'
 import notification from 'antd/lib/notification'
 import Button from 'antd/lib/button'
-import CONSTANTS from './component/constants'
+import CONSTANTS from '../pages/component/constants'
 
 const Noti = {}
 
@@ -34,7 +34,7 @@ Noti.hintWarning = (message, description) => {
   })
 }
 /* 通用网络错误 */
-Noti.hintNetworkError = (description) => {
+Noti.hintNetworkError = description => {
   notification['error']({
     message: '网络出错',
     description: description || CONSTANTS.NETWORKERRORMESSAGE,
@@ -42,7 +42,7 @@ Noti.hintNetworkError = (description) => {
   })
 }
 /* 提示业务错误，非网络错误 */
-Noti.hintServiceError = (description) => {
+Noti.hintServiceError = description => {
   notification['error']({
     message: '请求出错',
     description: description || CONSTANTS.ERRORALTMESSAGE,
@@ -52,15 +52,15 @@ Noti.hintServiceError = (description) => {
 Noti.hintSuccess = (history, route) => {
   const key = `open${Date.now()}`
   const btnClick = () => {
-      // to hide notification box
+    // to hide notification box
     history.push(route)
     notification.close(key)
   }
   const btn = (
-    <Button type='primary' size='small' onClick={btnClick}>
-        返回
-      </Button>
-    )
+    <Button type="primary" size="small" onClick={btnClick}>
+      返回
+    </Button>
+  )
   const close = () => {
     history.push(route)
   }
@@ -73,18 +73,18 @@ Noti.hintSuccess = (history, route) => {
     duration: 1
   })
 }
-Noti.hintSuccessAndBack = (history) => {
+Noti.hintSuccessAndBack = history => {
   const key = `open${Date.now()}`
   const btnClick = () => {
-      // to hide notification box
+    // to hide notification box
     history.goBack()
     notification.close(key)
   }
   const btn = (
-    <Button type='primary' size='small' onClick={btnClick}>
-        返回
-      </Button>
-    )
+    <Button type="primary" size="small" onClick={btnClick}>
+      返回
+    </Button>
+  )
   const close = () => {
     history.goBack()
   }
@@ -128,7 +128,7 @@ Noti.hintAndClick = (message, description, cb) => {
     notification.close(key)
   }
   const btn = (
-    <Button type='primary' size='small' onClick={btnClick}>
+    <Button type="primary" size="small" onClick={btnClick}>
       确认
     </Button>
   )
@@ -157,7 +157,7 @@ Noti.clickForYesOrNo = (message, description, confirmCb, cancelCb) => {
     notification.close(key)
   }
   const btn = (
-    <Button type='primary' size='small' onClick={yesClick}>
+    <Button type="primary" size="small" onClick={yesClick}>
       确认
     </Button>
   )
@@ -178,13 +178,13 @@ Noti.clickForYesOrNo = (message, description, confirmCb, cancelCb) => {
 Noti.hintAndRoute = (message, description, history, route) => {
   const key = `open${Date.now()}`
   const btnClick = () => {
-      // to hide notification box
+    // to hide notification box
     history.push(route)
     notification.close(key)
   }
   const btn = (
-    <Button type='primary' size='small' onClick={btnClick}>
-        确认
+    <Button type="primary" size="small" onClick={btnClick}>
+      确认
     </Button>
   )
   const close = () => {

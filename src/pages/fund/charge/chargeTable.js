@@ -1,9 +1,9 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import Table from 'antd/lib/table'
 
-import AjaxHandler from '../../ajax'
+import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 
@@ -23,7 +23,7 @@ class ChargeTable extends React.Component {
     schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
     const dataSource = []
     this.state = {
@@ -31,71 +31,75 @@ class ChargeTable extends React.Component {
       loading: false,
       total: 0
     }
-    this.columns = [{
-      title: '学校',
-      dataIndex: 'schoolName',
-      width: '20%',
-      className: 'firstCol'
-    }, {
-      title: '充值面额(元)',
-      dataIndex: 'items',
-      width: '50%',
-      className: 'amountItem',
-      render: (text, record, index) => {
-        let lis = record.items.map((r, i) => (
-          <span key={`chargeItem${i}`}>{r}</span>
-        ))
-        return (
-          <p>
-            {lis}
-          </p>
+    this.columns = [
+      {
+        title: '学校',
+        dataIndex: 'schoolName',
+        width: '20%',
+        className: 'firstCol'
+      },
+      {
+        title: '充值面额(元)',
+        dataIndex: 'items',
+        width: '50%',
+        className: 'amountItem',
+        render: (text, record, index) => {
+          let lis = record.items.map((r, i) => (
+            <span key={`chargeItem${i}`}>{r}</span>
+          ))
+          return <p>{lis}</p>
+        }
+      },
+      {
+        title: '操作',
+        dataIndex: 'operation',
+        className: 'lastCol',
+        render: (text, record, index) => (
+          <div key={`operation${index}`} className="editable-row-operations">
+            <Link
+              to={{ pathname: `/fund/charge/editCharge/:${record.schoolId}` }}
+            >
+              编辑
+            </Link>
+          </div>
         )
       }
-    }, {
-      title: '操作',
-      dataIndex: 'operation',
-      className: 'lastCol',
-      render: (text, record, index) => (
-        <div key={`operation${index}`} className='editable-row-operations'>
-          <Link to={{pathname: `/fund/charge/editCharge/:${record.schoolId}`}}>编辑</Link>
-        </div>
-      )
-    }]
+    ]
   }
-  fetchData = (body) => {
+  fetchData = body => {
     this.setState({
       loading: true
     })
-    let resource='/recharge/denomination/list'
-    const cb = (json) => {
-      let nextState = {loading: false}
-      if(json.error){
+    let resource = '/recharge/denomination/list'
+    const cb = json => {
+      let nextState = { loading: false }
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          const data = json.data.rechargeDenominations.map((s,i) => {
+        if (json.data) {
+          const data = json.data.rechargeDenominations.map((s, i) => {
             s.key = s.id
             return s
           })
           nextState.dataSource = data
           nextState.total = json.data.total
-        }else{
+        } else {
           this.setState(nextState)
-        }        
+        }
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb, this.errorHandler)
+    AjaxHandler.ajax(resource, body, cb, this.errorHandler)
   }
   errorHandler = () => {
     this.setState({
       loading: false
     })
   }
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    let {page, schoolId} = this.props
+    let { page, schoolId } = this.props
     const body = {
       page: page,
       size: SIZE
@@ -105,14 +109,14 @@ class ChargeTable extends React.Component {
     }
     this.fetchData(body)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
       return
     }
-    let {page, schoolId} = nextProps
+    let { page, schoolId } = nextProps
     const body = {
       page: page,
       size: SIZE
@@ -122,38 +126,45 @@ class ChargeTable extends React.Component {
     }
     this.fetchData(body)
   }
-  changeSchool = (value) => {
-    let {schoolId} = this.props
+  changeSchool = value => {
+    let { schoolId } = this.props
     if (schoolId === value) {
       return
     }
-    this.props.changeFund(subModule, {page: 1, schoolId: value})
+    this.props.changeFund(subModule, { page: 1, schoolId: value })
   }
-  changePage = (pageObj) => {
+  changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeFund(subModule, {page: page})
+    this.props.changeFund(subModule, { page: page })
   }
-  render () {
-    let {total, loading, dataSource} = this.state 
-    let {page, schoolId} = this.props
+  render() {
+    let { total, loading, dataSource } = this.state
+    let { page, schoolId } = this.props
     return (
-      <div className='contentArea'>
-        <SearchLine 
-          addTitle='添加充值面额' 
-          addLink='/fund/charge/addCharge'
-          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />}  
+      <div className="contentArea">
+        <SearchLine
+          addTitle="添加充值面额"
+          addLink="/fund/charge/addCharge"
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
         />
 
-        <div className='tableList'>
-          <Table bordered 
-            loading={loading} rowKey={(record)=>(record.id)} 
-            pagination={{pageSize: SIZE, current: page, total: total}}
+        <div className="tableList">
+          <Table
+            bordered
+            loading={loading}
+            rowKey={record => record.id}
+            pagination={{ pageSize: SIZE, current: page, total: total }}
             dataSource={dataSource}
             columns={this.columns}
             onChange={this.changePage}
           />
         </div>
-        </div>
+      </div>
     )
   }
 }
@@ -163,6 +174,8 @@ const mapStateToProps = (state, ownProps) => ({
   page: state.changeFund[subModule].page
 })
 
-export default withRouter(connect(mapStateToProps, {
-  changeFund
-})(ChargeTable))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeFund
+  })(ChargeTable)
+)

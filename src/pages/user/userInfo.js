@@ -1,9 +1,9 @@
 import React from 'react'
-import {Button, Modal, Popconfirm} from 'antd'
+import { Button, Modal, Popconfirm } from 'antd'
 import Time from '../component/time'
-import Noti from '../noti'
+import Noti from '../../util/noti'
 import CONSTANTS from '../component/constants'
-import AjaxHandler from '../ajax'
+import AjaxHandler from '../../util/ajax'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -11,8 +11,8 @@ import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
 
 const SEX = {
-  1:'男',
-  2:'女'
+  1: '男',
+  2: '女'
 }
 const backTitle = {
   fromOrder: '返回订单详情',
@@ -26,7 +26,7 @@ class UserInfo extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       data: {},
@@ -38,7 +38,7 @@ class UserInfo extends React.Component {
       reseting: false
     }
   }
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
     this.fetchData()
   }
@@ -48,18 +48,18 @@ class UserInfo extends React.Component {
     const body = {
       id: id
     }
-    const cb=(json)=>{
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error)
-      }else{
+      } else {
         this.setState({
           data: json.data
         })
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   back = () => {
@@ -70,7 +70,7 @@ class UserInfo extends React.Component {
       visible: true
     })
   }
-  changeAddingName = (e) => {
+  changeAddingName = e => {
     this.setState({
       addingName: e.target.value
     })
@@ -102,13 +102,14 @@ class UserInfo extends React.Component {
     this.setState({
       messagePosting: true
     })
-    let resource = '/api/notify/add', mobile = this.state.data.mobile
+    let resource = '/api/../util/notify/add',
+      mobile = this.state.data.mobile
     const body = {
       content: this.state.addingName,
       type: 3,
       mobiles: [mobile]
     }
-    const cb = (json) => {
+    const cb = json => {
       const nextState = {
         messagePosting: false
       }
@@ -137,7 +138,7 @@ class UserInfo extends React.Component {
     const body = {
       id: this.state.data.id
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         reseting: false
       })
@@ -160,7 +161,7 @@ class UserInfo extends React.Component {
     const body = {
       userId: this.state.data.id
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         cancelDefriending: false
       })
@@ -169,7 +170,10 @@ class UserInfo extends React.Component {
           Noti.hintOk('操作成功', '该用户已被取消拉黑！')
           this.fetchData()
         } else {
-          Noti.hintLock('操作失败', json.data.failReason || '操作失败，请联系客服或相关人员')
+          Noti.hintLock(
+            '操作失败',
+            json.data.failReason || '操作失败，请联系客服或相关人员'
+          )
         }
       } else {
         Noti.hintServiceError(json.error ? json.error.displayMessage : '')
@@ -178,74 +182,137 @@ class UserInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   toOrderOfUser = () => {
-    this.props.changeOrder('orderList', 
-      {
-        page: 1, schoolId: 'all', deviceType: 'all', status: 'all', 
-        selectKey: '', startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
-      }
-    )
+    this.props.changeOrder('orderList', {
+      page: 1,
+      schoolId: 'all',
+      deviceType: 'all',
+      status: 'all',
+      selectKey: '',
+      startTime: Time.get7DaysAgoStart(),
+      endTime: Time.getTodayEnd()
+    })
     let id = this.state.data.id
-    this.props.history.push({pathname: '/order/list', state: {path: 'fromUser', id: id}})
+    this.props.history.push({
+      pathname: '/order/list',
+      state: { path: 'fromUser', id: id }
+    })
   }
   toFundOfUser = () => {
-    let {mobile} = this.state.data
-    this.props.changeFund('fundList', 
-      {
-        page: 1, selectKey: mobile.toString(), type: 'all', status: 'all', schoolId: 'all',
-        startTime: Time.get7DaysAgoStart(), endTime: Time.getTodayEnd()
-      }
-    )
-    this.props.history.push({pathname:'/fund/list',state:{path: 'fromUser', mobile: mobile}})
+    let { mobile } = this.state.data
+    this.props.changeFund('fundList', {
+      page: 1,
+      selectKey: mobile.toString(),
+      type: 'all',
+      status: 'all',
+      schoolId: 'all',
+      startTime: Time.get7DaysAgoStart(),
+      endTime: Time.getTodayEnd()
+    })
+    this.props.history.push({
+      pathname: '/fund/list',
+      state: { path: 'fromUser', mobile: mobile }
+    })
   }
-  render () {
-    let {data, cancelDefriending, reseting} = this.state
-    const {forbiddenStatus} = this.props
+  render() {
+    let { data, cancelDefriending, reseting } = this.state
+    const { forbiddenStatus } = this.props
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
     return (
-      <div className='infoList'>
+      <div className="infoList">
         <ul>
-          <li className='imgWrapper'>
+          <li className="imgWrapper">
             <p>用户头像:</p>
-            {data.pictureUrl ? <img className='userThumb' src={CONSTANTS.FILEADDR + data.pictureUrl} alt='用户头像' /> : null}
+            {data.pictureUrl ? (
+              <img
+                className="userThumb"
+                src={CONSTANTS.FILEADDR + data.pictureUrl}
+                alt="用户头像"
+              />
+            ) : null}
           </li>
-          <li><p>用户昵称:</p>{data.nickName}</li>
-          <li><p>用户性别:</p>{SEX[data.sex]}</li>
-          <li><p>手机号:</p>{data.mobile}</li>
-          <li><p>手机型号:</p>{data.mobileModel || '未知'}</li>
-          <li><p>学校:</p>{data.schoolName}</li>
-          <li><p>宿舍楼栋:</p>{data.buildingName}</li>
-          <li><p>宿舍楼层:</p>{data.floorName}</li>
-          <li><p>宿舍号:</p>{data.roomName}</li>
-          <li><p>账户余额:</p>{data.balance ? '¥' + data.balance : '暂无'}</li>
-          <li><p>注册时间:</p>{time}</li>
-          <li><p>用户订单记录:</p><a onClick={this.toOrderOfUser} >查看详情</a></li>
-          <li><p>充值提现记录:</p><a onClick={this.toFundOfUser}>查看详情</a></li>
-          {forbiddenStatus.RESET_USER_PWD ? null : 
+          <li>
+            <p>用户昵称:</p>
+            {data.nickName}
+          </li>
+          <li>
+            <p>用户性别:</p>
+            {SEX[data.sex]}
+          </li>
+          <li>
+            <p>手机号:</p>
+            {data.mobile}
+          </li>
+          <li>
+            <p>手机型号:</p>
+            {data.mobileModel || '未知'}
+          </li>
+          <li>
+            <p>学校:</p>
+            {data.schoolName}
+          </li>
+          <li>
+            <p>宿舍楼栋:</p>
+            {data.buildingName}
+          </li>
+          <li>
+            <p>宿舍楼层:</p>
+            {data.floorName}
+          </li>
+          <li>
+            <p>宿舍号:</p>
+            {data.roomName}
+          </li>
+          <li>
+            <p>账户余额:</p>
+            {data.balance ? '¥' + data.balance : '暂无'}
+          </li>
+          <li>
+            <p>注册时间:</p>
+            {time}
+          </li>
+          <li>
+            <p>用户订单记录:</p>
+            <a onClick={this.toOrderOfUser}>查看详情</a>
+          </li>
+          <li>
+            <p>充值提现记录:</p>
+            <a onClick={this.toFundOfUser}>查看详情</a>
+          </li>
+          {forbiddenStatus.RESET_USER_PWD ? null : (
             <li>
               <p>重置密码:</p>
-              { reseting ?
-                <a href=''>重置</a>
-                :
-                <Popconfirm title="确定要重置么?" onConfirm={this.resetPwd} okText="确认" cancelText="取消">
+              {reseting ? (
+                <a href="">重置</a>
+              ) : (
+                <Popconfirm
+                  title="确定要重置么?"
+                  onConfirm={this.resetPwd}
+                  okText="确认"
+                  cancelText="取消"
+                >
                   <a href="">重置</a>
                 </Popconfirm>
-              }
-            </li> 
-          }
-          {data.blacklistInfo ?
+              )}
+            </li>
+          )}
+          {data.blacklistInfo ? (
             <li>
-              <p></p>
-              <span style={{marginRight: '20px'}}>{data.blacklistInfo}</span>
-              { cancelDefriending ?
-                <a href=''>取消拉黑</a>
-                : 
-                <Popconfirm title="确定要取消拉黑么?" onConfirm={this.cancelDefriend} okText="确认" cancelText="取消">
+              <p />
+              <span style={{ marginRight: '20px' }}>{data.blacklistInfo}</span>
+              {cancelDefriending ? (
+                <a href="">取消拉黑</a>
+              ) : (
+                <Popconfirm
+                  title="确定要取消拉黑么?"
+                  onConfirm={this.cancelDefriend}
+                  okText="确认"
+                  cancelText="取消"
+                >
                   <a href="">取消拉黑</a>
                 </Popconfirm>
-              }
+              )}
             </li>
-            : null
-          }
+          ) : null}
         </ul>
 
         <div>
@@ -255,16 +322,29 @@ class UserInfo extends React.Component {
             onOk={this.postMessage}
             onCancel={this.cancelPost}
             maskClosable={false}
-            className='addSupplierModal'
+            className="addSupplierModal"
           >
-            <textarea style={{width:'100%',height:'100px'}} value={this.state.addingName} onBlur={this.checkAddingName} onChange={this.changeAddingName} />
-            { this.state.empty ? <p className='checkInvalid'>消息不能为空！</p> : null }
+            <textarea
+              style={{ width: '100%', height: '100px' }}
+              value={this.state.addingName}
+              onBlur={this.checkAddingName}
+              onChange={this.changeAddingName}
+            />
+            {this.state.empty ? (
+              <p className="checkInvalid">消息不能为空！</p>
+            ) : null}
           </Modal>
         </div>
 
-        <div className='btnArea'>
-          <Button type='primary' onClick={this.openMessage}>发送客服消息</Button>
-          <Button onClick={this.back}>{this.props.location.state?(backTitle[this.props.location.state.path]):'返回'}</Button>
+        <div className="btnArea">
+          <Button type="primary" onClick={this.openMessage}>
+            发送客服消息
+          </Button>
+          <Button onClick={this.back}>
+            {this.props.location.state
+              ? backTitle[this.props.location.state.path]
+              : '返回'}
+          </Button>
         </div>
       </div>
     )
@@ -274,6 +354,9 @@ const mapStateToProps = (state, ownProps) => ({
   forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
-export default withRouter(connect(mapStateToProps, {
-  changeOrder, changeFund
-})(UserInfo))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeOrder,
+    changeFund
+  })(UserInfo)
+)

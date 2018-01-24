@@ -1,64 +1,65 @@
 import React from 'react'
 
-import {Button} from 'antd'
+import { Button } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
 class ChargeInfo extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.state = { 
+    this.state = {
       id: 0,
       schoolId: 0,
       originalSchool: 0,
       schoolError: false,
-      items: [{value: ''}],
+      items: [{ value: '' }],
       itemsError: false,
       checking: false,
       posting: false
     }
   }
-  fetchData =(body)=>{
+  fetchData = body => {
     let resource = '/recharge/denomination/one'
-    const cb=(json)=>{
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
-        if(json.data){
-          let {id, items, schoolId} = json.data
-          let nextState={
+      } else {
+        if (json.data) {
+          let { id, items, schoolId } = json.data
+          let nextState = {
             id: id,
             schoolId: schoolId,
             originalSchool: schoolId
           }
-          let result = items.map((r) => ({value: r}))
+          let result = items.map(r => ({ value: r }))
           nextState.items = result
           this.setState(nextState)
-        }      
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    if(this.props.match.params.id){
-      const body={
-        id:parseInt(this.props.match.params.id.slice(1), 10)
+    if (this.props.match.params.id) {
+      const body = {
+        id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   postInfo = () => {
-    let {id, schoolId, items, posting} = this.state, resource
+    let { id, schoolId, items, posting } = this.state,
+      resource
     if (posting) {
       return
     }
@@ -75,31 +76,31 @@ class ChargeInfo extends React.Component {
     } else {
       resource = '/recharge/denomination/add'
     }
-    body.items = items.map((r) => (parseInt(r.value, 10)))
-    const cb = (json) => {
+    body.items = items.map(r => parseInt(r.value, 10))
+    const cb = json => {
       this.setState({
         posting: false
       })
-      if(json.error){
+      if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          Noti.hintSuccess(this.props.history,'/fund/charge')
-        }       
+        if (json.data) {
+          Noti.hintSuccess(this.props.history, '/fund/charge')
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
   confirm = () => {
-    let {id, schoolId, originalSchool, checking, posting} = this.state
+    let { id, schoolId, originalSchool, checking, posting } = this.state
     const items = JSON.parse(JSON.stringify(this.state.items))
     if (!schoolId) {
       return this.setState({
         schoolError: true
       })
     }
-    for (let i = 0; i < items.length ; i++) {
+    for (let i = 0; i < items.length; i++) {
       let r = items[i]
       if (!r.hasOwnProperty('value') || !r.value) {
         r.error = true
@@ -108,7 +109,10 @@ class ChargeInfo extends React.Component {
           items: items
         })
       }
-      let same = items.some((rec, ind) => (parseInt(rec.value, 10) === parseInt(r.value, 10) && ind !== i))
+      let same = items.some(
+        (rec, ind) =>
+          parseInt(rec.value, 10) === parseInt(r.value, 10) && ind !== i
+      )
       if (same) {
         r.error = true
         r.errorMsg = '面额重复，请勿重复添加'
@@ -129,7 +133,7 @@ class ChargeInfo extends React.Component {
   back = () => {
     this.props.history.goBack()
   }
-  checkExist = (callback) => {
+  checkExist = callback => {
     if (this.state.checking) {
       return
     }
@@ -141,7 +145,7 @@ class ChargeInfo extends React.Component {
     const body = {
       schoolId: schoolId
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         checking: false
       })
@@ -178,7 +182,7 @@ class ChargeInfo extends React.Component {
         items: items
       })
     }
-    let same = items.some((r, i) => (i !== index && parseInt(r.value, 10) === v))
+    let same = items.some((r, i) => i !== index && parseInt(r.value, 10) === v)
     if (same) {
       items[index].error = true
       items[index].errorMsg = '当前面额已被添加，请勿重复添加～'
@@ -200,23 +204,23 @@ class ChargeInfo extends React.Component {
   }
   addItem = () => {
     const items = JSON.parse(JSON.stringify(this.state.items))
-    items.push({value: ''})
+    items.push({ value: '' })
     this.setState({
       items: items
     })
   }
-  changeSchool = (v) => {
+  changeSchool = v => {
     this.setState({
       schoolId: parseInt(v, 10)
     })
   }
-  checkSchool = (v) => {
+  checkSchool = v => {
     if (!v) {
       return this.setState({
         schoolError: true
       })
     }
-    let {schoolError, id, originalSchool, schoolId} = this.state
+    let { schoolError, id, originalSchool, schoolId } = this.state
     if (schoolError) {
       this.setState({
         schoolError: false
@@ -227,21 +231,38 @@ class ChargeInfo extends React.Component {
     }
   }
 
-  render () {
-    let {id, items, schoolId, schoolError} = this.state
+  render() {
+    let { id, items, schoolId, schoolError } = this.state
     let l = items.length
-    const itemsGroup = items && items.map((record,index)=>{
-      return (
-        <div key={`div${index}`}>
-          <span>面额</span>
-          <input type='number' key={`amount${index}`} className='shortInput' onChange={(e)=>{this.changeAmount(e,index)}} onBlur={(e)=>{this.checkAmount(e,index)}} value={record.value} />
-          <span>元</span>
-          {record.error?<span className='checkInvalid'>{record.errorMsg ? record.errorMsg : '金额不能为空！'}</span>:null}
-        </div>
-      )
-    })
+    const itemsGroup =
+      items &&
+      items.map((record, index) => {
+        return (
+          <div key={`div${index}`}>
+            <span>面额</span>
+            <input
+              type="number"
+              key={`amount${index}`}
+              className="shortInput"
+              onChange={e => {
+                this.changeAmount(e, index)
+              }}
+              onBlur={e => {
+                this.checkAmount(e, index)
+              }}
+              value={record.value}
+            />
+            <span>元</span>
+            {record.error ? (
+              <span className="checkInvalid">
+                {record.errorMsg ? record.errorMsg : '金额不能为空！'}
+              </span>
+            ) : null}
+          </div>
+        )
+      })
     return (
-      <div className='infoList prepayInfo'>
+      <div className="infoList prepayInfo">
         <ul>
           <li>
             <p>学校:</p>
@@ -249,24 +270,36 @@ class ChargeInfo extends React.Component {
               disabled={id}
               width={'140px'}
               className={id ? 'disabled' : ''}
-              selectedSchool={schoolId} 
-              changeSchool={this.changeSchool} 
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
               checkSchool={this.checkSchool}
             />
-            {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
+            {schoolError ? (
+              <span className="checkInvalid">学校不能为空！</span>
+            ) : null}
           </li>
-          <li className='itemsWrapper'>
+          <li className="itemsWrapper">
             <p>充值面额:</p>
             <div>
               {itemsGroup}
-              <AddPlusAbs count={l} abstract={this.abstractItem} add={this.addItem} />
+              <AddPlusAbs
+                count={l}
+                abstract={this.abstractItem}
+                add={this.addItem}
+              />
             </div>
           </li>
         </ul>
 
-        <div className='btnArea'>
-          <Button type='primary' onClick={this.confirm} >确认</Button>
-          <Button onClick={this.back} >{this.props.location.state ? BACKTITLE[this.props.location.state.path] : '返回'}</Button>
+        <div className="btnArea">
+          <Button type="primary" onClick={this.confirm}>
+            确认
+          </Button>
+          <Button onClick={this.back}>
+            {this.props.location.state
+              ? BACKTITLE[this.props.location.state.path]
+              : '返回'}
+          </Button>
         </div>
       </div>
     )

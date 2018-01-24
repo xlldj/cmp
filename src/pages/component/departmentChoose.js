@@ -1,13 +1,13 @@
 import React from 'react'
-import {Modal, Radio, Button} from 'antd'
-import Noti from '../noti'
+import { Modal, Radio, Button } from 'antd'
+import Noti from '../../util/noti'
 import CONSTANTS from './constants'
-import AjaxHandler from '../ajax'
+import AjaxHandler from '../../util/ajax'
 
 const RadioGroup = Radio.Group
 
-class DepartmentChoose extends React.Component{
-  constructor(props){
+class DepartmentChoose extends React.Component {
+  constructor(props) {
     super(props)
     this.state = {
       level: 1,
@@ -15,8 +15,8 @@ class DepartmentChoose extends React.Component{
       posting: false
     }
   }
-  componentDidMount () {
-    let {level} = this.props
+  componentDidMount() {
+    let { level } = this.props
     if (level) {
       this.setState({
         level: level
@@ -26,22 +26,25 @@ class DepartmentChoose extends React.Component{
   cancel = () => {
     this.props.cancel()
   }
-  postData = (body) => {
-    let resource='/api/work/order/handle'
-    const cb = (json) => {
+  postData = body => {
+    let resource = '/api/work/order/handle'
+    const cb = json => {
       this.setState({
         posting: false
       })
-      if(json.error){
+      if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           this.props.success()
-        }       
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
+    AjaxHandler.ajax(resource, body, cb, null, {
+      clearPosting: true,
+      thisObj: this
+    })
   }
   confirm = () => {
     if (this.state.posting) {
@@ -64,51 +67,53 @@ class DepartmentChoose extends React.Component{
     this.changeSelect(null, selectedRows)
   }
 
-  changeUrgencyLevel = (e) => {
+  changeUrgencyLevel = e => {
     this.setState({
       level: e.target.value
     })
   }
-  changeNote = (e) => {
+  changeNote = e => {
     this.setState({
       content: e.target.value
     })
   }
-  render(){
-    const {level, content} = this.state
+  render() {
+    const { level, content } = this.state
 
-    return (        
+    return (
       <Modal
-        wrapClassName='modal reassign'
+        wrapClassName="modal reassign"
         width={330}
-        title='工单转接'
+        title="工单转接"
         visible={true}
         onCancel={this.cancel}
         footer={null}
-        okText=''
+        okText=""
       >
-        <div className='info buildTask'>
+        <div className="info buildTask">
           <ul>
             <li>
               <p>紧急程度:</p>
-              <RadioGroup value={level} onChange={this.changeUrgencyLevel} >
+              <RadioGroup value={level} onChange={this.changeUrgencyLevel}>
                 <Radio value={1}>普通</Radio>
                 <Radio value={2}>优先</Radio>
                 <Radio value={3}>紧急</Radio>
               </RadioGroup>
             </li>
-            <li className='itemsWrapper'>
+            <li className="itemsWrapper">
               <p>备注:</p>
               <textarea
                 value={content}
-                className='longText'
+                className="longText"
                 onChange={this.changeNote}
               />
             </li>
           </ul>
-          <div className='btnArea'>
-            <Button onClick={this.confirm} type='primary'>确认</Button>
-            <Button onClick={this.cancel} >返回</Button>
+          <div className="btnArea">
+            <Button onClick={this.confirm} type="primary">
+              确认
+            </Button>
+            <Button onClick={this.cancel}>返回</Button>
           </div>
         </div>
       </Modal>

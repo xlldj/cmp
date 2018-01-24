@@ -1,12 +1,12 @@
 import React from 'react'
-import { Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import Table from 'antd/lib/table'
 import Popconfirm from 'antd/lib/popconfirm'
 
-import Noti from '../noti'
+import Noti from '../../util/noti'
 import Time from '../component/time'
-import AjaxHandler from '../ajax'
+import AjaxHandler from '../../util/ajax'
 import DeviceSelector from '../component/deviceSelector'
 import SearchLine from '../component/searchLine'
 import CONSTANTS from '../component/constants'
@@ -15,9 +15,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeGift } from '../../actions'
-import {checkObject} from '../util/checkSame'
+import { checkObject } from '../util/checkSame'
 const subModule = 'giftList'
-
 
 const typeName = CONSTANTS.DEVICETYPE
 const SIZE = CONSTANTS.PAGINATION
@@ -27,77 +26,91 @@ class GiftTable extends React.Component {
     deviceType: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
-  constructor(props){
+  constructor(props) {
     super(props)
-    let dataSource=[]
+    let dataSource = []
     this.state = {
-      dataSource, 
+      dataSource,
       loading: false,
-      page: 1,
+      page: 1
     }
-    this.columns = [{
-      title: '红包金额',
-      dataIndex: 'amount',
-      className: 'firstCol',
-      width: '25%',
-      render: (text) => (`¥${text}`)
-    }, {
-      title: '使用期限',
-      dataIndex: 'timeLimit',
-      width: '25%',
-      render: (text, record) => {
-        if (record.type === 1) {
-          return (
-            <span>{Time.showDate(record.startTime)}~{Time.showDate(record.endTime)}</span>
-          )
-        } else {
-          return (
-            <span>{record.timeLimit}天</span>
-          )
+    this.columns = [
+      {
+        title: '红包金额',
+        dataIndex: 'amount',
+        className: 'firstCol',
+        width: '25%',
+        render: text => `¥${text}`
+      },
+      {
+        title: '使用期限',
+        dataIndex: 'timeLimit',
+        width: '25%',
+        render: (text, record) => {
+          if (record.type === 1) {
+            return (
+              <span>
+                {Time.showDate(record.startTime)}~{Time.showDate(
+                  record.endTime
+                )}
+              </span>
+            )
+          } else {
+            return <span>{record.timeLimit}天</span>
+          }
         }
-      }
-    },{
-      title: '设备类型',
-      dataIndex: 'deviceType',
-      width: '25%',
-      render: (text,record,index) => (typeName[record.deviceType])
-    }, {
-      title: '操作',
-      dataIndex: 'operation',
-      className: 'lastCol',
-      render: (text, record, index) => (
-        <div className='editable-row-operations'>
-            <Link to={`/gift/list/giftInfo/:${record.id}`} >编辑</Link>
-            <span className='ant-divider' />
-            <Popconfirm title="确定要失效此红包么?" onConfirm={(e) => {this.delete(e,record.id)}} okText="确认" cancelText="取消">
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'deviceType',
+        width: '25%',
+        render: (text, record, index) => typeName[record.deviceType]
+      },
+      {
+        title: '操作',
+        dataIndex: 'operation',
+        className: 'lastCol',
+        render: (text, record, index) => (
+          <div className="editable-row-operations">
+            <Link to={`/gift/list/giftInfo/:${record.id}`}>编辑</Link>
+            <span className="ant-divider" />
+            <Popconfirm
+              title="确定要失效此红包么?"
+              onConfirm={e => {
+                this.delete(e, record.id)
+              }}
+              okText="确认"
+              cancelText="取消"
+            >
               <a href="">失效</a>
             </Popconfirm>
-        </div>
-      )
-    }]
+          </div>
+        )
+      }
+    ]
   }
 
-  fetchData = (body) => {
+  fetchData = body => {
     this.setState({
       loading: true
     })
-    let resource='/api/gift/list'
-    const cb = (json) => {
-      let nextState = {loading: false}
-      if(json.error){
+    let resource = '/api/gift/list'
+    const cb = json => {
+      let nextState = { loading: false }
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           nextState.dataSource = json.data.gifts
           nextState.total = json.data.total
-        }else{
+        } else {
           this.setState(nextState)
-        }        
+        }
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb, this.errorHandler)
+    AjaxHandler.ajax(resource, body, cb, this.errorHandler)
   }
   errorHandler = () => {
     this.setState({
@@ -105,10 +118,10 @@ class GiftTable extends React.Component {
     })
   }
 
-  componentDidMount(){
-    this.props.hide(false)  
+  componentDidMount() {
+    this.props.hide(false)
 
-    let {page, deviceType} = this.props
+    let { page, deviceType } = this.props
     const body = {
       page: page,
       size: SIZE
@@ -118,14 +131,14 @@ class GiftTable extends React.Component {
     }
     this.fetchData(body)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['page', 'deviceType'])) {
       return
     }
-    let {page, deviceType} = nextProps
+    let { page, deviceType } = nextProps
     const body = {
       page: page,
       size: SIZE
@@ -135,58 +148,68 @@ class GiftTable extends React.Component {
     }
     this.fetchData(body)
   }
-  changeDevice = (value) => {
-    let {deviceType} = this.props
+  changeDevice = value => {
+    let { deviceType } = this.props
     if (deviceType === value) {
       return
     }
-    this.props.changeGift(subModule, {page: 1, deviceType: value})
+    this.props.changeGift(subModule, { page: 1, deviceType: value })
   }
-  delete = (e,id) => {
+  delete = (e, id) => {
     e.preventDefault()
     let url = '/api/gift/delete'
     const body = {
-      id:id
+      id: id
     }
-    const cb = (json) => {
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          const body={
+        if (json.data) {
+          const body = {
             page: this.props.page,
             size: SIZE
           }
           this.fetchData(body)
-        }else{
+        } else {
           Noti.hintLock('请求出错', '当前红包还不能被设为失效')
-        }   
+        }
       }
     }
     AjaxHandler.ajax(url, body, cb)
   }
-  changePage = (pageObj) => {
+  changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeGift(subModule, {page: page})
+    this.props.changeGift(subModule, { page: page })
   }
 
-
-  render () {
-    const {dataSource, total, loading} = this.state
-    const {page, deviceType} = this.props
+  render() {
+    const { dataSource, total, loading } = this.state
+    const { page, deviceType } = this.props
 
     return (
-      <div className='contentArea'>
-        <SearchLine addTitle='创建红包' addLink='/gift/list/addGift' selector1={<DeviceSelector selectedDevice={deviceType} changeDevice={this.changeDevice} />} />
+      <div className="contentArea">
+        <SearchLine
+          addTitle="创建红包"
+          addLink="/gift/list/addGift"
+          selector1={
+            <DeviceSelector
+              selectedDevice={deviceType}
+              changeDevice={this.changeDevice}
+            />
+          }
+        />
 
-        <div className='tableList'>
-          <Table bordered 
-            loading={loading} rowKey={(record)=>(record.id)}  
-            pagination={{pageSize: SIZE, current: page, total: total}}  
-            dataSource={dataSource} 
-            columns={this.columns} 
-            onChange={this.changePage} 
+        <div className="tableList">
+          <Table
+            bordered
+            loading={loading}
+            rowKey={record => record.id}
+            pagination={{ pageSize: SIZE, current: page, total: total }}
+            dataSource={dataSource}
+            columns={this.columns}
+            onChange={this.changePage}
           />
         </div>
       </div>
@@ -194,12 +217,13 @@ class GiftTable extends React.Component {
   }
 }
 
-
 const mapStateToProps = (state, ownProps) => ({
   deviceType: state.changeGift[subModule].deviceType,
   page: state.changeGift[subModule].page
 })
 
-export default withRouter(connect(mapStateToProps, {
-  changeGift
-})(GiftTable))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeGift
+  })(GiftTable)
+)

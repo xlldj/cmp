@@ -1,30 +1,42 @@
-import React, { Component } from 'react';
-import { LineChart, Line, XAxis, YAxis,Tooltip, CartesianGrid, Legend, Label, LabelList, AreaChart, Area } from 'recharts';
-import { scalePow, scaleLog } from 'd3-scale';
+import React, { Component } from 'react'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  Label,
+  LabelList,
+  AreaChart,
+  Area
+} from 'recharts'
+import { scalePow, scaleLog } from 'd3-scale'
 import SchoolSelector from '../../component/schoolSelector'
 import Select from 'antd/lib/select'
 import Switch from 'antd/lib/switch'
 import Icon from 'antd/lib/icon'
 import DatePicker from 'antd/lib/date-picker'
-import AjaxHandler from '../../ajax'
+import AjaxHandler from '../../../util/ajax'
 import Format from '../../component/format'
 import CONSTANTS from '../../component/constants'
 import Time from '../../component/time'
-import Noti from '../../noti'
+import Noti from '../../../util/noti'
 import moment from 'moment'
-const {RangePicker, MonthPicker} = DatePicker
+const { RangePicker, MonthPicker } = DatePicker
 
 const NOW = Date.parse(new Date())
 
 const DAY = {
-  1:'本日',
-  2:'本周',
-  3:'本月'
+  1: '本日',
+  2: '本周',
+  3: '本月'
 }
 const LASTDAY = {
-  1:'昨日',
-  2:'上周',
-  3:'上月'
+  1: '昨日',
+  2: '上周',
+  3: '上月'
 }
 const CLASSNAMES = [
   {
@@ -106,15 +118,14 @@ const initilaState = {
   compare: false,
   timeSpan: 2,
   currentChart: 1,
-  currentMonth: true, 
+  currentMonth: true,
   monthStr: '',
   areaData: [],
   areaStartTime: Time.getFirstWeekStart(Time.getMonthStart(NOW))
-};
+}
 
 export default class Charts extends Component {
-
-  state = initilaState;
+  state = initilaState
 
   fetchData = (body, chartIndex) => {
     this.setState({
@@ -122,136 +133,159 @@ export default class Charts extends Component {
     })
     let currentChart = chartIndex || this.state.currentChart
     let resource = `/statistics/${CHARTTYPES[currentChart]}/polyline`
-    const cb = (json)=>{
+    const cb = json => {
       let nextState = {
         loading: false
       }
-      if(json.error){
+      if (json.error) {
         throw new Error(json.error)
-      }else{
-        let firstPoints = json.data[data1Name[currentChart]], secondPoints = json.data[data2Name[currentChart]] || null
+      } else {
+        let firstPoints = json.data[data1Name[currentChart]],
+          secondPoints = json.data[data2Name[currentChart]] || null
         // let showerPoints = json.data.showerPoints, secondPoints = json.data.secondPoints
-        let {startTime,endTime,timeUnit} = this.state,data
-        if(timeUnit===2){
-          data =Time.getDateArray(startTime,endTime)
-          data.map((r,i)=>{
+        let { startTime, endTime, timeUnit } = this.state,
+          data
+        if (timeUnit === 2) {
+          data = Time.getDateArray(startTime, endTime)
+          data.map((r, i) => {
             let t = Date.parse(new Date(r.x))
-            if(t<NOW){
+            if (t < NOW) {
               r.y = 0
               r.y2 = 0
             }
           })
-          firstPoints&&firstPoints.map((r,i)=>{
-            let x = Format.dayFormat(r.x)
-            let xInData = data.find((r,i)=>(r.x===x))
-            if(xInData){
-              xInData.y = r.y//push shower points into data array
-            }
-          })
-          secondPoints&&secondPoints.map((r,i)=>{
-            let x = Format.dayFormat(r.x)
-            let xInData = data.find((r,i)=>(r.x===x))
-            if(xInData){
-              xInData.y2 = r.y//push shower points into data array
-            }
-          })
-        }else{
-          data = Time.getHourArray(startTime,endTime)
-          data.map((r,i)=>{
+          firstPoints &&
+            firstPoints.map((r, i) => {
+              let x = Format.dayFormat(r.x)
+              let xInData = data.find((r, i) => r.x === x)
+              if (xInData) {
+                xInData.y = r.y //push shower points into data array
+              }
+            })
+          secondPoints &&
+            secondPoints.map((r, i) => {
+              let x = Format.dayFormat(r.x)
+              let xInData = data.find((r, i) => r.x === x)
+              if (xInData) {
+                xInData.y2 = r.y //push shower points into data array
+              }
+            })
+        } else {
+          data = Time.getHourArray(startTime, endTime)
+          data.map((r, i) => {
             let t = Date.parse(new Date(r.x))
-            if(t<NOW){
+            if (t < NOW) {
               r.y = 0
               r.y2 = 0
             }
           })
-          firstPoints&&firstPoints.map((r,i)=>{
-            let x = Format.hourFormat(r.x)
-            let xInData = data.find((r,i)=>(r.x===x))
-            if(xInData){
-              xInData.y = r.y//push shower points into data array
-            }
-          })
-          secondPoints&&secondPoints.map((r,i)=>{
-            let x = Format.hourFormat(r.x)
-            let xInData = data.find((r,i)=>(r.x===x))
-            if(xInData){
-              xInData.y2 = r.y//push shower points into data array
-            }
-          })
+          firstPoints &&
+            firstPoints.map((r, i) => {
+              let x = Format.hourFormat(r.x)
+              let xInData = data.find((r, i) => r.x === x)
+              if (xInData) {
+                xInData.y = r.y //push shower points into data array
+              }
+            })
+          secondPoints &&
+            secondPoints.map((r, i) => {
+              let x = Format.hourFormat(r.x)
+              let xInData = data.find((r, i) => r.x === x)
+              if (xInData) {
+                xInData.y2 = r.y //push shower points into data array
+              }
+            })
         }
         nextState.data = data
       }
-      if(this.state.compare){
+      if (this.state.compare) {
         this.fetchCompareData()
         nextState.loading = true
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  fetchAreaData = (body) => {
+  fetchAreaData = body => {
     let resource = '/api/statistics/repair/time/polyline'
-    const cb = (json)=>{
+    const cb = json => {
       let nextState = {
         loading: false
       }
-      if(json.error){
+      if (json.error) {
         throw new Error(json.error)
-      }else{
-        let {acceptTime,assignTime,repairTime}= json.data,data=[]
-        let {areaStartTime}=this.state
+      } else {
+        let { acceptTime, assignTime, repairTime } = json.data,
+          data = []
+        let { areaStartTime } = this.state
         //starttime是第一个周一的0点，用它减去该年第一天0点，除以7*24*3600*1000，就得到了中间有多少周
 
         let startWeekNum = Time.getFirstWeekNum(areaStartTime)
-        for(let i=0;i<4;i++){
-          let monday = areaStartTime + i*7*24*3600*1000
-          let item={
-            x:`第${i+1}周`,
-            num:startWeekNum+i
+        for (let i = 0; i < 4; i++) {
+          let monday = areaStartTime + i * 7 * 24 * 3600 * 1000
+          let item = {
+            x: `第${i + 1}周`,
+            num: startWeekNum + i
           }
           //如果周一的0点已经过去，就将所有的值值为0
-          if(monday<NOW){
-            item.assign= 0
-            item.repair=0
-            item.y=0
+          if (monday < NOW) {
+            item.assign = 0
+            item.repair = 0
+            item.y = 0
           }
           data.push(item)
         }
-        acceptTime&&acceptTime.forEach((r,i)=>{
-          let item = data.find((record,ind)=>(record.num===Format.getWeekNum(r.x)))
-          item&&(item.y = r.y)
-        })
-        assignTime&&assignTime.forEach((r,i)=>{
-          let item = data.find((record,ind)=>(record.num===Format.getWeekNum(r.x)))
-          item&&(item.assign = r.y)
-        })
-        repairTime&&repairTime.forEach((r,i)=>{
-          let item = data.find((record,ind)=>(record.num===Format.getWeekNum(r.x)))
-          item&&(item.repair = r.y)
-        })
+        acceptTime &&
+          acceptTime.forEach((r, i) => {
+            let item = data.find(
+              (record, ind) => record.num === Format.getWeekNum(r.x)
+            )
+            item && (item.y = r.y)
+          })
+        assignTime &&
+          assignTime.forEach((r, i) => {
+            let item = data.find(
+              (record, ind) => record.num === Format.getWeekNum(r.x)
+            )
+            item && (item.assign = r.y)
+          })
+        repairTime &&
+          repairTime.forEach((r, i) => {
+            let item = data.find(
+              (record, ind) => record.num === Format.getWeekNum(r.x)
+            )
+            item && (item.repair = r.y)
+          })
         nextState.areaData = data
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  componentDidMount(){
-    const body={
-      "endTime": Time.getWeekEnd(NOW),
-      "startTime": Time.getWeekStart(NOW),
-      "target": 1,
-      "timeUnit": 2
+  componentDidMount() {
+    const body = {
+      endTime: Time.getWeekEnd(NOW),
+      startTime: Time.getWeekStart(NOW),
+      target: 1,
+      timeUnit: 2
     }
     this.fetchData(body)
   }
 
-  changeTarget = (e) => {
+  changeTarget = e => {
     e.preventDefault()
     let v = parseInt(e.target.getAttribute('data-value'))
-    let {target,startTime,endTime,timeUnit,selectedSchool,compare} = this.state
-    if(v===target){
+    let {
+      target,
+      startTime,
+      endTime,
+      timeUnit,
+      selectedSchool,
+      compare
+    } = this.state
+    if (v === target) {
       return
     }
     const body = {
@@ -260,7 +294,7 @@ export default class Charts extends Component {
       timeUnit: timeUnit,
       target: v
     }
-    if(selectedSchool!=='all'){
+    if (selectedSchool !== 'all') {
       body.schoolId = parseInt(selectedSchool)
     }
     this.fetchData(body)
@@ -275,19 +309,29 @@ export default class Charts extends Component {
     this.setState({
       loading: true
     })
-    let {target,timeUnit,selectedSchool,timeSpan, currentChart} = this.state
-    let newStartTime,newEndTime  /*----------------------------------------------*/
-    if(timeSpan===1){
+    let {
+      target,
+      timeUnit,
+      selectedSchool,
+      timeSpan,
+      currentChart
+    } = this.state
+    let newStartTime,
+      newEndTime /*----------------------------------------------*/
+    if (timeSpan === 1) {
       newStartTime = Time.getYestodayStart()
       newEndTime = Time.getYestodayEnd()
-    }else if(timeSpan===2){
+    } else if (timeSpan === 2) {
       newStartTime = Time.getLastWeekStart()
       newEndTime = Time.getLastWeekEnd()
-    }else if(timeSpan===3){
+    } else if (timeSpan === 3) {
       newStartTime = Time.getLastMonthStart()
       newEndTime = Time.getLastMonthEnd()
-    }else{
-      return Noti.hintLock('当前状态下不能比较！','请选择本日/本周/本月后再进行比较')
+    } else {
+      return Noti.hintLock(
+        '当前状态下不能比较！',
+        '请选择本日/本周/本月后再进行比较'
+      )
     }
     let resource = `/statistics/${CHARTTYPES[currentChart]}/polyline`
     const body = {
@@ -296,107 +340,133 @@ export default class Charts extends Component {
       target: target,
       timeUnit: timeUnit
     }
-    if(selectedSchool!=='all'){
+    if (selectedSchool !== 'all') {
       body.schoolId = parseInt(selectedSchool)
     }
-    const cb = (json)=>{
+    const cb = json => {
       let nextState = {
         loading: false
       }
-      if(json.error){
+      if (json.error) {
         throw new Error(json.error)
-      }else{
-        let firstPoints = json.data[data1Name[currentChart]], secondPoints = data2Name[currentChart]&&json.data[data2Name[currentChart]]
-        let newData = JSON.parse(JSON.stringify(this.state.data)),timeSpan=this.state.timeSpan
+      } else {
+        let firstPoints = json.data[data1Name[currentChart]],
+          secondPoints =
+            data2Name[currentChart] && json.data[data2Name[currentChart]]
+        let newData = JSON.parse(JSON.stringify(this.state.data)),
+          timeSpan = this.state.timeSpan
         //将过去的数据转为本日/周/月的数据，再将其插入data数组中
-        if(timeSpan===1){
-          newData.map((r,i)=>{
+        if (timeSpan === 1) {
+          newData.map((r, i) => {
             r.lasty = 0
-            r.lasty2 =0
-            let lastX = Time.ago24Hour(r.x)//取得24小时之前的时间
+            r.lasty2 = 0
+            let lastX = Time.ago24Hour(r.x) //取得24小时之前的时间
             r.lastX = lastX
           })
-          firstPoints&&firstPoints.map((r,i)=>{
-            let item = newData.find((record,ind)=>(Format.hourFormat(r.x)===record.lastX))
-            if(item){
-              item.lasty = r.y
-            }
-          })
-          secondPoints&&secondPoints.map((r,i)=>{
-            let item = newData.find((record,ind)=>(Format.hourFormat(r.x)===record.lastX))
-            if(item){
-              item.lasty2 = r.y
-            }
-          })
-        }else if(timeSpan===2){
-          newData.map((r,i)=>{
+          firstPoints &&
+            firstPoints.map((r, i) => {
+              let item = newData.find(
+                (record, ind) => Format.hourFormat(r.x) === record.lastX
+              )
+              if (item) {
+                item.lasty = r.y
+              }
+            })
+          secondPoints &&
+            secondPoints.map((r, i) => {
+              let item = newData.find(
+                (record, ind) => Format.hourFormat(r.x) === record.lastX
+              )
+              if (item) {
+                item.lasty2 = r.y
+              }
+            })
+        } else if (timeSpan === 2) {
+          newData.map((r, i) => {
             r.lasty = 0
-            r.lasty2 =0
-            let lastX = Time.ago1Week(r.x)//取得24小时之前的时间
+            r.lasty2 = 0
+            let lastX = Time.ago1Week(r.x) //取得24小时之前的时间
             r.lastX = lastX
           })
-          firstPoints&&firstPoints.map((r,i)=>{
-            let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
-            if(item){
-              item.lasty = r.y
-            }
-          })
-          secondPoints&&secondPoints.map((r,i)=>{
-            let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
-            if(item){
-              item.lasty2 = r.y
-            }
-          })
-        }else{
-          let lastMonthArray = Time.getDateArray(Time.getLastMonthStart(),Time.getLastMonthEnd())
-          lastMonthArray.map((r,i)=>{
-            if(i<newData.length){
+          firstPoints &&
+            firstPoints.map((r, i) => {
+              let item = newData.find(
+                (record, ind) => record.lastX === Format.dayFormat(r.x)
+              )
+              if (item) {
+                item.lasty = r.y
+              }
+            })
+          secondPoints &&
+            secondPoints.map((r, i) => {
+              let item = newData.find(
+                (record, ind) => record.lastX === Format.dayFormat(r.x)
+              )
+              if (item) {
+                item.lasty2 = r.y
+              }
+            })
+        } else {
+          let lastMonthArray = Time.getDateArray(
+            Time.getLastMonthStart(),
+            Time.getLastMonthEnd()
+          )
+          lastMonthArray.map((r, i) => {
+            if (i < newData.length) {
               newData[i].lasty = 0
-              newData[i].lasty2 =0
+              newData[i].lasty2 = 0
               newData[i].lastX = r.x
-            }else{
+            } else {
               newData.push({
-                lastX:r.x,
-                lasty : 0,
-                lasty2 :0
+                lastX: r.x,
+                lasty: 0,
+                lasty2: 0
               })
             }
           })
-          firstPoints&&firstPoints.map((r,i)=>{
-            let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
-            if(item){
-              item.lasty = r.y
-            }
-          })
-          secondPoints&&secondPoints.map((r,i)=>{
-            let item = newData.find((record,ind)=>(record.lastX===Format.dayFormat(r.x)))
-            if(item){
-              item.lasty2 = r.y
-            }
-          })
+          firstPoints &&
+            firstPoints.map((r, i) => {
+              let item = newData.find(
+                (record, ind) => record.lastX === Format.dayFormat(r.x)
+              )
+              if (item) {
+                item.lasty = r.y
+              }
+            })
+          secondPoints &&
+            secondPoints.map((r, i) => {
+              let item = newData.find(
+                (record, ind) => record.lastX === Format.dayFormat(r.x)
+              )
+              if (item) {
+                item.lasty2 = r.y
+              }
+            })
         }
         nextState.data = newData
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
   removeCompareData = () => {
     /*-----------后续查看是否需要重新拉取数据，因为可能比较两月时，当前月的数据比上月少，删除上月后当前数据中有无效长度，重新拉取会呈现地更好-------------*/
-    let {data,compare} = this.state, newData = JSON.parse(JSON.stringify(data))
-    newData&&newData.map((r,i)=>{
-      delete r.lasty
-      delete r.lasty2
-    })
+    let { data, compare } = this.state,
+      newData = JSON.parse(JSON.stringify(data))
+    newData &&
+      newData.map((r, i) => {
+        delete r.lasty
+        delete r.lasty2
+      })
     this.setState({
       data: newData
     })
   }
 
-  chooseChart = (e) => {
+  chooseChart = e => {
     let i = parseInt(e.target.getAttribute('data-index'), 10)
-    let {currentChart} = this.state
+    let { currentChart } = this.state
     if (i === currentChart) {
       return
     }
@@ -409,9 +479,9 @@ export default class Charts extends Component {
       if (i === 6) {
         let areaStartTime = Time.getFirstWeekStart(Time.getMonthStart(NOW))
         let areaEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
-        const body={
-          "endTime": areaEndTime,
-          "startTime": areaStartTime,
+        const body = {
+          endTime: areaEndTime,
+          startTime: areaStartTime,
           timeUnit: AREATIMEUNIT
         }
         this.fetchAreaData(body)
@@ -426,80 +496,85 @@ export default class Charts extends Component {
 
       /* else fetch the line data */
       let body = {}
-      let {startTime, endTime, timeUnit, selectedSchool} = this.state
+      let { startTime, endTime, timeUnit, selectedSchool } = this.state
       body.startTime = startTime
       body.endTime = endTime
       body.timeUnit = timeUnit
       body.target = 1
-      if(selectedSchool!=='all'){
+      if (selectedSchool !== 'all') {
         body.schoolId = parseInt(selectedSchool)
       }
       this.setState(nextState)
       this.fetchData(body, i)
     }
-  }  
-  changeCurrent = (e) =>{
+  }
+  changeCurrent = e => {
     e.preventDefault()
-    let {currentMonth, selectedSchool}=this.state
-    if(currentMonth){
+    let { currentMonth, selectedSchool } = this.state
+    if (currentMonth) {
       return
     }
-    let newStartTime=Time.getFirstWeekStart(Time.getMonthStart(NOW)),newEndTime=Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
-    const body={
-      startTime:newStartTime,
-      endTime:newEndTime,
-      timeUnit:AREATIMEUNIT
+    let newStartTime = Time.getFirstWeekStart(Time.getMonthStart(NOW)),
+      newEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
+    const body = {
+      startTime: newStartTime,
+      endTime: newEndTime,
+      timeUnit: AREATIMEUNIT
     }
-    if(selectedSchool!=='all'){
-      body.schoolId=selectedSchool
+    if (selectedSchool !== 'all') {
+      body.schoolId = selectedSchool
     }
     this.fetchAreaData(body)
     this.setState({
       areaStartTime: newStartTime,
-      areaEndTime:newEndTime,
+      areaEndTime: newEndTime,
       currentMonth: true,
       loading: true,
-      monthStr:CURMONTHSTR
+      monthStr: CURMONTHSTR
     })
   }
-  selectRange = (date,dateString)=>{
-    let {monthStr,selectedSchool}=this.state
-    if(dateString===monthStr){
+  selectRange = (date, dateString) => {
+    let { monthStr, selectedSchool } = this.state
+    if (dateString === monthStr) {
       return
     }
-    let newStartTime = Time.getFirstWeekStart(Time.getMonthStart(dateString+'-1')),newEndTime=Time.getTheLastWeekEnd(Time.getMonthEnd(dateString+'-1'))
+    let newStartTime = Time.getFirstWeekStart(
+        Time.getMonthStart(dateString + '-1')
+      ),
+      newEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(dateString + '-1'))
     let nextState = {
-      monthStr:dateString,
+      monthStr: dateString,
       loading: true,
       areaStartTime: newStartTime,
-      areaEndTime:newEndTime
+      areaEndTime: newEndTime
     }
     const body = {
       timeUnit: AREATIMEUNIT,
       startTime: newStartTime,
       endTime: newEndTime
     }
-    if(selectedSchool!=='all'){
+    if (selectedSchool !== 'all') {
       body.schoolId = parseInt(selectedSchool, 10)
     }
-    if(dateString===CURMONTHSTR){
-      nextState.currentMonth=true
-    }else{
-      nextState.currentMonth=false
+    if (dateString === CURMONTHSTR) {
+      nextState.currentMonth = true
+    } else {
+      nextState.currentMonth = false
     }
     this.setState(nextState)
     this.fetchAreaData(body)
   }
-  changeSchool = (v) => {
+  changeSchool = v => {
     this.setState({
       selectedSchool: v
     })
 
-    let body = {}, currentChart = this.state.currentChart
+    let body = {},
+      currentChart = this.state.currentChart
     body.startTime = this.state.startTime
     body.endTime = this.state.endTime
     body.timeUnit = this.state.timeUnit
-    if(v !== 'all'){
+    if (v !== 'all') {
       body.schoolId = parseInt(v, 10)
     }
     if (currentChart === 6) {
@@ -509,25 +584,31 @@ export default class Charts extends Component {
       this.fetchData(body)
     }
   }
-  changeTimeSpan = (e) => {
+  changeTimeSpan = e => {
     /*-----------if compared,clean it-----------*/
     e.preventDefault()
-    let nextState = {}, timeUnit = 2
-    let v = parseInt(e.target.getAttribute('data-value')), timeSpan=this.state.timeSpan, newStartTime, newEndTime, body = {}
-    if(v===timeSpan){
+    let nextState = {},
+      timeUnit = 2
+    let v = parseInt(e.target.getAttribute('data-value')),
+      timeSpan = this.state.timeSpan,
+      newStartTime,
+      newEndTime,
+      body = {}
+    if (v === timeSpan) {
       return
     }
     nextState.timeSpan = v
     nextState.compareLock = false
 
-    if(v===1){//today
+    if (v === 1) {
+      //today
       newStartTime = Time.getDayStart(NOW)
       newEndTime = Time.getDayEnd(NOW)
       timeUnit = 1
-    }else if(v===2){
+    } else if (v === 2) {
       newStartTime = Time.getWeekStart(NOW)
       newEndTime = Time.getWeekEnd(NOW)
-    }else{
+    } else {
       newStartTime = Time.getMonthStart(NOW)
       newEndTime = Time.getMonthEnd(NOW)
     }
@@ -541,7 +622,7 @@ export default class Charts extends Component {
     body.timeUnit = timeUnit
     body.target = this.state.target
 
-    if(this.state.selectedSchool!=='all'){
+    if (this.state.selectedSchool !== 'all') {
       body.schoolId = parseInt(this.state.selectedSchool)
     }
     this.fetchData(body)
@@ -549,7 +630,7 @@ export default class Charts extends Component {
     this.setState(nextState)
   }
 
-  compareLast = (checked)=>{
+  compareLast = checked => {
     let nextState = {
       compare: checked
     }
@@ -563,313 +644,602 @@ export default class Charts extends Component {
   }
 
   render() {
-    const { data, selectedSchool,startTime,endTime, timeUnit,loading,target,timeSpan,compare, currentChart, currentMonth, monthStr, areaData } = this.state;
-    
+    const {
+      data,
+      selectedSchool,
+      startTime,
+      endTime,
+      timeUnit,
+      loading,
+      target,
+      timeSpan,
+      compare,
+      currentChart,
+      currentMonth,
+      monthStr,
+      areaData
+    } = this.state
+
     return (
-      <div className='chart'>
-        
-        <div className='selectBar'>
+      <div className="chart">
+        <div className="selectBar">
           <h3>统计图表</h3>
 
-          <div className='selectBox'>
+          <div className="selectBox">
             <SchoolSelector
               selectedSchool={selectedSchool}
               changeSchool={this.changeSchool}
             />
           </div>
 
-          {
-            currentChart !== 6 ?
-              <div className='timespan'>
-                <a data-value={1} ref='tp1' className={CLASSNAMES[0][timeSpan]} onClick={this.changeTimeSpan} >本日</a>
-                <a data-value={2} ref='tp2' className={CLASSNAMES[1][timeSpan]} onClick={this.changeTimeSpan} >本周</a>
-                <a data-value={3} ref='tp3' className={CLASSNAMES[2][timeSpan]} onClick={this.changeTimeSpan} >本月</a> 
-              </div>
-            : null
-          }
+          {currentChart !== 6 ? (
+            <div className="timespan">
+              <a
+                data-value={1}
+                ref="tp1"
+                className={CLASSNAMES[0][timeSpan]}
+                onClick={this.changeTimeSpan}
+              >
+                本日
+              </a>
+              <a
+                data-value={2}
+                ref="tp2"
+                className={CLASSNAMES[1][timeSpan]}
+                onClick={this.changeTimeSpan}
+              >
+                本周
+              </a>
+              <a
+                data-value={3}
+                ref="tp3"
+                className={CLASSNAMES[2][timeSpan]}
+                onClick={this.changeTimeSpan}
+              >
+                本月
+              </a>
+            </div>
+          ) : null}
 
-          {
-            currentChart !== 6 ?
-              <div className='selCompare'>
-                <span className='compare'>对比{LASTDAY[timeSpan]}</span>
-                <Switch checked={compare} size='small' onChange={this.compareLast} />
-              </div>
-            : null
-          }
+          {currentChart !== 6 ? (
+            <div className="selCompare">
+              <span className="compare">对比{LASTDAY[timeSpan]}</span>
+              <Switch
+                checked={compare}
+                size="small"
+                onChange={this.compareLast}
+              />
+            </div>
+          ) : null}
 
-          {
-            currentChart === 6 ?
-              <div className='areaQuery'>
-                  <a className={currentMonth?'on padR':'padR'} onClick={this.changeCurrent} >本月</a>
-                  <MonthPicker allowClear={false}  value={moment(monthStr)} className='rangePicker' onChange={this.selectRange} />
-              </div>
-            : null
-          }
+          {currentChart === 6 ? (
+            <div className="areaQuery">
+              <a
+                className={currentMonth ? 'on padR' : 'padR'}
+                onClick={this.changeCurrent}
+              >
+                本月
+              </a>
+              <MonthPicker
+                allowClear={false}
+                value={moment(monthStr)}
+                className="rangePicker"
+                onChange={this.selectRange}
+              />
+            </div>
+          ) : null}
         </div>
 
-        <ul className='chartSelector' onClick={this.chooseChart} >
-          <li data-index={1} className={currentChart === 1 ? 'active' : ''} >
+        <ul className="chartSelector" onClick={this.chooseChart}>
+          <li data-index={1} className={currentChart === 1 ? 'active' : ''}>
             订单统计
-            {currentChart === 1 ? <div className='bdbtm'></div> : null}
+            {currentChart === 1 ? <div className="bdbtm" /> : null}
           </li>
-          <li data-index={2} className={currentChart === 2 ? 'active' : ''} >
+          <li data-index={2} className={currentChart === 2 ? 'active' : ''}>
             用户统计
-            {currentChart === 2 ? <div className='bdbtm'></div> : null}
+            {currentChart === 2 ? <div className="bdbtm" /> : null}
           </li>
-          <li data-index={3} className={currentChart === 3 ? 'active' : ''} >
+          <li data-index={3} className={currentChart === 3 ? 'active' : ''}>
             红包使用统计
-            {currentChart === 3 ? <div className='bdbtm'></div> : null}
+            {currentChart === 3 ? <div className="bdbtm" /> : null}
           </li>
-          <li data-index={4} className={currentChart === 4 ? 'active' : ''} >
+          <li data-index={4} className={currentChart === 4 ? 'active' : ''}>
             资金统计
-            {currentChart === 4 ? <div className='bdbtm'></div> : null}
+            {currentChart === 4 ? <div className="bdbtm" /> : null}
           </li>
-          <li data-index={5} className={currentChart === 5 ? 'active' : ''} >
+          <li data-index={5} className={currentChart === 5 ? 'active' : ''}>
             设备报修统计
-            {currentChart === 5 ? <div className='bdbtm'></div> : null}
+            {currentChart === 5 ? <div className="bdbtm" /> : null}
           </li>
-          <li data-index={6} className={currentChart === 6 ? 'active' : ''} >
+          <li data-index={6} className={currentChart === 6 ? 'active' : ''}>
             设备报修处理时间统计
-            {currentChart === 6 ? <div className='bdbtm'></div> : null}
+            {currentChart === 6 ? <div className="bdbtm" /> : null}
           </li>
         </ul>
 
         <div>
-
-          {
-            currentChart !== 6 ? 
+          {currentChart !== 6 ? (
             <div>
-              <div className='query'>
+              <div className="query">
                 <div>
-                  <a data-value={1} className={target===1?'padLR on':'padLR'} onClick={this.changeTarget}>{data1label[currentChart]}</a>
-                  {data2Name[currentChart] ? <a data-value={2} className={target===2?'on':''} onClick={this.changeTarget}>{data2label[currentChart]}</a> : null }
-                </div> 
+                  <a
+                    data-value={1}
+                    className={target === 1 ? 'padLR on' : 'padLR'}
+                    onClick={this.changeTarget}
+                  >
+                    {data1label[currentChart]}
+                  </a>
+                  {data2Name[currentChart] ? (
+                    <a
+                      data-value={2}
+                      className={target === 2 ? 'on' : ''}
+                      onClick={this.changeTarget}
+                    >
+                      {data2label[currentChart]}
+                    </a>
+                  ) : null}
+                </div>
               </div>
               <div className="lineChartWrapper">
                 <LineChart
-                  width={CONSTANTS.CHARTWIDTH} height={CONSTANTS.CHARTHEIGHT} data={data}
+                  width={CONSTANTS.CHARTWIDTH}
+                  height={CONSTANTS.CHARTHEIGHT}
+                  data={data}
                   margin={{ top: 10, right: 20, bottom: 0, left: 0 }}
                 >
                   <CartesianGrid vertical={false} horizontal={false} />
-                  <XAxis axisLine={{stroke:'#ddd'}} name='date' dataKey="x" tick={<CustomizedXAxisTick timeUnit={timeUnit} />} tickLine={false}/>
-                  <YAxis axisLine={{stroke:'#ddd'}} domain={[0, 'dataMax']} tickLine={false} tick={<CustomizedAxisTick />} />
-                  <Tooltip isAnimationActive={false} cursor={{ stroke: '#222', strokeWidth: 1 }} content={<CustomizedTooltip timeUnit={timeUnit} />}  />
-                  <Legend align='left' verticalAlign="top" iconType='line' margin={{left:-20}} wrapperStyle={{paddingLeft:20,top:-15}} width={300} height={36}  />
-                  <Line name={compare?`${DAY[timeSpan]}${LEGEND[CHARTTYPES[currentChart]][target][0]}`:`${LEGEND[CHARTTYPES[currentChart]][target][0]}`} dataKey="y" label='饮水机'  stroke="#4aaaef" dot={false} activeDot={{strokeWidth: 2}} />
-                  {data2Name[currentChart] ? <Line name={compare?`${DAY[timeSpan]}${LEGEND[CHARTTYPES[currentChart]][target][1]}`:`${LEGEND[CHARTTYPES[currentChart]][target][1]}`} dataKey='y2' stroke='#97da7b' dot={false} activeDot={{strokeWidth: 2}} /> : null}
-                  {compare ? <Line name={compare?`${LASTDAY[timeSpan]}${LEGEND[CHARTTYPES[currentChart]][target][0]}`:`${LEGEND[CHARTTYPES[currentChart]][target][0]}`} dataKey='lasty' stroke='#ffa312' dot={false} activeDot={{strokeWidth: 2}} /> : null}
-                  {compare&&data2Name[currentChart] ? <Line name={compare?`${LASTDAY[timeSpan]}${LEGEND[CHARTTYPES[currentChart]][target][1]}`:`${LEGEND[CHARTTYPES[currentChart]][target][1]}`} dataKey='lasty2' stroke='#ff5555' dot={false} activeDot={{strokeWidth: 2}} /> : null}
+                  <XAxis
+                    axisLine={{ stroke: '#ddd' }}
+                    name="date"
+                    dataKey="x"
+                    tick={<CustomizedXAxisTick timeUnit={timeUnit} />}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    axisLine={{ stroke: '#ddd' }}
+                    domain={[0, 'dataMax']}
+                    tickLine={false}
+                    tick={<CustomizedAxisTick />}
+                  />
+                  <Tooltip
+                    isAnimationActive={false}
+                    cursor={{ stroke: '#222', strokeWidth: 1 }}
+                    content={<CustomizedTooltip timeUnit={timeUnit} />}
+                  />
+                  <Legend
+                    align="left"
+                    verticalAlign="top"
+                    iconType="line"
+                    margin={{ left: -20 }}
+                    wrapperStyle={{ paddingLeft: 20, top: -15 }}
+                    width={300}
+                    height={36}
+                  />
+                  <Line
+                    name={
+                      compare
+                        ? `${DAY[timeSpan]}${
+                            LEGEND[CHARTTYPES[currentChart]][target][0]
+                          }`
+                        : `${LEGEND[CHARTTYPES[currentChart]][target][0]}`
+                    }
+                    dataKey="y"
+                    label="饮水机"
+                    stroke="#4aaaef"
+                    dot={false}
+                    activeDot={{ strokeWidth: 2 }}
+                  />
+                  {data2Name[currentChart] ? (
+                    <Line
+                      name={
+                        compare
+                          ? `${DAY[timeSpan]}${
+                              LEGEND[CHARTTYPES[currentChart]][target][1]
+                            }`
+                          : `${LEGEND[CHARTTYPES[currentChart]][target][1]}`
+                      }
+                      dataKey="y2"
+                      stroke="#97da7b"
+                      dot={false}
+                      activeDot={{ strokeWidth: 2 }}
+                    />
+                  ) : null}
+                  {compare ? (
+                    <Line
+                      name={
+                        compare
+                          ? `${LASTDAY[timeSpan]}${
+                              LEGEND[CHARTTYPES[currentChart]][target][0]
+                            }`
+                          : `${LEGEND[CHARTTYPES[currentChart]][target][0]}`
+                      }
+                      dataKey="lasty"
+                      stroke="#ffa312"
+                      dot={false}
+                      activeDot={{ strokeWidth: 2 }}
+                    />
+                  ) : null}
+                  {compare && data2Name[currentChart] ? (
+                    <Line
+                      name={
+                        compare
+                          ? `${LASTDAY[timeSpan]}${
+                              LEGEND[CHARTTYPES[currentChart]][target][1]
+                            }`
+                          : `${LEGEND[CHARTTYPES[currentChart]][target][1]}`
+                      }
+                      dataKey="lasty2"
+                      stroke="#ff5555"
+                      dot={false}
+                      activeDot={{ strokeWidth: 2 }}
+                    />
+                  ) : null}
                 </LineChart>
-              </div> 
-            </div> 
-            : null
-          }
-          {
-            currentChart === 6 ? 
+              </div>
+            </div>
+          ) : null}
+          {currentChart === 6 ? (
             <div>
               <div className="areaChartWrapper">
                 <AreaChart
-                  width={CONSTANTS.CHARTWIDTH} height={CONSTANTS.CHARTHEIGHT} data={areaData}
+                  width={CONSTANTS.CHARTWIDTH}
+                  height={CONSTANTS.CHARTHEIGHT}
+                  data={areaData}
                   margin={{ top: 10, right: 20, bottom: 0, left: 0 }}
                 >
                   <CartesianGrid vertical={false} horizontal={false} />
-                  <XAxis axisLine={{stroke:'#ddd'}} name='' dataKey="x" tickLine={false}/>
-                  <YAxis axisLine={{stroke:'#ddd'}} domain={[0, 'dataMax']} tickLine={false} tick={<AreaYAxisTick />} />
-                  <Tooltip isAnimationActive={false} cursor={{ stroke: '#222', strokeWidth: 1 }} content={<AreaTooltip monthStr={monthStr} />} />
-                  <Legend align='left' verticalAlign="top" margin={{left:-20}} wrapperStyle={{paddingLeft:20,top:-15}} content={<AreaLegend  />} height={36}  />
-                  <Area name='客服处理时间' type='monotone' dataKey='assign' stackId="1"  fill='#ff5555' stroke='false' activeDot={{ stroke: '#ff5555', strokeWidth: 2,fill:'#fff'}}/>
-                  <Area name='维修员接受时间' type='monotone' dataKey='y' stackId="1" fill='#4aaaef' stroke='false' activeDot={{ stroke: '#4aaaef', strokeWidth: 2,fill:'#fff'}} />
-                  <Area name='维修时间' type='monotone' dataKey='repair' stackId="1" fill='#97da7b' stroke='false' activeDot={{ stroke: '#97da7b', strokeWidth: 2,fill:'#fff'}} />
+                  <XAxis
+                    axisLine={{ stroke: '#ddd' }}
+                    name=""
+                    dataKey="x"
+                    tickLine={false}
+                  />
+                  <YAxis
+                    axisLine={{ stroke: '#ddd' }}
+                    domain={[0, 'dataMax']}
+                    tickLine={false}
+                    tick={<AreaYAxisTick />}
+                  />
+                  <Tooltip
+                    isAnimationActive={false}
+                    cursor={{ stroke: '#222', strokeWidth: 1 }}
+                    content={<AreaTooltip monthStr={monthStr} />}
+                  />
+                  <Legend
+                    align="left"
+                    verticalAlign="top"
+                    margin={{ left: -20 }}
+                    wrapperStyle={{ paddingLeft: 20, top: -15 }}
+                    content={<AreaLegend />}
+                    height={36}
+                  />
+                  <Area
+                    name="客服处理时间"
+                    type="monotone"
+                    dataKey="assign"
+                    stackId="1"
+                    fill="#ff5555"
+                    stroke="false"
+                    activeDot={{
+                      stroke: '#ff5555',
+                      strokeWidth: 2,
+                      fill: '#fff'
+                    }}
+                  />
+                  <Area
+                    name="维修员接受时间"
+                    type="monotone"
+                    dataKey="y"
+                    stackId="1"
+                    fill="#4aaaef"
+                    stroke="false"
+                    activeDot={{
+                      stroke: '#4aaaef',
+                      strokeWidth: 2,
+                      fill: '#fff'
+                    }}
+                  />
+                  <Area
+                    name="维修时间"
+                    type="monotone"
+                    dataKey="repair"
+                    stackId="1"
+                    fill="#97da7b"
+                    stroke="false"
+                    activeDot={{
+                      stroke: '#97da7b',
+                      strokeWidth: 2,
+                      fill: '#fff'
+                    }}
+                  />
                 </AreaChart>
               </div>
             </div>
-            : null
-          }
+          ) : null}
         </div>
       </div>
-    );
+    )
   }
 }
 
 const CustomizedTooltip = React.createClass({
-  render () {
-    const {type, payload, label, active,timeUnit} = this.props;
-    const ys = !!payload&&payload.filter((r,i)=>{
-      return r.dataKey === 'y'
-    })
-    const yItems = !!ys&&ys.map((r,i)=>{
-        if(r.payload.x){
+  render() {
+    const { type, payload, label, active, timeUnit } = this.props
+    const ys =
+      !!payload &&
+      payload.filter((r, i) => {
+        return r.dataKey === 'y'
+      })
+    const yItems =
+      !!ys &&
+      ys.map((r, i) => {
+        if (r.payload.x) {
           return (
-              <li key={i}>
-                <svg key={`svg${i}`} className='lineIcon' >
-                  <line x1="0" x2="5" y1={5} y2={5} stroke={r.stroke} />
-                  <circle cx="7" cy={5} r="2" stroke={r.stroke} fill="transparent" />
-                  <line x1="9" x2="14" y1={5} y2={5} stroke={r.stroke} fill="transparent" />
-                </svg>
-                <span key={`span${i}`} className='name'>{r.name}</span>
-                <span key={`span2${i}`}>{r.value}</span>
-              </li>
-          )
-        }
-      }
-    )
-
-    const y2s = !!payload&&payload.filter((r,i)=>{
-      return r.dataKey === 'y2'
-    })
-    const y2Items = !!y2s&&y2s.map((r,i)=>{
-        if(r.payload.x){
-          return (
-              <li key={i}>
-                <svg key={`svg${i}`} className='lineIcon' >
-                  <line x1="0" x2="5" y1={5} y2={5} stroke={r.stroke} />
-                  <circle cx="7" cy={5} r="2" stroke={r.stroke} fill="transparent" />
-                  <line x1="9" x2="14" y1={5} y2={5} stroke={r.stroke} fill="transparent" />
-                </svg>
-                <span key={`span${i}`} className='name'>{r.name}</span>
-                <span key={`span2${i}`}>{r.value}</span>
-              </li>
-          )
-        }
-      }
-    )
-
-    const lastys = !!payload&&payload.filter((r,i)=>{
-      return r.dataKey === 'lasty'
-    })
-    const lastYItems = !!lastys&&lastys.map((r,i)=>{
-          return (
-              <li key={i}>
-                <svg key={`svg${i}`} className='lineIcon' >
-                  <line x1="0" x2="5" y1={5} y2={5} stroke={r.stroke} />
-                  <circle cx="7" cy={5} r="2" stroke={r.stroke} fill="transparent" />
-                  <line x1="9" x2="14" y1={5} y2={5} stroke={r.stroke} fill="transparent" />
-                </svg>
-                <span key={`span${i}`} className='name'>{r.name}</span>
-                <span key={`span2${i}`}>{r.value}</span>
-              </li>
-          )
-      }
-    )
-
-    const lasty2s = !!payload&&payload.filter((r,i)=>{
-      return r.dataKey === 'lasty2'
-    })
-    const lastY2Items = !!lasty2s&&lasty2s.map((r,i)=>{
-        return (
             <li key={i}>
-              <svg key={`svg${i}`} className='lineIcon' >
+              <svg key={`svg${i}`} className="lineIcon">
                 <line x1="0" x2="5" y1={5} y2={5} stroke={r.stroke} />
-                <circle cx="7" cy={5} r="2" stroke={r.stroke} fill="transparent" />
-                <line x1="9" x2="14" y1={5} y2={5} stroke={r.stroke} fill="transparent" />
+                <circle
+                  cx="7"
+                  cy={5}
+                  r="2"
+                  stroke={r.stroke}
+                  fill="transparent"
+                />
+                <line
+                  x1="9"
+                  x2="14"
+                  y1={5}
+                  y2={5}
+                  stroke={r.stroke}
+                  fill="transparent"
+                />
               </svg>
-              <span key={`span${i}`} className='name'>{r.name}</span>
+              <span key={`span${i}`} className="name">
+                {r.name}
+              </span>
               <span key={`span2${i}`}>{r.value}</span>
             </li>
-        )
-      }
-    )
+          )
+        }
+      })
 
-    if(active){
-      return (
-        <div className='tooltip'>
-          <ul>
-            {label?(<li className='label'>{label}</li>):null}
-            {!!ys?yItems:null}
-            {!!y2s?y2Items:null}
-            {!!lastys.length?(<li className='label'>{lastys[0].payload.lastX}</li>):null}
-            {!!lastys.length?lastYItems:null}
-            {!!lasty2s.length?lastY2Items:null}
-          </ul>
-        </div>
-      )
-    }else{
-      return null
-    }
-  }
-});
+    const y2s =
+      !!payload &&
+      payload.filter((r, i) => {
+        return r.dataKey === 'y2'
+      })
+    const y2Items =
+      !!y2s &&
+      y2s.map((r, i) => {
+        if (r.payload.x) {
+          return (
+            <li key={i}>
+              <svg key={`svg${i}`} className="lineIcon">
+                <line x1="0" x2="5" y1={5} y2={5} stroke={r.stroke} />
+                <circle
+                  cx="7"
+                  cy={5}
+                  r="2"
+                  stroke={r.stroke}
+                  fill="transparent"
+                />
+                <line
+                  x1="9"
+                  x2="14"
+                  y1={5}
+                  y2={5}
+                  stroke={r.stroke}
+                  fill="transparent"
+                />
+              </svg>
+              <span key={`span${i}`} className="name">
+                {r.name}
+              </span>
+              <span key={`span2${i}`}>{r.value}</span>
+            </li>
+          )
+        }
+      })
 
-const CustomizedXAxisTick = React.createClass({
-  render () {
-    const {x, y, stroke, payload,timeUnit} = this.props;
-    
-    return (
-      <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dx={5} dy={12} textAnchor="end" fill="#999" transform="rotate(-35)">{timeUnit===2?Format.dayLabel(payload.value):Format.hourLabel(payload.value)}</text>
-      </g>
-    );
-  }
-});
-
-const CustomizedAxisTick = React.createClass({
-  render () {
-    const {x, y, stroke, payload} = this.props;
-    
-    return (
-      <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={0} textAnchor="end" fill="#999">{payload.value}</text>
-      </g>
-    );
-  }
-});
-const AreaLegend = (props) => {
-  const { payload } = props;
-
-  return (
-    <ul>
-      {
-        payload.map((entry, index) => (
-          <span className='rectLegend' key={`item-${index}`}>
-            <svg key={`svg${index}`} className='rectIcon' >
-              <rect x="0" y='0' width='20' height='10' fill={entry.payload.fill}/>
-            </svg>
-            {entry.value}
-          </span>
-        ))
-      }
-    </ul>
-  );
-}
-
-const AreaTooltip = React.createClass({
-  render () {
-    const {payload, label, active,monthStr} = this.props;
-
-    const payloads = payload&&payload.map((r,i)=>{
+    const lastys =
+      !!payload &&
+      payload.filter((r, i) => {
+        return r.dataKey === 'lasty'
+      })
+    const lastYItems =
+      !!lastys &&
+      lastys.map((r, i) => {
         return (
           <li key={i}>
-            <svg key={`svg${i}`} className='rectIcon' >
-              <rect x="0" y='0' width='20' height='10' fill={r.fill}/>
+            <svg key={`svg${i}`} className="lineIcon">
+              <line x1="0" x2="5" y1={5} y2={5} stroke={r.stroke} />
+              <circle
+                cx="7"
+                cy={5}
+                r="2"
+                stroke={r.stroke}
+                fill="transparent"
+              />
+              <line
+                x1="9"
+                x2="14"
+                y1={5}
+                y2={5}
+                stroke={r.stroke}
+                fill="transparent"
+              />
             </svg>
-            <span key={`span${i}`} className='name'>{r.name}</span>
+            <span key={`span${i}`} className="name">
+              {r.name}
+            </span>
             <span key={`span2${i}`}>{r.value}</span>
           </li>
         )
-      }
-    )
-    if(active){
+      })
+
+    const lasty2s =
+      !!payload &&
+      payload.filter((r, i) => {
+        return r.dataKey === 'lasty2'
+      })
+    const lastY2Items =
+      !!lasty2s &&
+      lasty2s.map((r, i) => {
+        return (
+          <li key={i}>
+            <svg key={`svg${i}`} className="lineIcon">
+              <line x1="0" x2="5" y1={5} y2={5} stroke={r.stroke} />
+              <circle
+                cx="7"
+                cy={5}
+                r="2"
+                stroke={r.stroke}
+                fill="transparent"
+              />
+              <line
+                x1="9"
+                x2="14"
+                y1={5}
+                y2={5}
+                stroke={r.stroke}
+                fill="transparent"
+              />
+            </svg>
+            <span key={`span${i}`} className="name">
+              {r.name}
+            </span>
+            <span key={`span2${i}`}>{r.value}</span>
+          </li>
+        )
+      })
+
+    if (active) {
       return (
-        <div className='tooltip'>
+        <div className="tooltip">
           <ul>
-            <li className='label'>{Format.monthFormat(monthStr)} {label}</li>
+            {label ? <li className="label">{label}</li> : null}
+            {!!ys ? yItems : null}
+            {!!y2s ? y2Items : null}
+            {!!lastys.length ? (
+              <li className="label">{lastys[0].payload.lastX}</li>
+            ) : null}
+            {!!lastys.length ? lastYItems : null}
+            {!!lasty2s.length ? lastY2Items : null}
+          </ul>
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
+})
+
+const CustomizedXAxisTick = React.createClass({
+  render() {
+    const { x, y, stroke, payload, timeUnit } = this.props
+
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text
+          x={0}
+          y={0}
+          dx={5}
+          dy={12}
+          textAnchor="end"
+          fill="#999"
+          transform="rotate(-35)"
+        >
+          {timeUnit === 2
+            ? Format.dayLabel(payload.value)
+            : Format.hourLabel(payload.value)}
+        </text>
+      </g>
+    )
+  }
+})
+
+const CustomizedAxisTick = React.createClass({
+  render() {
+    const { x, y, stroke, payload } = this.props
+
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={0} textAnchor="end" fill="#999">
+          {payload.value}
+        </text>
+      </g>
+    )
+  }
+})
+const AreaLegend = props => {
+  const { payload } = props
+
+  return (
+    <ul>
+      {payload.map((entry, index) => (
+        <span className="rectLegend" key={`item-${index}`}>
+          <svg key={`svg${index}`} className="rectIcon">
+            <rect
+              x="0"
+              y="0"
+              width="20"
+              height="10"
+              fill={entry.payload.fill}
+            />
+          </svg>
+          {entry.value}
+        </span>
+      ))}
+    </ul>
+  )
+}
+
+const AreaTooltip = React.createClass({
+  render() {
+    const { payload, label, active, monthStr } = this.props
+
+    const payloads =
+      payload &&
+      payload.map((r, i) => {
+        return (
+          <li key={i}>
+            <svg key={`svg${i}`} className="rectIcon">
+              <rect x="0" y="0" width="20" height="10" fill={r.fill} />
+            </svg>
+            <span key={`span${i}`} className="name">
+              {r.name}
+            </span>
+            <span key={`span2${i}`}>{r.value}</span>
+          </li>
+        )
+      })
+    if (active) {
+      return (
+        <div className="tooltip">
+          <ul>
+            <li className="label">
+              {Format.monthFormat(monthStr)} {label}
+            </li>
             {payloads}
           </ul>
         </div>
       )
-    }else{
+    } else {
       return null
     }
   }
-});
+})
 
 const AreaYAxisTick = React.createClass({
-  render () {
-    const {x, y, payload} = this.props;
-    
+  render() {
+    const { x, y, payload } = this.props
+
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={0} textAnchor="end" fill="#999">{payload.value}小时</text>
+        <text x={0} y={0} dy={0} textAnchor="end" fill="#999">
+          {payload.value}小时
+        </text>
       </g>
-    );
+    )
   }
-});
+})

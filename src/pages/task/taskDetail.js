@@ -11,8 +11,8 @@ import {
 } from 'antd'
 
 import Time from '../component/time'
-import Noti from '../noti'
-import AjaxHandler from '../ajax'
+import Noti from '../../util/noti'
+import AjaxHandler from '../../util/ajax'
 import CONSTANTS from '../component/constants'
 import LoadingMask from '../component/loadingMask'
 import RepairmanTable from '../component/repairmanChoose'

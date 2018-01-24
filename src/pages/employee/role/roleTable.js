@@ -4,15 +4,15 @@
 */
 
 import React from 'react'
-import { Link} from 'react-router-dom'
-import { Table, Popconfirm} from 'antd'
-import Noti from '../../noti'
-import AjaxHandler from '../../ajax'
+import { Link } from 'react-router-dom'
+import { Table, Popconfirm } from 'antd'
+import Noti from '../../../util/noti'
+import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 
-import {checkObject} from '../../util/checkSame'
-import {add, mul} from '../../util/numberHandle'
+import { checkObject } from '../../util/checkSame'
+import { add, mul } from '../../util/numberHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -28,7 +28,7 @@ class RoleTable extends React.Component {
     roles: PropTypes.array.isRequired,
     rolesSet: PropTypes.bool.isRequired
   }
-  constructor(props){
+  constructor(props) {
     super(props)
     this.state = {
       dataSource: [],
@@ -38,50 +38,66 @@ class RoleTable extends React.Component {
       deletingId: '',
       hintDeleteModal: false
     }
-    this.columns = [{
-      title: '身份',
-      dataIndex: 'name',
-      width: '75%',
-      className: 'firstCol'
-    }, {
-      title: '操作',
-      dataIndex: 'operation',
-      className: 'lastCol',
-      width: '100',
-      render: (text, record, index) => (
-        <div style={{textAlign:'right'}} key={index} className='editable-row-operations'>
-          <Link to={`/employee/role/detail/:${record.id}`} >编辑</Link>
-          <span className='ant-divider' />
-          <Popconfirm title="确定要删除此角色?" 
-            onConfirm={(e) => {this.delete(e, record.id)}} okText="确认" cancelText="取消">
-            <a href="">删除</a>
-          </Popconfirm>
-        </div>
-      )
-    }]
+    this.columns = [
+      {
+        title: '身份',
+        dataIndex: 'name',
+        width: '75%',
+        className: 'firstCol'
+      },
+      {
+        title: '操作',
+        dataIndex: 'operation',
+        className: 'lastCol',
+        width: '100',
+        render: (text, record, index) => (
+          <div
+            style={{ textAlign: 'right' }}
+            key={index}
+            className="editable-row-operations"
+          >
+            <Link to={`/employee/role/detail/:${record.id}`}>编辑</Link>
+            <span className="ant-divider" />
+            <Popconfirm
+              title="确定要删除此角色?"
+              onConfirm={e => {
+                this.delete(e, record.id)
+              }}
+              okText="确认"
+              cancelText="取消"
+            >
+              <a href="">删除</a>
+            </Popconfirm>
+          </div>
+        )
+      }
+    ]
   }
-  fetchData = (body) => {
+  fetchData = body => {
     this.setState({
       loading: true
     })
-    let resource='/role/list'
-    const cb = (json) => {
-      let nextState = {loading: false}
+    let resource = '/role/list'
+    const cb = json => {
+      let nextState = { loading: false }
       if (json.data) {
         this.props.setRoleList({
           roles: json.data.roles,
           rolesSet: true
         })
       }
-      this.setState(nextState)  
+      this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb, null, {clearLoading: true, thisObj: this})
+    AjaxHandler.ajax(resource, body, cb, null, {
+      clearLoading: true,
+      thisObj: this
+    })
   }
   setData = () => {
-    let {page, roles} = this.props
+    let { page, roles } = this.props
     console.log(roles)
     let total = roles.length
-    let start = mul((page - 1), SIZE)
+    let start = mul(page - 1, SIZE)
     let end = add(start, SIZE) > total ? total : add(start, SIZE)
     let data = roles.slice(start, end)
     console.log(data)
@@ -90,9 +106,9 @@ class RoleTable extends React.Component {
       total: total
     })
   }
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    let {rolesSet} = this.props
+    let { rolesSet } = this.props
     if (rolesSet) {
       this.setData()
     } else {
@@ -103,16 +119,16 @@ class RoleTable extends React.Component {
       this.fetchData(body)
     }
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     // this.props.hide(true)
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['page', 'roles', 'rolesSet'])) {
       return
     }
     console.log(nextProps)
 
-    let {rolesSet} = nextProps
+    let { rolesSet } = nextProps
     if (rolesSet) {
       this.props = nextProps
       this.setData()
@@ -128,18 +144,20 @@ class RoleTable extends React.Component {
     if (e) {
       e.preventDefault()
     }
-    let resource='/role/delete'
-    const body={
+    let resource = '/role/delete'
+    const body = {
       id: id
     }
-    const cb = (json) => {
+    const cb = json => {
       let nextState = {}
       if (json.data) {
-        let {result, failReason} = json.data
-        if (result === false) { // service error, unknown reason
+        let { result, failReason } = json.data
+        if (result === false) {
+          // service error, unknown reason
           Noti.hintWarning('删除出错', failReason || '请稍后重新尝试')
-        } else { // delete success
-          const body={
+        } else {
+          // delete success
+          const body = {
             page: this.props.page,
             size: SIZE
           }
@@ -148,36 +166,36 @@ class RoleTable extends React.Component {
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  back = (e) => {
+  back = e => {
     this.props.history.goBack()
   }
-  changePage = (pageObj) => {
+  changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeEmployee(subModule, {page: page})
+    this.props.changeEmployee(subModule, { page: page })
   }
 
-  render () {
-    const {dataSource, total, loading} = this.state
-    const {page} = this.props
+  render() {
+    const { dataSource, total, loading } = this.state
+    const { page } = this.props
 
     return (
-        <div className='contentArea'>
-          <SearchLine addTitle='添加身份' addLink='/employee/role/add'  />
+      <div className="contentArea">
+        <SearchLine addTitle="添加身份" addLink="/employee/role/add" />
 
-          <div className='tableList'>
-            <Table 
-              bordered
-              loading={loading}
-              rowKey={(record)=>(record.id)} 
-              pagination={{pageSize: SIZE, current: page, total: total}}  
-              dataSource={dataSource} 
-              columns={this.columns} 
-              onChange={this.changePage}
-            />
-          </div>
+        <div className="tableList">
+          <Table
+            bordered
+            loading={loading}
+            rowKey={record => record.id}
+            pagination={{ pageSize: SIZE, current: page, total: total }}
+            dataSource={dataSource}
+            columns={this.columns}
+            onChange={this.changePage}
+          />
         </div>
+      </div>
     )
   }
 }
@@ -188,7 +206,9 @@ const mapStateToProps = (state, ownProps) => ({
   page: state.changeEmployee[subModule].page
 })
 
-export default withRouter(connect(mapStateToProps, {
- changeEmployee,
- setRoleList 
-})(RoleTable))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeEmployee,
+    setRoleList
+  })(RoleTable)
+)

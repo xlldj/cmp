@@ -1,92 +1,92 @@
-import React, { Component } from 'react';
-import SchoolSelector from '../component/schoolSelector';
-import OVDetail from './ovdetail';
-import Time from '../component/time';
-import AjaxHandler from '../ajax';
-import userImg from '../assets/user2.png';
+import React, { Component } from 'react'
+import SchoolSelector from '../component/schoolSelector'
+import OVDetail from './ovdetail'
+import Time from '../component/time'
+import AjaxHandler from '../../util/ajax'
+import userImg from '../assets/user2.png'
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { changeStat } from '../../actions';
-import { checkObject } from '../util/checkSame';
-const subModule = 'overview';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeStat } from '../../actions'
+import { checkObject } from '../util/checkSame'
+const subModule = 'overview'
 
 const initilaState = {
   units: []
-};
+}
 
 class OverView extends Component {
   static propTypes = {
     schoolId: PropTypes.string.isRequired
-  };
-  state = initilaState;
+  }
+  state = initilaState
 
   fetchData = body => {
-    let resource = '/api/statistics/overview';
+    let resource = '/api/statistics/overview'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error);
+        throw new Error(json.error)
       } else {
         this.setState({
           units: json.data.units
-        });
+        })
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
   componentDidMount() {
-    this.props.hide(false);
-    let { schoolId } = this.props;
+    this.props.hide(false)
+    let { schoolId } = this.props
     const body = {
       startTime: Time.getTodayStart(),
       endTime: Time.getNow()
-    };
+    }
     if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10);
+      body.schoolId = parseInt(schoolId, 10)
     }
 
-    this.fetchData(body);
+    this.fetchData(body)
   }
 
   componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['schoolId'])) {
-      return;
+      return
     }
-    let { schoolId } = nextProps;
+    let { schoolId } = nextProps
     if (schoolId === this.props.schoolId) {
-      return;
+      return
     }
     const body = {
       startTime: Time.getTodayStart(),
       endTime: Time.getNow()
-    };
+    }
     if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10);
+      body.schoolId = parseInt(schoolId, 10)
     }
 
-    this.fetchData(body);
+    this.fetchData(body)
   }
 
   changeSchool = v => {
-    let { schoolId } = this.props;
+    let { schoolId } = this.props
     if (schoolId !== v) {
-      this.props.changeStat(subModule, { schoolId: v });
+      this.props.changeStat(subModule, { schoolId: v })
     }
-  };
+  }
 
   render() {
-    const { units } = this.state;
-    const { schoolId } = this.props;
+    const { units } = this.state
+    const { schoolId } = this.props
 
-    const userData = units && units.find((r, i) => r.type === 1);
-    const showerOrder = units && units.find((r, i) => r.type === 2);
-    const drinkerOrder = units && units.find((r, i) => r.type === 3);
-    const depositAmount = units && units.find((r, i) => r.type === 4);
-    const cashAmount = units && units.find((r, i) => r.type === 5);
-    const showerRepair = units && units.find((r, i) => r.type === 6);
-    const drinkerRepair = units && units.find((r, i) => r.type === 7);
+    const userData = units && units.find((r, i) => r.type === 1)
+    const showerOrder = units && units.find((r, i) => r.type === 2)
+    const drinkerOrder = units && units.find((r, i) => r.type === 3)
+    const depositAmount = units && units.find((r, i) => r.type === 4)
+    const cashAmount = units && units.find((r, i) => r.type === 5)
+    const showerRepair = units && units.find((r, i) => r.type === 6)
+    const drinkerRepair = units && units.find((r, i) => r.type === 7)
 
     return (
       <div className="overview">
@@ -148,18 +148,18 @@ class OverView extends Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
   return {
     schoolId: state.changeStat[subModule].schoolId
-  };
-};
+  }
+}
 
 export default withRouter(
   connect(mapStateToProps, {
     changeStat
   })(OverView)
-);
+)

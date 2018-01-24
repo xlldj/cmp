@@ -1,10 +1,10 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import {Table} from 'antd'
+import { Table } from 'antd'
 
-import Noti from '../../noti'
-import AjaxHandler from '../../ajax'
+import Noti from '../../../util/noti'
+import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelector'
@@ -23,7 +23,7 @@ class PrepayTable extends React.Component {
     schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
     const dataSource = []
     this.state = {
@@ -31,50 +31,56 @@ class PrepayTable extends React.Component {
       loading: false,
       total: 0
     }
-    this.columns = [{
-      title: '学校',
-      dataIndex: 'schoolName',
-      className: 'firstCol',
-      width: '20%'
-    },{
-      title: '设备类型',
-      dataIndex: 'deviceType',
-      width: '20%',
-      render: (text,record) => (CONSTANTS.DEVICETYPE[record.deviceType])
-    }, {
-      title: '预付金额',
-      dataIndex: 'prepay',
-      render: (text,record,index) => ('¥' + (record.prepay || '未知'))
-    }, {
-      title: '最低预付金额',
-      dataIndex: 'minPrepay',
-      width: '20%',
-      render: (text,record) => ('¥' + (text || '未知'))
-    }, {
-      title: (<p className='lastCol'>操作</p>),
-      dataIndex: 'operation',
-      width: '20%',
-      render: (text, record, index) => (
-        <div className='editable-row-operations lastCol'>
-          <span>
-            <Link to={`/device/prepay/editPrepay/:${record.id}`}>编辑</Link>
-          </span>
-        </div>
-      )
-    }]
+    this.columns = [
+      {
+        title: '学校',
+        dataIndex: 'schoolName',
+        className: 'firstCol',
+        width: '20%'
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'deviceType',
+        width: '20%',
+        render: (text, record) => CONSTANTS.DEVICETYPE[record.deviceType]
+      },
+      {
+        title: '预付金额',
+        dataIndex: 'prepay',
+        render: (text, record, index) => '¥' + (record.prepay || '未知')
+      },
+      {
+        title: '最低预付金额',
+        dataIndex: 'minPrepay',
+        width: '20%',
+        render: (text, record) => '¥' + (text || '未知')
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        width: '20%',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <span>
+              <Link to={`/device/prepay/editPrepay/:${record.id}`}>编辑</Link>
+            </span>
+          </div>
+        )
+      }
+    ]
   }
-  fetchData = (body) => {
+  fetchData = body => {
     this.setState({
       loading: true
     })
-    let resource='/api/device/prepay/option/list'
-    const cb = (json) => {
-      let nextState = {loading: false}
-      if(json.error){
+    let resource = '/api/device/prepay/option/list'
+    const cb = json => {
+      let nextState = { loading: false }
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           let data = JSON.parse(JSON.stringify(json.data.options))
           nextState.dataSource = data
           nextState.total = json.data.total
@@ -82,11 +88,11 @@ class PrepayTable extends React.Component {
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    let {page, schoolId} = this.props
+    let { page, schoolId } = this.props
     const body = {
       page: page,
       size: SIZE
@@ -96,14 +102,14 @@ class PrepayTable extends React.Component {
     }
     this.fetchData(body)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
       return
     }
-    let {page, schoolId} = nextProps
+    let { page, schoolId } = nextProps
     const body = {
       page: page,
       size: SIZE
@@ -115,54 +121,67 @@ class PrepayTable extends React.Component {
   }
   delete = (e, id) => {
     e.preventDefault()
-    let resource='/api/device/prepay/option/delete'
+    let resource = '/api/device/prepay/option/delete'
     const body = {
       id: id
     }
-    const cb = (json) => {
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           const body = {
             page: this.props.page,
             size: SIZE
           }
           this.fetchData(body)
-        }else{
-          Noti.hintLock('当前项不能被删除','请咨询相关人员！')
-        }        
+        } else {
+          Noti.hintLock('当前项不能被删除', '请咨询相关人员！')
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  changePage = (pageObj) => {
+  changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeDevice(subModule, {page: page})
+    this.props.changeDevice(subModule, { page: page })
   }
-  changeSchool = (value) => {
-    let {schoolId} = this.props
+  changeSchool = value => {
+    let { schoolId } = this.props
     if (schoolId === value) {
       return
     }
-    this.props.changeDevice(subModule, {page: 1, schoolId: value})
+    this.props.changeDevice(subModule, { page: 1, schoolId: value })
   }
-  render () {
-    let {loading, total} = this.state
-    const {page, schoolId} = this.props
+  render() {
+    let { loading, total } = this.state
+    const { page, schoolId } = this.props
 
     return (
-      <div className='contentArea'>
-        <SearchLine 
-          addTitle='添加预付选项' 
-          addLink='/device/prepay/addPrepay' 
-          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
+      <div className="contentArea">
+        <SearchLine
+          addTitle="添加预付选项"
+          addLink="/device/prepay/addPrepay"
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
         />
 
-          <div className='tableList'>
-            <Table bordered loading={loading} rowKey={(record)=>(record.id)} pagination={{pageSize: SIZE, current: page, total: total}} onChange={this.changePage}  dataSource={this.state.dataSource} columns={this.columns} />
-          </div>
+        <div className="tableList">
+          <Table
+            bordered
+            loading={loading}
+            rowKey={record => record.id}
+            pagination={{ pageSize: SIZE, current: page, total: total }}
+            onChange={this.changePage}
+            dataSource={this.state.dataSource}
+            columns={this.columns}
+          />
+        </div>
       </div>
     )
   }
@@ -175,6 +194,8 @@ const mapStateToProps = (state, ownProps) => ({
   schoolId: state.changeDevice[subModule].schoolId
 })
 
-export default withRouter(connect(mapStateToProps, {
-  changeDevice
-})(PrepayTable))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeDevice
+  })(PrepayTable)
+)

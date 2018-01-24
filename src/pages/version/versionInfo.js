@@ -4,18 +4,17 @@
   2. If edit, does not need to fetch.
 */
 
-
 import React from 'react'
 
-import {Button, Popconfirm} from 'antd'
-import AjaxHandler from '../ajax'
+import { Button, Popconfirm } from 'antd'
+import AjaxHandler from '../../util/ajax'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
-import Noti from '../noti'
+import Noti from '../../util/noti'
 import CONSTANTS from '../component/constants'
 import PicturesWall from '../component/picturesWall'
 
 class VersionInfo extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       id: 0,
@@ -39,26 +38,26 @@ class VersionInfo extends React.Component {
       envError: false
     }
   }
-  fetchData =(body)=>{
-    let resource='/version/one'
-    const cb = (json) => {
+  fetchData = body => {
+    let resource = '/version/one'
+    const cb = json => {
       if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data) {
           this.setState(json.data)
-          this.setState({originalVersion: json.data.versionNo})
-        }     
+          this.setState({ originalVersion: json.data.versionNo })
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    if(this.props.match.params.id){
+    if (this.props.match.params.id) {
       let id = parseInt(this.props.match.params.id.slice(1), 10)
-      const body={
+      const body = {
         id: id
       }
       this.fetchData(body)
@@ -67,7 +66,7 @@ class VersionInfo extends React.Component {
       })
     }
   }
-  getDefaultVersion (arr) {
+  getDefaultVersion(arr) {
     let reversed = arr.reverse()
     let over = false
     reversed.forEach((r, index, current) => {
@@ -78,7 +77,7 @@ class VersionInfo extends React.Component {
           current[index] = r
           // if not the last number change, all later numbers clear to 0
           if (index > 0) {
-            for (let j=0;j<index;j++) {
+            for (let j = 0; j < index; j++) {
               current[j] = 0
             }
           }
@@ -88,15 +87,15 @@ class VersionInfo extends React.Component {
     })
     return reversed.reverse().join('.')
   }
-  fetchVersion (body) {
+  fetchVersion(body) {
     let resource = '/version/list'
     body.page = 1
     body.size = 1
-    const cb = (json) => {
+    const cb = json => {
       if (json.data && json.data.versions) {
         let key = body.envType.toString() + body.system.toString()
         let nextState = {}
-        let {defaultAddr} = this.state
+        let { defaultAddr } = this.state
         let addr = JSON.parse(JSON.stringify(defaultAddr))
         if (json.data.versions.length > 0) {
           let no = json.data.versions[0].versionNo
@@ -112,11 +111,22 @@ class VersionInfo extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   postInfo = () => {
-    let {system, versionNo, type, method, url, content, id, fileList, envType, posting} = this.state
+    let {
+      system,
+      versionNo,
+      type,
+      method,
+      url,
+      content,
+      id,
+      fileList,
+      envType,
+      posting
+    } = this.state
     if (posting) {
       return
     }
@@ -142,7 +152,7 @@ class VersionInfo extends React.Component {
     } else {
       resource = '/version/add'
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         posting: false
       })
@@ -151,16 +161,28 @@ class VersionInfo extends React.Component {
       } else {
         /*--------redirect --------*/
         if (json.data) {
-          Noti.hintSuccess(this.props.history,'/version')
+          Noti.hintSuccess(this.props.history, '/version')
         } else {
           Noti.hintServiceError(json.error.displayMessage)
-        }        
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb, null)
+    AjaxHandler.ajax(resource, body, cb, null)
   }
   completeEdit = () => {
-    let {system, versionNo, type, method, url, content, fileList, envType, checking, posting} = this.state, nextState = {}
+    let {
+        system,
+        versionNo,
+        type,
+        method,
+        url,
+        content,
+        fileList,
+        envType,
+        checking,
+        posting
+      } = this.state,
+      nextState = {}
     if (!system) {
       nextState.systemError = true
       return this.setState(nextState)
@@ -178,7 +200,8 @@ class VersionInfo extends React.Component {
     }
     if (!/^[1-9]\d?\.[0-9]\d?\.[0-9]\d?(\.[0-9]\d?)?$/.test(versionNo)) {
       nextState.codeError = true
-      nextState.codeErrorMsg = '版本号格式不正确，请输入如1.1.1或1.1.1.1格式的数字,每个数字不超过两位'
+      nextState.codeErrorMsg =
+        '版本号格式不正确，请输入如1.1.1或1.1.1.1格式的数字,每个数字不超过两位'
       return this.setState(nextState)
     }
     nextState.codeError = false
@@ -193,7 +216,7 @@ class VersionInfo extends React.Component {
     }
     nextState.methodError = false
     if (method === '1' && !url) {
-      return nextState.urlError = true
+      return (nextState.urlError = true)
     }
     nextState.urlError = false
     if (method === '2' && fileList.length === 0) {
@@ -226,14 +249,15 @@ class VersionInfo extends React.Component {
   cancelPost = () => {
     // nothing
   }
-  changeCode = (e) => {
+  changeCode = e => {
     let v = e.target.value
     this.setState({
       versionNo: v
     })
   }
-  checkCode = (e) => {
-    let v = e.target.value.trim(), nextState = {versionNo: v}
+  checkCode = e => {
+    let v = e.target.value.trim(),
+      nextState = { versionNo: v }
     if (!v) {
       nextState.codeError = true
       nextState.codeErrorMsg = '版本号不能为空！'
@@ -241,7 +265,8 @@ class VersionInfo extends React.Component {
     }
     if (!/^[1-9]\d?\.[0-9]\d?\.[0-9]\d?(\.[0-9]\d?)?$/.test(v)) {
       nextState.codeError = true
-      nextState.codeErrorMsg = '版本号格式不正确，请输入如1.1.1或1.1.1.1格式的数字,每个数字不超过两位'
+      nextState.codeErrorMsg =
+        '版本号格式不正确，请输入如1.1.1或1.1.1.1格式的数字,每个数字不超过两位'
       return this.setState(nextState)
     }
     nextState.codeError = false
@@ -249,8 +274,15 @@ class VersionInfo extends React.Component {
     this.setState(nextState)
     this.checkExist(null)
   }
-  checkExist = (callback) => {
-    let {versionNo, id, system, originalVersion, envType, checking} = this.state
+  checkExist = callback => {
+    let {
+      versionNo,
+      id,
+      system,
+      originalVersion,
+      envType,
+      checking
+    } = this.state
     if (!envType) {
       return
     }
@@ -270,7 +302,7 @@ class VersionInfo extends React.Component {
       versionNo: versionNo.trim(),
       envType: parseInt(envType, 10)
     }
-    const cb = (json) => {
+    const cb = json => {
       const nextState = {
         checking: false
       }
@@ -290,12 +322,12 @@ class VersionInfo extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
-  changeType = (v) => {
+  changeType = v => {
     let nextState = {}
     nextState.type = v
     this.setState(nextState)
   }
-  checkType = (v) => {
+  checkType = v => {
     if (!v) {
       return this.setState({
         typeError: true
@@ -307,14 +339,15 @@ class VersionInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeContent = (e) => {
+  changeContent = e => {
     let v = e.target.value
     this.setState({
       content: v
     })
   }
-  checkContent = (e) => {
-    let v = e.target.value.trim(), nextState = {content: v}
+  checkContent = e => {
+    let v = e.target.value.trim(),
+      nextState = { content: v }
     if (!v) {
       return this.setState({
         contentError: true,
@@ -332,11 +365,11 @@ class VersionInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeSystem = (v) => {
+  changeSystem = v => {
     let nextState = {
       system: v
     }
-    let {envType, defaultAddr} = this.state
+    let { envType, defaultAddr } = this.state
     // if 'envType' is set
     if (envType) {
       let envSys = envType.toString() + v
@@ -353,7 +386,7 @@ class VersionInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  checkSystem = (v) => {
+  checkSystem = v => {
     if (!v) {
       return this.setState({
         systemError: true
@@ -365,17 +398,17 @@ class VersionInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  setImages = (fileList) => {
+  setImages = fileList => {
     this.setState({
       fileList: JSON.parse(JSON.stringify(fileList))
     })
   }
-  changeMethod = (v) => {
+  changeMethod = v => {
     this.setState({
       method: v
     })
   }
-  checkMethod = (v) => {
+  checkMethod = v => {
     if (!v) {
       this.setState({
         methodError: true
@@ -387,12 +420,12 @@ class VersionInfo extends React.Component {
       })
     }
   }
-  changeUrl = (e) => {
+  changeUrl = e => {
     this.setState({
       url: e.target.value
     })
   }
-  checkUrl = (e) => {
+  checkUrl = e => {
     let v = e.target.value.trim()
     if (!v) {
       return this.setState({
@@ -407,12 +440,12 @@ class VersionInfo extends React.Component {
       })
     }
   }
-  changeEnv = (v) => {
+  changeEnv = v => {
     let nextState = {
       envType: v
     }
 
-    let {system, defaultAddr} = this.state
+    let { system, defaultAddr } = this.state
     // if 'system' is set
     if (system) {
       let envSys = v + system.toString()
@@ -428,7 +461,7 @@ class VersionInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  checkEnv = (v) => {
+  checkEnv = v => {
     if (!v) {
       return this.setState({
         envError: true
@@ -436,34 +469,52 @@ class VersionInfo extends React.Component {
     }
     if (this.state.envError) {
       this.setState({
-        envError: false,
+        envError: false
       })
     }
   }
-  render () {
-    let {id, type, typeError, versionNo, codeError, codeErrorMsg, 
-      content, contentError, contentErrorMsg,
-      system, systemError, method, methodError,
-      url, urlError, apkError, fileList, posting,
-      envType, envError
+  render() {
+    let {
+      id,
+      type,
+      typeError,
+      versionNo,
+      codeError,
+      codeErrorMsg,
+      content,
+      contentError,
+      contentErrorMsg,
+      system,
+      systemError,
+      method,
+      methodError,
+      url,
+      urlError,
+      apkError,
+      fileList,
+      posting,
+      envType,
+      envError
     } = this.state
 
     return (
-      <div className='infoList versionInfo'>
+      <div className="infoList versionInfo">
         <ul>
           <li>
             <p>选择系统:</p>
             <BasicSelectorWithoutAll
               width={'140px'}
-              disabled={id} 
+              disabled={id}
               className={id ? 'disabled' : ''}
-              staticOpts={CONSTANTS.SYSTEMS}  
-              selectedOpt={system.toString()} 
+              staticOpts={CONSTANTS.SYSTEMS}
+              selectedOpt={system.toString()}
               changeOpt={this.changeSystem}
               checkOpt={this.checkSystem}
-              invalidTitle='选择系统'
+              invalidTitle="选择系统"
             />
-            {systemError ? <span className='checkInvalid'>系统不能为空！</span> : null}        
+            {systemError ? (
+              <span className="checkInvalid">系统不能为空！</span>
+            ) : null}
           </li>
           <li>
             <p>选择环境:</p>
@@ -475,79 +526,117 @@ class VersionInfo extends React.Component {
               selectedOpt={envType}
               changeOpt={this.changeEnv}
               checkOpt={this.checkEnv}
-              invalidTitle='选择环境'
+              invalidTitle="选择环境"
             />
-            {envError ? <span className='checkInvalid'>环境不能为空！</span> : null}
+            {envError ? (
+              <span className="checkInvalid">环境不能为空！</span>
+            ) : null}
           </li>
           <li>
             <p>版本号:</p>
-            <input value={versionNo}  onChange={this.changeCode} onBlur={this.checkCode} placeholder='' />
-            {codeError ? <span className='checkInvalid'>{codeErrorMsg}</span>:null}        
+            <input
+              value={versionNo}
+              onChange={this.changeCode}
+              onBlur={this.checkCode}
+              placeholder=""
+            />
+            {codeError ? (
+              <span className="checkInvalid">{codeErrorMsg}</span>
+            ) : null}
           </li>
           <li>
             <p>更新方式:</p>
             <BasicSelectorWithoutAll
               width={'140px'}
-              staticOpts={CONSTANTS.UPDATETYPE}  
-              selectedOpt={type.toString()} 
+              staticOpts={CONSTANTS.UPDATETYPE}
+              selectedOpt={type.toString()}
               changeOpt={this.changeType}
               checkOpt={this.checkType}
-              invalidTitle='选择方式'
+              invalidTitle="选择方式"
             />
-            {typeError ? <span className='checkInvalid'>更新方式不能为空！</span>:null}        
+            {typeError ? (
+              <span className="checkInvalid">更新方式不能为空！</span>
+            ) : null}
           </li>
 
           <li>
             <p>地址输入方式:</p>
             <BasicSelectorWithoutAll
               width={'140px'}
-              staticOpts={CONSTANTS.VERSIONADDMETHOD}  
-              selectedOpt={method} 
+              staticOpts={CONSTANTS.VERSIONADDMETHOD}
+              selectedOpt={method}
               changeOpt={this.changeMethod}
               checkOpt={this.checkMethod}
-              invalidTitle='选择方式'
+              invalidTitle="选择方式"
             />
-            {methodError ? <span className='checkInvalid'>更新方式不能为空！</span>:null} 
-            {apkError ? <span className='checkInvalid'>请上传安装包！</span>:null}        
+            {methodError ? (
+              <span className="checkInvalid">更新方式不能为空！</span>
+            ) : null}
+            {apkError ? (
+              <span className="checkInvalid">请上传安装包！</span>
+            ) : null}
           </li>
 
-          {
-            method === '1' || id ?
-              <li>
-                <p>地址:</p>
-                <input className='long' type='url' value={url} onChange={this.changeUrl} onBlur={this.checkUrl} placeholder='' />
-                {urlError ? <span className='checkInvalid'>地址不能为空！</span>:null}  
-              </li>
-            : null
-          }
+          {method === '1' || id ? (
+            <li>
+              <p>地址:</p>
+              <input
+                className="long"
+                type="url"
+                value={url}
+                onChange={this.changeUrl}
+                onBlur={this.checkUrl}
+                placeholder=""
+              />
+              {urlError ? (
+                <span className="checkInvalid">地址不能为空！</span>
+              ) : null}
+            </li>
+          ) : null}
 
-          {
-            method === '2' ?
-              <li className='itemsWrapper'>
-                <p>安装包上传:</p>
-                <PicturesWall accept='*' limit={1} setImages={this.setImages} fileList={fileList} dir='version-apk' />         
-              </li>
-            : null
-          }
+          {method === '2' ? (
+            <li className="itemsWrapper">
+              <p>安装包上传:</p>
+              <PicturesWall
+                accept="*"
+                limit={1}
+                setImages={this.setImages}
+                fileList={fileList}
+                dir="version-apk"
+              />
+            </li>
+          ) : null}
 
-          <li className='itemsWrapper high'>
+          <li className="itemsWrapper high">
             <p>更新内容:</p>
             <div>
-              <textarea value={content} onChange={this.changeContent} onBlur={this.checkContent} />
-              {contentError ? <span className='checkInvalid'>{ contentErrorMsg }</span> : null }
+              <textarea
+                value={content}
+                onChange={this.changeContent}
+                onBlur={this.checkContent}
+              />
+              {contentError ? (
+                <span className="checkInvalid">{contentErrorMsg}</span>
+              ) : null}
             </div>
           </li>
         </ul>
 
-        <div className='btnArea'>
-          { posting ?
-            <Button type='primary'>确认</Button>
-            : 
-            <Popconfirm title="确定要添加么?" onConfirm={this.completeEdit} onCancel={this.cancelPost} okText="确认" cancelText="取消">
-              <Button type='primary' >确认</Button>
+        <div className="btnArea">
+          {posting ? (
+            <Button type="primary">确认</Button>
+          ) : (
+            <Popconfirm
+              title="确定要添加么?"
+              onConfirm={this.completeEdit}
+              onCancel={this.cancelPost}
+              okText="确认"
+              cancelText="取消"
+            >
+              <Button type="primary">确认</Button>
             </Popconfirm>
-          }
-          <Button onClick={this.cancel} >返回</Button>
+          )}
+          <Button onClick={this.cancel}>返回</Button>
         </div>
       </div>
     )

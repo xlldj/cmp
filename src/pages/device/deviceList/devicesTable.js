@@ -1,8 +1,8 @@
 import React from 'react'
-import { Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import {Table} from 'antd'
-import AjaxHandler from '../../ajax'
+import { Table } from 'antd'
+import AjaxHandler from '../../../util/ajax'
 
 import SearchLine from '../../component/searchLine'
 import DeviceSelector from '../../component/deviceSelector'
@@ -15,109 +15,135 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../../actions'
 
-const typeName =CONSTANTS.DEVICETYPE
+const typeName = CONSTANTS.DEVICETYPE
 const SIZE = CONSTANTS.PAGINATION
 
-class DevicesTable extends React.Component {  
+class DevicesTable extends React.Component {
   static propTypes = {
     schoolId: PropTypes.string.isRequired,
     deviceType: PropTypes.string.isRequired,
     selectKey: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
-  constructor(props){
+  constructor(props) {
     super(props)
-    let dataSource=[],schools=[]
-    let searchingText = '',searchText = '',reset = false, loading = false, total = 0
+    let dataSource = [],
+      schools = []
+    let searchingText = '',
+      searchText = '',
+      reset = false,
+      loading = false,
+      total = 0
     this.state = {
-      s: '',dataSource,schools, searchingText, searchText, reset, loading, total
+      s: '',
+      dataSource,
+      schools,
+      searchingText,
+      searchText,
+      reset,
+      loading,
+      total
     }
-    this.columns = [{
-      title: '学校',
-      dataIndex: 'schoolId',
-      className: 'firstCol',
-      render: (text,record,index) => {
-        if(this.state.schools.length){
-          let sch = this.state.schools.find((r,i) => {return r.id === record.schoolId})
-          return sch.name
-        }else{
-          return ''
+    this.columns = [
+      {
+        title: '学校',
+        dataIndex: 'schoolId',
+        className: 'firstCol',
+        render: (text, record, index) => {
+          if (this.state.schools.length) {
+            let sch = this.state.schools.find((r, i) => {
+              return r.id === record.schoolId
+            })
+            return sch.name
+          } else {
+            return ''
+          }
+        }
+      },
+      {
+        title: '设备位置',
+        dataIndex: 'location',
+        width: '25%',
+        render: (text, record) => (text ? text : '暂无')
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'type',
+        width: '25%',
+        render: (text, record, index) => typeName[record.type]
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        width: '25%',
+        render: (text, record, index) => {
+          let addr = {
+            pathname: `/device/list/deviceInfo/:${record.id}`,
+            state: {
+              id: record.id,
+              deviceType: record.type,
+              residenceId: record.residenceId
+            }
+          }
+          return (
+            <div className="editable-row-operations lastCol">
+              <span>
+                <Link to={addr}>详情</Link>
+              </span>
+            </div>
+          )
         }
       }
-    }, {
-      title: '设备位置',
-      dataIndex: 'location',
-      width: '25%',
-      render:(text,record)=>(text?text:'暂无')
-    }, {
-      title: '设备类型',
-      dataIndex: 'type',
-      width: '25%',
-      render: (text,record,index) => (typeName[record.type])
-    }, {
-      title: (<p className='lastCol'>操作</p>),
-      dataIndex: 'operation',
-      width: '25%',
-      render: (text, record, index) => {
-        let addr = {pathname: `/device/list/deviceInfo/:${record.id}`, state: {id: record.id, deviceType: record.type, residenceId: record.residenceId}}
-        return (
-          <div className='editable-row-operations lastCol'>
-            <span>
-              <Link to={addr} >详情</Link>
-            </span>
-          </div>
-        )
-      }
-    }]
+    ]
   }
   fetchSchools = () => {
-    let resource='/api/school/list'
-    const body={
+    let resource = '/api/school/list'
+    const body = {
       page: 1,
       size: 100
     }
-    const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            this.setState({
-              schools: json.data.schools
-            })
-          }       
+    const cb = json => {
+      if (json.error) {
+        throw new Error(json.error.displayMessage || json.error)
+      } else {
+        /*--------redirect --------*/
+        if (json.data) {
+          this.setState({
+            schools: json.data.schools
+          })
         }
+      }
     }
-    AjaxHandler.ajax(resource,body,cb)
-  }  
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
-  fetchData = (body) => {
+  fetchData = body => {
     this.setState({
       loading: true
     })
-    let resource='/api/device/query/list'
-    const cb = (json) => {
+    let resource = '/api/device/query/list'
+    const cb = json => {
       const nextState = {
         loading: false
       }
-      if(json.error){
+      if (json.error) {
         this.setState(nextState)
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           nextState.dataSource = json.data.devices
           nextState.total = json.data.total
-        }  
+        }
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
-  }  
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    let {page, schoolId, deviceType, selectKey} = this.props
+    let { page, schoolId, deviceType, selectKey } = this.props
     const body = {
       page: page,
       size: SIZE
@@ -125,23 +151,30 @@ class DevicesTable extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if(deviceType !== 'all'){
+    if (deviceType !== 'all') {
       body.type = deviceType
     }
-    if(selectKey){
+    if (selectKey) {
       body.selectKey = selectKey
     }
     this.fetchSchools()
     this.fetchData(body)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
-  componentWillReceiveProps (nextProps) {
-    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'deviceType', 'selectKey'])) {
+  componentWillReceiveProps(nextProps) {
+    if (
+      checkObject(this.props, nextProps, [
+        'page',
+        'schoolId',
+        'deviceType',
+        'selectKey'
+      ])
+    ) {
       return
     }
-    let {page, schoolId, deviceType, selectKey} = nextProps
+    let { page, schoolId, deviceType, selectKey } = nextProps
     const body = {
       page: page,
       size: SIZE
@@ -149,69 +182,79 @@ class DevicesTable extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if(deviceType !== 'all'){
+    if (deviceType !== 'all') {
       body.type = deviceType
     }
-    if(selectKey){
+    if (selectKey) {
       body.selectKey = selectKey
     }
     this.fetchData(body)
   }
-  changeSchool = (value) => {
-    let {schoolId} = this.props
+  changeSchool = value => {
+    let { schoolId } = this.props
     if (schoolId === value) {
       return
     }
-    this.props.changeDevice('deviceList', {page: 1, schoolId: value})
+    this.props.changeDevice('deviceList', { page: 1, schoolId: value })
   }
-  changeDevice = (value) => {
-    let {deviceType} = this.props
+  changeDevice = value => {
+    let { deviceType } = this.props
     if (deviceType === value) {
       return
     }
-    this.props.changeDevice('deviceList', {page: 1, deviceType: value})
+    this.props.changeDevice('deviceList', { page: 1, deviceType: value })
   }
-  changeSearch = (e) => {
+  changeSearch = e => {
     this.setState({
       searchingText: e.target.value
     })
   }
   pressEnter = () => {
-    let {selectKey} = this.props
-    let {searchingText} = this.state
+    let { selectKey } = this.props
+    let { searchingText } = this.state
     if (selectKey === searchingText) {
       return
     }
-    this.props.changeDevice('deviceList', {page: 1, selectKey: searchingText})
+    this.props.changeDevice('deviceList', { page: 1, selectKey: searchingText })
   }
-  changePage = (pageObj) => {
+  changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeDevice('deviceList', {page: page})
+    this.props.changeDevice('deviceList', { page: page })
   }
 
-  render () {
-    const {dataSource, loading, total, searchingText} = this.state
-    const {page, schoolId, deviceType} = this.props
+  render() {
+    const { dataSource, loading, total, searchingText } = this.state
+    const { page, schoolId, deviceType } = this.props
 
     return (
-      <div className='contentArea'>
-        <SearchLine 
-          searchInputText='设备位置' 
-          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />}
-          selector2={<DeviceSelector selectedDevice={deviceType} changeDevice={this.changeDevice} />} 
-          searchingText={searchingText} 
-          pressEnter={this.pressEnter} 
-          changeSearch={this.changeSearch} 
+      <div className="contentArea">
+        <SearchLine
+          searchInputText="设备位置"
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
+          selector2={
+            <DeviceSelector
+              selectedDevice={deviceType}
+              changeDevice={this.changeDevice}
+            />
+          }
+          searchingText={searchingText}
+          pressEnter={this.pressEnter}
+          changeSearch={this.changeSearch}
         />
 
-        <div className='tableList'>
-          <Table 
-            loading={loading} 
-            bordered 
-            rowKey={(record)=>(record.id)} 
-            pagination={{pageSize: SIZE, current: page, total: total}}  
-            dataSource={dataSource} 
-            columns={this.columns} 
+        <div className="tableList">
+          <Table
+            loading={loading}
+            bordered
+            rowKey={record => record.id}
+            pagination={{ pageSize: SIZE, current: page, total: total }}
+            dataSource={dataSource}
+            columns={this.columns}
             onChange={this.changePage}
           />
         </div>
@@ -229,6 +272,8 @@ const mapStateToProps = (state, ownProps) => ({
   page: state.changeDevice.deviceList.page
 })
 
-export default withRouter(connect(mapStateToProps, {
-  changeDevice
-})(DevicesTable))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeDevice
+  })(DevicesTable)
+)

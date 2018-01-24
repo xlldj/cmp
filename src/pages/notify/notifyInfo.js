@@ -1,38 +1,38 @@
-import React from 'react';
-import moment from 'moment';
+import React from 'react'
+import moment from 'moment'
 
-import { Button, DatePicker, Table, Modal } from 'antd';
+import { Button, DatePicker, Table, Modal } from 'antd'
 
-import AjaxHandler from '../ajax';
-import Noti from '../noti';
-import AddPlusAbs from '../component/addPlusAbs';
-import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll';
-import CONSTANTS from '../component/constants';
+import AjaxHandler from '../../util/ajax'
+import Noti from '../../util/noti'
+import AddPlusAbs from '../component/addPlusAbs'
+import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
+import CONSTANTS from '../component/constants'
 
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { changeNotify } from '../../actions';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeNotify } from '../../actions'
 
-const VALUELENGTH = '150px';
+const VALUELENGTH = '150px'
 
 class NotifyInfo extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
-  };
+  }
   constructor(props) {
-    super(props);
+    super(props)
     let schoolError = false,
       type = '0',
-      typeError = false;
+      typeError = false
     let content = '',
       contentError = false,
       endTime = moment(),
       endTimeError = false,
       mobiles = [{ mobile: '', error: false }],
       mobilesError,
-      checkCount = 0;
-    let existError = false;
+      checkCount = 0
+    let existError = false
 
     this.state = {
       type,
@@ -55,13 +55,13 @@ class NotifyInfo extends React.Component {
       posting: false,
       checking: false,
       mobileChecking: false
-    };
+    }
   }
   fetchData = body => {
-    let resource = '/api/notify/one';
+    let resource = '/api/notify/one'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data) {
           let mobiles =
@@ -70,8 +70,8 @@ class NotifyInfo extends React.Component {
               return {
                 mobile: r,
                 error: false
-              };
-            });
+              }
+            })
           let {
               type,
               schoolIds,
@@ -80,119 +80,119 @@ class NotifyInfo extends React.Component {
               endTime,
               schoolNames
             } = json.data,
-            nextState = {};
+            nextState = {}
           let schools =
             schoolIds &&
-            schoolIds.map((id, i) => ({ id: id, name: schoolNames[i] }));
-          nextState.type = type.toString();
+            schoolIds.map((id, i) => ({ id: id, name: schoolNames[i] }))
+          nextState.type = type.toString()
           if (schoolRange === 1) {
-            nextState.all = true;
+            nextState.all = true
           } else if (schoolRange === 2) {
-            nextState.schools = schools;
+            nextState.schools = schools
           }
           if (type === 1) {
             // 如果为紧急公告，保留信息以查重.
             if (schoolRange === 1) {
-              nextState.originalAll = true;
+              nextState.originalAll = true
             } else {
-              nextState.originalSchoolIds = JSON.parse(JSON.stringify(schools));
+              nextState.originalSchoolIds = JSON.parse(JSON.stringify(schools))
             }
           }
-          nextState.content = content;
+          nextState.content = content
           if (endTime) {
-            nextState.endTime = moment(endTime);
+            nextState.endTime = moment(endTime)
           }
           if (mobiles) {
-            nextState.mobiles = mobiles;
+            nextState.mobiles = mobiles
           }
-          this.setState(nextState);
+          this.setState(nextState)
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
   componentDidMount() {
-    this.props.hide(false);
+    this.props.hide(false)
     if (this.props.match.params.id) {
-      let id = parseInt(this.props.match.params.id.slice(1), 10);
+      let id = parseInt(this.props.match.params.id.slice(1), 10)
       const body = {
         id: id
-      };
-      this.fetchData(body);
+      }
+      this.fetchData(body)
       this.setState({
         id: id
-      });
+      })
     }
   }
   componentWillUnmount() {
-    this.props.hide(true);
+    this.props.hide(true)
   }
   postInfo = () => {
     if (this.state.posting) {
-      return;
+      return
     }
 
     let { schools, all, type, content, endTime } = this.state,
-      mobiles = JSON.parse(JSON.stringify(this.state.mobiles));
+      mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
     const body = {
       type: parseInt(type, 10),
       content: content
-    };
+    }
     if (type === '3') {
       for (let i = 0; i < mobiles.length; i++) {
         if (
           !mobiles[i].mobile ||
           !/^1[3|4|5|7|8][0-9]{9}$/.test(parseInt(mobiles[i].mobile, 10))
         ) {
-          mobiles[i].error = true;
-          mobiles[i].errorMessage = '手机号出错，请重新核对！';
+          mobiles[i].error = true
+          mobiles[i].errorMessage = '手机号出错，请重新核对！'
           return this.setState({
             mobiles: mobiles
-          });
+          })
         }
       }
-      let ms = mobiles.map((r, i) => parseInt(r.mobile, 10));
-      body.mobiles = ms;
+      let ms = mobiles.map((r, i) => parseInt(r.mobile, 10))
+      body.mobiles = ms
     } else {
       if (all) {
-        body.schoolRange = 1;
+        body.schoolRange = 1
       } else {
-        body.schoolRange = 2;
-        body.schoolIds = schools.map(s => s.id);
+        body.schoolRange = 2
+        body.schoolIds = schools.map(s => s.id)
       }
-      body.endTime = parseInt(moment(endTime).valueOf(), 10);
+      body.endTime = parseInt(moment(endTime).valueOf(), 10)
     }
-    let resource;
+    let resource
     if (this.props.match.params.id) {
-      body.id = parseInt(this.props.match.params.id.slice(1), 10);
-      resource = '/api/notify/update';
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
+      resource = '/api/notify/update'
     } else {
-      resource = '/api/notify/add';
+      resource = '/api/notify/add'
     }
     const cb = json => {
       const nextState = {
         posting: false
-      };
+      }
       if (json.error) {
-        this.hintError(json.error.displayMessage);
+        this.hintError(json.error.displayMessage)
       } else {
         /*--------redirect --------*/
         if (json.data) {
-          Noti.hintSuccess(this.props.history, '/notify/list');
+          Noti.hintSuccess(this.props.history, '/notify/list')
         } else {
-          this.hintError(CONSTANTS.NETWORKERRORMESSAGE);
+          this.hintError(CONSTANTS.NETWORKERRORMESSAGE)
         }
       }
-      this.setState(nextState);
-    };
+      this.setState(nextState)
+    }
 
     this.setState({
       posting: true
-    });
+    })
 
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    AjaxHandler.ajax(resource, body, cb)
+  }
   comleteEdit = () => {
     let {
       id,
@@ -203,300 +203,300 @@ class NotifyInfo extends React.Component {
       originalAll,
       checking,
       posting
-    } = this.state;
+    } = this.state
     if (!type || type === '0') {
       return this.setState({
         typeError: true
-      });
+      })
     }
     if (!content) {
       return this.setState({
         contentError: true
-      });
+      })
     }
     if ((type === '1' || type === '2') && schools.length < 1) {
       return this.setState({
         schoolError: true
-      });
+      })
     }
     if (checking || posting) {
-      return;
+      return
     }
     if (type === '3') {
-      this.checkMobileExistAndPost();
+      this.checkMobileExistAndPost()
     } else if (type === '1') {
       // 如果是紧急公告，要进行查重
       if (id && originalAll) {
         // 若原来就是全部学校, 不需要查重
-        this.postInfo();
+        this.postInfo()
       } else if (id) {
         // 编辑，但非全部学校
         let beyond = schools.filter(s => {
-          let exist = originalSchoolIds.some(o => o.id === s.id);
-          return !exist;
-        });
+          let exist = originalSchoolIds.some(o => o.id === s.id)
+          return !exist
+        })
         if (beyond.length > 0) {
           let body = {
             schoolRange: 2
-          };
-          body.schoolIds = beyond.map(b => b.id);
-          this.checkNotifyExist(this.postInfo, body);
+          }
+          body.schoolIds = beyond.map(b => b.id)
+          this.checkNotifyExist(this.postInfo, body)
         } else {
-          this.postInfo();
+          this.postInfo()
         }
       } else {
-        this.checkNotifyExist(this.postInfo);
+        this.checkNotifyExist(this.postInfo)
       }
     } else {
-      this.postInfo();
+      this.postInfo()
     }
-  };
+  }
   cancel = () => {
-    this.props.history.goBack();
-  };
+    this.props.history.goBack()
+  }
   checkNotifyExist = (callback, payload) => {
     if (this.state.checking) {
-      return;
+      return
     }
 
     this.setState({
       checking: true
-    });
+    })
 
-    let { schools, all } = this.state;
-    let resource = '/notify/check';
-    let body = {};
+    let { schools, all } = this.state
+    let resource = '/notify/check'
+    let body = {}
     if (payload) {
-      body = payload;
+      body = payload
     } else {
       if (all) {
-        body.schoolRange = 1;
+        body.schoolRange = 1
       } else {
-        body.schoolRange = 2;
-        body.schoolIds = schools.map(s => s.id);
+        body.schoolRange = 2
+        body.schoolIds = schools.map(s => s.id)
       }
     }
     const cb = json => {
       const nextState = {
         checking: false
-      };
+      }
       if (json.error) {
-        this.hintError();
+        this.hintError()
       } else {
         if (json.data.result) {
-          Noti.hintLock('请求出错', '该学校已存在紧急公告，当前不能再添加');
+          Noti.hintLock('请求出错', '该学校已存在紧急公告，当前不能再添加')
           this.setState({
             existError: true
-          });
+          })
         } else {
           if (this.state.existError) {
-            nextState.existError = false;
+            nextState.existError = false
           }
           if (callback) {
-            callback();
+            callback()
           }
         }
-        this.setState(nextState);
+        this.setState(nextState)
       }
-      this.setState(nextState);
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+      this.setState(nextState)
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   changeType = v => {
-    let nextState = {};
-    nextState.type = v;
-    this.setState(nextState);
-  };
+    let nextState = {}
+    nextState.type = v
+    this.setState(nextState)
+  }
   checkType = v => {
     if (!v || v === '0') {
       return this.setState({
         typeError: true
-      });
+      })
     }
-    let nextState = {};
+    let nextState = {}
     if (this.state.typeError) {
-      nextState.typeError = false;
+      nextState.typeError = false
     }
-    this.setState(nextState);
-  };
+    this.setState(nextState)
+  }
   changeContent = e => {
-    let v = e.target.value;
+    let v = e.target.value
     this.setState({
       content: v
-    });
-  };
+    })
+  }
   checkContent = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       return this.setState({
         content: v,
         contentError: true
-      });
+      })
     }
     let nextState = {
       content: v
-    };
-    if (this.state.contentError) {
-      nextState.contentError = false;
     }
-    this.setState(nextState);
-  };
+    if (this.state.contentError) {
+      nextState.contentError = false
+    }
+    this.setState(nextState)
+  }
   changeEndTime = v => {
     this.setState({
       endTime: v
-    });
-  };
+    })
+  }
   changeMobile = (e, i) => {
-    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles));
-    mobiles[i].mobile = e.target.value.trim();
+    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
+    mobiles[i].mobile = e.target.value.trim()
     this.setState({
       mobiles: mobiles
-    });
-  };
+    })
+  }
   checkMobile = (e, i) => {
-    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles));
+    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
     if (
       !mobiles[i].mobile ||
       !/^1[3|4|5|7|8][0-9]{9}$/.test(parseInt(mobiles[i].mobile, 10))
     ) {
-      mobiles[i].error = true;
-      mobiles[i].errorMessage = '手机号格式不正确！';
+      mobiles[i].error = true
+      mobiles[i].errorMessage = '手机号格式不正确！'
       return this.setState({
         mobiles: mobiles
-      });
+      })
     } else if (mobiles[i].error) {
-      mobiles[i].error = false;
+      mobiles[i].error = false
     }
     /* ----- check mobile if exist ----- */
     this.setState({
       mobiles: mobiles
-    });
-    this.checkSingleMobileExist(mobiles[i].mobile, i);
-  };
+    })
+    this.checkSingleMobileExist(mobiles[i].mobile, i)
+  }
   hintError = message => {
-    Noti.hintLock('请求出错', message || CONSTANTS.ERRORALTMESSAGE);
-  };
+    Noti.hintLock('请求出错', message || CONSTANTS.ERRORALTMESSAGE)
+  }
   checkMobileExistAndPost = () => {
     if (this.state.mobileChecking) {
-      return;
+      return
     }
 
     this.setState({
       mobileChecking: true
-    });
+    })
 
-    let { checkCount, mobiles } = this.state;
-    let resource = '/api/user/mobile/check';
+    let { checkCount, mobiles } = this.state
+    let resource = '/api/user/mobile/check'
     const body = {
       mobile: parseInt(mobiles[checkCount].mobile, 10)
-    };
+    }
     const cb = json => {
       const nextState = {
         mobileChecking: false
-      };
+      }
       if (json.error) {
-        this.hintError(json.error.displayMessage);
+        this.hintError(json.error.displayMessage)
       } else {
         if (json.data.result) {
-          checkCount++;
-          nextState.checkCount = checkCount;
+          checkCount++
+          nextState.checkCount = checkCount
           if (checkCount === mobiles.length) {
-            this.postInfo();
+            this.postInfo()
           } else {
-            this.checkMobileExistAndPost();
+            this.checkMobileExistAndPost()
           }
         } else {
           // hint the mobile does not exist
-          let mobiles = JSON.parse(JSON.stringify(this.state.mobiles));
-          mobiles[checkCount].error = true;
-          mobiles[checkCount].errorMessage = '该手机号未注册！';
-          nextState.checkCount = 0;
-          nextState.mobiles = mobiles;
+          let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
+          mobiles[checkCount].error = true
+          mobiles[checkCount].errorMessage = '该手机号未注册！'
+          nextState.checkCount = 0
+          nextState.mobiles = mobiles
         }
       }
-      this.setState(nextState);
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+      this.setState(nextState)
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   checkSingleMobileExist = (m, i) => {
     if (this.state.mobileChecking === true) {
-      return;
+      return
     }
     this.setState({
       mobileChecking: true
-    });
-    let resource = '/api/user/mobile/check';
+    })
+    let resource = '/api/user/mobile/check'
     const body = {
       mobile: parseInt(m, 10)
-    };
+    }
     const cb = json => {
       const nextState = {
         mobileChecking: false
-      };
+      }
       if (json.error) {
-        this.hintError(json.error.displayMessage);
+        this.hintError(json.error.displayMessage)
       } else {
         if (json.data.result) {
           // nothing
         } else {
           // hint the mobile does not exist
-          let mobiles = JSON.parse(JSON.stringify(this.state.mobiles));
-          mobiles[i].error = true;
-          mobiles[i].errorMessage = '该手机号未注册！';
-          nextState.mobiles = mobiles;
+          let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
+          mobiles[i].error = true
+          mobiles[i].errorMessage = '该手机号未注册！'
+          nextState.mobiles = mobiles
         }
       }
-      this.setState(nextState);
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+      this.setState(nextState)
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   addMobile = () => {
-    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles));
-    mobiles.push({ mobile: '', error: false });
+    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
+    mobiles.push({ mobile: '', error: false })
     this.setState({
       mobiles: mobiles
-    });
-  };
+    })
+  }
   abstractMobile = () => {
-    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles));
-    mobiles.pop();
+    let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
+    mobiles.pop()
     this.setState({
       mobiles: mobiles
-    });
-  };
+    })
+  }
   showSchools = e => {
-    e.preventDefault();
+    e.preventDefault()
     this.setState({
       showSchools: true
-    });
-  };
+    })
+  }
   closeModal = () => {
     this.setState({
       showSchools: false
-    });
-  };
+    })
+  }
   setSchools = (data, all) => {
     let { id, type, originalAll, originalSchoolIds } = this.state,
-      body = {};
+      body = {}
     if (all) {
-      let schools = data.map(r => ({ id: r.id, name: r.name }));
+      let schools = data.map(r => ({ id: r.id, name: r.name }))
       if (type === '1') {
         if (!id) {
           // 新建，全量查
-          body.schoolRange = 1;
-          this.checkNotifyExist(null, body);
+          body.schoolRange = 1
+          this.checkNotifyExist(null, body)
         } else if (!originalAll) {
           //// 原来不是全部，查重
           let beyond = schools.filter(s => {
             // 是否有超出原来范围的学校
-            let exist = originalSchoolIds.some(o => o.id === s.id);
-            return !exist;
-          });
+            let exist = originalSchoolIds.some(o => o.id === s.id)
+            return !exist
+          })
           if (beyond.length > 0) {
             // 有则对超出的学校查重
-            body.schoolRange = 2;
-            body.schoolIds = beyond.map(b => b.id);
-            this.checkNotifyExist(null, body);
+            body.schoolRange = 2
+            body.schoolIds = beyond.map(b => b.id)
+            this.checkNotifyExist(null, body)
           }
         }
       }
@@ -505,57 +505,57 @@ class NotifyInfo extends React.Component {
         showSchools: false,
         schoolError: false,
         schools: schools
-      });
+      })
     }
     let schools = [],
-      nextState = {};
+      nextState = {}
     data.forEach((r, i) => {
       if (r.selected) {
         schools.push({
           id: r.id,
           name: r.name
-        });
+        })
       }
-    });
+    })
     if (schools.length === 0) {
-      nextState.schoolError = true;
-      nextState.showSchools = false;
-      nextState.all = false;
-      nextState.schools = schools;
-      return this.setState(nextState);
+      nextState.schoolError = true
+      nextState.showSchools = false
+      nextState.all = false
+      nextState.schools = schools
+      return this.setState(nextState)
     } else if (this.state.schoolError) {
       // 若不为0，且当前有维修员无学校报错，清空报错
-      nextState.schoolError = false;
+      nextState.schoolError = false
     }
-    nextState.showSchools = false;
-    nextState.schools = schools;
-    nextState.all = false;
-    this.setState(nextState);
+    nextState.showSchools = false
+    nextState.schools = schools
+    nextState.all = false
+    this.setState(nextState)
 
     if (schools.length > 0 && type === '1') {
-      let schoolIds = schools.map(s => s.id);
+      let schoolIds = schools.map(s => s.id)
       body = {
         schoolRange: 2
-      };
+      }
       if (id === 0) {
         // 新建
-        body.schoolIds = schoolIds;
-        this.checkNotifyExist(null, body);
+        body.schoolIds = schoolIds
+        this.checkNotifyExist(null, body)
       } else if (!originalAll) {
         //原来是全部，就不需要查重，否则查重
         let beyond = schools.filter(s => {
           // 是否有超出原来范围的学校
-          let exist = originalSchoolIds.some(o => o.id === s.id);
-          return !exist;
-        });
+          let exist = originalSchoolIds.some(o => o.id === s.id)
+          return !exist
+        })
         if (beyond.length > 0) {
           // 有则对超出的学校查重
-          body.schoolIds = beyond.map(b => b.id);
-          this.checkNotifyExist(null, body);
+          body.schoolIds = beyond.map(b => b.id)
+          this.checkNotifyExist(null, body)
         }
       }
     }
-  };
+  }
 
   render() {
     let {
@@ -570,7 +570,7 @@ class NotifyInfo extends React.Component {
       showSchools,
       schools,
       all
-    } = this.state;
+    } = this.state
     const contentInput = (
       <li className="itemsWrapper high">
         <p>公告内容:</p>
@@ -585,7 +585,7 @@ class NotifyInfo extends React.Component {
           ) : null}
         </div>
       </li>
-    );
+    )
     const endItem = (
       <li>
         <p>公告截至时间:</p>
@@ -598,7 +598,7 @@ class NotifyInfo extends React.Component {
           onChange={this.changeEndTime}
         />
       </li>
-    );
+    )
     const mobileGroup =
       mobiles.length &&
       mobiles.map((r, i) => {
@@ -609,10 +609,10 @@ class NotifyInfo extends React.Component {
               key={`input${i}`}
               value={r.mobile}
               onChange={e => {
-                this.changeMobile(e, i);
+                this.changeMobile(e, i)
               }}
               onBlur={e => {
-                this.checkMobile(e, i);
+                this.checkMobile(e, i)
               }}
             />
             {r.error ? (
@@ -621,8 +621,8 @@ class NotifyInfo extends React.Component {
               </span>
             ) : null}
           </div>
-        );
-      });
+        )
+      })
     const mobileItem = (
       <li className="itemsWrapper">
         <p>用户手机:</p>
@@ -635,27 +635,27 @@ class NotifyInfo extends React.Component {
           />
         </div>
       </li>
-    );
+    )
     const schoolItems = schools.map((s, i) => (
       <span className="puncSeperated" key={i}>
         {s.name}
       </span>
-    ));
+    ))
 
     let {
       EDIT_EMERGENCY_NOTIFY,
       EDIT_SYSTEM_NOTIFY,
       EDIT_CUSTOM_NOTIFY
-    } = this.props.forbiddenStatus;
-    let notifyTypeList = JSON.parse(JSON.stringify(CONSTANTS.NOTIFYTYPES));
+    } = this.props.forbiddenStatus
+    let notifyTypeList = JSON.parse(JSON.stringify(CONSTANTS.NOTIFYTYPES))
     if (EDIT_EMERGENCY_NOTIFY) {
-      delete notifyTypeList[1];
+      delete notifyTypeList[1]
     }
     if (EDIT_SYSTEM_NOTIFY) {
-      delete notifyTypeList[2];
+      delete notifyTypeList[2]
     }
     if (EDIT_CUSTOM_NOTIFY) {
-      delete notifyTypeList[3];
+      delete notifyTypeList[3]
     }
     return (
       <div className="infoList notifyInfo">
@@ -712,154 +712,154 @@ class NotifyInfo extends React.Component {
           />
         </div>
       </div>
-    );
+    )
   }
 }
 
 class SchoolMultiSelector extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     let dataSource = [],
-      searchingText = '';
+      searchingText = ''
     this.state = {
       dataSource,
       searchingText,
       all: false
-    };
+    }
   }
   fetchSchools = body => {
-    let resource = '/school/list';
+    let resource = '/school/list'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         /*--------redirect --------*/
         if (json.data) {
           let schoolLists = json.data.schools,
-            schools = this.props.schools;
+            schools = this.props.schools
           schools.forEach((r, i) => {
-            let s = schoolLists.find(rec => rec.id === r.id);
+            let s = schoolLists.find(rec => rec.id === r.id)
             if (s) {
-              s.selected = true;
+              s.selected = true
             }
-          });
+          })
           schoolLists.forEach((r, i) => {
             if (!r.selected) {
-              r.selected = false;
+              r.selected = false
             }
-          });
+          })
           this.setState({
             dataSource: schoolLists
-          });
+          })
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   componentDidMount() {
     const body = {
       page: 1,
       size: 100
-    };
-    this.fetchSchools(body);
+    }
+    this.fetchSchools(body)
   }
   componentWillReceiveProps(nextProps) {
-    let all = nextProps.all;
-    let nextSchools = nextProps.schools;
+    let all = nextProps.all
+    let nextSchools = nextProps.schools
     if (all) {
-      let dataSource = JSON.parse(JSON.stringify(this.state.dataSource));
-      dataSource.forEach(r => (r.selected = true));
+      let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+      dataSource.forEach(r => (r.selected = true))
       return this.setState({
         all: true,
         dataSource: dataSource
-      });
+      })
     }
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource));
-    dataSource.forEach(r => (r.selected = false));
+    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    dataSource.forEach(r => (r.selected = false))
     nextSchools.forEach(r => {
-      let s = dataSource.find(school => school.id === r.id);
+      let s = dataSource.find(school => school.id === r.id)
       if (s) {
-        s.selected = true;
+        s.selected = true
       }
-    });
+    })
     this.setState({
       dataSource: dataSource
-    });
+    })
   }
   confirm = () => {
     if (this.state.all) {
       this.props.setSchools(
         JSON.parse(JSON.stringify(this.state.dataSource)),
         true
-      );
+      )
     } else {
-      this.props.setSchools(JSON.parse(JSON.stringify(this.state.dataSource)));
+      this.props.setSchools(JSON.parse(JSON.stringify(this.state.dataSource)))
     }
-  };
+  }
   cancel = () => {
     //clear all the data
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource));
-    dataSource.forEach(r => (r.selected = false));
+    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    dataSource.forEach(r => (r.selected = false))
     this.setState({
       dataSource: dataSource
-    });
-    this.props.closeModal();
-  };
+    })
+    this.props.closeModal()
+  }
   changeSelect = (e, i) => {
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource));
-    dataSource[i].selected = !dataSource[i].selected;
+    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    dataSource[i].selected = !dataSource[i].selected
     this.setState({
       dataSource: dataSource
-    });
-  };
+    })
+  }
   searchKey = e => {
     if (e.key.toLowerCase() === 'enter') {
-      this.handleSearch();
+      this.handleSearch()
     }
-  };
+  }
   changeSearch = e => {
     this.setState({
       searchingText: e.target.value.trim()
-    });
-  };
+    })
+  }
   handleSearch = () => {
     const body = {
       page: 1,
       size: 80000,
       namePrefix: this.state.searchingText
-    };
-    this.fetchSchools(body);
-  };
+    }
+    this.fetchSchools(body)
+  }
   resetSearch = () => {
     this.setState({
       searchingText: ''
-    });
+    })
     const body = {
       page: 1,
       size: 80000
-    };
-    this.fetchSchools(body);
-  };
+    }
+    this.fetchSchools(body)
+  }
   selectRow = (record, index, event) => {
-    this.changeSelect(null, index);
-  };
+    this.changeSelect(null, index)
+  }
   toggleAll = () => {
-    let all = this.state.all;
+    let all = this.state.all
     let nextState = {
       all: !all
-    };
-    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource));
+    }
+    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
     if (!all) {
       // 现在选中了所有
-      dataSource.forEach(s => (s.selected = true));
+      dataSource.forEach(s => (s.selected = true))
     } else {
-      dataSource.forEach(s => (s.selected = false));
+      dataSource.forEach(s => (s.selected = false))
     }
-    nextState.dataSource = dataSource;
-    this.setState(nextState);
-  };
+    nextState.dataSource = dataSource
+    this.setState(nextState)
+  }
   render() {
-    const { dataSource, all } = this.state;
+    const { dataSource, all } = this.state
 
     const columns = [
       {
@@ -881,15 +881,15 @@ class SchoolMultiSelector extends React.Component {
             type="checkbox"
             checked={record.selected}
             onChange={e => {
-              this.changeSelect(e, index);
+              this.changeSelect(e, index)
             }}
           />
         )
       }
-    ];
+    ]
 
     const schools =
-      dataSource && dataSource.filter((r, i) => r.selected === true);
+      dataSource && dataSource.filter((r, i) => r.selected === true)
 
     const selectedSchoolItems =
       schools &&
@@ -897,7 +897,7 @@ class SchoolMultiSelector extends React.Component {
         <span className="seperateItem" key={i}>
           {r.name}/
         </span>
-      ));
+      ))
 
     return (
       <Modal
@@ -939,18 +939,18 @@ class SchoolMultiSelector extends React.Component {
           />
         </div>
       </Modal>
-    );
+    )
   }
 }
 
 const mapStateToProps = (state, ownProps) => {
   return {
     forbiddenStatus: state.setAuthenData.forbiddenStatus
-  };
-};
+  }
+}
 
 export default withRouter(
   connect(mapStateToProps, {
     changeNotify
   })(NotifyInfo)
-);
+)

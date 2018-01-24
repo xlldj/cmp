@@ -1,14 +1,14 @@
 import React from 'react'
 
-import {Button} from 'antd'
+import { Button } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 
 class SupplierInfo extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.state = { 
+    this.state = {
       id: 0,
       name: '',
       nameError: false,
@@ -16,20 +16,20 @@ class SupplierInfo extends React.Component {
       aliasError: false,
       version: '',
       versionError: false,
-      posting: false, 
+      posting: false,
       checking: false,
       originalName: ''
     }
   }
-  fetchData =(body)=>{
-    let resource='/supplier/query/one'
-    const cb=(json)=>{
-      if(json.error){
+  fetchData = body => {
+    let resource = '/supplier/query/one'
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
-        if(json.data){
-          let {id, name, alias, version} = json.data
-          let nextState={
+      } else {
+        if (json.data) {
+          let { id, name, alias, version } = json.data
+          let nextState = {
             id: id,
             name: name,
             originalName: name,
@@ -39,26 +39,26 @@ class SupplierInfo extends React.Component {
             nextState.version = version
           }
           this.setState(nextState)
-        }      
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    if(this.props.match.params.id){
-      const body={
-        id:parseInt(this.props.match.params.id.slice(1), 10)
+    if (this.props.match.params.id) {
+      const body = {
+        id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   completeEdit = () => {
-    let {id, name, alias, version, posting} = this.state
+    let { id, name, alias, version, posting } = this.state
     if (posting) {
       return
     }
@@ -74,26 +74,29 @@ class SupplierInfo extends React.Component {
       body.version = version
     }
     const resource = '/supplier/save'
-    if (id){
+    if (id) {
       body.id = id
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         posting: false
       })
-      if(json.error){
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          Noti.hintSuccess(this.props.history,'/device/suppliers')
+        if (json.data) {
+          Noti.hintSuccess(this.props.history, '/device/suppliers')
         }
       }
     }
-    AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
+    AjaxHandler.ajax(resource, body, cb, null, {
+      clearPosting: true,
+      thisObj: this
+    })
   }
   confirm = () => {
-    let {id, name, alias, originalName, checking, posting} = this.state
+    let { id, name, alias, originalName, checking, posting } = this.state
     if (!name) {
       return this.setState({
         nameError: true
@@ -125,7 +128,7 @@ class SupplierInfo extends React.Component {
   }
   /* -----需要改成对应的查重------ */
   checkExist = (callback, state) => {
-    let {name, checking} = {...this.state, ...state}
+    let { name, checking } = { ...this.state, ...state }
     if (checking) {
       return
     }
@@ -136,7 +139,7 @@ class SupplierInfo extends React.Component {
     const body = {
       name: name
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         checking: false
       })
@@ -154,12 +157,12 @@ class SupplierInfo extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
-  changeName = (e) => {
+  changeName = e => {
     this.setState({
       name: e.target.value
     })
   }
-  checkName = (e) => {
+  checkName = e => {
     let v = e.target.value.trim()
     if (!v) {
       return this.setState({
@@ -174,14 +177,14 @@ class SupplierInfo extends React.Component {
       nextState.nameError = false
     }
     this.setState(nextState)
-    this.checkExist(null, {name: v})
+    this.checkExist(null, { name: v })
   }
-  changeAlias = (e) => {
+  changeAlias = e => {
     this.setState({
       alias: e.target.value
     })
   }
-  checkAlias = (e) => {
+  checkAlias = e => {
     let v = e.target.value.trim()
     if (!v) {
       return this.setState({
@@ -197,38 +200,61 @@ class SupplierInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeVersion = (e) => {
+  changeVersion = e => {
     this.setState({
       version: e.target.value
     })
   }
 
-  render () {
-    let {name, nameError, alias, aliasError, version, versionError} = this.state
+  render() {
+    let {
+      name,
+      nameError,
+      alias,
+      aliasError,
+      version,
+      versionError
+    } = this.state
 
     return (
-      <div className='infoList '>
+      <div className="infoList ">
         <ul>
           <li>
             <p>供应商名称:</p>
-            <input value={name} onChange={this.changeName} onBlur={this.checkName} />
-            {nameError ? <span className='checkInvalid'>供应商名字不能为空！</span> : null}
+            <input
+              value={name}
+              onChange={this.changeName}
+              onBlur={this.checkName}
+            />
+            {nameError ? (
+              <span className="checkInvalid">供应商名字不能为空！</span>
+            ) : null}
           </li>
           <li>
             <p>别名:</p>
-            <input value={alias} onChange={this.changeAlias} onBlur={this.checkAlias} />
-            {aliasError ? <span className='checkInvalid'>别名不能为空！</span> : null}
-          </li> 
+            <input
+              value={alias}
+              onChange={this.changeAlias}
+              onBlur={this.checkAlias}
+            />
+            {aliasError ? (
+              <span className="checkInvalid">别名不能为空！</span>
+            ) : null}
+          </li>
           <li>
             <p>版本号:</p>
             <input value={version} onChange={this.changeVersion} />
-            {versionError ? <span className='checkInvalid'>别名不能为空！</span> : null}
-          </li>   
+            {versionError ? (
+              <span className="checkInvalid">别名不能为空！</span>
+            ) : null}
+          </li>
         </ul>
 
-        <div className='btnArea'>
-          <Button type='primary' onClick={this.confirm} >确认</Button>
-          <Button onClick={this.back} >返回</Button>
+        <div className="btnArea">
+          <Button type="primary" onClick={this.confirm}>
+            确认
+          </Button>
+          <Button onClick={this.back}>返回</Button>
         </div>
       </div>
     )

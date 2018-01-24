@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 
 import { Table, Popconfirm } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import Time from '../../component/time'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'

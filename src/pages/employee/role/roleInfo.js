@@ -7,12 +7,15 @@
 /* ----------- add privileges control (2018/1/8)---------- */
 
 import React from 'react'
-import { Button, Checkbox} from 'antd'
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import { Button, Checkbox } from 'antd'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import CONSTANTS from '../../component/constants'
 import AuthenDataTable from '../../component/authenDataTable'
-import {buildAuthenBaseOnfull, buildAuthenDataForServer} from '../../util/authenDataHandle'
+import {
+  buildAuthenBaseOnfull,
+  buildAuthenDataForServer
+} from '../../util/authenDataHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -26,7 +29,7 @@ class RoleInfo extends React.Component {
     originalPrivileges: PropTypes.array.isRequired,
     full: PropTypes.array.isRequired
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       id: '',
@@ -42,12 +45,12 @@ class RoleInfo extends React.Component {
       functionLimitError: false
     }
   }
-  fetchData = (body) => {
-    let resource='/api/role/one'
-    const cb = (json) => {
+  fetchData = body => {
+    let resource = '/api/role/one'
+    const cb = json => {
       try {
-        if(json.data){
-          let {name, privileges, loginLimit, functionLimit} = json.data
+        if (json.data) {
+          let { name, privileges, loginLimit, functionLimit } = json.data
           let status = []
           privileges.forEach(p => {
             let r = this.props.originalPrivileges.find(o => o.id === p)
@@ -59,7 +62,7 @@ class RoleInfo extends React.Component {
           let nextState = {
             name: name,
             originalName: name,
-            authenStatus: authenStatus 
+            authenStatus: authenStatus
           }
           if (loginLimit) {
             nextState.loginLimit = loginLimit
@@ -68,19 +71,19 @@ class RoleInfo extends React.Component {
             nextState.functionLimit = functionLimit
           }
           this.setState(nextState)
-        }  
+        }
       } catch (e) {
         console.log(e)
-      }     
+      }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  componentDidMount () {
+  componentDidMount() {
     console.log(this.props.full)
     this.props.hide(false)
-    if(this.props.match.params.id){
+    if (this.props.match.params.id) {
       let id = parseInt(this.props.match.params.id.slice(1), 10)
-      const body={
+      const body = {
         id: id
       }
       this.fetchData(body)
@@ -89,14 +92,21 @@ class RoleInfo extends React.Component {
       })
     }
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   back = () => {
     this.props.history.goBack()
   }
   postData = () => {
-    let {id, name, authenStatus, posting, loginLimit, functionLimit} = this.state
+    let {
+      id,
+      name,
+      authenStatus,
+      posting,
+      loginLimit,
+      functionLimit
+    } = this.state
     if (posting) {
       return
     }
@@ -105,7 +115,7 @@ class RoleInfo extends React.Component {
     })
     let resource
     let privileges = buildAuthenDataForServer(authenStatus)
-    const body={
+    const body = {
       name: name,
       privileges: privileges,
       loginLimit: loginLimit
@@ -113,29 +123,32 @@ class RoleInfo extends React.Component {
     if (loginLimit.includes(CONSTANTS.LOGIN_LIGHT)) {
       body.functionLimit = functionLimit
     }
-    if(id){
+    if (id) {
       body.id = id
-      resource ='/api/role/update'
-    }else{
+      resource = '/api/role/update'
+    } else {
       resource = '/api/role/add'
     }
-    const cb = (json) => {
+    const cb = json => {
       try {
         this.setState({
           posting: false
         })
         if (json.data.result) {
           this.updateRolesInStore()
-          Noti.hintSuccess(this.props.history,'/employee/role')
+          Noti.hintSuccess(this.props.history, '/employee/role')
         } else {
           Noti.hintWarning(null, json.data.failReason || '添加出错，请稍后重试')
         }
       } catch (e) {
         console.log(e)
-      }     
+      }
     }
     // console.log(body)
-    AjaxHandler.ajax(resource,body,cb, null, {clearPosting: true, thisObj: this})
+    AjaxHandler.ajax(resource, body, cb, null, {
+      clearPosting: true,
+      thisObj: this
+    })
   }
   updateRolesInStore = () => {
     this.props.setRoleList({
@@ -150,7 +163,7 @@ class RoleInfo extends React.Component {
       page: 1,
       size: 10000
     }
-    const cb = (json) => {
+    const cb = json => {
       if (json.data.roles) {
         this.props.setRoleList({
           roles: json.data.roles,
@@ -164,14 +177,14 @@ class RoleInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   fetchRolePrivileges = () => {
-    let {roles} = this.props
+    let { roles } = this.props
     let roleIds = roles.map(r => r.id)
     let resource = '/role/detail/list'
     const body = {
       ids: roleIds
     }
-    const cb = (json) => {
-      let {roles} = json.data
+    const cb = json => {
+      let { roles } = json.data
       this.props.setRoleList({
         rolePrivileges: roles,
         rolePrivilegesSet: true
@@ -180,18 +193,31 @@ class RoleInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   confirm = () => {
-    let {name, originalName, id, checking, posting, loginLimit, functionLimit} = this.state
+    let {
+      name,
+      originalName,
+      id,
+      checking,
+      posting,
+      loginLimit,
+      functionLimit
+    } = this.state
     if (!name) {
       return this.setState({
         nameError: true
       })
     }
-    if (loginLimit.length < 1) { // at least one for loginLimit
+    if (loginLimit.length < 1) {
+      // at least one for loginLimit
       return this.setState({
         loginLimitError: true
       })
     }
-    if (loginLimit.includes(CONSTANTS.LOGIN_LIGHT) && functionLimit.length < 1) { // at least one if choosed 'light'
+    if (
+      loginLimit.includes(CONSTANTS.LOGIN_LIGHT) &&
+      functionLimit.length < 1
+    ) {
+      // at least one if choosed 'light'
       return this.setState({
         functionLimitError: true
       })
@@ -200,7 +226,7 @@ class RoleInfo extends React.Component {
       return
     }
     // if edit and name is not changed, post directly
-    if (id && (name === originalName)) {
+    if (id && name === originalName) {
       this.postData()
     } else {
       this.checkExist(this.postData)
@@ -208,7 +234,7 @@ class RoleInfo extends React.Component {
   }
   checkExist = (callback, state) => {
     console.log('checking')
-    let {checking, name} = {...this.state, state}
+    let { checking, name } = { ...this.state, state }
     console.log(checking)
     if (checking) {
       return
@@ -220,7 +246,7 @@ class RoleInfo extends React.Component {
     const body = {
       name: name
     }
-    const cb = (json) => {
+    const cb = json => {
       const nextState = {
         checking: false
       }
@@ -233,14 +259,17 @@ class RoleInfo extends React.Component {
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource, body, cb, null, {clearChecking: true, thisObj: this})
+    AjaxHandler.ajax(resource, body, cb, null, {
+      clearChecking: true,
+      thisObj: this
+    })
   }
-  changeName = (e) => {
+  changeName = e => {
     this.setState({
       name: e.target.value
     })
   }
-  checkName = (e) => {
+  checkName = e => {
     let m = e.target.value.trim()
     if (!m) {
       return this.setState({
@@ -248,20 +277,20 @@ class RoleInfo extends React.Component {
         nameError: true
       })
     } else {
-      this.checkExist(null, {name: m})
+      this.checkExist(null, { name: m })
       this.setState({
         name: m,
         nameError: false
       })
     }
   }
-  setAuthenStatus = (status) => {
+  setAuthenStatus = status => {
     this.setState({
       authenStatus: JSON.parse(JSON.stringify(status))
     })
   }
-  
-  changeLoginLimit = (v)=>{
+
+  changeLoginLimit = v => {
     let nextState = {}
     if (v.length === 0) {
       return this.setState({
@@ -273,8 +302,8 @@ class RoleInfo extends React.Component {
     nextState.loginLimit = v
     this.setState(nextState)
   }
-    
-  changeFunctionLimit = (v)=>{
+
+  changeFunctionLimit = v => {
     let nextState = {}
     if (v.length === 0) {
       // if has right to control function block, hint error when functionLimit is empty.
@@ -289,56 +318,67 @@ class RoleInfo extends React.Component {
     nextState.functionLimit = v
     this.setState(nextState)
   }
-  render () {
-    const {id, name, nameError, authenStatus, loginLimit, loginLimitError,
-      functionLimit, functionLimitError
+  render() {
+    const {
+      id,
+      name,
+      nameError,
+      authenStatus,
+      loginLimit,
+      loginLimitError,
+      functionLimit,
+      functionLimitError
     } = this.state
 
     return (
-      <div className='infoList roleInfo'>
+      <div className="infoList roleInfo">
         <ul>
           <li>
             <p>身份名称:</p>
-            <input 
+            <input
               disabled={id}
-              className={id ? 'disabled' : ''} 
-              onChange={this.changeName} 
+              className={id ? 'disabled' : ''}
+              onChange={this.changeName}
               onBlur={this.checkName}
-              value={name} 
+              value={name}
             />
-            { nameError ? <span className='checkInvalid'>名称不能为空！</span> : null }
+            {nameError ? (
+              <span className="checkInvalid">名称不能为空！</span>
+            ) : null}
           </li>
           <li>
             <p>可登录环境:</p>
-            <CheckboxGroup value={loginLimit} onChange={this.changeLoginLimit} >
+            <CheckboxGroup value={loginLimit} onChange={this.changeLoginLimit}>
               <Checkbox value={CONSTANTS.LOGIN_LIGHT}>运维端APP</Checkbox>
               <Checkbox value={CONSTANTS.LOGIN_CMP}>CMP管理后台</Checkbox>
             </CheckboxGroup>
-            {
-              loginLimitError ? <span className='checkInvalid' >请选择至少一个环境！</span> : null
-            }
+            {loginLimitError ? (
+              <span className="checkInvalid">请选择至少一个环境！</span>
+            ) : null}
           </li>
-          {loginLimit.includes(CONSTANTS.LOGIN_LIGHT) ?
-              <li>
-                <p>运维端功能入口:</p>
-                <CheckboxGroup value={functionLimit} onChange={this.changeFunctionLimit} >
-                  <Checkbox value={CONSTANTS.LIGHT_DEVICE}>设备管理</Checkbox>
-                  <Checkbox value={CONSTANTS.LIGHT_REPAIR}>报修管理</Checkbox>
-                  <Checkbox value={CONSTANTS.LIGHT_ORDER}>订单管理</Checkbox>
-                  <Checkbox value={CONSTANTS.LIGHT_STAT}>统计分析</Checkbox>
-                  <Checkbox value={CONSTANTS.LIGHT_FUND}>充值管理</Checkbox>
-                  <Checkbox value={CONSTANTS.LIGHT_NOTIFY}>公告管理</Checkbox>
-                </CheckboxGroup>
-                {
-                  functionLimitError ? <span className='checkInvalid' >请选择运维端权限！</span> : null
-                }
-              </li>
-              : null
-          }
-          <li className='itemsWrapper'>
+          {loginLimit.includes(CONSTANTS.LOGIN_LIGHT) ? (
+            <li>
+              <p>运维端功能入口:</p>
+              <CheckboxGroup
+                value={functionLimit}
+                onChange={this.changeFunctionLimit}
+              >
+                <Checkbox value={CONSTANTS.LIGHT_DEVICE}>设备管理</Checkbox>
+                <Checkbox value={CONSTANTS.LIGHT_REPAIR}>报修管理</Checkbox>
+                <Checkbox value={CONSTANTS.LIGHT_ORDER}>订单管理</Checkbox>
+                <Checkbox value={CONSTANTS.LIGHT_STAT}>统计分析</Checkbox>
+                <Checkbox value={CONSTANTS.LIGHT_FUND}>充值管理</Checkbox>
+                <Checkbox value={CONSTANTS.LIGHT_NOTIFY}>公告管理</Checkbox>
+              </CheckboxGroup>
+              {functionLimitError ? (
+                <span className="checkInvalid">请选择运维端权限！</span>
+              ) : null}
+            </li>
+          ) : null}
+          <li className="itemsWrapper">
             <p>CMP权限设置:</p>
           </li>
-          <li className='itemsWrapper'>
+          <li className="itemsWrapper">
             <AuthenDataTable
               clickable={true}
               authenStatus={authenStatus}
@@ -347,17 +387,17 @@ class RoleInfo extends React.Component {
           </li>
         </ul>
 
-        <div className='btnArea'>
-          <Button type='primary' onClick={this.confirm}>确认</Button>
+        <div className="btnArea">
+          <Button type="primary" onClick={this.confirm}>
+            确认
+          </Button>
           <Button onClick={this.back}>返回</Button>
         </div>
-        <div style={{clear:'both'}}></div>
-
+        <div style={{ clear: 'both' }} />
       </div>
     )
   }
 }
-
 
 const mapStateToProps = (state, ownProps) => ({
   originalPrivileges: state.setAuthenData.originalPrivileges,
@@ -367,8 +407,10 @@ const mapStateToProps = (state, ownProps) => ({
   rolePrivilegesSet: state.setRoleList.rolePrivilegesSet
 })
 
-export default withRouter(connect(mapStateToProps, {
-  changeEmployee,
-  setAuthenData,
-  setRoleList
-})(RoleInfo))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeEmployee,
+    setAuthenData,
+    setRoleList
+  })(RoleInfo)
+)

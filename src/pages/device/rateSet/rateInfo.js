@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Button } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import AddPlusAbs from '../../component/addPlusAbs'
 import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'

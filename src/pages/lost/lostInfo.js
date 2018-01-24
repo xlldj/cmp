@@ -1,9 +1,9 @@
 import React from 'react'
 import { Button, Modal, Carousel, Popconfirm } from 'antd'
-import AjaxHandler from '../ajax'
+import AjaxHandler from '../../util/ajax'
 import Time from '../component/time'
 import CONSTANTS from '../component/constants'
-import Noti from '../noti'
+import Noti from '../../util/noti'
 import BasicSelector from '../component/basicSelectorWithoutAll'
 
 import PropTypes from 'prop-types'
@@ -11,7 +11,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { setAuthenData } from '../../actions'
 
-const typeName ={
+const typeName = {
   1: '失物',
   2: '招领'
 }
@@ -20,7 +20,7 @@ class LostInfo extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       data: {},
@@ -32,37 +32,37 @@ class LostInfo extends React.Component {
       blocking: false
     }
   }
-  fetchData = (body) => {
-    let resource='/api/lost/details'
-    const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            this.setState({
-              data: json.data
-            })
-          }      
+  fetchData = body => {
+    let resource = '/api/lost/details'
+    const cb = json => {
+      if (json.error) {
+        throw new Error(json.error.displayMessage || json.error)
+      } else {
+        /*--------redirect --------*/
+        if (json.data) {
+          this.setState({
+            data: json.data
+          })
         }
+      }
     }
-    AjaxHandler.ajax(resource,body,cb)
-  }  
-  componentDidMount(){
+    AjaxHandler.ajax(resource, body, cb)
+  }
+  componentDidMount() {
     this.props.hide(false)
-    let id = this.props.match.params.id.slice(1) 
-    const body={
+    let id = this.props.match.params.id.slice(1)
+    const body = {
       id: id
     }
     this.fetchData(body)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   back = () => {
     this.props.history.push('/lost')
   }
-  showImgs = (e,i) => {
+  showImgs = (e, i) => {
     this.setState({
       showImgs: true,
       initialSlide: i
@@ -84,7 +84,7 @@ class LostInfo extends React.Component {
     const body = {
       id: this.state.data.id
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         blocking: false
       })
@@ -105,13 +105,13 @@ class LostInfo extends React.Component {
       showDefriendDate: true
     })
   }
-  changeLevel = (v) => {
+  changeLevel = v => {
     this.setState({
       defriendLevel: v
     })
   }
   postLevel = () => {
-    let {defriendLevel, data, defriending} = this.state
+    let { defriendLevel, data, defriending } = this.state
     if (defriending) {
       return
     }
@@ -130,7 +130,7 @@ class LostInfo extends React.Component {
       userId: data.userId,
       level: parseInt(defriendLevel, 10)
     }
-    const cb = (json) => {
+    const cb = json => {
       const nextState = {
         defriending: false
       }
@@ -140,7 +140,10 @@ class LostInfo extends React.Component {
           nextState.showDefriendDate = false
           nextState.level = ''
         } else {
-          Noti.hintWaring('操作失败', json.data.failReason || '请求出错,请联系客服或相关人员')
+          Noti.hintWaring(
+            '操作失败',
+            json.data.failReason || '请求出错,请联系客服或相关人员'
+          )
         }
       } else {
         Noti.hintServiceError(json.error ? json.error.displayMessage : '')
@@ -155,93 +158,171 @@ class LostInfo extends React.Component {
       showDefriendDate: false
     })
   }
-  render () {
-    let {data, showImgs, initialSlide, showDefriendDate, defriendLevel, defriendError, blocking} = this.state
-    const {forbiddenStatus} = this.props
+  render() {
+    let {
+      data,
+      showImgs,
+      initialSlide,
+      showDefriendDate,
+      defriendLevel,
+      defriendError,
+      blocking
+    } = this.state
+    const { forbiddenStatus } = this.props
 
-    let createTimeStr = Time.getTimeStr(data.createTime), lostStr = Time.getTimeStr(data.lostTime)
+    let createTimeStr = Time.getTimeStr(data.createTime),
+      lostStr = Time.getTimeStr(data.lostTime)
 
-    const imgs = (data.images&&data.images.length>0)&&(data.images.map((s,i)=>(
-      <img alt='' key={i} src={CONSTANTS.FILEADDR + s} className='thumbnail' onClick={(e)=>{this.showImgs(e,i)}} />
-    )))
+    const imgs =
+      data.images &&
+      data.images.length > 0 &&
+      data.images.map((s, i) => (
+        <img
+          alt=""
+          key={i}
+          src={CONSTANTS.FILEADDR + s}
+          className="thumbnail"
+          onClick={e => {
+            this.showImgs(e, i)
+          }}
+        />
+      ))
 
-    const carouselItems = (data.images&&data.images.length>0)&&(data.images.map((r,i) => {
-      return <img alt='' key={i} src={CONSTANTS.FILEADDR + r} className='carouselImg' />
-    }))
+    const carouselItems =
+      data.images &&
+      data.images.length > 0 &&
+      data.images.map((r, i) => {
+        return (
+          <img
+            alt=""
+            key={i}
+            src={CONSTANTS.FILEADDR + r}
+            className="carouselImg"
+          />
+        )
+      })
     const carousel = (
-      <Carousel dots={true} accessibility={true}  className='carouselItem' autoplay={true} arrows={true} initialSlide={initialSlide} >
-          {carouselItems}
+      <Carousel
+        dots={true}
+        accessibility={true}
+        className="carouselItem"
+        autoplay={true}
+        arrows={true}
+        initialSlide={initialSlide}
+      >
+        {carouselItems}
       </Carousel>
     )
 
     return (
-      <div className='infoList lostInfo' >
+      <div className="infoList lostInfo">
         <ul>
-          <li><p>学校:</p>{data.schoolName}</li>
+          <li>
+            <p>学校:</p>
+            {data.schoolName}
+          </li>
           <li>
             <p>用户:</p>
             {data.user}
-            {forbiddenStatus.DEACTIVE_USER ? null :
-              <div className='defriendWrapper'>
-                <Popconfirm title="确定要拉入黑名单么?" onConfirm={this.defriend} okText="确认" cancelText="取消">
-                  <a href=''>拉入黑名单</a>
+            {forbiddenStatus.DEACTIVE_USER ? null : (
+              <div className="defriendWrapper">
+                <Popconfirm
+                  title="确定要拉入黑名单么?"
+                  onConfirm={this.defriend}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">拉入黑名单</a>
                 </Popconfirm>
-                {showDefriendDate ?
-                  <span className='selectWrapper'>
+                {showDefriendDate ? (
+                  <span className="selectWrapper">
                     <BasicSelector
                       width={CONSTANTS.SHORTSELECTOR}
                       staticOpts={CONSTANTS.DEFRIENDLEVEL}
                       selectedOpt={defriendLevel}
                       changeOpt={this.changeLevel}
-                      invalidTitle='选择时长'
+                      invalidTitle="选择时长"
                     />
-                    <Button type='primary' onClick={this.postLevel} >确认</Button>
+                    <Button type="primary" onClick={this.postLevel}>
+                      确认
+                    </Button>
                     <Button onClick={this.cancelDefriend}>取消</Button>
-                    {
-                      defriendError ? <span className='checkInvalid'>请先选择拉入黑名单的期限!</span> : null
-                    }
+                    {defriendError ? (
+                      <span className="checkInvalid">
+                        请先选择拉入黑名单的期限!
+                      </span>
+                    ) : null}
                   </span>
-                  : null
-                }
+                ) : null}
               </div>
-            }
+            )}
           </li>
-          <li><p>类型:</p>{typeName[data.type]}</li>
-          { data.images && data.images.length>0 ? 
-            <li className='imgWrapper'><p>图片:</p>{imgs}</li> 
-            : null 
-          }
-          <li><p>标题:</p>{data.title}</li>
-          <li className='itemsWrapper'>
+          <li>
+            <p>类型:</p>
+            {typeName[data.type]}
+          </li>
+          {data.images && data.images.length > 0 ? (
+            <li className="imgWrapper">
+              <p>图片:</p>
+              {imgs}
+            </li>
+          ) : null}
+          <li>
+            <p>标题:</p>
+            {data.title}
+          </li>
+          <li className="itemsWrapper">
             <p>过程描述:</p>
-            <div className='paragraph'>
-              {data.description}
-            </div>
+            <div className="paragraph">{data.description}</div>
           </li>
-          <li><p>物品名称:</p>{data.itemName}</li>
-          <li><p>地点:</p>{data.location}</li>
-          <li><p>时间:</p>{lostStr}</li>
-          <li><p>联系方式:</p>{data.mobile}</li>
-          <li><p>发布时间:</p>{createTimeStr}</li>
+          <li>
+            <p>物品名称:</p>
+            {data.itemName}
+          </li>
+          <li>
+            <p>地点:</p>
+            {data.location}
+          </li>
+          <li>
+            <p>时间:</p>
+            {lostStr}
+          </li>
+          <li>
+            <p>联系方式:</p>
+            {data.mobile}
+          </li>
+          <li>
+            <p>发布时间:</p>
+            {createTimeStr}
+          </li>
         </ul>
-          <div className='btnArea'>
-            {
-              forbiddenStatus.SHIELD_LOST_INFO ? null :
-              ( blocking ? 
-                <Button type='primary'>屏蔽显示</Button>
-                :
-                <Popconfirm title="确定要屏蔽显示么?" onConfirm={this.blockMessage} okText="确认" cancelText="取消">
-                  <Button type='primary'>屏蔽显示</Button>
-                </Popconfirm>
-              )
-            }
-            <Button onClick={this.back}>返回</Button>
-          </div>
+        <div className="btnArea">
+          {forbiddenStatus.SHIELD_LOST_INFO ? null : blocking ? (
+            <Button type="primary">屏蔽显示</Button>
+          ) : (
+            <Popconfirm
+              title="确定要屏蔽显示么?"
+              onConfirm={this.blockMessage}
+              okText="确认"
+              cancelText="取消"
+            >
+              <Button type="primary">屏蔽显示</Button>
+            </Popconfirm>
+          )}
+          <Button onClick={this.back}>返回</Button>
+        </div>
 
-        <Modal  visible={showImgs}  title='' closable={false} onCancel={this.closeImgs}  className='carouselModal' okText='' footer={null} >
-          <div className='carouselContainer' >{carousel}</div>
+        <Modal
+          visible={showImgs}
+          title=""
+          closable={false}
+          onCancel={this.closeImgs}
+          className="carouselModal"
+          okText=""
+          footer={null}
+        >
+          <div className="carouselContainer">{carousel}</div>
         </Modal>
-
       </div>
     )
   }
@@ -251,6 +332,8 @@ const mapStateToProps = (state, ownProps) => ({
   forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
-export default withRouter(connect(mapStateToProps, {
-  setAuthenData
-})(LostInfo))
+export default withRouter(
+  connect(mapStateToProps, {
+    setAuthenData
+  })(LostInfo)
+)

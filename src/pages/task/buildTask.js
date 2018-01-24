@@ -1,18 +1,18 @@
-import React from 'react';
-import { Button, Radio, Modal } from 'antd';
-import SchoolSelector from '../component/schoolSelectorWithoutAll';
-import BasicSelector from '../component/basicSelectorWithoutAll';
-import DeviceSelector from '../component/deviceWithoutAll';
-import CONSTANTS from '../component/constants';
-import AjaxHandler from '../ajax';
+import React from 'react'
+import { Button, Radio, Modal } from 'antd'
+import SchoolSelector from '../component/schoolSelectorWithoutAll'
+import BasicSelector from '../component/basicSelectorWithoutAll'
+import DeviceSelector from '../component/deviceWithoutAll'
+import CONSTANTS from '../component/constants'
+import AjaxHandler from '../../util/ajax'
 // import { locale } from 'moment'
-const { EMPLOYEE_REPAIRMAN } = CONSTANTS;
+const { EMPLOYEE_REPAIRMAN } = CONSTANTS
 
-const RadioGroup = Radio.Group;
+const RadioGroup = Radio.Group
 
 class BuildTask extends React.Component {
   constructor(props) {
-    super();
+    super()
     this.state = {
       schoolId: '',
       schoolError: false,
@@ -32,44 +32,44 @@ class BuildTask extends React.Component {
       posting: false,
       deviceType: '',
       deviceTypeError: false
-    };
-    this.employeeTypes = {};
-    this.employeeTypes[CONSTANTS.EMPLOYEE_REPAIRMAN] = '维修员';
-    this.taskTypes = {};
-    this.taskTypes[CONSTANTS.TASK_TYPE_REPAIR] = '报修工单';
+    }
+    this.employeeTypes = {}
+    this.employeeTypes[CONSTANTS.EMPLOYEE_REPAIRMAN] = '维修员'
+    this.taskTypes = {}
+    this.taskTypes[CONSTANTS.TASK_TYPE_REPAIR] = '报修工单'
   }
   fetchData = body => {
-    let resource = '/api/employee/department/member/list';
+    let resource = '/api/employee/department/member/list'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         /*--------redirect --------*/
         if (json.data) {
-          let items = {};
+          let items = {}
           json.data.employees.forEach(r => {
-            items[r.id] = r.name;
-          });
-          let maintainers = Object.assign({}, this.state.maintainers);
-          maintainers[body.schoolId] = items;
+            items[r.id] = r.name
+          })
+          let maintainers = Object.assign({}, this.state.maintainers)
+          maintainers[body.schoolId] = items
           this.setState({
             maintainers: maintainers
-          });
+          })
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   changeSchool = v => {
-    let schoolId = parseInt(v, 10);
+    let schoolId = parseInt(v, 10)
     let nextState = {
       schoolId: schoolId
-    };
-    let { schoolError, maintainers } = this.state;
-    if (schoolError) {
-      nextState.schoolError = false;
     }
-    this.setState(nextState);
+    let { schoolError, maintainers } = this.state
+    if (schoolError) {
+      nextState.schoolError = false
+    }
+    this.setState(nextState)
     if (schoolId) {
       if (!maintainers[schoolId]) {
         const body = {
@@ -77,115 +77,115 @@ class BuildTask extends React.Component {
           size: 10000,
           schoolId: schoolId,
           department: EMPLOYEE_REPAIRMAN
-        };
-        this.fetchData(body);
+        }
+        this.fetchData(body)
       }
     }
-  };
+  }
   changeType = value => {
     this.setState({
       type: value
-    });
-  };
+    })
+  }
   changeDevice = value => {
     this.setState({
       deviceType: value
-    });
-  };
+    })
+  }
   checkDevice = v => {
     if (!v) {
       return this.setState({
         deviceTypeError: true
-      });
+      })
     } else if (this.state.deviceTypeError) {
       this.setState({
         deviceTypeError: false
-      });
+      })
     }
-  };
+  }
   changeLocation = e => {
-    let v = e.target.value;
+    let v = e.target.value
     this.setState({
       location: v
-    });
-  };
+    })
+  }
   checkLocation = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       return this.setState({
         locationError: true,
         location: v
-      });
+      })
     }
     if (this.state.locationError) {
       this.setState({
         locationError: false,
         location: v
-      });
+      })
     }
-  };
+  }
   changeDesc = e => {
-    let v = e.target.value;
+    let v = e.target.value
     this.setState({
       desc: v
-    });
-  };
+    })
+  }
   checkDesc = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       return this.setState({
         descError: true,
         desc: v
-      });
+      })
     }
     if (this.state.descError) {
       this.setState({
         descError: false,
         desc: v
-      });
+      })
     }
-  };
+  }
   changeMobile = e => {
     this.setState({
       userMobile: e.target.value
-    });
-  };
+    })
+  }
   checkMobile = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
-      return;
+      return
     }
     if (!/^1[3|4|5|7|8][0-9]{9}$/.test(v)) {
       this.setState({
         mobileFormatError: true
-      });
+      })
     } else if (this.state.mobileFormatError) {
       this.setState({
         mobileFormatError: false
-      });
+      })
     }
-  };
+  }
   changeUrgency = e => {
-    console.log(e.target.value);
+    console.log(e.target.value)
     this.setState({
       urgency: e.target.value
-    });
-  };
+    })
+  }
   changeMaintainerType = v => {
     this.setState({
       maintainerType: v
-    });
-  };
+    })
+  }
   changeMaintainer = v => {
     this.setState({
       maintainerId: v
-    });
+    })
     if (this.state.maintainerIdError) {
       this.setState({
         maintainerIdError: false
-      });
+      })
     }
-  };
+  }
   cancelSubmit = () => {
     // clear state
     this.setState({
@@ -195,10 +195,10 @@ class BuildTask extends React.Component {
       userMobile: '',
       urgency: '',
       maintainerId: ''
-    });
+    })
     // tell parent to close
-    this.props.cancel();
-  };
+    this.props.cancel()
+  }
   confirm = () => {
     let {
       schoolId,
@@ -209,47 +209,47 @@ class BuildTask extends React.Component {
       maintainerId,
       posting,
       deviceType
-    } = this.state;
+    } = this.state
     if (!schoolId) {
       return this.setState({
         schoolError: true
-      });
+      })
     }
     if (!deviceType) {
       return this.setState({
         deviceTypeError: true
-      });
+      })
     }
     if (!location) {
       return this.setState({
         locationError: true
-      });
+      })
     }
     if (!desc) {
       return this.setState({
         descError: true
-      });
+      })
     }
     if (!/^1[3|4|5|7|8][0-9]{9}$/.test(userMobile)) {
       return this.setState({
         mobileFormatError: true
-      });
+      })
     }
     if (!urgency) {
       return this.setState({
         urgencyError: true
-      });
+      })
     }
     if (!maintainerId) {
       return this.setState({
         maintainerIdError: true
-      });
+      })
     }
     if (posting) {
-      return;
+      return
     }
-    this.postData();
-  };
+    this.postData()
+  }
   postData = () => {
     let {
       schoolId,
@@ -260,8 +260,8 @@ class BuildTask extends React.Component {
       maintainerType,
       maintainerId,
       deviceType
-    } = this.state;
-    let resource = '/work/order/add';
+    } = this.state
+    let resource = '/work/order/add'
     const body = {
       assignId: maintainerId,
       department: parseInt(maintainerType, 10),
@@ -273,20 +273,20 @@ class BuildTask extends React.Component {
       deviceType: parseInt(deviceType, 10),
       userMobile: userMobile,
       env: CONSTANTS.TASK_BUILD_CMP
-    };
+    }
     const cb = json => {
       this.setState({
         posting: false
-      });
+      })
       if (json.data) {
-        this.props.success();
+        this.props.success()
       }
-    };
+    }
     this.setState({
       posting: true
-    });
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    })
+    AjaxHandler.ajax(resource, body, cb)
+  }
   render() {
     const {
       schoolError,
@@ -306,10 +306,10 @@ class BuildTask extends React.Component {
       maintainers,
       deviceType,
       deviceTypeError
-    } = this.state;
+    } = this.state
 
     const maintainerItems =
-      schoolId && maintainers[schoolId] ? maintainers[schoolId] : {};
+      schoolId && maintainers[schoolId] ? maintainers[schoolId] : {}
 
     return (
       <Modal
@@ -426,8 +426,8 @@ class BuildTask extends React.Component {
           </div>
         </div>
       </Modal>
-    );
+    )
   }
 }
 
-export default BuildTask;
+export default BuildTask

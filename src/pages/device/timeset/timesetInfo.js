@@ -6,8 +6,8 @@ import 'rc-time-picker/assets/index.css'
 
 import { Button } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'

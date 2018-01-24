@@ -1,9 +1,9 @@
 import React from 'react'
 
-import {Table, Popconfirm, Modal} from 'antd'
+import { Table, Popconfirm, Modal } from 'antd'
 
-import Noti from '../../noti'
-import AjaxHandler from '../../ajax'
+import Noti from '../../../util/noti'
+import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
@@ -15,7 +15,7 @@ const SIZE = CONSTANTS.PAGINATION
 //const Modal = asyncComponent(() => import(/* webpackChunkName: "modal" */ "antd/lib/modal"))
 
 class ComponentType extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const dataSource = []
     this.state = {
@@ -32,65 +32,83 @@ class ComponentType extends React.Component {
       total: 0,
       id: 0
     }
-    this.columns = [{
-      title: '设备类型',
-      dataIndex: 'deviceType',
-      width: '10%',
-      className: 'firstCol',
-      render: (text, record) => (CONSTANTS.DEVICETYPE[record.deviceType])
-    }, {
-      title: '配件类型',
-      dataIndex: 'description'
-    }, {
-      title: (<p className='lastCol'>操作</p>),
-      dataIndex: 'operation',
-      width: '15%',
-      render: (text, record, index) => (
-        <div className='editable-row-operations lastCol'>
-          <span>
-            <a href='' onClick={(e) => {this.edit(e,index)}}>编辑</a>
-            <span className='ant-divider' />
-            <Popconfirm title="确定要删除此么?" onConfirm={(e) => {this.delete(e,index)}} okText="确认" cancelText="取消">
-              <a href="">删除</a>
-            </Popconfirm>
-          </span>
-        </div>
-      )
-    }]
+    this.columns = [
+      {
+        title: '设备类型',
+        dataIndex: 'deviceType',
+        width: '10%',
+        className: 'firstCol',
+        render: (text, record) => CONSTANTS.DEVICETYPE[record.deviceType]
+      },
+      {
+        title: '配件类型',
+        dataIndex: 'description'
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        width: '15%',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <span>
+              <a
+                href=""
+                onClick={e => {
+                  this.edit(e, index)
+                }}
+              >
+                编辑
+              </a>
+              <span className="ant-divider" />
+              <Popconfirm
+                title="确定要删除此么?"
+                onConfirm={e => {
+                  this.delete(e, index)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        )
+      }
+    ]
   }
-  fetchData = (body) => {
+  fetchData = body => {
     this.setState({
       loading: true
     })
-    let resource='/api/device/component/type/list'
-    const cb = (json) => {
-      let nextState = {loading: false}
-      if(json.error){
+    let resource = '/api/device/component/type/list'
+    const cb = json => {
+      let nextState = { loading: false }
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          const data = json.data.componentTypes.map((s,i) => {
+        if (json.data) {
+          const data = json.data.componentTypes.map((s, i) => {
             s.key = s.id
             return s
           })
           nextState.dataSource = data
           nextState.total = json.data.total
-        }       
+        }
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    const body={
+    const body = {
       page: 1,
       size: SIZE
     }
     this.fetchData(body)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   /*-------打开弹窗开始添加---------*/
@@ -101,8 +119,8 @@ class ComponentType extends React.Component {
     })
   }
   postCpType = () => {
-    let {deviceType} = this.state
-    if (!deviceType || deviceType==='0') {
+    let { deviceType } = this.state
+    if (!deviceType || deviceType === '0') {
       return this.setState({
         dtError: true
       })
@@ -117,7 +135,7 @@ class ComponentType extends React.Component {
       deviceType: parseInt(this.state.deviceType, 10)
     }
     let resource
-    if(this.state.editing){
+    if (this.state.editing) {
       resource = '/api/device/component/type/update'
       this.setState({
         visible: false,
@@ -127,8 +145,7 @@ class ComponentType extends React.Component {
       /*-----------update the data into the database-----------*/
       body.id = this.state.dataSource[this.state.editingIndex].id
       /*-----------dosen't need to fetch data again------------*/
-      
-    }else{
+    } else {
       resource = '/api/device/component/type/add'
       this.setState({
         visible: false,
@@ -137,18 +154,18 @@ class ComponentType extends React.Component {
       })
       /*-----------push the newly added data to the database--------------*/
     }
-    const cb = (json) => {
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           //重新拉取数据
-          if(json.data.id === -1){
-            Noti.hintLock('该配件类型已经添加','请重新输入！')
-          }else{
+          if (json.data.id === -1) {
+            Noti.hintLock('该配件类型已经添加', '请重新输入！')
+          } else {
             Noti.hintSuccessWithoutSkip()
-            const body={
+            const body = {
               size: SIZE
             }
             if (this.state.editing) {
@@ -161,27 +178,27 @@ class ComponentType extends React.Component {
             }
             this.fetchData(body)
           }
-        }else{
+        } else {
           throw new Error('网络出错，请稍后重试～')
-        }        
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
   cancelPost = () => {
-    //reset the addingName 
+    //reset the addingName
     this.setState({
       visible: false,
       addingName: '',
       editing: false
-    })    
+    })
   }
-  changeAddingName = (e) => {
+  changeAddingName = e => {
     this.setState({
       addingName: e.target.value
     })
   }
-  edit = (e,index) => {
+  edit = (e, index) => {
     e.preventDefault()
     this.setState({
       visible: true,
@@ -191,33 +208,33 @@ class ComponentType extends React.Component {
       editingIndex: index
     })
   }
-  delete = (e,index) => {
+  delete = (e, index) => {
     e.preventDefault()
-    let resource='/api/device/component/type/delete'
+    let resource = '/api/device/component/type/delete'
     const body = {
       id: this.state.dataSource[index].id
     }
-    const cb = (json) => {
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          const body={
+        if (json.data) {
+          const body = {
             page: this.state.page,
             size: SIZE
           }
           this.fetchData(body)
-        }else{
-          Noti.hintError('当前项不能被删除','请咨询相关人员！')
-        }        
+        } else {
+          Noti.hintError('当前项不能被删除', '请咨询相关人员！')
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  checkProblem = (e) => {
+  checkProblem = e => {
     let v = e.target.value.trim()
-    if(!v){
+    if (!v) {
       return this.setState({
         addingName: v,
         typeError: true
@@ -228,13 +245,13 @@ class ComponentType extends React.Component {
       typeError: false
     })
   }
-  changeDevice = (v) => {
+  changeDevice = v => {
     this.setState({
       deviceType: v
     })
   }
-  checkDevice = (v) => {
-    if (!v || v==='0') {
+  checkDevice = v => {
+    if (!v || v === '0') {
       return this.setState({
         dtError: true
       })
@@ -243,7 +260,7 @@ class ComponentType extends React.Component {
       dtError: false
     })
   }
-  changePage = (pageObj) => {
+  changePage = pageObj => {
     let page = pageObj.current
     this.setState({
       page: page,
@@ -255,55 +272,64 @@ class ComponentType extends React.Component {
     }
     this.fetchData(body)
   }
-  render () {
-    let {editing, page, total, loading, dataSource} = this.state 
+  render() {
+    let { editing, page, total, loading, dataSource } = this.state
     return (
-      <div className='contentArea'>
-        <SearchLine openTitle='添加配件类型' openModal={this.addProblem} />
+      <div className="contentArea">
+        <SearchLine openTitle="添加配件类型" openModal={this.addProblem} />
 
-          <div className='tableList'>
-            <Table 
-              bordered
-              loading={loading}
-              rowKey={(record)=>(record.id)} 
-              pagination={{pageSize: SIZE, current: page, total: total}}  
-              dataSource={dataSource} 
-              columns={this.columns} 
-              onChange={this.changePage}
-            />
-          </div>
-          <div>
-            <Modal
-              title="添加配件类型"
-              visible={this.state.visible}
-              onOk={this.postCpType}
-              onCancel={this.cancelPost}
-              maskClosable={false}
-              className='addSupplierModal'
-            >
-              <div className='contentWrapper'>
-                <label >设备类型:</label>
-                <div className='contentValue'>
-                  <DeviceWithoutAll 
-                    selectedDevice={this.state.deviceType} 
-                    width={150} 
-                    changeDevice={this.changeDevice} 
-                    checkDevice={this.checkDevice}
-                    disabled={editing}
-                    className={editing ? 'disabled' : ''}
-                  />
-                  {this.state.dtError?<span className='checkInvalid'>设备类型不能为空!</span>:null}
-                </div>
+        <div className="tableList">
+          <Table
+            bordered
+            loading={loading}
+            rowKey={record => record.id}
+            pagination={{ pageSize: SIZE, current: page, total: total }}
+            dataSource={dataSource}
+            columns={this.columns}
+            onChange={this.changePage}
+          />
+        </div>
+        <div>
+          <Modal
+            title="添加配件类型"
+            visible={this.state.visible}
+            onOk={this.postCpType}
+            onCancel={this.cancelPost}
+            maskClosable={false}
+            className="addSupplierModal"
+          >
+            <div className="contentWrapper">
+              <label>设备类型:</label>
+              <div className="contentValue">
+                <DeviceWithoutAll
+                  selectedDevice={this.state.deviceType}
+                  width={150}
+                  changeDevice={this.changeDevice}
+                  checkDevice={this.checkDevice}
+                  disabled={editing}
+                  className={editing ? 'disabled' : ''}
+                />
+                {this.state.dtError ? (
+                  <span className="checkInvalid">设备类型不能为空!</span>
+                ) : null}
               </div>
-              <div className='contentWrapper' >
-                <label htmlFor='name' >类型名称:</label>
-                <div className='contentValue'>
-                  <input  id='name' value={this.state.addingName} onChange={this.changeAddingName} onBlur={this.checkProblem} />
-                  {this.state.typeError?<span className='red'>类型不能为空!</span>:null}
-                </div>
+            </div>
+            <div className="contentWrapper">
+              <label htmlFor="name">类型名称:</label>
+              <div className="contentValue">
+                <input
+                  id="name"
+                  value={this.state.addingName}
+                  onChange={this.changeAddingName}
+                  onBlur={this.checkProblem}
+                />
+                {this.state.typeError ? (
+                  <span className="red">类型不能为空!</span>
+                ) : null}
               </div>
-            </Modal>
-          </div>
+            </div>
+          </Modal>
+        </div>
       </div>
     )
   }

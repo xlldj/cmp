@@ -1,10 +1,10 @@
 import React from 'react'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-import {Table, Popconfirm} from 'antd'
+import { Table, Popconfirm } from 'antd'
 
-import Noti from '../../noti'
-import AjaxHandler from '../../ajax'
+import Noti from '../../../util/noti'
+import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 
@@ -23,7 +23,7 @@ class RateLimitTable extends React.Component {
     schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
     const dataSource = []
     this.state = {
@@ -31,59 +31,74 @@ class RateLimitTable extends React.Component {
       loading: false,
       total: 0
     }
-    this.columns = [{
-      title: '学校',
-      dataIndex: 'schoolName',
-      className: 'firstCol',
-      width: '25%'
-    },{
-      title: '设备类型',
-      dataIndex: 'deviceType',
-      width: '25%',
-      render: (text,record) => (CONSTANTS.DEVICETYPE[record.deviceType])
-    }, {
-      title: '扣费速率',
-      dataIndex: 'money',
-      render: (text,record,index) => (`${record.time}秒/${record.money}元`)
-    }, {
-      title: (<p className='lastCol'>操作</p>),
-      dataIndex: 'operation',
-      width: '25%',
-      render: (text, record, index) => (
-        <div className='editable-row-operations lastCol'>
-          <span>
-            <Link to={`/device/rateLimit/editRateLimit/:${record.id}`}>编辑</Link>
-            <span className='ant-divider' />
-            <Popconfirm title="确定要删除么?" onConfirm={(e) => {this.delete(e,record.id)}} onCancel={this.cancelDelete} okText="确认" cancelText="取消">
-              <a href="">删除</a>
-            </Popconfirm>
-          </span>
-        </div>
-      )
-    }]
+    this.columns = [
+      {
+        title: '学校',
+        dataIndex: 'schoolName',
+        className: 'firstCol',
+        width: '25%'
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'deviceType',
+        width: '25%',
+        render: (text, record) => CONSTANTS.DEVICETYPE[record.deviceType]
+      },
+      {
+        title: '扣费速率',
+        dataIndex: 'money',
+        render: (text, record, index) => `${record.time}秒/${record.money}元`
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        width: '25%',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <span>
+              <Link to={`/device/rateLimit/editRateLimit/:${record.id}`}>
+                编辑
+              </Link>
+              <span className="ant-divider" />
+              <Popconfirm
+                title="确定要删除么?"
+                onConfirm={e => {
+                  this.delete(e, record.id)
+                }}
+                onCancel={this.cancelDelete}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        )
+      }
+    ]
   }
-  fetchData = (body) => {
+  fetchData = body => {
     this.setState({
       loading: true
     })
-    let resource='/order/limit/list'
-    const cb = (json) => {
-      let nextState = {loading: false}
-      if(json.error){
+    let resource = '/order/limit/list'
+    const cb = json => {
+      let nextState = { loading: false }
+      if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-      }else{
-        if(json.data){
+      } else {
+        if (json.data) {
           nextState.dataSource = json.data.orderLimits
           nextState.total = json.data.total
         }
       }
       this.setState(nextState)
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    let {page, schoolId} = this.props
+    let { page, schoolId } = this.props
     const body = {
       page: page,
       size: SIZE
@@ -93,14 +108,14 @@ class RateLimitTable extends React.Component {
     }
     this.fetchData(body)
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
       return
     }
-    let {page, schoolId} = nextProps
+    let { page, schoolId } = nextProps
     const body = {
       page: page,
       size: SIZE
@@ -110,12 +125,12 @@ class RateLimitTable extends React.Component {
     }
     this.fetchData(body)
   }
-  changeSchool = (value) => {
-    let {schoolId} = this.props
+  changeSchool = value => {
+    let { schoolId } = this.props
     if (schoolId === value) {
       return
     }
-    this.props.changeDevice(subModule, {page: 1, schoolId: value})
+    this.props.changeDevice(subModule, { page: 1, schoolId: value })
   }
   delete = (e, id) => {
     e.preventDefault()
@@ -123,47 +138,60 @@ class RateLimitTable extends React.Component {
     const body = {
       id: id
     }
-    const cb = (json) => {
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
+        if (json.data) {
           const body = {
             page: this.props.page,
             size: SIZE
           }
           this.fetchData(body)
-        }else{
-          Noti.hintLock('当前项不能被删除','请咨询相关人员！')
-        }        
+        } else {
+          Noti.hintLock('当前项不能被删除', '请咨询相关人员！')
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
   cancelDelete = () => {
     // nothing
   }
-  changePage = (pageObj) => {
+  changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeDevice(subModule, {page: page})
+    this.props.changeDevice(subModule, { page: page })
   }
 
-  render () {
-    let {loading, total} = this.state
-    let {page, schoolId} = this.props
+  render() {
+    let { loading, total } = this.state
+    let { page, schoolId } = this.props
 
     return (
-      <div className='contentArea'>
-        <SearchLine 
-          addTitle='添加扣费速率' 
-          addLink='/device/rateLimit/addRateLimit'
-          selector1={<SchoolSelector selectedSchool={schoolId} changeSchool={this.changeSchool} />} 
+      <div className="contentArea">
+        <SearchLine
+          addTitle="添加扣费速率"
+          addLink="/device/rateLimit/addRateLimit"
+          selector1={
+            <SchoolSelector
+              selectedSchool={schoolId}
+              changeSchool={this.changeSchool}
+            />
+          }
         />
 
-          <div className='tableList'>
-            <Table bordered loading={loading} rowKey={(record)=>(record.id)} pagination={{pageSize: SIZE, current: page, total: total}} onChange={this.changePage}  dataSource={this.state.dataSource} columns={this.columns} />
-          </div>
+        <div className="tableList">
+          <Table
+            bordered
+            loading={loading}
+            rowKey={record => record.id}
+            pagination={{ pageSize: SIZE, current: page, total: total }}
+            onChange={this.changePage}
+            dataSource={this.state.dataSource}
+            columns={this.columns}
+          />
+        </div>
       </div>
     )
   }
@@ -174,6 +202,8 @@ const mapStateToProps = (state, ownProps) => ({
   page: state.changeDevice[subModule].page
 })
 
-export default withRouter(connect(mapStateToProps, {
-  changeDevice
-})(RateLimitTable))
+export default withRouter(
+  connect(mapStateToProps, {
+    changeDevice
+  })(RateLimitTable)
+)

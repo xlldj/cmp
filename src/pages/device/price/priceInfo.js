@@ -1,21 +1,25 @@
 import React from 'react'
 
-import {Button} from 'antd'
+import { Button } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
 
-const initialItems = [{amount: '', prepay: '', unit: 0}]
-const initialDrinkItems =[[{amount: '', prepay: '', unit: 0, usefor: 0}],[{amount: '', prepay: '', unit: 0, usefor: 2}],[{amount: '', prepay: '', unit: 0, usefor: 3}]]
+const initialItems = [{ amount: '', prepay: '', unit: 0 }]
+const initialDrinkItems = [
+  [{ amount: '', prepay: '', unit: 0, usefor: 0 }],
+  [{ amount: '', prepay: '', unit: 0, usefor: 2 }],
+  [{ amount: '', prepay: '', unit: 0, usefor: 3 }]
+]
 class PriceInfo extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.state = { 
+    this.state = {
       id: 0,
       money: '',
       moneyError: false,
@@ -25,31 +29,31 @@ class PriceInfo extends React.Component {
       schoolError: false
     }
   }
-  fetchData =(body)=>{
-    let resource='/device/prepay/function/one'
-    const cb=(json)=>{
-      if(json.error){
+  fetchData = body => {
+    let resource = '/device/prepay/function/one'
+    const cb = json => {
+      if (json.error) {
         throw {
           title: '请求出错',
           message: json.error.displayMessage || '网络出错，请稍后重试～'
         }
-      }else{
-        if(json.data){
+      } else {
+        if (json.data) {
           this.setState(json.data)
           this.setState({
             originalSchool: json.data.schoolId
           })
-        }       
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    if(this.props.match.params.id){
-      const body={
-        id:parseInt(this.props.match.params.id.slice(1), 10)
+    if (this.props.match.params.id) {
+      const body = {
+        id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
       this.setState({
@@ -57,12 +61,12 @@ class PriceInfo extends React.Component {
       })
     }
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
 
   postInfo = () => {
-    let {id, schoolId, money, amount} = this.state
+    let { id, schoolId, money, amount } = this.state
 
     const body = {
       schoolId: schoolId,
@@ -70,30 +74,30 @@ class PriceInfo extends React.Component {
       amount: amount
     }
     let resource
-    if (id){
+    if (id) {
       body.id = id
       resource = '/api/device/prepay/function/update'
     } else {
       resource = '/api/device/prepay/function/add'
     }
 
-    const cb = (json) => {
-      if(json.error){
+    const cb = json => {
+      if (json.error) {
         throw {
           title: '请求出错',
           message: json.error.displayMessage || '网络出错，请稍后重试～'
         }
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          Noti.hintSuccess(this.props.history,'/device/price')
-        }       
+        if (json.data) {
+          Noti.hintSuccess(this.props.history, '/device/price')
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
   confirm = () => {
-    let {id, schoolId, money, amount, originalSchool} = this.state
+    let { id, schoolId, money, amount, originalSchool } = this.state
     if (!schoolId) {
       return this.setState({
         schoolError: true
@@ -120,12 +124,12 @@ class PriceInfo extends React.Component {
     this.props.history.goBack()
   }
 
-  checkExist = (callback) => {
+  checkExist = callback => {
     let resource = '/device/prepay/function/check'
     const body = {
       schoolId: this.state.schoolId
     }
-    const cb = (json) => {
+    const cb = json => {
       if (json.error) {
         throw {
           title: '请求出错',
@@ -144,18 +148,18 @@ class PriceInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
 
-  changeSchool = (v) => {
+  changeSchool = v => {
     this.setState({
       schoolId: parseInt(v, 10)
     })
   }
-  checkSchool = (v) => {
+  checkSchool = v => {
     if (!v) {
       return this.setState({
         schoolError: true
       })
     }
-    let {schoolError, id, originalSchool, schoolId} = this.state
+    let { schoolError, id, originalSchool, schoolId } = this.state
     if (schoolError) {
       this.setState({
         schoolError: false
@@ -165,13 +169,13 @@ class PriceInfo extends React.Component {
       this.checkExist(null)
     }
   }
-  changeMoney = (e) => {
+  changeMoney = e => {
     let v = e.target.value
     this.setState({
       money: v
     })
   }
-  checkMoney = (e) => {
+  checkMoney = e => {
     let v = e.target.value
     if (!v) {
       return this.setState({
@@ -184,13 +188,13 @@ class PriceInfo extends React.Component {
       })
     }
   }
-  changeAmount = (e) => {
+  changeAmount = e => {
     let v = e.target.value
     this.setState({
       amount: v
     })
   }
-  checkAmount = (e) => {
+  checkAmount = e => {
     let v = e.target.value
     if (!v) {
       return this.setState({
@@ -204,40 +208,72 @@ class PriceInfo extends React.Component {
     }
   }
 
-  render () {
-    let {id, schoolId, schoolError, money, moneyError, amount, amountError} = this.state
+  render() {
+    let {
+      id,
+      schoolId,
+      schoolError,
+      money,
+      moneyError,
+      amount,
+      amountError
+    } = this.state
 
     return (
-      <div className='infoList priceInfo'>
+      <div className="infoList priceInfo">
         <ul>
           <li>
             <p>学校:</p>
             <SchoolSelector
               selectedSchool={schoolId}
               width={CONSTANTS.SELECTWIDTH}
-              changeSchool={this.changeSchool} 
+              changeSchool={this.changeSchool}
               checkSchool={this.checkSchool}
               disabled={id}
               className={id ? 'disabled' : ''}
             />
-            {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
+            {schoolError ? (
+              <span className="checkInvalid">学校不能为空！</span>
+            ) : null}
           </li>
           <li>
             <p>水量单价:</p>
             <div>
-              <input type='number' className='shortInput' onChange={this.changeMoney} onBlur={this.checkMoney} value={money} />
+              <input
+                type="number"
+                className="shortInput"
+                onChange={this.changeMoney}
+                onBlur={this.checkMoney}
+                value={money}
+              />
               <span>元</span>
-              <input type='number' className='shortInput' onChange={this.changeAmount} onBlur={this.checkAmount} value={amount} />
+              <input
+                type="number"
+                className="shortInput"
+                onChange={this.changeAmount}
+                onBlur={this.checkAmount}
+                value={amount}
+              />
               <span>L水</span>
-              {moneyError?<span className='checkInvalid'>金额不能为空！</span>:null}
-              {amountError?<span className='checkInvalid'>水量不能为空！</span>:null}
+              {moneyError ? (
+                <span className="checkInvalid">金额不能为空！</span>
+              ) : null}
+              {amountError ? (
+                <span className="checkInvalid">水量不能为空！</span>
+              ) : null}
             </div>
           </li>
         </ul>
 
-        <div className='btnArea'>
-          <Button type='primary' onClick={this.confirm} >确认</Button>
-          <Button onClick={this.back} >{this.props.location.state ? BACKTITLE[this.props.location.state.path] : '返回'}</Button>
+        <div className="btnArea">
+          <Button type="primary" onClick={this.confirm}>
+            确认
+          </Button>
+          <Button onClick={this.back}>
+            {this.props.location.state
+              ? BACKTITLE[this.props.location.state.path]
+              : '返回'}
+          </Button>
         </div>
       </div>
     )

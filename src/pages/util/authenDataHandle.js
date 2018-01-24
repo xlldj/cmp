@@ -1,9 +1,9 @@
-import Noti from '../noti'
+import Noti from '../../util/noti'
 import CONSTANTS from '../component/constants'
 const privilege2Url = CONSTANTS.PRIVILEGE2URL
 const OPETYPES = CONSTANTS.AuthenOpeType
 
-export function buildAuthenData (data, selected) {
+export function buildAuthenData(data, selected) {
   /* count: count of authentication items, for style */
   /*   key: to facilitate the handle of click event in ahthen table */
   // debugger
@@ -12,7 +12,10 @@ export function buildAuthenData (data, selected) {
   }
   let status = []
   data.forEach((r, i) => {
-    let mainId = r.mainId, subId = r.subId, oper = r.oper, authenId = r.id
+    let mainId = r.mainId,
+      subId = r.subId,
+      oper = r.oper,
+      authenId = r.id
     let mainBlock = status.find(s => s.id === mainId)
     if (mainBlock) {
       // status has the mainId
@@ -21,7 +24,8 @@ export function buildAuthenData (data, selected) {
       if (subBlock) {
         // current main block has the sub
         subBlock.count++
-        let operBlock = subBlock.children && subBlock.children.find(o => o.opeType === oper)
+        let operBlock =
+          subBlock.children && subBlock.children.find(o => o.opeType === oper)
         if (operBlock) {
           // current sub has the operation block
           operBlock.count++
@@ -130,7 +134,7 @@ export function buildAuthenData (data, selected) {
 }
 
 // build current user's authentication status, only has selected items
-export function buildCurrentAuthen (data) {
+export function buildCurrentAuthen(data) {
   if (data.length === 0) {
     return
   }
@@ -141,7 +145,7 @@ export function buildCurrentAuthen (data) {
 // build authen status based on full. Such as in roleInfo.js, employeeInfo.js
 // 'data' is a constructed authen structure like in buildAuthenData()
 // 'status' is a array of selected privileges, fetched from server,
-export function buildAuthenBaseOnfull (data, status) {
+export function buildAuthenBaseOnfull(data, status) {
   let full = JSON.parse(JSON.stringify(data))
   console.log(full)
   console.log(status)
@@ -166,7 +170,7 @@ export function buildAuthenBaseOnfull (data, status) {
 }
 // build a array which contains forbidden url
 // 'full' and 'current' are some structure: flatten object array directly from server.
-export function buildForbiddenUrl (full, current) {
+export function buildForbiddenUrl(full, current) {
   if (!full || full.length === 0) {
     return
   }
@@ -174,7 +178,7 @@ export function buildForbiddenUrl (full, current) {
     return
   }
   try {
-    let forbidden = full.filter((r) => {
+    let forbidden = full.filter(r => {
       let found = current.find(rec => rec.id === r.id)
       if (found) {
         return false
@@ -183,7 +187,7 @@ export function buildForbiddenUrl (full, current) {
       }
     })
     let forbiddenUrls = []
-    forbidden.forEach((r) => {
+    forbidden.forEach(r => {
       // console.log(privilege2Url[r.desc])
       let urls = privilege2Url[r.desc]
       if (urls) {
@@ -197,12 +201,12 @@ export function buildForbiddenUrl (full, current) {
   }
 }
 
-export function buildForbiddenStatus (full, current) {
+export function buildForbiddenStatus(full, current) {
   let desc2status = CONSTANTS.DESC2STATUS
   let forbiddenStatus = {}
   // find all the forbidden items
   if (current && current.length > 0 && full && full.length > 0) {
-    let forbidden = full.filter((r) => {
+    let forbidden = full.filter(r => {
       let found = current.find(rec => rec.id === r.id)
       if (found) {
         return false
@@ -223,7 +227,7 @@ export function buildForbiddenStatus (full, current) {
 
 // used in authenInfo
 // build previleges data for server
-export function buildAuthenDataForServer (status) {
+export function buildAuthenDataForServer(status) {
   const result = []
   // debugger
   status.forEach(main => {
@@ -246,14 +250,17 @@ export function buildAuthenDataForServer (status) {
   return result
 }
 
-export function updatePrivilege (full, status) {
+export function updatePrivilege(full, status) {
   // data is a full privelege table, status is the info need to be added
   let data = JSON.parse(JSON.stringify(full))
   if (!data || !status) {
     return
   }
-  status.forEach((r) => {
-    let mainId = r.mainId, subId = r.subId, oper = r.oper, authenId = r.id
+  status.forEach(r => {
+    let mainId = r.mainId,
+      subId = r.subId,
+      oper = r.oper,
+      authenId = r.id
     let mainBlock = data.find(s => s.id === mainId)
     if (mainBlock) {
       // status has the mainId
@@ -262,7 +269,8 @@ export function updatePrivilege (full, status) {
       if (subBlock) {
         subBlock.selected = true
         // current main block has the sub
-        let operBlock = subBlock.children && subBlock.children.find(o => o.opeType === oper)
+        let operBlock =
+          subBlock.children && subBlock.children.find(o => o.opeType === oper)
         if (operBlock) {
           operBlock.selected = true
           // current sub has the operation block

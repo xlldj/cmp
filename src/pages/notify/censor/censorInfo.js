@@ -1,11 +1,11 @@
 import React from 'react'
-import moment from 'moment';
-import 'rc-time-picker/assets/index.css';
+import moment from 'moment'
+import 'rc-time-picker/assets/index.css'
 
-import {Button, DatePicker, Modal} from 'antd'
+import { Button, DatePicker, Modal } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import CONSTANTS from '../../component/constants'
 
 import PropTypes from 'prop-types'
@@ -16,13 +16,20 @@ class NotifyInfo extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
   }
-  constructor (props) {
+  constructor(props) {
     super(props)
-    let type=''
-    let content='', contentError=false, endTime = moment(), endTimeError = false
+    let type = ''
+    let content = '',
+      contentError = false,
+      endTime = moment(),
+      endTimeError = false
 
-    this.state = { 
-      type, content, contentError, endTime, endTimeError, 
+    this.state = {
+      type,
+      content,
+      contentError,
+      endTime,
+      endTimeError,
       id: 0,
       schools: [],
       all: false,
@@ -34,15 +41,28 @@ class NotifyInfo extends React.Component {
       noteError: false
     }
   }
-  fetchData =(body)=>{
-    let resource='/api/notify/one'
-    const cb=(json)=>{
-      if(json.error){
+  fetchData = body => {
+    let resource = '/api/notify/one'
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
-        if(json.data){
-          let {type, schoolIds, content, schoolRange, endTime, schoolNames, status, creatorName, note} = json.data, nextState = {}
-          let schools = schoolIds && schoolIds.map((id, i) => ({id: id, name: schoolNames[i]}))
+      } else {
+        if (json.data) {
+          let {
+              type,
+              schoolIds,
+              content,
+              schoolRange,
+              endTime,
+              schoolNames,
+              status,
+              creatorName,
+              note
+            } = json.data,
+            nextState = {}
+          let schools =
+            schoolIds &&
+            schoolIds.map((id, i) => ({ id: id, name: schoolNames[i] }))
           nextState.type = type
           if (schoolRange === 1) {
             nextState.all = true
@@ -57,17 +77,17 @@ class NotifyInfo extends React.Component {
           nextState.creatorName = creatorName || ''
           nextState.note = note || ''
           this.setState(nextState)
-        }        
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    if(this.props.match.params.id){
+    if (this.props.match.params.id) {
       let id = parseInt(this.props.match.params.id.slice(1), 10)
-      const body={
+      const body = {
         id: id
       }
       this.fetchData(body)
@@ -76,14 +96,14 @@ class NotifyInfo extends React.Component {
       })
     }
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   postInfo = () => {
     this.setState({
       posting: true
     })
-    let {id, content, endTime, note, pass} = this.state
+    let { id, content, endTime, note, pass } = this.state
     let resource = '/notify/censor'
     let passed = pass ? 1 : 2
     const body = {
@@ -93,17 +113,17 @@ class NotifyInfo extends React.Component {
       pass: passed,
       note: note.trim()
     }
-    const cb = (json) => {
-        if(json.error){
-          throw new Error(json.error.displayMessage || json.error)
-        }else{
-          /*--------redirect --------*/
-          if(json.data){
-            Noti.hintSuccess(this.props.history,'/notify/censor')
-          }      
+    const cb = json => {
+      if (json.error) {
+        throw new Error(json.error.displayMessage || json.error)
+      } else {
+        /*--------redirect --------*/
+        if (json.data) {
+          Noti.hintSuccess(this.props.history, '/notify/censor')
         }
+      }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
   censorRefuse = () => {
     if (this.checkComplete()) {
@@ -122,7 +142,7 @@ class NotifyInfo extends React.Component {
     }
   }
   checkComplete = () => {
-    let {content} = this.state
+    let { content } = this.state
     if (content) {
       return true
     } else {
@@ -135,13 +155,13 @@ class NotifyInfo extends React.Component {
   cancel = () => {
     this.props.history.goBack()
   }
-  changeContent = (e) => {
+  changeContent = e => {
     let v = e.target.value
     this.setState({
       content: v
     })
   }
-  checkContent = (e) => {
+  checkContent = e => {
     let v = e.target.value.trim()
     if (!v) {
       return this.setState({
@@ -157,14 +177,14 @@ class NotifyInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeEndTime = (v) => {
+  changeEndTime = v => {
     this.setState({
       endTime: v
     })
   }
   confirm = () => {
     let note = this.state.note.trim()
-    let {pass, checking, posting} = this.state
+    let { pass, checking, posting } = this.state
     if (!note && !pass) {
       return this.setState({
         noteError: true
@@ -182,8 +202,8 @@ class NotifyInfo extends React.Component {
       this.postInfo()
     }
   }
-  checkExist = (callback) => {
-    let {schools, checking} = this.state
+  checkExist = callback => {
+    let { schools, checking } = this.state
     if (checking) {
       return
     }
@@ -194,9 +214,9 @@ class NotifyInfo extends React.Component {
     let body = {}
 
     body.schoolRange = 2
-    body.schoolIds = schools.map((s) => (s.id))
+    body.schoolIds = schools.map(s => s.id)
 
-    const cb = (json) => {
+    const cb = json => {
       if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
       } else {
@@ -218,82 +238,117 @@ class NotifyInfo extends React.Component {
       }
     }
     AjaxHandler.ajax(resource, body, cb)
-  } 
+  }
   cancelInput = () => {
     this.setState({
       showModal: false
     })
   }
-  changeNote = (e) => {
+  changeNote = e => {
     this.setState({
       note: e.target.value
     })
   }
 
-  render () {
-    let {type, content, contentError, 
-      endTime, schools, all,
-      status, creatorName,
-      showModal, note, pass
+  render() {
+    let {
+      type,
+      content,
+      contentError,
+      endTime,
+      schools,
+      all,
+      status,
+      creatorName,
+      showModal,
+      note,
+      pass
     } = this.state
-    let {forbiddenStatus} = this.props
+    let { forbiddenStatus } = this.props
 
-    const schoolItems = schools.map((s, i) => (<span className='puncSeperated' key={i}>{s.name}</span>))
+    const schoolItems = schools.map((s, i) => (
+      <span className="puncSeperated" key={i}>
+        {s.name}
+      </span>
+    ))
 
     return (
-      <div className='infoList notifyInfo'>
+      <div className="infoList notifyInfo">
         <ul>
           <li>
             <p>公告类型:</p>
-            <span>{CONSTANTS.NOTIFYTYPES[type]}</span>      
+            <span>{CONSTANTS.NOTIFYTYPES[type]}</span>
           </li>
           <li>
             <p>选择学校:</p>
             <span>{all ? '全部学校' : schoolItems}</span>
           </li>
-          <li className='itemsWrapper high'>
+          <li className="itemsWrapper high">
             <p>公告内容:</p>
             <div>
-              <textarea value={content} onChange={this.changeContent} onBlur={this.checkContent} />
-              {contentError ? <span className='checkInvalid'>公告内容不能为空！</span> : null }
+              <textarea
+                value={content}
+                onChange={this.changeContent}
+                onBlur={this.checkContent}
+              />
+              {contentError ? (
+                <span className="checkInvalid">公告内容不能为空！</span>
+              ) : null}
             </div>
           </li>
-          <li >
+          <li>
             <p>公告截至时间:</p>
-              <DatePicker
-                className='datePicker'
-                style={{height: '30px', width: 'auto'}}
-                showTime
-                allowClear={false}
-                value={moment(endTime)}
-                format="YYYY-MM-DD HH:mm"
-                onChange={this.changeEndTime}
-              />
+            <DatePicker
+              className="datePicker"
+              style={{ height: '30px', width: 'auto' }}
+              showTime
+              allowClear={false}
+              value={moment(endTime)}
+              format="YYYY-MM-DD HH:mm"
+              onChange={this.changeEndTime}
+            />
           </li>
 
           <li>
             <p>公告状态:</p>
-            <span>{CONSTANTS.NOTIFYSTATUS[status]}</span>       
+            <span>{CONSTANTS.NOTIFYSTATUS[status]}</span>
           </li>
           <li>
             <p>创建人:</p>
             <span>维修员 {creatorName}</span>
           </li>
-
         </ul>
 
-        <div className='btnArea'>
-          {forbiddenStatus.CENSOR_NOTIFY ? null : <Button onClick={this.censorRefuse} >审核未通过</Button>}
-          {forbiddenStatus.CENSOR_NOTIFY ? null : <Button type='primary' onClick={this.censorPass} >审核通过</Button>}
-          <Button onClick={this.cancel} >返回</Button>
+        <div className="btnArea">
+          {forbiddenStatus.CENSOR_NOTIFY ? null : (
+            <Button onClick={this.censorRefuse}>审核未通过</Button>
+          )}
+          {forbiddenStatus.CENSOR_NOTIFY ? null : (
+            <Button type="primary" onClick={this.censorPass}>
+              审核通过
+            </Button>
+          )}
+          <Button onClick={this.cancel}>返回</Button>
         </div>
 
-        <Modal wrapClassName='modal' width={800} title={pass ? '请输入备注' : '请输入拒绝原因'} visible={showModal} onCancel={this.cancelInput} onOk={this.confirm} okText='确认'>
-          <div className=''>
-            <input placeholder={pass ? "备注" : '拒绝原因'} className='noteInput' value={note} onChange={this.changeNote} />
+        <Modal
+          wrapClassName="modal"
+          width={800}
+          title={pass ? '请输入备注' : '请输入拒绝原因'}
+          visible={showModal}
+          onCancel={this.cancelInput}
+          onOk={this.confirm}
+          okText="确认"
+        >
+          <div className="">
+            <input
+              placeholder={pass ? '备注' : '拒绝原因'}
+              className="noteInput"
+              value={note}
+              onChange={this.changeNote}
+            />
           </div>
         </Modal>
-
       </div>
     )
   }
@@ -305,5 +360,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, {
-})(NotifyInfo))
+export default withRouter(connect(mapStateToProps, {})(NotifyInfo))

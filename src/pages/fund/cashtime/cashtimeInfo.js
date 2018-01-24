@@ -1,12 +1,12 @@
 import React from 'react'
-import moment from '../../util/myMoment';
-import TimePicker from 'rc-time-picker';
-import 'rc-time-picker/assets/index.css';
+import moment from '../../util/myMoment'
+import TimePicker from 'rc-time-picker'
+import 'rc-time-picker/assets/index.css'
 
-import {Button, DatePicker} from 'antd'
+import { Button, DatePicker } from 'antd'
 
-import AjaxHandler from '../../ajax'
-import Noti from '../../noti'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
 import Time from '../../component/time'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
@@ -15,37 +15,51 @@ import CONSTANTS from '../../component/constants'
 const RangePicker = DatePicker.RangePicker
 
 class CashtimeInfo extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    let schoolId = 0, schoolError= false, type= 0, typeError= false, initialSchool = 0, id = 0
-    let fixedTime={
+    let schoolId = 0,
+      schoolError = false,
+      type = 0,
+      typeError = false,
+      initialSchool = 0,
+      id = 0
+    let fixedTime = {
       endTime: {
-        time: {hour:0, minute: 0}, 
+        time: { hour: 0, minute: 0 },
         weekday: '1'
-      }, 
+      },
       startTime: {
-        time: {hour:0, minute: 0}, 
+        time: { hour: 0, minute: 0 },
         weekday: '1'
       }
     }
     let specificTime = {
-      "endTime": Time.getMonthEnd(new Date()),
-      "startTime": Time.getTodayStart()
+      endTime: Time.getMonthEnd(new Date()),
+      startTime: Time.getTodayStart()
     }
     let timeValueError = false
-    this.state = { 
-      schoolId, schoolError, type, specificTime, fixedTime, typeError, initialSchool, id, timeValueError,
+    this.state = {
+      schoolId,
+      schoolError,
+      type,
+      specificTime,
+      fixedTime,
+      typeError,
+      initialSchool,
+      id,
+      timeValueError,
       posting: false
     }
   }
-  fetchData =(body)=>{
-    let resource='/api/time/range/withdraw/one'
-    const cb=(json)=>{
-      if(json.error){
+  fetchData = body => {
+    let resource = '/api/time/range/withdraw/one'
+    const cb = json => {
+      if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
-      }else{
-        if(json.data){
-          let {schoolId, type, specificTime, fixedTime, id} = json.data, nextState = {}
+      } else {
+        if (json.data) {
+          let { schoolId, type, specificTime, fixedTime, id } = json.data,
+            nextState = {}
           if (json.data.type === 2) {
             nextState.specificTime = specificTime
           } else {
@@ -56,22 +70,22 @@ class CashtimeInfo extends React.Component {
           nextState.type = type
           nextState.id = id
           this.setState(nextState)
-        }       
+        }
       }
     }
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.props.hide(false)
-    if(this.props.match.params.id){
-      const body={
-        id:parseInt(this.props.match.params.id.slice(1), 10)
+    if (this.props.match.params.id) {
+      const body = {
+        id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
   }
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.hide(true)
   }
   completeEdit = () => {
@@ -88,14 +102,16 @@ class CashtimeInfo extends React.Component {
     if (this.state.timeValueError) {
       return
     }
-    let {fixedTime, specificTime, type, schoolId, posting} = this.state
+    let { fixedTime, specificTime, type, schoolId, posting } = this.state
     const body = {
       type: parseInt(type, 10),
       schoolId: parseInt(schoolId, 10)
     }
     if (this.state.type === 1) {
-      let start = moment(fixedTime.startTime.time).valueOf(), end = moment(fixedTime.endTime.time).valueOf()
-      let weekStart = fixedTime.startTime.weekday, weekEnd = fixedTime.endTime.weekday
+      let start = moment(fixedTime.startTime.time).valueOf(),
+        end = moment(fixedTime.endTime.time).valueOf()
+      let weekStart = fixedTime.startTime.weekday,
+        weekEnd = fixedTime.endTime.weekday
       if (weekStart === weekEnd && end <= start) {
         return this.setState({
           timeValueError: true
@@ -107,14 +123,14 @@ class CashtimeInfo extends React.Component {
             hour: parseInt(moment(fixedTime.startTime.time).hour(), 10),
             minute: parseInt(moment(fixedTime.startTime.time).minute(), 10)
           },
-          weekday: parseInt(fixedTime.startTime.weekday, 10),
-        }, 
+          weekday: parseInt(fixedTime.startTime.weekday, 10)
+        },
         endTime: {
           time: {
             hour: parseInt(moment(fixedTime.endTime.time).hour(), 10),
             minute: parseInt(moment(fixedTime.endTime.time).minute(), 10)
           },
-          weekday: parseInt(fixedTime.endTime.weekday, 10),
+          weekday: parseInt(fixedTime.endTime.weekday, 10)
         }
       }
     } else {
@@ -124,23 +140,23 @@ class CashtimeInfo extends React.Component {
       }
     }
     let resource
-    if(this.props.match.params.id){
+    if (this.props.match.params.id) {
       body.id = parseInt(this.props.match.params.id.slice(1), 10)
       resource = '/api/time/range/withdraw/update'
     } else {
       resource = '/api/time/range/withdraw/add'
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         posting: false
       })
-      if(json.error){
+      if (json.error) {
         Noti.hintServiceError(json.error.displayMessage)
-      }else{
+      } else {
         /*--------redirect --------*/
-        if(json.data){
-          Noti.hintSuccess(this.props.history,'/fund/cashtime')
-        }    
+        if (json.data) {
+          Noti.hintSuccess(this.props.history, '/fund/cashtime')
+        }
       }
     }
     if (posting) {
@@ -149,12 +165,12 @@ class CashtimeInfo extends React.Component {
     this.setState({
       posting: true
     })
-    AjaxHandler.ajax(resource,body,cb)
+    AjaxHandler.ajax(resource, body, cb)
   }
   cancel = () => {
     this.props.history.goBack()
   }
-  changeSchool = (v) => {
+  changeSchool = v => {
     if (!v) {
       return this.setState({
         schoolError: true
@@ -167,7 +183,7 @@ class CashtimeInfo extends React.Component {
     nextState.schoolId = v
     this.setState(nextState)
   }
-  checkSchool = (v) => {
+  checkSchool = v => {
     if (!parseInt(this.state.schoolId, 10)) {
       return this.setState({
         schoolError: true
@@ -179,17 +195,17 @@ class CashtimeInfo extends React.Component {
     this.checkExist(null)
   }
   confirm = () => {
-    let {checking, posting} = this.state
+    let { checking, posting } = this.state
     if (checking || posting) {
       return
     }
     this.checkExist(this.completeEdit)
   }
 
-  checkExist = (callback) => {
-    let {schoolId, id, initialSchool, checking} = this.state
+  checkExist = callback => {
+    let { schoolId, id, initialSchool, checking } = this.state
 
-    if (id && (parseInt(schoolId, 10) === initialSchool) ) {
+    if (id && parseInt(schoolId, 10) === initialSchool) {
       if (callback) {
         callback()
       }
@@ -205,7 +221,7 @@ class CashtimeInfo extends React.Component {
     const body = {
       schoolId: parseInt(schoolId, 10)
     }
-    const cb = (json) => {
+    const cb = json => {
       this.setState({
         checking: false
       })
@@ -224,7 +240,7 @@ class CashtimeInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
 
-  changeType = (v) => {
+  changeType = v => {
     if (!v) {
       return this.setState({
         typeError: true
@@ -237,12 +253,15 @@ class CashtimeInfo extends React.Component {
     nextState.type = parseInt(v, 10)
     this.setState(nextState)
   }
-  changeStartDay = (v) => {
-    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)), nextState = {}
+  changeStartDay = v => {
+    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)),
+      nextState = {}
     fixedTime.startTime.weekday = v
-    let end = moment(fixedTime.endTime.time).valueOf(), start = moment(fixedTime.startTime.time).valueOf()
+    let end = moment(fixedTime.endTime.time).valueOf(),
+      start = moment(fixedTime.startTime.time).valueOf()
 
-    let weekStart = v, weekEnd = fixedTime.endTime.weekday
+    let weekStart = v,
+      weekEnd = fixedTime.endTime.weekday
     if (weekStart === weekEnd && end <= start) {
       nextState.timeValueError = true
     } else if (this.state.timeValueError === true) {
@@ -251,12 +270,15 @@ class CashtimeInfo extends React.Component {
     nextState.fixedTime = fixedTime
     this.setState(nextState)
   }
-  changeEndDay = (v) => {
-    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)), nextState = {}
+  changeEndDay = v => {
+    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)),
+      nextState = {}
     fixedTime.endTime.weekday = v
-    let end = moment(fixedTime.endTime.time).valueOf(), start = moment(fixedTime.startTime.time).valueOf()
+    let end = moment(fixedTime.endTime.time).valueOf(),
+      start = moment(fixedTime.startTime.time).valueOf()
 
-    let weekStart = fixedTime.startTime.weekday, weekEnd = v
+    let weekStart = fixedTime.startTime.weekday,
+      weekEnd = v
     if (weekStart === weekEnd && end <= start) {
       nextState.timeValueError = true
     } else if (this.state.timeValueError === true) {
@@ -265,24 +287,30 @@ class CashtimeInfo extends React.Component {
     nextState.fixedTime = fixedTime
     this.setState(nextState)
   }
-  changeStartTime = (v) => {
-    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)), nextState = {}
+  changeStartTime = v => {
+    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)),
+      nextState = {}
     fixedTime.startTime.time = v
-    let end = moment(fixedTime.endTime.time).valueOf(), start = v.valueOf()
-    let weekStart = fixedTime.startTime.weekday, weekEnd = fixedTime.endTime.weekday
+    let end = moment(fixedTime.endTime.time).valueOf(),
+      start = v.valueOf()
+    let weekStart = fixedTime.startTime.weekday,
+      weekEnd = fixedTime.endTime.weekday
     if (weekStart === weekEnd && end <= start) {
       nextState.timeValueError = true
     } else if (this.state.timeValueError === true) {
       nextState.timeValueError = false
     }
     nextState.fixedTime = fixedTime
-    this.setState({fixedTime: fixedTime})
+    this.setState({ fixedTime: fixedTime })
   }
-  changeEndTime = (v) => {
-    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)), nextState = {}
+  changeEndTime = v => {
+    let fixedTime = JSON.parse(JSON.stringify(this.state.fixedTime)),
+      nextState = {}
     fixedTime.endTime.time = v
-    let start = moment(fixedTime.startTime.time).valueOf(), end = v.valueOf()
-    let weekStart = fixedTime.startTime.weekday, weekEnd = fixedTime.endTime.weekday
+    let start = moment(fixedTime.startTime.time).valueOf(),
+      end = v.valueOf()
+    let weekStart = fixedTime.startTime.weekday,
+      weekEnd = fixedTime.endTime.weekday
     if (weekStart === weekEnd && end <= start) {
       nextState.timeValueError = true
     } else if (this.state.timeValueError === true) {
@@ -300,40 +328,61 @@ class CashtimeInfo extends React.Component {
     })
   }
 
-  render () {
-    let {typeError, schoolId, schoolError, specificTime, fixedTime, type, timeValueError, initialSchool} = this.state
+  render() {
+    let {
+      typeError,
+      schoolId,
+      schoolError,
+      specificTime,
+      fixedTime,
+      type,
+      timeValueError,
+      initialSchool
+    } = this.state
     const fixedItem = (
       <li>
         <p>选择时段:</p>
         <span>
-          <span className='mg10'>每周</span>
-          <BasicSelectorWithoutAll staticOpts={CONSTANTS.WEEKDAYS} width={70} selectedOpt={fixedTime.startTime.weekday} changeOpt={this.changeStartDay} />
+          <span className="mg10">每周</span>
+          <BasicSelectorWithoutAll
+            staticOpts={CONSTANTS.WEEKDAYS}
+            width={70}
+            selectedOpt={fixedTime.startTime.weekday}
+            changeOpt={this.changeStartDay}
+          />
           <TimePicker
-            className='timepicker'
+            className="timepicker"
             allowEmpty={false}
             showSecond={false}
             value={moment(fixedTime.startTime.time)}
             onChange={this.changeStartTime}
           />
-          <span >~</span>
-          <span className='mg10'>每周</span>
-          <BasicSelectorWithoutAll staticOpts={CONSTANTS.WEEKDAYS} width={70} selectedOpt={fixedTime.endTime.weekday} changeOpt={this.changeEndDay} />
+          <span>~</span>
+          <span className="mg10">每周</span>
+          <BasicSelectorWithoutAll
+            staticOpts={CONSTANTS.WEEKDAYS}
+            width={70}
+            selectedOpt={fixedTime.endTime.weekday}
+            changeOpt={this.changeEndDay}
+          />
           <TimePicker
-            className='timepicker'
+            className="timepicker"
             allowEmpty={false}
             showSecond={false}
             value={moment(fixedTime.endTime.time)}
             onChange={this.changeEndTime}
           />
         </span>
-        {timeValueError ? <span className='checkInvalid'>结束时间应大于开始时间！</span> : null }
+        {timeValueError ? (
+          <span className="checkInvalid">结束时间应大于开始时间！</span>
+        ) : null}
       </li>
     )
     const specificItem = (
-      <li >
+      <li>
         <p>选择时段:</p>
         <RangePicker
-          className='rangePicker'
+          className="rangePicker"
           value={[moment(specificTime.startTime), moment(specificTime.endTime)]}
           allowClear={false}
           format="YYYY/MM/DD"
@@ -343,7 +392,7 @@ class CashtimeInfo extends React.Component {
     )
 
     return (
-      <div className='infoList cashtimeInfo'>
+      <div className="infoList cashtimeInfo">
         <ul>
           <li>
             <p>选择学校:</p>
@@ -351,30 +400,36 @@ class CashtimeInfo extends React.Component {
               width={'140px'}
               disabled={initialSchool}
               className={initialSchool ? 'disabled' : ''}
-              selectedSchool={schoolId.toString()} 
+              selectedSchool={schoolId.toString()}
               changeSchool={this.changeSchool}
               checkSchool={this.checkSchool}
-            /> 
-            {schoolError?<span className='checkInvalid'>学校不能为空！</span>:null}
+            />
+            {schoolError ? (
+              <span className="checkInvalid">学校不能为空！</span>
+            ) : null}
           </li>
           <li>
             <p>时间类型:</p>
-            <BasicSelectorWithoutAll 
-              invalidTitle='选择类型' 
-              staticOpts={CONSTANTS.WITHDRAWTIME} 
-              width={'140px'} 
-              selectedOpt={type} 
-              changeOpt={this.changeType} 
+            <BasicSelectorWithoutAll
+              invalidTitle="选择类型"
+              staticOpts={CONSTANTS.WITHDRAWTIME}
+              width={'140px'}
+              selectedOpt={type}
+              changeOpt={this.changeType}
             />
-            {typeError?<span className='checkInvalid'>时间类型不能为空！</span>:null}        
+            {typeError ? (
+              <span className="checkInvalid">时间类型不能为空！</span>
+            ) : null}
           </li>
 
-          {type === 1 ? fixedItem : (type === 2 ? specificItem : null)}    
+          {type === 1 ? fixedItem : type === 2 ? specificItem : null}
         </ul>
 
-        <div className='btnArea'>
-          <Button type='primary' onClick={this.confirm} >确认</Button>
-          <Button onClick={this.cancel} >返回</Button>
+        <div className="btnArea">
+          <Button type="primary" onClick={this.confirm}>
+            确认
+          </Button>
+          <Button onClick={this.cancel}>返回</Button>
         </div>
       </div>
     )

@@ -1,5 +1,5 @@
 import { heartBeat, stopBeat } from '../tasks/heartBeat'
-import AjaxHandler from '../pages/ajax'
+import AjaxHandler from '../util/ajax'
 import { buildAuthenData } from '../pages/util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../pages/util/storage'
 

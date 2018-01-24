@@ -1,5 +1,5 @@
-import React from 'react';
-import moment from 'moment';
+import React from 'react'
+import moment from 'moment'
 import {
   Button,
   Radio,
@@ -8,37 +8,37 @@ import {
   notification,
   Select,
   DatePicker
-} from 'antd';
-import AjaxHandler from '../../ajax';
-import Noti from '../../noti';
-import CONSTANTS from '../../component/constants';
-import Time from '../../component/time';
-import PicturesWall from '../../component/picturesWall';
-import SchoolSelector from '../../component/schoolSelectorWithoutAll';
-import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll';
+} from 'antd'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
+import CONSTANTS from '../../component/constants'
+import Time from '../../component/time'
+import PicturesWall from '../../component/picturesWall'
+import SchoolSelector from '../../component/schoolSelectorWithoutAll'
+import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 const {
   FILEADDR,
   GIFT_ACT_CODE,
   GIFT_ACT_H5,
   GIFT_ACT_NEW,
   RELEASE_RANDOM
-} = CONSTANTS;
-const Option = Select.Option;
+} = CONSTANTS
+const Option = Select.Option
 
-const RadioGroup = Radio.Group;
+const RadioGroup = Radio.Group
 
-const deviceName = CONSTANTS.DEVICETYPE;
+const deviceName = CONSTANTS.DEVICETYPE
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
-};
+}
 
 /* state explanation */
 /* released: 活动是否发布，即是否在发挥作用(判断标准：1. 在有效期内；2. online为1) */
 /* online: 是否上线。默认新建时不论是否在有效期内，都置位true。编辑时如果在有效期内根据返回的字段置位 */
 class ActInfo extends React.Component {
   constructor(props) {
-    super(props);
-    let fileList = [];
+    super(props)
+    let fileList = []
     this.state = {
       id: '',
       selectedSchool: '',
@@ -86,88 +86,88 @@ class ActInfo extends React.Component {
 
       posting: false,
       checking: false
-    };
+    }
   }
   fetchGifts = () => {
-    let resource = '/api/gift/list';
+    let resource = '/api/gift/list'
     const body = {
       page: 1,
       size: 100
-    };
+    }
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data) {
           this.setState({
             gifts: json.data.gifts
-          });
+          })
           if (this.props.match.params.id) {
-            let id = parseInt(this.props.match.params.id.slice(1), 10);
+            let id = parseInt(this.props.match.params.id.slice(1), 10)
             const body = {
               id: id
-            };
-            this.fetchData(body);
+            }
+            this.fetchData(body)
             this.setState({
               id: id
-            });
+            })
           }
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   fetchSchools = () => {
-    let resource = '/api/school/list';
+    let resource = '/api/school/list'
     const body = {
       page: 1,
       size: 100
-    };
+    }
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data) {
           this.setState({
             schools: json.data.schools
-          });
+          })
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   fetchData = body => {
-    let resource = '/api/gift/activity/details';
+    let resource = '/api/gift/activity/details'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error);
+        throw new Error(json.error)
       } else {
         if (json.data) {
-          let d = json.data;
-          let gifts = JSON.parse(JSON.stringify(this.state.gifts)); //this is the denominations for update state.denominations
-          let newState = {}; //this is the state for update
-          newState.selectedSchool = d.schoolId.toString();
-          newState.originalSchool = d.schoolId;
-          newState.name = d.name.trim();
-          newState.originalName = d.name.trim();
-          newState.type = d.type.toString();
-          newState.originalType = d.type;
+          let d = json.data
+          let gifts = JSON.parse(JSON.stringify(this.state.gifts)) //this is the denominations for update state.denominations
+          let newState = {} //this is the state for update
+          newState.selectedSchool = d.schoolId.toString()
+          newState.originalSchool = d.schoolId
+          newState.name = d.name.trim()
+          newState.originalName = d.name.trim()
+          newState.type = d.type.toString()
+          newState.originalType = d.type
           if (d.type === GIFT_ACT_NEW) {
-            newState.releaseMethodLock = true;
+            newState.releaseMethodLock = true
           }
-          newState.amount = d.amount ? d.amount : '';
+          newState.amount = d.amount ? d.amount : ''
           newState.releaseMethod = d.releaseMethod
             ? d.releaseMethod.toString()
-            : '';
+            : ''
           if (d.releaseMethod === RELEASE_RANDOM && d.amountRandom) {
-            newState.amountRandom = d.amountRandom;
+            newState.amountRandom = d.amountRandom
           }
           if (d.type === GIFT_ACT_CODE) {
-            newState.inventory = d.planInventory;
-            newState.remainInventory = d.inventory;
-            newState.usedInventory = d.planInventory - d.inventory;
-            newState.code = d.code.trim();
-            newState.originalCode = d.code;
+            newState.inventory = d.planInventory
+            newState.remainInventory = d.inventory
+            newState.usedInventory = d.planInventory - d.inventory
+            newState.code = d.code.trim()
+            newState.originalCode = d.code
           } else {
             if (d.imageEntrance) {
               newState.fileList = [
@@ -176,116 +176,116 @@ class ActInfo extends React.Component {
                   status: 'done',
                   url: FILEADDR + d.imageEntrance
                 }
-              ];
+              ]
             }
-            newState.url = d.url ? d.url : '';
+            newState.url = d.url ? d.url : ''
           }
-          newState.startTime = d.startTime;
-          newState.endTime = d.endTime;
+          newState.startTime = d.startTime
+          newState.endTime = d.endTime
           let timeValid =
             Date.parse(new Date()) >= d.startTime &&
-            Date.parse(new Date()) <= d.endTime;
-          newState.online = d.online === 1 ? true : false;
+            Date.parse(new Date()) <= d.endTime
+          newState.online = d.online === 1 ? true : false
           if (timeValid && d.online === 1) {
-            newState.released = true;
+            newState.released = true
           } else {
-            newState.released = false;
+            newState.released = false
           }
           d.gifts &&
             d.gifts.forEach((g, i) => {
-              let gift = gifts.find((r, ind) => r.id === g.giftId);
+              let gift = gifts.find((r, ind) => r.id === g.giftId)
               if (!!gift) {
-                gift.count = g.quantity;
+                gift.count = g.quantity
               }
-            });
-          newState.gifts = gifts;
-          this.setState(newState);
+            })
+          newState.gifts = gifts
+          this.setState(newState)
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   componentDidMount() {
-    this.props.hide(false);
-    this.fetchSchools();
-    this.fetchGifts();
+    this.props.hide(false)
+    this.fetchSchools()
+    this.fetchGifts()
   }
   componentWillUnmount() {
-    this.props.hide(true);
+    this.props.hide(true)
   }
 
   handleBack = () => {
-    this.props.history.push('/gift/act');
-  };
+    this.props.history.push('/gift/act')
+  }
   changeSchool = v => {
     this.setState({
       selectedSchool: v
-    });
-  };
+    })
+  }
   checkSchool = v => {
     if (v === 'all') {
       return this.setState({
         schoolError: true
-      });
+      })
     }
     if (this.state.schoolError) {
       this.setState({
         schoolError: false
-      });
+      })
     }
-  };
+  }
   changeName = e => {
     this.setState({
       name: e.target.value
-    });
-  };
+    })
+  }
   checkName = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       return this.setState({
         name: v,
         nameError: true
-      });
+      })
     }
     let nextState = {
       name: v
-    };
-    if (this.state.nameError) {
-      nextState.nameError = false;
     }
-    this.setState(nextState);
-  };
+    if (this.state.nameError) {
+      nextState.nameError = false
+    }
+    this.setState(nextState)
+  }
   hintLock = () => {
     notification.open({
       message: '当前类型只能选择全部发放！',
       description: '请继续选择其他项，或选择其他活动类型！'
-    });
-  };
+    })
+  }
   changeType = v => {
-    let newState = {};
-    newState.type = v;
+    let newState = {}
+    newState.type = v
     if (v === '1') {
-      newState.releaseMethod = '1';
-      newState.releaseMethodLock = true;
+      newState.releaseMethod = '1'
+      newState.releaseMethodLock = true
     } else {
       if (this.state.releaseMethodLock) {
-        newState.releaseMethodLock = false;
+        newState.releaseMethodLock = false
       }
     }
-    this.setState(newState);
-  };
+    this.setState(newState)
+  }
   checkType = v => {
     if (v === '0' || !v) {
       return this.setState({
         typeError: true
-      });
+      })
     }
     if (this.state.typeError) {
       this.setState({
         typeError: false
-      });
+      })
     }
-  };
+  }
   handleSubmit = () => {
     /*-------------need to check the data here---------------*/
     let {
@@ -304,63 +304,63 @@ class ActInfo extends React.Component {
       imageError,
       posting,
       checking
-    } = this.state;
+    } = this.state
     if (!selectedSchool) {
       return this.setState({
         schoolError: true
-      });
+      })
     }
     if (!name) {
       return this.setState({
         nameError: true
-      });
+      })
     }
     if (!type) {
       return this.setState({
         typeError: true
-      });
+      })
     }
     if (type !== GIFT_ACT_H5.toString() && !amount) {
       return this.setState({
         amountError: true
-      });
+      })
     }
     if (type !== GIFT_ACT_H5.toString() && !releaseMethod) {
       return this.setState({
         releaseMethodError: true
-      });
+      })
     }
     if (type === GIFT_ACT_CODE.toString()) {
       if (!code) {
         return this.setState({
           codeError: true
-        });
+        })
       }
       if (!inventory) {
         return this.setState({
           inventoryError: true,
           inventoryErrorMsg: '库存不能为空'
-        });
+        })
       }
       if (usedInventory && inventory < usedInventory) {
         return this.setState({
           inventoryError: true,
           inventoryErrorMsg: '库存不能小于已发个数'
-        });
+        })
       }
     } else {
       if (fileList.length < 1) {
         return this.setState({
           imageError: true
-        });
+        })
       } else if (imageError) {
         this.setState({
           imageError: false
-        });
+        })
       }
     }
     if (released && online) {
-      return this.props.history.push('/gift/act');
+      return this.props.history.push('/gift/act')
     }
     /* 如果是在编辑，没有改变学校和关键字段, 执行下线操作
     (在以后的版本中，只有在有效期内才能操作online。为了兼容之前的版本，这里对是否在有效期内进行检测，只有在有效期内且是下线操作才不用查重-2017/12/6 v1.0.1)
@@ -369,15 +369,15 @@ class ActInfo extends React.Component {
     // let end = parseInt(moment(endTime).valueOf(), 10)
     // let timeValid = Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
     if (posting || checking) {
-      return;
+      return
     }
     if (id && this.checkSame()) {
-      this.postInfo();
+      this.postInfo()
     } else {
-      this.checkExist(this.postInfo);
+      this.checkExist(this.postInfo)
     }
     // this.postInfo()
-  };
+  }
   checkSame = () => {
     let {
       selectedSchool,
@@ -388,65 +388,65 @@ class ActInfo extends React.Component {
       originalName,
       originalType,
       originalCode
-    } = this.state;
+    } = this.state
     if (parseInt(selectedSchool, 10) !== originalSchool) {
-      return false;
+      return false
     }
     if (name !== originalName) {
-      return false;
+      return false
     }
     if (parseInt(type, 10) !== originalType) {
-      return false;
+      return false
     }
     if (type === GIFT_ACT_CODE.toString() && code !== originalCode) {
-      return false;
+      return false
     }
-    return true;
-  };
+    return true
+  }
   checkExist = callback => {
-    let { selectedSchool, type, code, name, checking } = this.state;
-    let url = '/gift/activity/check';
+    let { selectedSchool, type, code, name, checking } = this.state
+    let url = '/gift/activity/check'
     const body = {
       schoolId: parseInt(selectedSchool, 10),
       name: name,
       type: parseInt(type, 10)
-    };
+    }
     if (type === GIFT_ACT_CODE.toString()) {
-      body.code = code;
+      body.code = code
     }
     const cb = json => {
       this.setState({
         checking: false
-      });
+      })
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data.result) {
           Noti.hintLock(
             '请求出错',
             '已存在与当前设置重复的红包活动，请勿重复提交'
-          );
+          )
         } else {
           if (callback) {
-            callback();
+            callback()
           }
         }
       }
-    };
+    }
     if (checking) {
-      return;
+      return
     } else {
       this.setState({
         checking: true
-      });
+      })
     }
     AjaxHandler.ajax(url, body, cb, null, {
       clearChecking: true,
       thisObj: this
-    });
-  };
+    })
+  }
   postInfo = () => {
-    let resource = '/api/gift/activity/save';
+    let resource = '/api/gift/activity/save'
     let {
         gifts,
         type,
@@ -464,17 +464,17 @@ class ActInfo extends React.Component {
         online,
         posting
       } = this.state,
-      items = [];
+      items = []
     gifts.forEach((g, i) => {
       if (g.count) {
         items.push({
           giftId: g.id,
           quantity: g.count
-        });
+        })
       }
-    });
-    let start = parseInt(moment(startTime).valueOf(), 10);
-    let end = parseInt(moment(endTime).valueOf(), 10);
+    })
+    let start = parseInt(moment(startTime).valueOf(), 10)
+    let end = parseInt(moment(endTime).valueOf(), 10)
     const body = {
       schoolId: parseInt(selectedSchool, 10),
       name: name,
@@ -482,281 +482,281 @@ class ActInfo extends React.Component {
       startTime: start,
       endTime: end,
       online: online
-    };
+    }
     if (type !== GIFT_ACT_H5.toString()) {
-      body.amount = amount;
-      body.releaseMethod = +releaseMethod;
-      body.gifts = items;
+      body.amount = amount
+      body.releaseMethod = +releaseMethod
+      body.gifts = items
     }
     if (releaseMethod === RELEASE_RANDOM.toString()) {
       // depracated.
-      body.amountRandom = parseInt(amountRandom, 10);
+      body.amountRandom = parseInt(amountRandom, 10)
     }
     if (type === GIFT_ACT_CODE.toString()) {
-      body.inventory = inventory;
-      body.code = code;
+      body.inventory = inventory
+      body.code = code
     } else {
       if (fileList.length > 0) {
-        body.imageEntrance = fileList[0].url.replace(FILEADDR, '');
+        body.imageEntrance = fileList[0].url.replace(FILEADDR, '')
       }
-      body.url = url;
+      body.url = url
     }
     if (this.props.match.params.id) {
-      body.id = parseInt(this.props.match.params.id.slice(1), 10);
+      body.id = parseInt(this.props.match.params.id.slice(1), 10)
     }
     const cb = json => {
       let nextState = {
         posting: false
-      };
+      }
       if (json.error) {
         Noti.hintLock(
           '请求出错',
           json.error.displayMessage || '请求出错, 请稍后刷新重试'
-        );
+        )
       } else {
         if (json.data) {
           if (this.state.released && !this.state.online) {
             // this.openNotificationWithIcon('info')
-            Noti.hintOk('当前活动已下线', '您可以对此活动继续编辑！');
-            nextState.released = false;
+            Noti.hintOk('当前活动已下线', '您可以对此活动继续编辑！')
+            nextState.released = false
           } else {
             let timeValid =
-              Date.parse(new Date()) >= start && Date.parse(new Date()) <= end;
+              Date.parse(new Date()) >= start && Date.parse(new Date()) <= end
             if (this.state.online && timeValid) {
               return Noti.hintAndRoute(
                 '当前活动已上线',
                 '将返回活动列表！',
                 this.props.history,
                 '/gift/act'
-              );
+              )
             }
-            Noti.hintSuccess(this.props.history, '/gift/act');
+            Noti.hintSuccess(this.props.history, '/gift/act')
           }
         } else {
-          Noti.hintLock('请求出错', '网络出错, 请稍后刷新重试');
+          Noti.hintLock('请求出错', '网络出错, 请稍后刷新重试')
         }
       }
-      this.setState(nextState);
-    };
+      this.setState(nextState)
+    }
     if (posting) {
-      return;
+      return
     } else {
       this.setState({
         posting: true
-      });
+      })
     }
     AjaxHandler.ajax(resource, body, cb, null, {
       clearPosting: true,
       thisObj: this
-    });
-  };
+    })
+  }
   openNotification = () => {
     notification.open({
       message: '当前活动已上线',
       description: '将返回活动列表！',
       onClose: () => {
-        this.props.history.push('/gift/act');
+        this.props.history.push('/gift/act')
       },
       duration: 2
-    });
-  };
+    })
+  }
   openNotificationWithIcon = type => {
     notification['info']({
       message: '当前活动已下线',
       description: '您可以对此活动继续编辑！',
       duration: 2
-    });
-  };
+    })
+  }
   changeEndTime = v => {
     this.setState({
       endTime: v
-    });
-  };
+    })
+  }
   changeStartTime = t => {
     this.setState({
       startTime: t
-    });
-  };
+    })
+  }
   chooseGifts = (e, i) => {
-    e.preventDefault();
+    e.preventDefault()
     this.setState({
       editingDenomination: i,
       showGifts: true
-    });
-  };
+    })
+  }
   setGift = (gifts, total) => {
     if (!total) {
       return this.setState({
         amountError: true
-      });
+      })
     }
-    let newState = {};
+    let newState = {}
     if (this.state.amountError) {
-      newState.amountError = false;
+      newState.amountError = false
     }
-    let oriGifts = JSON.parse(JSON.stringify(this.state.gifts));
-    newState.amount = total;
+    let oriGifts = JSON.parse(JSON.stringify(this.state.gifts))
+    newState.amount = total
     gifts.forEach((g, i) => {
       if (g.count) {
-        let editGift = oriGifts.find((r, i) => r.id === g.id);
+        let editGift = oriGifts.find((r, i) => r.id === g.id)
         if (!!editGift) {
-          editGift.count = g.count;
+          editGift.count = g.count
         }
       }
-    });
-    newState.gifts = oriGifts;
-    this.setState(newState);
-  };
+    })
+    newState.gifts = oriGifts
+    this.setState(newState)
+  }
   closeModal = () => {
     this.setState({
       showGifts: false
-    });
-  };
+    })
+  }
   changeOnline = v => {
     let nextState = {
       online: v.target.value
-    };
-    this.setState(nextState);
-  };
+    }
+    this.setState(nextState)
+  }
   checkOnline = v => {
     this.setState({
       onlineError: false
-    });
-  };
+    })
+  }
   changeReleaseMethod = e => {
-    let newState = {};
-    let v = e.target.value;
-    let { releaseMethodLock } = this.state;
+    let newState = {}
+    let v = e.target.value
+    let { releaseMethodLock } = this.state
     if (releaseMethodLock) {
-      return this.hintLock();
+      return this.hintLock()
     }
     if (!v) {
       return this.setState({
         releaseMethodError: true
-      });
+      })
     }
     if (this.state.releaseMethodError) {
-      newState.releaseMethodError = false;
+      newState.releaseMethodError = false
     }
-    newState.releaseMethod = e.target.value;
+    newState.releaseMethod = e.target.value
     if (v === '1' && this.state.amountRandomError) {
-      newState.amountRandomError = false;
+      newState.amountRandomError = false
     }
-    this.setState(newState);
-  };
+    this.setState(newState)
+  }
   handleLogo = e => {
-    var data = new FormData();
-    data.append('file', e.target.files[0]);
+    var data = new FormData()
+    data.append('file', e.target.files[0])
     const cb = json => {
       this.setState({
         imageEntrance: json.data
-      });
-    };
-    AjaxHandler.uploadFile(data, cb);
-  };
+      })
+    }
+    AjaxHandler.uploadFile(data, cb)
+  }
   changeAmountRandom = e => {
     this.setState({
       amountRandom: e.target.value
-    });
-  };
+    })
+  }
   checkAmountRandom = e => {
     if (!e.target.value) {
       return this.setState({
         amountRandomError: true,
         randomErrorMessage: '请输入随机红包个数！'
-      });
+      })
     }
     if (e.target.value > this.state.amount) {
       return this.setState({
         amountRandomError: true,
         randomErrorMessage: '随机红包个数越界！'
-      });
+      })
     }
     if (this.state.amountRandomError) {
       this.setState({
         amountRandomError: false
-      });
+      })
     }
-  };
+  }
   changeCode = e => {
     this.setState({
       code: e.target.value
-    });
-  };
+    })
+  }
   checkCode = e => {
-    let v = e.target.value;
+    let v = e.target.value
     if (!v) {
       return this.setState({
         code: v,
         codeError: true
-      });
+      })
     }
     let nextState = {
       code: v
-    };
-    if (this.state.codeError) {
-      nextState.codeError = false;
     }
-    this.setState(nextState);
-  };
+    if (this.state.codeError) {
+      nextState.codeError = false
+    }
+    this.setState(nextState)
+  }
   changeInventory = e => {
     this.setState({
       inventory: e.target.value
-    });
-  };
+    })
+  }
   checkInventory = e => {
-    let v = parseInt(e.target.value, 10);
+    let v = parseInt(e.target.value, 10)
     if (!v) {
       return this.setState({
         inventoryError: true,
         inventoryErrorMsg: '库存不能为空'
-      });
+      })
     }
-    let { usedInventory } = this.state;
+    let { usedInventory } = this.state
     if (usedInventory && v < this.state.usedInventory) {
       return this.setState({
         inventoryError: true,
         inventoryErrorMsg: '库存不能小于已发个数'
-      });
+      })
     }
     if (this.state.inventoryError) {
       this.setState({
         inventoryError: false
-      });
+      })
     }
-  };
+  }
   changeUrl = e => {
     this.setState({
       url: e.target.value
-    });
-  };
+    })
+  }
   checkUrl = e => {
-    let v = e.target.value.trim();
+    let v = e.target.value.trim()
     if (!v) {
       return this.setState({
         url: v,
         urlError: true
-      });
+      })
     }
     let nextState = {
       url: v
-    };
+    }
     if (this.state.urlError) {
-      nextState.urlError = false;
+      nextState.urlError = false
     }
-    this.setState(nextState);
-  };
+    this.setState(nextState)
+  }
   setImages = fileList => {
-    let nextState = {};
+    let nextState = {}
     if (fileList.length > 0 && this.state.imageError) {
-      nextState.imageError = false;
+      nextState.imageError = false
     }
-    nextState.fileList = JSON.parse(JSON.stringify(fileList));
-    this.setState(nextState);
-  };
+    nextState.fileList = JSON.parse(JSON.stringify(fileList))
+    this.setState(nextState)
+  }
   cancelSubmit = () => {
-    this.props.history.goBack();
-  };
+    this.props.history.goBack()
+  }
   render() {
     let {
       id,
@@ -791,11 +791,11 @@ class ActInfo extends React.Component {
       imageError,
       startTime,
       startTimeError
-    } = this.state;
+    } = this.state
 
     let timeValid =
       Date.parse(new Date()) >= parseInt(moment(startTime).valueOf(), 10) &&
-      Date.parse(new Date()) <= parseInt(moment(endTime).valueOf(), 10);
+      Date.parse(new Date()) <= parseInt(moment(endTime).valueOf(), 10)
 
     const selectRandomGift = (
       <span>
@@ -813,7 +813,7 @@ class ActInfo extends React.Component {
         />
         个发放
       </span>
-    );
+    )
 
     return (
       <div className="infoList">
@@ -1058,111 +1058,111 @@ class ActInfo extends React.Component {
           />
         </div>
       </div>
-    );
+    )
   }
 }
 
 class GiftTable extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     let dataSource = [],
       allTypeData = [],
-      selectedDevice = 'all';
+      selectedDevice = 'all'
     this.state = {
       allTypeData,
       dataSource,
       selectedDevice,
       total: 0
-    };
+    }
   }
   componentWillReceiveProps(nextProps) {
-    let nextState = {};
+    let nextState = {}
     if (
       JSON.stringify(nextProps.gifts) !== JSON.stringify(this.state.dataSource)
     ) {
-      let data = JSON.parse(JSON.stringify(nextProps.gifts));
+      let data = JSON.parse(JSON.stringify(nextProps.gifts))
       if (data.length > 0) {
         data.forEach((r, i) => {
           if (!r.count) {
-            r.count = 0;
+            r.count = 0
           }
-        });
-        nextState.allTypeData = JSON.parse(JSON.stringify(data));
-        nextState.dataSource = data;
+        })
+        nextState.allTypeData = JSON.parse(JSON.stringify(data))
+        nextState.dataSource = data
       }
     }
     if (nextProps.total !== this.state.total) {
-      nextState.total = nextProps.total;
+      nextState.total = nextProps.total
     }
-    this.setState(nextState);
+    this.setState(nextState)
   }
   confirm = () => {
-    this.props.closeModal();
+    this.props.closeModal()
     this.props.setGift(
       JSON.parse(JSON.stringify(this.state.dataSource)),
       this.state.total
-    );
-  };
+    )
+  }
   changeDevice = v => {
-    let data = JSON.parse(JSON.stringify(this.state.allTypeData));
+    let data = JSON.parse(JSON.stringify(this.state.allTypeData))
     if (v === 'all') {
       return this.setState({
         dataSource: data,
         selectedDevice: 'all'
-      });
+      })
     }
-    let newData = data.filter((r, i) => r.deviceType === v);
+    let newData = data.filter((r, i) => r.deviceType === v)
     this.setState({
       dataSource: newData,
       selectedDevice: v
-    });
-  };
+    })
+  }
   add = (e, i) => {
     let gifts = JSON.parse(JSON.stringify(this.state.dataSource)),
       total = this.state.total,
       all = JSON.parse(JSON.stringify(this.state.allTypeData)),
-      editingGift = all.filter((r, ind) => r.id === gifts[i].id);
-    editingGift[0].count++;
-    gifts[i].count++;
-    total++;
+      editingGift = all.filter((r, ind) => r.id === gifts[i].id)
+    editingGift[0].count++
+    gifts[i].count++
+    total++
     this.setState({
       allTypeData: all,
       dataSource: gifts,
       total: total
-    });
-  };
+    })
+  }
   minus = (e, i) => {
     let gifts = JSON.parse(JSON.stringify(this.state.dataSource)),
-      total = this.state.total;
-    gifts[i].count--;
-    total--;
+      total = this.state.total
+    gifts[i].count--
+    total--
     this.setState({
       dataSource: gifts,
       total: total
-    });
-  };
+    })
+  }
   cancel = () => {
     //clear all the data
-    let all = JSON.parse(JSON.stringify(this.state.allTypeData));
+    let all = JSON.parse(JSON.stringify(this.state.allTypeData))
     all.forEach((r, i) => {
-      r.count = 0;
-    });
+      r.count = 0
+    })
     this.setState({
       allTypeData: all,
       dataSource: JSON.parse(JSON.stringify(all)),
       total: 0
-    });
-    this.props.closeModal();
-  };
+    })
+    this.props.closeModal()
+  }
   render() {
-    const { dataSource } = this.state;
+    const { dataSource } = this.state
 
-    let ds = Object.keys(deviceName);
+    let ds = Object.keys(deviceName)
     const deviceOptions = ds.map((d, i) => (
       <option style={{ textAlign: 'center' }} value={d} key={d}>
         {deviceName[d]}
       </option>
-    ));
+    ))
 
     const columns = [
       {
@@ -1208,9 +1208,9 @@ class GiftTable extends React.Component {
                   record.endTime
                 )}
               </span>
-            );
+            )
           } else {
-            return <span>{record.timeLimit}天</span>;
+            return <span>{record.timeLimit}天</span>
           }
         },
         className: 'center'
@@ -1246,7 +1246,7 @@ class GiftTable extends React.Component {
           </div>
         )
       }
-    ];
+    ]
     return (
       <Modal
         wrapClassName="modal"
@@ -1275,7 +1275,7 @@ class GiftTable extends React.Component {
           />
         </div>
       </Modal>
-    );
+    )
   }
 }
-export default ActInfo;
+export default ActInfo

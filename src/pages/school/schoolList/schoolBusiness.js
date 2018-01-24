@@ -1,121 +1,121 @@
-import React from 'react';
-import { Button, Popconfirm, Checkbox } from 'antd';
-import Noti from '../../noti';
-import AjaxHandler from '../../ajax';
+import React from 'react'
+import { Button, Popconfirm, Checkbox } from 'antd'
+import Noti from '../../../util/noti'
+import AjaxHandler from '../../../util/ajax'
 
-const CheckboxGroup = Checkbox.Group;
+const CheckboxGroup = Checkbox.Group
 
 class SchoolBusiness extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       businesses: [],
       id: 0,
       schoolName: '',
       clearError: false,
       posting: false
-    };
+    }
   }
   fetchData = body => {
-    let resource = '/api/school/business/list';
+    let resource = '/api/school/business/list'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error);
+        throw new Error(json.error.displayMessage || json.error)
       } else {
         /*--------redirect --------*/
         if (json.data) {
           this.setState({
             businesses: json.data.businesses
-          });
+          })
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   componentDidMount() {
-    this.props.hide(false);
-    let id = parseInt(this.props.match.params.id.slice(1), 10);
+    this.props.hide(false)
+    let id = parseInt(this.props.match.params.id.slice(1), 10)
     this.setState({
       id: id
-    });
+    })
     const body = {
       id: id
-    };
-    this.fetchData(body);
-    this.fetchSchoolInfo(body);
+    }
+    this.fetchData(body)
+    this.fetchSchoolInfo(body)
   }
   componentWillUnmount() {
-    this.props.hide(true);
+    this.props.hide(true)
   }
 
   fetchSchoolInfo = body => {
-    let resource = '/school/one';
+    let resource = '/school/one'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error);
+        throw new Error(json.error)
       } else {
         this.setState({
           schoolName: json.data.name
-        });
+        })
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
 
   changeBusiness = v => {
-    let nextState = {};
+    let nextState = {}
     if (v.length === 0) {
       return this.setState({
         clearError: true
-      });
+      })
     } else if (this.state.clearError) {
-      nextState.clearError = false;
+      nextState.clearError = false
     }
-    nextState.businesses = v;
-    this.setState(nextState);
-  };
+    nextState.businesses = v
+    this.setState(nextState)
+  }
   confirm = () => {
-    let { businesses, posting } = this.state;
+    let { businesses, posting } = this.state
     if (posting) {
-      return;
+      return
     }
 
     if (businesses.length === 0) {
       return this.setState({
         clearError: true
-      });
+      })
     }
     this.setState({
       posting: true
-    });
-    let resource = '/api/school/business/save';
+    })
+    let resource = '/api/school/business/save'
     const body = {
       schoolId: this.state.id,
       businesses: JSON.parse(JSON.stringify(this.state.businesses))
-    };
+    }
     const cb = json => {
       this.setState({
         posting: false
-      });
+      })
       if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage);
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         // 确认
         if (this.props.location.state && this.props.location.state.path) {
-          Noti.hintSuccessAndBack(this.props.history);
+          Noti.hintSuccessAndBack(this.props.history)
         } else {
-          Noti.hintSuccess(this.props.history, '/school/list');
+          Noti.hintSuccess(this.props.history, '/school/list')
         }
       }
-    };
-    AjaxHandler.ajax(resource, body, cb);
-  };
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
   back = () => {
-    this.props.history.goBack();
-  };
+    this.props.history.goBack()
+  }
 
   render() {
-    let { businesses, schoolName, clearError, posting } = this.state;
+    let { businesses, schoolName, clearError, posting } = this.state
     return (
       <div className="infoList">
         <ul>
@@ -158,8 +158,8 @@ class SchoolBusiness extends React.Component {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default SchoolBusiness;
+export default SchoolBusiness
