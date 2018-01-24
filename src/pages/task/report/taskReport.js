@@ -955,6 +955,7 @@ class TaskList extends React.Component {
       assess_dim
     } = this.props[subModule]
     const { forbiddenStatus } = this.props
+    console.log('complaint_tag_build', forbiddenStatus.BUILD_COMPLAINT_TAG)
     // console.log(dataSource)
     const {
       loading,

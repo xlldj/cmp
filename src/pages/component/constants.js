@@ -654,103 +654,9 @@ const CONSTANTS = {
     删除公告: 'DELETE_NOTIFY',
     审核: 'CENSOR_NOTIFY',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
-    创建工单: 'BUILD_TASK'
+    创建工单: 'BUILD_TASK',
+    添加标签: 'BUILD_COMPLAINT_TAG'
   },
-  authenData: [
-    {
-      name: '学校管理',
-      key: '1',
-      level: 1,
-      selected: false,
-      count: 7,
-      children: [
-        {
-          name: '学校列表',
-          key: '1-1',
-          level: 2,
-          selected: false,
-          count: 6,
-          children: [
-            {
-              name: '查看',
-              key: '1-1-1',
-              level: 3,
-              selected: false,
-              count: 2,
-              children: [
-                {
-                  name: '学校列表/搜索/查询',
-                  key: '1-1-1-1',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '楼栋查看',
-                  key: '1-1-1-2',
-                  level: 4,
-                  selected: false
-                }
-              ]
-            },
-            {
-              name: '操作',
-              key: '1-1-2',
-              level: 3,
-              selected: false,
-              count: 4,
-              children: [
-                {
-                  name: '添加/编辑学校信息',
-                  key: '1-1-2-1',
-                  level: 4
-                },
-                {
-                  name: '楼栋编辑',
-                  key: '1-1-2-2',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '功能入口管理',
-                  key: '1-1-2-3',
-                  level: 4,
-                  selected: false
-                },
-                {
-                  name: '禁用学校',
-                  key: '1-1-2-4',
-                  level: 4,
-                  selected: false
-                }
-              ]
-            }
-          ]
-        },
-        {
-          name: '信息总览',
-          key: '1-2',
-          level: 2,
-          selected: false,
-          children: [
-            {
-              name: '查看',
-              key: '1-2-1',
-              level: 3,
-              selected: false,
-              children: [
-                {
-                  name: '信息总览列表/搜索/查询',
-                  key: '1-2-1-1',
-                  level: 4,
-                  selected: false
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ],
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
     楼栋列表: ['/school/list/blockManage'],
@@ -822,11 +728,8 @@ const CONSTANTS = {
     用户详情: ['user/userInfo'],
     '工单列表查询/搜索/详情': ['task/list'],
     '转接/完结/发送客服消息': [],
-    '客服工作记录列表/搜索/查询': ['task/log'],
-    客服工作记录详情: ['task/log/detail'],
-    添加工作记录: ['task/log/add'],
-    '账单投诉列表/搜索/查询': ['task/complaint'],
-    '意见反馈列表/搜索/查询': ['task/feedback'],
+    // 上下线是通过登录时是否为客服的isCs字段来控制的，不需要另外设置.
+    // 工作报表查看 通过子导航就可以控制，不需要另外设置.
     '员工列表搜索/查询': ['employee/list'],
     '添加/编辑员工': ['employee/list/add', 'employee/list/detail'],
     身份列表: ['employee/role'],
