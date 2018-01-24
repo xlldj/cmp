@@ -971,7 +971,7 @@ class TaskList extends React.Component {
     } = this.state
 
     let page = panel_page[mainCate]
-    let max = 0
+    let max = 1
     let unused =
       mainCate === REPORT_CATE_COMPLAINT - 1 &&
       dataSource &&
@@ -1018,7 +1018,9 @@ class TaskList extends React.Component {
               <span key={`wrapper${record.id}`} className="sliderWrapper">
                 <ProgressBar
                   key={`slider${record.id}`}
-                  value={record.amount ? div(mul(record.amount, 100), max) : 0}
+                  innerWidth={
+                    record.amount ? div(mul(record.amount, 100), max) : 0
+                  }
                   bgColor={indexOfAll > 3 ? '#108EE9' : '#ff5555'}
                 />
               </span>

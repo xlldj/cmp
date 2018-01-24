@@ -53,10 +53,9 @@ const initialTagList = {}
 const setTagList = (state = initialTagList, action) => {
   const { type } = action
   if (type === ActionTypes.SET_TAG_LIST) {
-    // console.log(action.value);
     const value = action.value
-    // console.log({...state, ...value})
-    return Object.assign({}, state, value)
+    // don't merge state, or else it will keep deleted tag.
+    return Object.assign({}, value)
   }
   return state
 }
