@@ -46,7 +46,9 @@ export const changeOnline = () => {
 export const changeOffline = (forceOffline, stillHasTaskCallback) => {
   return dispatch => {
     let resource = '/employee/cs/offline'
-    const body = null
+    const body = {
+      force: forceOffline
+    }
     const cb = json => {
       if (json.data) {
         let data = {}

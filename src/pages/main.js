@@ -16,7 +16,6 @@ import { getLocal, setLocal, removeLocal, getStore } from './util/storage'
 import AjaxHandler from './ajax'
 import Noti from './noti'
 import { removeStore } from './util/storage'
-import {} from '../actions'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -41,7 +40,7 @@ import {
   changeOnline,
   changeOffline
 } from '../actions'
-import { heartBeat } from '../tasks/heartBeat'
+import { heartBeat, stopBeat } from '../tasks/heartBeat'
 
 const Welcome = asyncComponent(() =>
   import(/* webpackChunkName: "welcome" */ './welcome/welcome')
@@ -379,6 +378,8 @@ class Main extends React.Component {
   }
 
   logout = () => {
+    // whether is customer, stop beat.
+    stopBeat()
     this.props.logout()
   }
   hide = v => {
