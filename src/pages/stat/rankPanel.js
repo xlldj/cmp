@@ -52,7 +52,7 @@ const TOTALNAME = [
   'totalAmount'
 ]
 const TOTAL2NAME = ['', '', 'totalMoney', '', '']
-const SIZE = 2
+const SIZE = 6
 
 const orderColumns = [
   {

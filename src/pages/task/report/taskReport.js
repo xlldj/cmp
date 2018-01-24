@@ -121,7 +121,7 @@ class TaskList extends React.Component {
             dataIndex: 'responseTime',
             width: '10%',
             render: (text, record) =>
-              record.responseTime ? Time.formatSpan(record.responseTime) : ''
+              record.responseTime ? Time.formatSpan(record.responseTime) : 0
           },
           {
             title: '发送客服消息数量',
@@ -212,9 +212,10 @@ class TaskList extends React.Component {
             orderby: 'ratioInOne',
             width: '8%',
             render: (text, record) =>
-              (record.repairmanWorkAssess &&
-                record.repairmanWorkAssess.finishedRate) ||
-              0,
+              record.repairmanWorkAssess &&
+              record.repairmanWorkAssess.finishedRate
+                ? `${record.repairmanWorkAssess.finishedRate}%`
+                : 0,
             sorter: true
           },
           {
@@ -235,9 +236,10 @@ class TaskList extends React.Component {
             orderBy: 'repairTime',
             width: '8%',
             render: (text, record) =>
-              (record.repairmanWorkAssess &&
-                record.repairmanWorkAssess.repairTime) ||
-              0,
+              record.repairmanWorkAssess &&
+              record.repairmanWorkAssess.repairTime
+                ? Time.formatSpan(record.repairmanWorkAssess.repairTime)
+                : 0,
             sorter: true
           },
           {
@@ -347,7 +349,11 @@ class TaskList extends React.Component {
             title: '一天内完成率',
             dataIndex: 'ratioInOne',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.finishedRate,
+            render: (text, record) =>
+              record.repairmanWorkAssess &&
+              record.repairmanWorkAssess.finishedRate
+                ? `${record.repairmanWorkAssess.finishedRate}%`
+                : 0,
             sorter: true
           },
           {
@@ -365,7 +371,11 @@ class TaskList extends React.Component {
             title: '平均维修时长',
             dataIndex: 'repairTime',
             width: '8%',
-            render: (text, record) => record.repairmanWorkAssess.repairTime,
+            render: (text, record) =>
+              record.repairmanWorkAssess &&
+              record.repairmanWorkAssess.repairTime
+                ? Time.formatSpan(record.repairmanWorkAssess.repairTime)
+                : 0,
             sorter: true
           },
           {
@@ -955,7 +965,6 @@ class TaskList extends React.Component {
       assess_dim
     } = this.props[subModule]
     const { forbiddenStatus } = this.props
-    console.log('complaint_tag_build', forbiddenStatus.BUILD_COMPLAINT_TAG)
     // console.log(dataSource)
     const {
       loading,
@@ -986,7 +995,7 @@ class TaskList extends React.Component {
       <Table
         bordered
         loading={loading}
-        rowKey={record => record.id}
+        rowKey={record => `sum${record.userId}`}
         pagination={{
           pageSize: SIZE,
           current: page,
@@ -1059,7 +1068,7 @@ class TaskList extends React.Component {
       <Table
         bordered
         loading={loading}
-        rowKey={record => record.id}
+        rowKey={record => `complaint${record.id}`}
         pagination={{
           pageSize: SIZE,
           current: page,
