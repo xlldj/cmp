@@ -5,7 +5,7 @@ import { Button, Popconfirm, Tag } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
 import CONSTANTS from '../../component/constants'
-import Format from '../../component/format'
+import Format from '../../../util/format'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { getStore } from '../../../util/storage'
 

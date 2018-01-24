@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import SchoolSelector from '../component/schoolSelector'
 import OVDetail from './ovdetail'
-import Time from '../component/time'
+import Time from '../../util/time'
 import AjaxHandler from '../../util/ajax'
 import userImg from '../assets/user2.png'
 
@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeStat } from '../../actions'
-import { checkObject } from '../util/checkSame'
+import { checkObject } from '../../util/checkSame'
 const subModule = 'overview'
 
 const initilaState = {

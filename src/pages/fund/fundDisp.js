@@ -6,7 +6,7 @@ import { asyncComponent } from '../component/asyncComponent'
 import Bread from '../component/bread'
 import './style/style.css'
 import { getLocal } from '../../util/storage'
-import Time from '../component/time'
+import Time from '../../util/time'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'

@@ -5,7 +5,7 @@ import { Table, Badge, Button } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../component/constants'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import OperationSelector from '../../component/operationSelector'
 import BasicSelector from '../../component/basicSelector'
 import SearchLine from '../../component/searchLine'
@@ -15,7 +15,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../../actions'
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 const subModule = 'fundList'
 
 const typeName = CONSTANTS.FUNDTYPE

@@ -13,7 +13,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../../actions'
 import SchoolSelector from '../../component/schoolSelector'
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 const subModule = 'rateLimit'
 
 const SIZE = CONSTANTS.PAGINATION

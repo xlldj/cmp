@@ -1,5 +1,5 @@
 import React from 'react'
-import { obj2arr, isNumber } from '../util/types'
+import { obj2arr, isNumber } from '../../util/types'
 
 class CheckSelector extends React.Component {
   constructor(props) {

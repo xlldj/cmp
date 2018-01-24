@@ -26,7 +26,7 @@ import { setStore, getStore } from '../../util/storage'
 import MultiSelectModal from '../component/multiSelectModal'
 import SchoolMutilSelect from '../component/schoolMultiSelectModal'
 import AuthenDataTable from '../component/authenDataTable'
-import { buildAuthenBaseOnfull } from '../util/authenDataHandle'
+import { buildAuthenBaseOnfull } from '../../util/authenDataHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

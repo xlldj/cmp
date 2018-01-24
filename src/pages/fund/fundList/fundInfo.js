@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { Button, Popconfirm, Modal } from 'antd'
 
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import Noti from '../../../util/noti'
 import CONSTANTS from '../../component/constants'
 import AjaxHandler from '../../../util/ajax'

@@ -5,7 +5,7 @@ import Table from 'antd/lib/table'
 import Popconfirm from 'antd/lib/popconfirm'
 
 import Noti from '../../util/noti'
-import Time from '../component/time'
+import Time from '../../util/time'
 import AjaxHandler from '../../util/ajax'
 import DeviceSelector from '../component/deviceSelector'
 import SearchLine from '../component/searchLine'
@@ -15,7 +15,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeGift } from '../../actions'
-import { checkObject } from '../util/checkSame'
+import { checkObject } from '../../util/checkSame'
 const subModule = 'giftList'
 
 const typeName = CONSTANTS.DEVICETYPE

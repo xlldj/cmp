@@ -9,7 +9,7 @@ import CONSTANTS from '../../component/constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
-import { mul, div } from '../../util/numberHandle'
+import { mul, div } from '../../../util/numberHandle'
 const Fragment = React.Fragment
 const {
   DEVICE_TYPE_HEATER,

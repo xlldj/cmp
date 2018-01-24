@@ -30,6 +30,7 @@ Time.getTimeStr = t => {
   }
 }
 
+// get interval between the timestamp and now.
 Time.getSpan = t => {
   let n = new Date()
   let span = n.getTime() - t

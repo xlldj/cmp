@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Modal, Carousel, Popconfirm } from 'antd'
 import AjaxHandler from '../../util/ajax'
-import Time from '../component/time'
+import Time from '../../util/time'
 import CONSTANTS from '../component/constants'
 import Noti from '../../util/noti'
 import BasicSelector from '../component/basicSelectorWithoutAll'

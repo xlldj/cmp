@@ -4,7 +4,7 @@ import { Icon } from 'antd'
 import './style/index.css'
 import CONSTANTS from '../component/constants'
 import { setLocal, getLocal } from '../../util/storage'
-import Time from '../component/time'
+import Time from '../../util/time'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -24,7 +24,7 @@ import {
   setAuthenData
 } from '../../actions'
 import { withRouter } from 'react-router-dom'
-import { checkObject } from '../util/checkSame'
+import { checkObject } from '../../util/checkSame'
 
 // const this.rootBlock = CONSTANTS.this.rootBlock
 

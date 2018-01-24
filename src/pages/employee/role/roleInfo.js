@@ -15,7 +15,7 @@ import AuthenDataTable from '../../component/authenDataTable'
 import {
   buildAuthenBaseOnfull,
   buildAuthenDataForServer
-} from '../../util/authenDataHandle'
+} from '../../../util/authenDataHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

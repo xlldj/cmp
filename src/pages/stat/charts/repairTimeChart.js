@@ -12,9 +12,9 @@ import SchoolSelector from '../../component/schoolSelector'
 import Icon from 'antd/lib/icon'
 import DatePicker from 'antd/lib/date-picker'
 import AjaxHandler from '../../../util/ajax'
-import Format from '../../component/format'
+import Format from '../../../util/format'
 import CONSTANTS from '../../component/constants'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import moment from 'moment'
 const { MonthPicker } = DatePicker
 

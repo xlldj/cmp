@@ -5,13 +5,13 @@ import AjaxHandler from '../../util/ajax'
 import Noti from '../../util/noti'
 import { setToken } from '../../util/handleToken'
 import { setStore, getLocal, getStore, removeStore } from '../../util/storage'
-import { clientDetect } from '../util/clientDetect'
+import { clientDetect } from '../../util/clientDetect'
 import {
   buildAuthenData,
   buildForbiddenUrl,
   buildCurrentAuthen,
   buildForbiddenStatus
-} from '../util/authenDataHandle'
+} from '../../util/authenDataHandle'
 import logLogo from '../assets/log_logo.png'
 import './style/style.css'
 

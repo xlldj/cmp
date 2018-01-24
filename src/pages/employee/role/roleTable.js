@@ -11,8 +11,8 @@ import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 
-import { checkObject } from '../../util/checkSame'
-import { add, mul } from '../../util/numberHandle'
+import { checkObject } from '../../../util/checkSame'
+import { add, mul } from '../../../util/numberHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

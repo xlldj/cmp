@@ -9,7 +9,7 @@ import { getLocal } from '../../util/storage'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../actions'
-import Time from '../component/time'
+import Time from '../../util/time'
 import './style/style.css'
 
 const OrderTable = asyncComponent(() =>

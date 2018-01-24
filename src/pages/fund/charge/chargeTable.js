@@ -8,7 +8,7 @@ import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 
 import SchoolSelector from '../../component/schoolSelector'
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

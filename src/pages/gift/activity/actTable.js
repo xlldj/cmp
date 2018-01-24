@@ -10,13 +10,13 @@ import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeGift } from '../../../actions'
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 const subModule = 'act'
 
 const typeName = CONSTANTS.GIFTACTTYPE

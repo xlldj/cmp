@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom'
 import { Table } from 'antd'
 
 import Noti from '../../../util/noti'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../component/constants'
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

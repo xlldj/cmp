@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { Table, Badge, Button } from 'antd'
 import AjaxHandler from '../../../util/ajax'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
 import DeviceSelector from '../../component/deviceSelector'
@@ -13,7 +13,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../../actions'
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 const subModule = 'abnormal'
 
 const SIZE = CONSTANTS.PAGINATION

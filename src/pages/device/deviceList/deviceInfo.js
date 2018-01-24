@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { Button } from 'antd'
 
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../component/constants'
 import Noti from '../../../util/noti'

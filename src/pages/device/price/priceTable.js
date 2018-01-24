@@ -6,7 +6,7 @@ import { Table, Popconfirm } from 'antd'
 
 import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import SearchLine from '../../component/searchLine'
 import CONSTANTS from '../../component/constants'
 const SIZE = CONSTANTS.PAGINATION

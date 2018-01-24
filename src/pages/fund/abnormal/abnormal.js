@@ -3,7 +3,7 @@ import React from 'react'
 import { Table, Popconfirm } from 'antd'
 
 import Noti from '../../../util/noti'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../component/constants'
 import SearchLine from '../../component/searchLine'
@@ -13,7 +13,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../../actions'
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 const subModule = 'abnormal'
 
 const SIZE = CONSTANTS.PAGINATION

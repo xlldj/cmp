@@ -6,7 +6,7 @@ import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import DeviceSelector from '../../component/deviceWithoutAll'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import CONSTANTS from '../../component/constants'
 
 import PropTypes from 'prop-types'

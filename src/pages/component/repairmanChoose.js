@@ -1,6 +1,6 @@
 import React from 'react'
 import { Modal, Table, Button } from 'antd'
-import Time from './time'
+import Time from '../../util/time'
 import Noti from '../../util/noti'
 import AjaxHandler from '../../util/ajax'
 import CONSTANTS from './constants'

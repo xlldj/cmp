@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Popconfirm, Button, Modal } from 'antd'
 import AjaxHandler from '../../util/ajax'
 import CONSTANTS from '../component/constants'
-import Time from '../component/time'
+import Time from '../../util/time'
 import Noti from '../../util/noti'
 
 const STATUSCLASS = {

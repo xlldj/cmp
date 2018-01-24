@@ -1,5 +1,5 @@
-export function clientDetect () {
-  const client = (function () {
+export function clientDetect() {
+  const client = (function() {
     let engine = {
       // 呈现引擎
       ie: 0,
@@ -38,8 +38,9 @@ export function clientDetect () {
       browser: browser,
       system: system
     }
-  }())
-  let {engine, browser, system} = client, result = {}
+  })()
+  let { engine, browser, system } = client,
+    result = {}
   let ua = navigator.userAgent.toLowerCase()
   if (ua.match(/opr\/([\d.]+)/) || window.opera) {
     let opera = ua.match(/opr\/([\d.]+)/)
@@ -127,7 +128,7 @@ export function clientDetect () {
   } else if (platform.indexOf('Mac') === 0) {
     system.mac = true
     result.brand = 'Mac'
-  } else if ((platform.indexOf('X11') === 0) || (platform.indexOf('Linux') === 0)) {
+  } else if (platform.indexOf('X11') === 0 || platform.indexOf('Linux') === 0) {
     system.x11 = true
     result.brand = 'linux'
   }

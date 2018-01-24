@@ -1,5 +1,5 @@
 import React from 'react'
-import moment from '../../util/myMoment'
+import moment from '../../../util/myMoment'
 import TimePicker from 'rc-time-picker'
 import 'rc-time-picker/assets/index.css'
 
@@ -7,7 +7,7 @@ import { Button, DatePicker } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import CONSTANTS from '../../component/constants'

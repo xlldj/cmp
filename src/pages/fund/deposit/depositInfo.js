@@ -5,7 +5,7 @@ import CONSTANTS from '../../component/constants'
 import SchoolSelectorWithoutAll from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import Noti from '../../../util/noti'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 const RadioGroup = Radio.Group
 const Option = Select.Option
 const deviceName = CONSTANTS.DEVICETYPE

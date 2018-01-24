@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import AjaxHandler from '../../../util/ajax'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 
 /*----------timespan: 1-今日，2-本周,3-本月-----*/
 

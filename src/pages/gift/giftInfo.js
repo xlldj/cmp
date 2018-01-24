@@ -1,11 +1,11 @@
 import React from 'react'
-import moment from '../util/myMoment'
+import moment from '../../util/myMoment'
 
 import { Button, DatePicker } from 'antd'
 
 import AjaxHandler from '../../util/ajax'
 import Noti from '../../util/noti'
-import Time from '../component/time'
+import Time from '../../util/time'
 import CONSTANTS from '../component/constants'
 import DeviceSelectorWithoutAll from '../component/deviceWithoutAll'
 import BasicSelector from '../component/basicSelectorWithoutAll'

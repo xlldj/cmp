@@ -10,7 +10,7 @@ import {
   Pagination
 } from 'antd'
 
-import Time from '../component/time'
+import Time from '../../util/time'
 import Noti from '../../util/noti'
 import AjaxHandler from '../../util/ajax'
 import CONSTANTS from '../component/constants'
@@ -19,10 +19,10 @@ import RepairmanTable from '../component/repairmanChoose'
 import EmployeeChoose from '../component/employeeChoose'
 import BasicSelector from '../component/basicSelectorWithoutAll'
 import DepartmentChoose from '../component/departmentChoose'
-import { checkObject } from '../util/checkSame'
+import { checkObject } from '../../util/checkSame'
 import closeBtn from '../assets/close.png'
-import { mul, add } from '../util/numberHandle'
-import Format from '../component/format'
+import { mul, add } from '../../util/numberHandle'
+import Format from '../../util/format'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

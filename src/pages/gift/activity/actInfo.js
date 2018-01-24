@@ -12,7 +12,7 @@ import {
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
 import CONSTANTS from '../../component/constants'
-import Time from '../../component/time'
+import Time from '../../../util/time'
 import PicturesWall from '../../component/picturesWall'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
