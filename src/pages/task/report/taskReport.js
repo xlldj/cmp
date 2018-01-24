@@ -443,8 +443,8 @@ class TaskList extends React.Component {
         endTime: panel_endTime[mainCate]
       })
     }
-    let csOnline = this.props.user.csOnline
-    if (!csOnline) {
+    let { csOnline, isCs } = this.props.user
+    if (isCs && !csOnline) {
       return
     }
     const body = {
