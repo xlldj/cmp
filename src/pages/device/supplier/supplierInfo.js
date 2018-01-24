@@ -4,6 +4,8 @@ import { Button } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
+import CONSTANTS from '../../component/constants'
+import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 
 class SupplierInfo extends React.Component {
   constructor(props) {
@@ -14,31 +16,36 @@ class SupplierInfo extends React.Component {
       nameError: false,
       alias: '',
       aliasError: false,
-      version: '',
-      versionError: false,
-      posting: false,
-      checking: false,
-      originalName: ''
+      agreement: '',
+      agreementError: false,
+      notify: '',
+      notifyError: false,
+      write: '',
+      writeError: false,
+      service: '',
+      serviceError: false
     }
   }
   fetchData = body => {
     let resource = '/supplier/query/one'
     const cb = json => {
       if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+        Noti.hintServiceError(json.error.displayMessage)
       } else {
         if (json.data) {
-          let { id, name, alias, version } = json.data
+          let { id, name, alias, agreement } = json.data
           let nextState = {
             id: id,
             name: name,
             originalName: name,
             alias: alias
           }
-          if (version) {
-            nextState.version = version
+          if (agreement) {
+            nextState.agreement = agreement
           }
           this.setState(nextState)
+        } else {
+          throw new Error('网络出错，获取数据失败，请稍后重试～')
         }
       }
     }
@@ -58,20 +65,15 @@ class SupplierInfo extends React.Component {
     this.props.hide(true)
   }
   completeEdit = () => {
-    let { id, name, alias, version, posting } = this.state
-    if (posting) {
-      return
-    }
-    this.setState({
-      posting: true
-    })
+    let { id, name, alias, agreement, write, notify, service } = this.state
 
     const body = {
       name: name,
-      alias: alias
-    }
-    if (version) {
-      body.version = version
+      alias: alias,
+      agreement: parseInt(agreement, 10),
+      notify: notify,
+      write: write,
+      service: service
     }
     const resource = '/supplier/save'
     if (id) {
@@ -86,7 +88,10 @@ class SupplierInfo extends React.Component {
       } else {
         /*--------redirect --------*/
         if (json.data) {
+          // throw new Error('test')
           Noti.hintSuccess(this.props.history, '/device/suppliers')
+        } else {
+          throw new Error('网络出错，请稍后重试～')
         }
       }
     }
@@ -96,7 +101,7 @@ class SupplierInfo extends React.Component {
     })
   }
   confirm = () => {
-    let { id, name, alias, originalName, checking, posting } = this.state
+    let { id, name, alias, agreement, write, notify, service } = this.state
     if (!name) {
       return this.setState({
         nameError: true
@@ -107,19 +112,31 @@ class SupplierInfo extends React.Component {
         aliasError: true
       })
     }
-    if (checking || posting) {
-      return
-    }
-    /*版本号可以为空 
-    if (!version) {
+    if (!agreement) {
       return this.setState({
-        versionError: true
+        agreementError: true
       })
-    }*/
-    if (!(id && originalName === name)) {
-      this.checkExist(this.completeEdit)
-    } else {
+    }
+    if (!write) {
+      return this.setState({
+        writeError: true
+      })
+    }
+    if (!notify) {
+      return this.setState({
+        notifyError: true
+      })
+    }
+    if (!service) {
+      return this.setState({
+        serviceError: true
+      })
+    }
+    /* if edit a supplier, name is forbidden to be changed. so no need to check exist */
+    if (id) {
       this.completeEdit()
+    } else {
+      this.checkExist(this.completeEdit)
     }
     // this.completeEdit()
   }
@@ -143,19 +160,18 @@ class SupplierInfo extends React.Component {
       this.setState({
         checking: false
       })
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
+      if (json.data.result) {
+        Noti.hintLock('添加出错', '当前供应商已被添加，请返回该项编辑')
       } else {
-        if (json.data.result) {
-          Noti.hintLock('添加出错', '当前供应商已被添加，请勿重复添加！')
-        } else {
-          if (callback) {
-            callback()
-          }
+        if (callback) {
+          callback()
         }
       }
     }
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.ajax(resource, body, cb, null, {
+      clearChecking: true,
+      thisObj: this
+    })
   }
   changeName = e => {
     this.setState({
@@ -200,20 +216,93 @@ class SupplierInfo extends React.Component {
     }
     this.setState(nextState)
   }
-  changeVersion = e => {
+  changeAgreement = v => {
     this.setState({
-      version: e.target.value
+      agreement: v
     })
+  }
+  changeNotify = e => {
+    this.setState({
+      notify: e.target.value
+    })
+  }
+  checkNotify = e => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        notifyError: true,
+        notify: v
+      })
+    }
+    const nextState = {
+      notify: v
+    }
+    if (this.state.notifyError) {
+      nextState.notifyError = false
+    }
+    this.setState(nextState)
+  }
+
+  changeWrite = e => {
+    this.setState({
+      write: e.target.value
+    })
+  }
+  checkWrite = e => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        writeError: true,
+        write: v
+      })
+    }
+    const nextState = {
+      write: v
+    }
+    if (this.state.writeError) {
+      nextState.writeError = false
+    }
+    this.setState(nextState)
+  }
+
+  changeService = e => {
+    this.setState({
+      service: e.target.value
+    })
+  }
+  checkService = e => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        serviceError: true,
+        service: v
+      })
+    }
+    const nextState = {
+      service: v
+    }
+    nextState.service = v
+    if (this.state.serviceError) {
+      nextState.serviceError = false
+    }
+    this.setState(nextState)
   }
 
   render() {
     let {
+      id,
       name,
       nameError,
       alias,
       aliasError,
-      version,
-      versionError
+      agreement,
+      agreementError,
+      notify,
+      notifyError,
+      write,
+      writeError,
+      service,
+      serviceError
     } = this.state
 
     return (
@@ -223,6 +312,7 @@ class SupplierInfo extends React.Component {
             <p>供应商名称:</p>
             <input
               value={name}
+              disabled={id ? true : false}
               onChange={this.changeName}
               onBlur={this.checkName}
             />
@@ -242,10 +332,49 @@ class SupplierInfo extends React.Component {
             ) : null}
           </li>
           <li>
-            <p>版本号:</p>
-            <input value={version} onChange={this.changeVersion} />
-            {versionError ? (
-              <span className="checkInvalid">别名不能为空！</span>
+            <p>协议:</p>
+            <BasicSelectorWithoutAll
+              invalidTitle="选择设备协议"
+              staticOpts={CONSTANTS.DEVICEPROTOCOL}
+              width={CONSTANTS.SELECTWIDTH}
+              selectedOpt={agreement}
+              changeOpt={this.changeAgreement}
+            />
+            {agreementError ? (
+              <span className="checkInvalid">协议不能为空！</span>
+            ) : null}
+          </li>
+          <li>
+            <p>notify_uuid:</p>
+            <input
+              value={notify}
+              onChange={this.changeNotify}
+              onBlur={this.checkNotify}
+            />
+            {notifyError ? (
+              <span className="checkInvalid">notify_uuid不能为空！</span>
+            ) : null}
+          </li>
+          <li>
+            <p>write_uuid:</p>
+            <input
+              value={write}
+              onChange={this.changeWrite}
+              onBlur={this.checkWrite}
+            />
+            {writeError ? (
+              <span className="checkInvalid">write_uuid不能为空！</span>
+            ) : null}
+          </li>
+          <li>
+            <p>service_uuid:</p>
+            <input
+              value={service}
+              onChange={this.changeService}
+              onBlur={this.checkService}
+            />
+            {serviceError ? (
+              <span className="checkInvalid">service_uuid不能为空！</span>
             ) : null}
           </li>
         </ul>
