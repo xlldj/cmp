@@ -18,3 +18,11 @@ export const heartBeat = () => {
   }
   sendCheck2Server()
 }
+
+export const stopBeat = () => {
+  console.log('stop')
+  if (ti) {
+    clearTimeout(ti)
+    ti = null
+  }
+}

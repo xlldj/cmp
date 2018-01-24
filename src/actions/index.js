@@ -1,4 +1,4 @@
-import { heartBeat } from '../tasks/heartBeat'
+import { heartBeat, stopBeat } from '../tasks/heartBeat'
 import AjaxHandler from '../pages/ajax'
 import { buildAuthenData } from '../pages/util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../pages/util/storage'
@@ -43,7 +43,7 @@ export const changeOnline = () => {
   }
 }
 
-export const changeOffline = (forceOffline, callback) => {
+export const changeOffline = (forceOffline, stillHasTaskCallback) => {
   return dispatch => {
     let resource = '/employee/cs/offline'
     const body = null
@@ -59,9 +59,10 @@ export const changeOffline = (forceOffline, callback) => {
             value: data
           })
           removeStore('online')
+          stopBeat()
         } else {
-          if (callback) {
-            callback()
+          if (stillHasTaskCallback) {
+            stillHasTaskCallback()
           }
         }
       }
