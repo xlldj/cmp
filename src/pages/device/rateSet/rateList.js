@@ -17,7 +17,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../../actions'
 const subModule = 'rateSet'
-const { DEVICE_TYPE_WASHER, WASHER_RATE_TYPES } = CONSTANTS
+const { DEVICE_TYPE_WASHER, DEVICE_TYPE_BLOWER, WASHER_RATE_TYPES } = CONSTANTS
 
 const SIZE = CONSTANTS.PAGINATION
 
@@ -33,7 +33,8 @@ class RateList extends React.Component {
     this.state = {
       dataSource: [],
       loading: false,
-      total: 0
+      total: 0,
+      suppliers: {}
     }
     this.columns = [
       {
@@ -45,13 +46,22 @@ class RateList extends React.Component {
       {
         title: '设备类型',
         dataIndex: 'deviceType',
-        width: '17%',
+        width: '13%',
         render: (text, r) => typeName[r.deviceType]
+      },
+      {
+        title: '供应商',
+        dataIndex: 'supplierId',
+        width: '13%',
+        render: (text, r) =>
+          r.supplierId && this.state.suppliers[r.supplierId]
+            ? this.state.suppliers[r.supplierId]
+            : ''
       },
       {
         title: '费率',
         dataIndex: 'rates',
-        width: '32%',
+        width: '24%',
         render: (text, record, index) => {
           // washer's denomination is 'YUAN', doesn't need to mul by 100.
           const washerItems =
@@ -68,9 +78,10 @@ class RateList extends React.Component {
           const items = record.rateGroups.map((r, i) => (
             <li key={i}>
               <span key={i}>
-                扣费：{r.price ? mul(r.price, 100) : ''}分钱 脉冲数：{r.pulse
+                扣费：{r.price ? mul(r.price, 100) : ''}分钱/{r.pulse
                   ? r.pulse
-                  : ''}个
+                  : ''}
+                {record.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'}
               </span>
             </li>
           ))
@@ -92,7 +103,6 @@ class RateList extends React.Component {
       {
         title: <p className="lastCol">操作</p>,
         dataIndex: 'operation',
-        width: '17%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
@@ -125,6 +135,33 @@ class RateList extends React.Component {
       body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
+    this.fetchSuppliers()
+  }
+  fetchSuppliers = () => {
+    let resource = '/supplier/query/list'
+    const body = {
+      page: 1,
+      size: 100
+    }
+    const cb = json => {
+      if (json.error) {
+        throw new Error(json.error.displayMessage || json.error)
+      } else {
+        if (json.data) {
+          const suppliers = {},
+            nextState = {}
+          for (let i = 0; i < json.data.total; i++) {
+            suppliers[json.data.supplierEntities[i].id] =
+              json.data.supplierEntities[i].name
+          }
+          nextState.suppliers = suppliers
+          this.setState(nextState)
+        } else {
+          throw new Error('网络出错，获取供应商列表失败，请稍后重试～')
+        }
+      }
+    }
+    AjaxHandler.ajax(resource, body, cb)
   }
   componentWillUnmount() {
     this.props.hide(true)
