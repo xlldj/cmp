@@ -8,7 +8,7 @@ import Time from '../../util/time'
 import AjaxHandler from '../../util/ajax'
 import SearchLine from '../component/searchLine'
 import BasicSelector from '../component/basicSelector'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'

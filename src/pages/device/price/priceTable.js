@@ -8,7 +8,7 @@ import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'
 import Time from '../../../util/time'
 import SearchLine from '../../component/searchLine'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 const SIZE = CONSTANTS.PAGINATION
 
 //const Table = asyncComponent(() => import(/* webpackChunkName: "table" */ "antd/lib/table"))

@@ -1,7 +1,7 @@
 import React from 'react'
 import notification from 'antd/lib/notification'
 import Button from 'antd/lib/button'
-import CONSTANTS from '../pages/component/constants'
+import CONSTANTS from '../constants'
 
 const Noti = {}
 

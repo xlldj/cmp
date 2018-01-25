@@ -2,7 +2,7 @@ import React from 'react'
 import Upload from 'antd/lib/upload'
 import Icon from 'antd/lib/icon'
 import Modal from 'antd/lib/modal'
-import CONSTANTS from './constants'
+import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
 import Noti from '../../util/noti'
 const FILEADDR = CONSTANTS.FILEADDR

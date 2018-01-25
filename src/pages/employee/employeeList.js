@@ -9,7 +9,7 @@ import { Table, Button, Popconfirm, Modal } from 'antd'
 import Noti from '../../util/noti'
 import AjaxHandler from '../../util/ajax'
 import SearchLine from '../component/searchLine'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import SchoolSelector from '../component/schoolSelector'
 
 import { checkObject } from '../../util/checkSame'

@@ -1,7 +1,7 @@
 import React from 'react'
 import AjaxHandler from '../../util/ajax'
 import { getLocal, setLocal } from '../../util/storage'
-import CONSTANTS from './constants'
+import CONSTANTS from '../../constants'
 import Select from './select'
 
 import PropTypes from 'prop-types'

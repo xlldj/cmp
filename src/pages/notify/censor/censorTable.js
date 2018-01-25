@@ -6,7 +6,7 @@ import { Table } from 'antd'
 import Noti from '../../../util/noti'
 import Time from '../../../util/time'
 import AjaxHandler from '../../../util/ajax'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'

@@ -7,7 +7,7 @@ import AjaxHandler from '../../util/ajax'
 import Noti from '../../util/noti'
 import AddPlusAbs from '../component/addPlusAbs'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

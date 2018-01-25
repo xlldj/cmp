@@ -13,7 +13,7 @@ import {
 import Time from '../../util/time'
 import Noti from '../../util/noti'
 import AjaxHandler from '../../util/ajax'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import LoadingMask from '../component/loadingMask'
 import RepairmanTable from '../component/repairmanChoose'
 import EmployeeChoose from '../component/employeeChoose'

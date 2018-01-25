@@ -6,7 +6,7 @@ import { Table, Popconfirm } from 'antd'
 import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

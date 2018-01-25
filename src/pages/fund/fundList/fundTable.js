@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Table, Badge, Button } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import Time from '../../../util/time'
 import OperationSelector from '../../component/operationSelector'
 import BasicSelector from '../../component/basicSelector'

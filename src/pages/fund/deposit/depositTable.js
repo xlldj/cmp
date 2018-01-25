@@ -3,7 +3,7 @@ import { Table, Badge, Popconfirm, notification } from 'antd'
 import { Link } from 'react-router-dom'
 import AjaxHandler from '../../../util/ajax'
 import Time from '../../../util/time'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from 'antd'
 import './style/index.css'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import { setLocal, getLocal } from '../../util/storage'
 import Time from '../../util/time'
 

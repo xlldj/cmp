@@ -5,7 +5,7 @@
 
 import React from 'react'
 import SearchLine from '../../component/searchLine'
-// import CONSTANTS from '../../component/constants'
+// import CONSTANTS from '../../../constants'
 import AuthenDataTable from '../../component/authenDataTable'
 import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'

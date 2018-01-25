@@ -1,5 +1,5 @@
 import Noti from './noti'
-import CONSTANTS from '../pages/component/constants'
+import CONSTANTS from '../constants'
 const privilege2Url = CONSTANTS.PRIVILEGE2URL
 const OPETYPES = CONSTANTS.AuthenOpeType
 

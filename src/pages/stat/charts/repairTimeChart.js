@@ -13,7 +13,7 @@ import Icon from 'antd/lib/icon'
 import DatePicker from 'antd/lib/date-picker'
 import AjaxHandler from '../../../util/ajax'
 import Format from '../../../util/format'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import Time from '../../../util/time'
 import moment from 'moment'
 const { MonthPicker } = DatePicker

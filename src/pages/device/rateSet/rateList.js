@@ -8,7 +8,7 @@ import Noti from '../../../util/noti'
 import Time from '../../../util/time'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import { checkObject } from '../../../util/checkSame'
 import { mul } from '../../../util/numberHandle'
 

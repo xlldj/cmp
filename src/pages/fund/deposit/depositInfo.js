@@ -1,7 +1,7 @@
 import React from 'react'
 import AjaxHandler from '../../../util/ajax'
 import { Button, Radio, Select, Modal, Table, notification } from 'antd'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import SchoolSelectorWithoutAll from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import Noti from '../../../util/noti'

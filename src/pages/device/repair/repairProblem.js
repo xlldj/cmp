@@ -7,7 +7,7 @@ import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import DeviceSelector from '../../component/deviceWithoutAll'
 import Time from '../../../util/time'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

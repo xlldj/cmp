@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal, Radio, Button } from 'antd'
 import Noti from '../../util/noti'
-import CONSTANTS from './constants'
+import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
 
 const RadioGroup = Radio.Group

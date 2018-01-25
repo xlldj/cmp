@@ -7,7 +7,7 @@ import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import DeviceSelector from '../../component/deviceSelector'
 import SchoolSelector from '../../component/schoolSelector'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'

@@ -6,7 +6,7 @@ import { Button, DatePicker, Modal } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

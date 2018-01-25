@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Modal, Popconfirm } from 'antd'
 import Time from '../../util/time'
 import Noti from '../../util/noti'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
 
 import PropTypes from 'prop-types'

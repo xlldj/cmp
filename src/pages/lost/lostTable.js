@@ -7,7 +7,7 @@ import AjaxHandler from '../../util/ajax'
 import SearchLine from '../component/searchLine'
 import SchoolSelector from '../component/schoolSelector'
 import BasicSelector from '../component/basicSelector'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import Time from '../../util/time'
 
 import PropTypes from 'prop-types'

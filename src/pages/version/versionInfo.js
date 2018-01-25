@@ -10,7 +10,7 @@ import { Button, Popconfirm } from 'antd'
 import AjaxHandler from '../../util/ajax'
 import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
 import Noti from '../../util/noti'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import PicturesWall from '../component/picturesWall'
 
 class VersionInfo extends React.Component {

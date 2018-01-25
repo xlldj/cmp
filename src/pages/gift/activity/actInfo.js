@@ -11,7 +11,7 @@ import {
 } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import Time from '../../../util/time'
 import PicturesWall from '../../component/picturesWall'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'

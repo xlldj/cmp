@@ -10,7 +10,7 @@ import React from 'react'
 import { Button, Checkbox } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import AuthenDataTable from '../../component/authenDataTable'
 import {
   buildAuthenBaseOnfull,

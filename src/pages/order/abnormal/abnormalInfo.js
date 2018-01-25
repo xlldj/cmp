@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from 'antd'
 import AjaxHandler from '../../../util/ajax'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import Time from '../../../util/time'
 import Noti from '../../../util/noti'
 

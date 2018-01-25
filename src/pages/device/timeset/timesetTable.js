@@ -7,7 +7,7 @@ import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import Format from '../../../util/format'
 import { checkObject } from '../../../util/checkSame'
 

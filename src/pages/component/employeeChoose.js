@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal, Table, Button } from 'antd'
 import Noti from '../../util/noti'
-import CONSTANTS from './constants'
+import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
 
 class EmployeeChoose extends React.Component {

@@ -11,7 +11,7 @@ import Noti from '../../../util/noti'
 import AddPlusAbs from '../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
 const { DEVICE_TYPE_HEATER } = CONSTANTS
 const OPTIONS = {

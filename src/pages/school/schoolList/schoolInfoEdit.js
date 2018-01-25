@@ -8,7 +8,7 @@ import PicturesWall from '../../component/picturesWall'
 import Cascader from 'antd/lib/cascader'
 import Button from 'antd/lib/button'
 import Radio from 'antd/lib/radio'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'

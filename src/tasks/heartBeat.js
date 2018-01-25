@@ -1,7 +1,7 @@
 // This is for heart beat of online status.
 // Send to server every 'HEARTBEATTIMEOUT'
 import AjaxHandler from '../util/ajax'
-import CONSTANTS from '../pages/component/constants'
+import CONSTANTS from '../constants'
 const { HEARTBEATTIMEOUT } = CONSTANTS
 let ti = null
 const sendCheck2Server = () => {

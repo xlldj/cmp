@@ -2,7 +2,7 @@ import React from 'react'
 import AjaxHandler from '../../../util/ajax'
 import { Button, Modal, Carousel } from 'antd'
 import Time from '../../../util/time'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import Noti from '../../../util/noti'
 const typeName = CONSTANTS.DEVICETYPE
 const { TASK_PENDING, TASK_FINISHED, TASKSTATUS } = CONSTANTS

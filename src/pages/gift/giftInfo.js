@@ -6,7 +6,7 @@ import { Button, DatePicker } from 'antd'
 import AjaxHandler from '../../util/ajax'
 import Noti from '../../util/noti'
 import Time from '../../util/time'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import DeviceSelectorWithoutAll from '../component/deviceWithoutAll'
 import BasicSelector from '../component/basicSelectorWithoutAll'
 

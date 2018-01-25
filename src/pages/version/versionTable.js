@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import AjaxHandler from '../../util/ajax'
 import Time from '../../util/time'
 import SearchLine from '../component/searchLine'
-import CONSTANTS from '../component/constants'
+import CONSTANTS from '../../constants'
 import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'

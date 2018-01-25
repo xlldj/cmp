@@ -9,7 +9,7 @@ import React from 'react'
 import { Button } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
 import AddPlusAbs from '../../component/addPlusAbs'
 

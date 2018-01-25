@@ -9,7 +9,7 @@ import SchoolSelector from '../../component/schoolSelector'
 import BasicSelector from '../../component/basicSelector'
 import DeviceSelector from '../../component/deviceSelector'
 import Time from '../../../util/time'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'

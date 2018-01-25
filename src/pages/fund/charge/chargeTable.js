@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import Table from 'antd/lib/table'
 
 import AjaxHandler from '../../../util/ajax'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import SearchLine from '../../component/searchLine'
 
 import SchoolSelector from '../../component/schoolSelector'

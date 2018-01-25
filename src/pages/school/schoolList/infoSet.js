@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'
 import Format from '../../../util/format'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import { mul } from '../../../util/numberHandle'
 const { DEVICE_TYPE_BLOWER, DEVICE_TYPE_WASHER, WASHER_RATE_TYPES } = CONSTANTS
 

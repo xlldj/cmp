@@ -3,7 +3,7 @@ import { Modal, Table, Button } from 'antd'
 import Time from '../../util/time'
 import Noti from '../../util/noti'
 import AjaxHandler from '../../util/ajax'
-import CONSTANTS from './constants'
+import CONSTANTS from '../../constants'
 const { TASK_BUILD_CMP } = CONSTANTS
 
 class RepairmanTable extends React.Component {

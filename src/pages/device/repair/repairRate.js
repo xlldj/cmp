@@ -3,7 +3,7 @@ import React from 'react'
 import { Table } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 const SIZE = CONSTANTS.PAGINATION
 
 class RepairRate extends React.Component {

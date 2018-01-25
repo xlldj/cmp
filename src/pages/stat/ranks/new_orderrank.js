@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Icon } from 'antd'
 import AjaxHandler from '../../../util/ajax'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 import Time from '../../../util/time'
 
 /*----------timespan: 1-今日，2-本周,3-本月-----*/

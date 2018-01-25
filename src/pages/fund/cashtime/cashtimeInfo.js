@@ -10,7 +10,7 @@ import Noti from '../../../util/noti'
 import Time from '../../../util/time'
 import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
-import CONSTANTS from '../../component/constants'
+import CONSTANTS from '../../../constants'
 
 const RangePicker = DatePicker.RangePicker
 
