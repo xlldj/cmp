@@ -216,7 +216,7 @@ const CONSTANTS = {
     repairRating: 16
   },
   // for heart beat check of online status
-  HEARTBEATTIMEOUT: 5 * 60 * 1000,
+  HEARTBEATTIMEOUT: 4 * 60 * 1000,
 
   CHARTTYPES: {
     1: 'order',
