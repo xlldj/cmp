@@ -721,23 +721,24 @@ class TaskList extends React.Component {
   }
   changeNote = e => {
     let v = e.target.value
-    if (v.length > 10) {
-      return this.setState({
-        tagLengthError: true
-      })
-    }
     this.setState({
-      note: e.target.value,
+      note: v,
       tagLengthError: false,
       tagExistError: false,
       noteError: false
     })
   }
   checkNote = e => {
-    let v = e.target.value
+    let v = e.target.value.trim()
     if (!v) {
       return this.setState({
         noteError: true,
+        note: v
+      })
+    }
+    if (v.length > 10) {
+      return this.setState({
+        tagLengthError: true,
         note: v
       })
     }
@@ -754,6 +755,11 @@ class TaskList extends React.Component {
     if (!description) {
       return this.setState({
         noteError: true
+      })
+    }
+    if (description.length > 10) {
+      return this.setState({
+        tagLengthError: true
       })
     }
     console.log('build', posting, checking)
