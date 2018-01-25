@@ -65,6 +65,7 @@ class RateInfo extends React.Component {
       originalDT,
       originalSchool,
       supplierId,
+      originalSupplier: '',
       supplierError,
       suppliers,
       rateGroupsVersionB,
@@ -137,6 +138,7 @@ class RateInfo extends React.Component {
           }
           if (r.supplierId) {
             nextState.supplierId = r.supplierId
+            nextState.originalSupplier = r.supplierId
           }
           if (r.deviceType === DEVICE_TYPE_WASHER) {
             let dryPrice =
@@ -231,20 +233,6 @@ class RateInfo extends React.Component {
     this.setState({
       deviceTypeError: false
     })
-    let { id, deviceType, originalDT, schoolId, originalSchool } = this.state
-    if (!schoolId) {
-      // 如果没有供应商选项，不去查重
-      return
-    }
-    if (
-      !(
-        id &&
-        parseInt(deviceType, 10) === originalDT &&
-        parseInt(schoolId, 10) === originalSchool
-      )
-    ) {
-      this.checkExist(null)
-    }
   }
   changeSchool = v => {
     this.setState({
@@ -260,6 +248,7 @@ class RateInfo extends React.Component {
     this.setState({
       schoolError: false
     })
+    /*
     let { id, deviceType, originalDT, schoolId, originalSchool } = this.state
     if (!deviceType) {
       // 如果没有供应商选项，不去查重
@@ -274,6 +263,7 @@ class RateInfo extends React.Component {
     ) {
       this.checkExist(null)
     }
+    */
   }
   checkExist = callback => {
     if (this.state.checking) {
@@ -465,29 +455,30 @@ class RateInfo extends React.Component {
       return
     }
 
-    let {
-      id,
-      deviceType,
-      originalDT,
-      schoolId,
-      originalSchool,
-      checking,
-      posting
-    } = this.state
+    let { id, checking, posting } = this.state
 
     if (checking || posting) {
       return
     }
+    /*
     if (
       !(
         id &&
         parseInt(deviceType, 10) === originalDT &&
-        parseInt(schoolId, 10) === originalSchool
+        parseInt(schoolId, 10) === originalSchool &&
+        parseInt(supplierId, 10) === originalSupplier
       )
     ) {
       this.checkExist(this.postInfo)
     } else {
       this.postInfo()
+    }
+    */
+    // since 'schoolId', 'deviceType', and 'supplierId' can't be changed when editing, only check if editing is ok.
+    if (id) {
+      this.postInfo()
+    } else {
+      this.checkExist(this.postInfo)
     }
   }
   postInfo = () => {
