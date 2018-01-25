@@ -222,9 +222,10 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
   if (options && options.domain) {
     url = options.domain + resource
   } else {
-    url = 'http://116.62.236.67:5080' + resource
+    // url = 'http://116.62.236.67:5080' + resource
     // url = 'http://10.0.0.4:5080' + resource
     // url = 'https://api.xiaolian365.com/m' + resource
+    url = 'http://120.78.246.160:5080' + resource
   }
 
   const token = getToken()
@@ -246,9 +247,10 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
 
 /* for client ajax request */
 AjaxHandler.ajaxClient = (resource, body, cb) => {
-  const domain = 'http://116.62.236.67:5081'
+  // const domain = 'http://116.62.236.67:5081'
   // const domain = 'http://10.0.0.4:5081'
   // const domain = 'https://api.xiaolian365.com/c'
+  const domain = 'http://120.78.246.160:5081'
   AjaxHandler.ajax(resource, body, cb, null, { domain: domain })
 }
 
