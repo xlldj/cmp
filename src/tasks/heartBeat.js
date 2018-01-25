@@ -5,7 +5,7 @@ import CONSTANTS from '../pages/component/constants'
 const { HEARTBEATTIMEOUT } = CONSTANTS
 let ti = null
 const sendCheck2Server = () => {
-  let resource = '/employee/cs/online/heartbeat'
+  let resource = '/employee/cs/online/heart/beat'
   const cb = () => {}
   AjaxHandler.ajax(resource, null, cb)
   ti = setTimeout(sendCheck2Server, HEARTBEATTIMEOUT)
