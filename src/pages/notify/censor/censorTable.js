@@ -16,13 +16,14 @@ import { changeNotify } from '../../../actions'
 const subModule = 'censor'
 
 const SIZE = CONSTANTS.PAGINATION
+const { NOTIFY_STATUS_PENDING, NOTIFY_STATUS_REFUSED } = CONSTANTS
 
 //const Table = asyncComponent(() => import(/* webpackChunkName: "table" */ "antd/lib/table"))
 //const Button = asyncComponent(() => import(/* webpackChunkName: "button" */ "antd/lib/button"))
 //const Popconfirm = asyncComponent(() => import(/* webpackChunkName: "popconfirm" */ "antd/lib/popconfirm"))
 //const Modal = asyncComponent(() => import(/* webpackChunkName: "modal" */ "antd/lib/modal"))
 
-class NotifyTable extends React.Component {
+class CensorTable extends React.Component {
   static propTypes = {
     page: PropTypes.number.isRequired
   }
@@ -109,7 +110,7 @@ class NotifyTable extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/../util/notify/censor/info/:${record.id}`}>详情</Link>
+              <Link to={`/notify/censor/info/:${record.id}`}>详情</Link>
             </span>
           </div>
         )
@@ -121,7 +122,7 @@ class NotifyTable extends React.Component {
     this.setState({
       loading: true
     })
-    let resource = '/api/../util/notify/list'
+    let resource = '/api/notify/list'
     const cb = json => {
       let nextState = { loading: false }
       if (json.error) {
@@ -150,7 +151,7 @@ class NotifyTable extends React.Component {
     const body = {
       page: page,
       size: SIZE,
-      status: [3, 4]
+      status: [NOTIFY_STATUS_PENDING, NOTIFY_STATUS_REFUSED]
     }
     this.fetchData(body)
   }
@@ -159,7 +160,7 @@ class NotifyTable extends React.Component {
   }
   delete = (e, id) => {
     e.preventDefault()
-    let resource = '/api/../util/notify/delete'
+    let resource = '/api/notify/delete'
     const body = {
       id: id
     }
@@ -172,7 +173,7 @@ class NotifyTable extends React.Component {
           const body = {
             page: this.props.page,
             size: SIZE,
-            status: [3, 4]
+            status: [NOTIFY_STATUS_PENDING, NOTIFY_STATUS_REFUSED]
           }
           this.fetchData(body)
         } else {
@@ -229,6 +230,6 @@ const mapStateToProps = (state, ownProps) => {
 export default withRouter(
   connect(mapStateToProps, {
     changeNotify
-  })(NotifyTable)
+  })(CensorTable)
 )
 // export default NotifyTable

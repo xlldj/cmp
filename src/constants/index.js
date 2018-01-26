@@ -25,7 +25,7 @@ const CONSTANTS = {
   ...STAT,
   ...TASK,
   ...USER,
-  VERSION
+  ...VERSION
 }
 
 export default CONSTANTS

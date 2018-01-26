@@ -310,10 +310,12 @@ class RepairInfo extends React.Component {
               <p>设备类型:</p>
               {deviceType ? typeName[deviceType] : '无'}
             </li>
-            <li>
+            <li className="longText">
               <p>设备位置:</p>
-              <span>{location}</span>
-              <span>{exist ? '' : ' (设备已解绑)'}</span>
+              <span className="detailContent">
+                <span>{location}</span>
+                <span>{exist ? '' : ' (设备已解绑)'}</span>
+              </span>
             </li>
           </ul>
         </div>
@@ -325,9 +327,9 @@ class RepairInfo extends React.Component {
               <p>设备问题:</p>
               <div>{cause || '暂无'}</div>
             </li>
-            <li className="itemsWrapper">
+            <li className="longText">
               <p>报修内容:</p>
-              <div>{description || '暂无'}</div>
+              <span className="detailContent">{description || '暂无'}</span>
             </li>
             {images && images.length > 0 ? (
               <li className="imgWrapper">

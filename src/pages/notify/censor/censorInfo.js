@@ -11,8 +11,9 @@ import CONSTANTS from '../../../constants'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+const { NOTIFY_STATUS_PENDING, NOTIFY_STATUS_REFUSED } = CONSTANTS
 
-class NotifyInfo extends React.Component {
+class CensorInfo extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
   }
@@ -320,10 +321,12 @@ class NotifyInfo extends React.Component {
         </ul>
 
         <div className="btnArea">
-          {forbiddenStatus.CENSOR_NOTIFY ? null : (
+          {forbiddenStatus.CENSOR_NOTIFY ||
+          status !== NOTIFY_STATUS_PENDING ? null : (
             <Button onClick={this.censorRefuse}>审核未通过</Button>
           )}
-          {forbiddenStatus.CENSOR_NOTIFY ? null : (
+          {forbiddenStatus.CENSOR_NOTIFY ||
+          status !== NOTIFY_STATUS_PENDING ? null : (
             <Button type="primary" onClick={this.censorPass}>
               审核通过
             </Button>
@@ -360,4 +363,4 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, {})(NotifyInfo))
+export default withRouter(connect(mapStateToProps, {})(CensorInfo))

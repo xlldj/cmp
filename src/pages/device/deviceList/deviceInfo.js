@@ -225,14 +225,16 @@ class DeviceInfo extends React.Component {
               <p>设备位置:</p>
               {data.location || '暂无'}
             </li>
-            <li className="itemsWrapper">
-              <p>设备费率:</p>
-              {deviceType !== 2 ? (
-                `${data.price * 100}分钱/${data.pulse}${denomination}`
-              ) : (
-                <div>{rateItems}</div>
-              )}
-            </li>
+            {data.price || rateItems ? (
+              <li className="itemsWrapper">
+                <p>设备费率:</p>
+                {deviceType !== 2 ? (
+                  `${data.price * 100}分钱/${data.pulse}${denomination}`
+                ) : (
+                  <div>{rateItems}</div>
+                )}
+              </li>
+            ) : null}
             <li>
               <p>绑定时间:</p>
               {time}

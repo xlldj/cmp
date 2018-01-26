@@ -674,15 +674,18 @@ class TaskList extends React.Component {
   changeTable = (pageObj, filters, sorter) => {
     console.log(sorter)
     let { order, field, column } = sorter
+    let { orderBy, assess_dim } = this.props[subModule]
     let data = {}
+    let newOrder = Array.from(this.props[subModule].order),
+      newOrderBy = Array.from(orderBy)
     if (order) {
-      let { orderBy, assess_dim } = this.props[subModule]
-      let newOrder = Array.from(this.props[subModule].order),
-        newOrderBy = Array.from(orderBy)
       newOrder[assess_dim - 1] = ORDER[order]
       newOrderBy[assess_dim - 1] =
         ORDERBYS[column.orderBy ? column.orderBy : field]
       data.order = newOrder
+      data.orderBy = newOrderBy
+    } else if (orderBy[assess_dim - 1] !== 0) {
+      newOrderBy[assess_dim - 1] = 0
       data.orderBy = newOrderBy
     }
     let page = pageObj.current

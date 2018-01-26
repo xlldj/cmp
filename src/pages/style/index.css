@@ -453,7 +453,6 @@ button.grayBackColor:linked {
   line-height: 45px;
   height: 45px;
   color: #222;
-  word-break: keep-all;
   display: flex;
   flex: none;
   flex-wrap: nowrap;
@@ -527,6 +526,19 @@ button.grayBackColor:linked {
   line-height: 22px;
 }
 .infoBlock > ul .itemsWrapper textarea {
+  line-height: 22px;
+}
+.infoBlock > ul .longText {
+  align-items: flex-start;
+  height: auto;
+  min-height: 45px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  line-height: 22px;
+}
+.infoBlock > ul .longText .detailContent {
+  display: inline-block;
+  max-width: 180px;
   line-height: 22px;
 }
 .info > h3 {

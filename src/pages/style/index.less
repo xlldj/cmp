@@ -487,7 +487,6 @@ button.grayBackColor:linked{
       line-height: @liHeight;
       height: @liHeight;
       color: #222;
-      word-break: keep-all;
 
       .flex;
 
@@ -558,6 +557,22 @@ button.grayBackColor:linked{
         line-height: 22px;
       }
       textarea{
+        line-height: 22px;
+      }
+    }
+    .longText{
+      align-items: flex-start;
+      height: auto;
+      min-height: @liHeight;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      line-height: 22px;
+      p:first-child{
+
+      }
+      .detailContent{
+        display: inline-block;
+        max-width: 180px;
         line-height: 22px;
       }
     }

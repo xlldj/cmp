@@ -102,7 +102,7 @@ class UserInfo extends React.Component {
     this.setState({
       messagePosting: true
     })
-    let resource = '/api/../util/notify/add',
+    let resource = '/api/notify/add',
       mobile = this.state.data.mobile
     const body = {
       content: this.state.addingName,
