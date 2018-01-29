@@ -769,7 +769,12 @@ class TaskDetail extends React.Component {
     this.setState({
       loadingId: body.id
     })
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.ajax(resource, body, cb, null, null, this.clearDetailLoading)
+  }
+  clearDetailLoading = () => {
+    this.props.changeTask(subModule, {
+      detailLoading: false
+    })
   }
   changeDivision = v => {
     let { all } = this.state

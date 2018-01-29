@@ -56,7 +56,13 @@ AjaxHandler.tiForBug = () =>
 
 /* fetch has no timeout originally, so give a timeout promise to compete. If timeout happens first, Hint error. */
 /* But Notice, the ajax may be successful (Especially under slow network) */
-const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
+const abortablePromise = (
+  fetch_promise,
+  cb,
+  serviceErrorCb,
+  options,
+  errorCb
+) => {
   let timeoutAction = null
 
   // 这是一个可以被reject的promise
@@ -97,6 +103,9 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
     })
     .catch(error => {
       console.log(error)
+      if (errorCb) {
+        errorCb(error)
+      }
       /* if need clear posting status for the caller class even error occurs, clear the status */
       if (options && options.clearPosting && options.thisObj) {
         options.thisObj.setState({
@@ -210,7 +219,7 @@ const abortablePromise = (fetch_promise, cb, serviceErrorCb, options) => {
   return abortable_promise
 }
 
-AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
+AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options, errorCb) => {
   /* ----handle the 'api' ----- */
   /* this is because cmp used a node.js server as a mock server at the beginning. And I used '/api' to distinguish it from Java server api */
   if (resource.includes('/api')) {
@@ -222,9 +231,9 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
   if (options && options.domain) {
     url = options.domain + resource
   } else {
-    url = 'http://116.62.236.67:5080' + resource
+    // url = 'http://116.62.236.67:5080' + resource
     // url = 'http://10.0.0.4:5080' + resource
-    // url = 'https://api.xiaolian365.com/m' + resource
+    url = 'https://api.xiaolian365.com/m' + resource
     // url = 'http://120.78.246.160:2080' + resource
   }
 
@@ -242,14 +251,14 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options) => {
     headers: hdrs
   })
 
-  return abortablePromise(fetch_promise, cb, serviceErrorCb, options)
+  return abortablePromise(fetch_promise, cb, serviceErrorCb, options, errorCb)
 }
 
 /* for client ajax request */
 AjaxHandler.ajaxClient = (resource, body, cb) => {
-  const domain = 'http://116.62.236.67:5081'
+  // const domain = 'http://116.62.236.67:5081'
   // const domain = 'http://10.0.0.4:5081'
-  // const domain = 'https://api.xiaolian365.com/c'
+  const domain = 'https://api.xiaolian365.com/c'
   // const domain = 'http://120.78.25.22:2080'
   AjaxHandler.ajax(resource, body, cb, null, { domain: domain })
 }
