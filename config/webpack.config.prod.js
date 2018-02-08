@@ -12,7 +12,8 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter')
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
 const paths = require('./paths')
 const getClientEnvironment = require('./env')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -56,10 +57,7 @@ module.exports = {
   devtool: 'source-map',
   // In production, we only want to load the polyfills and the app code.
   entry: {
-    index: [
-      require.resolve('./polyfills'),
-      paths.appSrc + '/index.js'
-    ]
+    index: [require.resolve('./polyfills'), paths.appSrc + '/index.js']
   },
   output: {
     path: paths.appBuild,
@@ -87,7 +85,6 @@ module.exports = {
     // for React Native Web.
     extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
     alias: {
-
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web'
@@ -117,7 +114,6 @@ module.exports = {
           {
             options: {
               formatter: eslintFormatter
-
             },
             loader: require.resolve('eslint-loader')
           }
@@ -167,7 +163,7 @@ module.exports = {
             loader: require.resolve('babel-loader'),
             query: {
               presets: ['es2015', 'stage-0', 'react'],
-              plugins: [['import', { libraryName: 'antd'}]]
+              plugins: [['import', { libraryName: 'antd' }]]
             }
           }
         ]
@@ -299,7 +295,7 @@ module.exports = {
       // about it being stale, and the cache-busting can be skipped.
       dontCacheBustUrlsMatching: /\.\w{8}\./,
       filename: 'service-worker.js',
-      logger (message) {
+      logger(message) {
         if (message.indexOf('Total precache size is') === 0) {
           // This message occurs for every build and is a bit too noisy.
           return
@@ -320,6 +316,12 @@ module.exports = {
       // Don't precache sourcemaps (they're large) and build asset manifest:
       staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/]
     }),
+    // Moment.js is an extremely popular library that bundles large locale files
+    // by default due to how Webpack interprets its code. This is a practical
+    // solution that requires the user to opt into importing specific locales.
+    // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
+    // You can remove this if you don't use Moment.js:
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new BundleAnalyzerPlugin()
   ],
   // Some libraries import Node modules but don't use them in the browser.

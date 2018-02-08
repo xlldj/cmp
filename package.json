@@ -6,7 +6,7 @@
   "devDependencies": {
     "babel-plugin-import": "^1.4.0",
     "babel-plugin-transform-imports": "^1.4.1",
-    "enzyme": "^3.0.0",
+    "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "eslint-plugin-prettier": "^2.4.0",
     "husky": "^0.14.3",
@@ -46,7 +46,7 @@
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
     "humps": "^2.0.1",
-    "jest": "20.0.4",
+    "jest": "^22.1.4",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "normalizr": "^3.2.4",
@@ -96,7 +96,11 @@
   },
   "jest": {
     "collectCoverageFrom": ["src/**/*.{js,jsx}"],
-    "setupFiles": ["<rootDir>/config/polyfills.js"],
+    "setupFiles": [
+      "<rootDir>/config/polyfills.js",
+      "<rootDir>/config/shim.js",
+      "<rootDir>/config/enzyme-setup.js"
+    ],
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.js?(x)",
       "<rootDir>/src/**/?(*.)(spec|test).js?(x)"

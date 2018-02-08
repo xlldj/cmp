@@ -771,6 +771,7 @@ class TaskDetail extends React.Component {
     })
     AjaxHandler.ajax(resource, body, cb, null, null, this.clearDetailLoading)
   }
+  // clear 'detailLoading' in store, for error handling.
   clearDetailLoading = () => {
     this.props.changeTask(subModule, {
       detailLoading: false

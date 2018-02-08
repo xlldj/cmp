@@ -202,14 +202,18 @@ class NotifyTable extends React.Component {
                   : Time.getDayFormat(record.endTime))
               )
             } else {
-              let names = record.schoolNames.map((name, index) => (
-                <span
-                  className={record.schoolNames.length > 1 ? 'inlineItem' : ''}
-                  key={index}
-                >
-                  {name}
-                </span>
-              ))
+              let names =
+                record.schoolNames &&
+                record.schoolNames.map((name, index) => (
+                  <span
+                    className={
+                      record.schoolNames.length > 1 ? 'inlineItem' : ''
+                    }
+                    key={index}
+                  >
+                    {name}
+                  </span>
+                ))
               return (
                 <span>
                   {record.schoolNames ? names : '暂无'}
