@@ -1104,14 +1104,16 @@ class GiftTable extends React.Component {
     )
   }
   changeDevice = v => {
+    console.log(v)
     let data = JSON.parse(JSON.stringify(this.state.allTypeData))
+    console.log(data)
     if (v === 'all') {
       return this.setState({
         dataSource: data,
         selectedDevice: 'all'
       })
     }
-    let newData = data.filter((r, i) => r.deviceType === v)
+    let newData = data.filter((r, i) => r.deviceType === parseInt(v, 10))
     this.setState({
       dataSource: newData,
       selectedDevice: v
@@ -1159,9 +1161,9 @@ class GiftTable extends React.Component {
 
     let ds = Object.keys(deviceName)
     const deviceOptions = ds.map((d, i) => (
-      <option style={{ textAlign: 'center' }} value={d} key={d}>
+      <Option style={{ textAlign: 'center' }} value={d} key={d}>
         {deviceName[d]}
-      </option>
+      </Option>
     ))
 
     const columns = [

@@ -990,7 +990,7 @@ class TaskList extends React.Component {
 
     let page = panel_page[mainCate]
     let max = 1
-    let unused =
+    /* let unused =
       mainCate === REPORT_CATE_COMPLAINT - 1 &&
       dataSource &&
       dataSource.length > 0 &&
@@ -998,7 +998,7 @@ class TaskList extends React.Component {
         if (r.amount > max) {
           max = r.amount
         }
-      })
+      }) */
 
     const sumTable = mainCate === REPORT_CATE_SUM - 1 && (
       <Table

@@ -75,7 +75,7 @@ class App extends React.Component {
     const component = logged ? main : log
 
     return (
-      <div class="home">
+      <div className="home">
         <div className="pageLoading hide" ref="loading">
           加载中...
         </div>

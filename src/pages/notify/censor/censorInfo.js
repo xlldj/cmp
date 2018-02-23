@@ -11,7 +11,7 @@ import CONSTANTS from '../../../constants'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-const { NOTIFY_STATUS_PENDING, NOTIFY_STATUS_REFUSED } = CONSTANTS
+const { NOTIFY_STATUS_PENDING } = CONSTANTS
 
 class CensorInfo extends React.Component {
   static propTypes = {
