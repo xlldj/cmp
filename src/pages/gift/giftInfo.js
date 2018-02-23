@@ -126,7 +126,7 @@ class GiftInfo extends React.Component {
       deviceType
     } = this.state
     /*-------------need to check the data here---------------*/
-    if (!amount || amount < 0) {
+    if (!amount || amount <= 0) {
       return this.setState({
         amountError: true
       })
@@ -381,7 +381,7 @@ class GiftInfo extends React.Component {
             />
             {amountError ? (
               <span className="checkInvalid">
-                红包金额必须为正书(支持1位小数)！
+                红包金额必须为正数(支持1位小数)！
               </span>
             ) : null}
           </li>

@@ -1271,7 +1271,7 @@ class GiftTable extends React.Component {
         <div className="depositGiftTable">
           <Table
             rowKey={record => record.id}
-            pagination={false}
+            // pagination={false}
             dataSource={dataSource}
             columns={columns}
           />
