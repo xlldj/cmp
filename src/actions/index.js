@@ -104,6 +104,37 @@ export const fetchPrivileges = () => {
   }
 }
 
+export const SET_GIFTS = 'SET_GIFTS'
+export const setGifts = value => {
+  return {
+    type: SET_GIFTS,
+    value
+  }
+}
+// fetch privilege/list
+export const fetchGifts = () => {
+  return dispatch => {
+    let resource = '/api/gift/list'
+    const body = {
+      page: 1,
+      size: 100
+    }
+    const cb = json => {
+      if (json.data) {
+        let value = {
+          gifts: json.data.gifts,
+          giftSet: true
+        }
+        dispatch({
+          type: 'SET_GIFTS',
+          value: value
+        })
+      }
+    }
+    return AjaxHandler.ajax(resource, body, cb)
+  }
+}
+
 export const SET_TAG_LIST = 'SET_TAG_LIST'
 export const setTagList = value => {
   return {

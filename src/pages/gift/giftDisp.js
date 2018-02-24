@@ -16,6 +16,9 @@ const GiftContainer = asyncComponent(() =>
 const ActContainer = asyncComponent(() =>
   import(/* webpackChunkName: "actContainer" */ './activity/actContainer')
 )
+const CreditExchange = asyncComponent(() =>
+  import(/* webpackChunkName: "creditExchange" */ './credits/creditExchange')
+)
 
 const breadcrumbNameMap = {
   '/list': '红包列表',
@@ -78,6 +81,12 @@ class GiftDisp extends React.Component {
               path="/gift/list"
               render={props => (
                 <GiftContainer hide={this.props.hide} {...props} />
+              )}
+            />
+            <Route
+              path="/gift/credits"
+              render={props => (
+                <CreditExchange hide={this.props.hide} {...props} />
               )}
             />
             <Route

@@ -10,7 +10,8 @@ const FUND = {
     6: '已取消'
   },
   WITHDRAWTIME: { 1: '固定时段', 2: '具体时段' },
-  DEPOSITACTTYPE: { 1: '充值优惠' },
+  // DEPOSITACTTYPE: { 1: '充值优惠', 2: '赠送红包' },
+  DEPOSITACTTYPE: { 2: '赠送红包' },
   PAYMENTTYPE: { 1: '余额支付', 2: '红包支付' }
 }
 

@@ -153,6 +153,11 @@ const BASIC = {
           name: '红包活动',
           path: 'act',
           key: 1
+        },
+        {
+          name: '积分兑换',
+          path: 'credits',
+          key: 2
         }
       ]
     },

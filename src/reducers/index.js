@@ -48,6 +48,20 @@ const setAuthenData = (state = initialAuthenData, action) => {
   return state
 }
 
+// for set all the gifts globally.
+const initialGifts = {
+  gifts: [],
+  giftSet: false
+}
+const setGifts = (state = initialGifts, action) => {
+  const { type } = action
+  if (type === ActionTypes.SET_GIFTS) {
+    const value = action.value
+    return Object.assign({}, state, value)
+  }
+  return state
+}
+
 const initialTagList = {}
 const setTagList = (state = initialTagList, action) => {
   const { type } = action
@@ -239,6 +253,10 @@ const initialGiftState = {
     deviceType: 'all'
   },
   act: {
+    page: 1,
+    schoolId: selectedSchool
+  },
+  credits: {
     page: 1,
     schoolId: selectedSchool
   }
@@ -458,7 +476,8 @@ const rootReducer = combineReducers({
   setAuthenData,
   setRoleList,
   setTagList,
-  setUserInfo
+  setUserInfo,
+  setGifts
 })
 
 export default rootReducer

@@ -1,3 +1,4 @@
+// check two objects if has same values of keys in arr.
 export function checkObject(o1, o2, arr) {
   // debugger
   if (o1 === o2) {
