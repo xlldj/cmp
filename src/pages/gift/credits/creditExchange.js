@@ -3,8 +3,8 @@ import React from 'react'
 import { Table, Modal, Popconfirm, Button } from 'antd'
 
 import Noti from '../../../util/noti'
-// import AjaxHandler from '../../../util/ajax'
-import AjaxHandler from '../../../mock/ajax'
+import AjaxHandler from '../../../util/ajax'
+// import AjaxHandler from '../../../mock/ajax'
 import CONSTANTS from '../../../constants'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
@@ -40,6 +40,7 @@ class CreditExchange extends React.Component {
         formatError: false,
         matchError: false,
         emptyError: false,
+        existError: false, // check if the shcool has set rules
         items: [
           {
             giftId: '',
@@ -63,6 +64,8 @@ class CreditExchange extends React.Component {
           }
         ]
       },
+      posting: false, // for bad network
+      checking: false,
       showGifts: false,
       gifts: [],
       editingDeviceType: 0,
@@ -189,12 +192,20 @@ class CreditExchange extends React.Component {
     })
     let resource = '/api/credits/list'
     const cb = json => {
-      console.log(json.data)
       let nextState = { loading: false }
       if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data) {
+          // change 'bonusId' to 'giftId'
+          json.data.credits.forEach(c => {
+            let items = c.creditsItems
+            items.forEach(i => {
+              if (i.bonusId) {
+                i.giftId = i.bonusId
+              }
+            })
+          })
           nextState.dataSource = json.data.credits
           nextState.total = json.data.total
         }
@@ -332,16 +343,22 @@ class CreditExchange extends React.Component {
     editingCredit.emptyError = false
     editingCredit.formatError = false
     editingCredit.matchError = false
+    editingCredit.existError = false
     editingCredit.items.forEach(item => {
       item.credits = ''
       item.giftId = ''
     })
     this.setState({
       showCreditCreate: false,
-      editingCredit: editingCredit
+      editingCredit: editingCredit,
+      editingId: '' // clear editingId
     })
   }
   confirmBuildCredit = () => {
+    let { posting, checking } = this.state
+    if (posting || checking) {
+      return
+    }
     let editingCredit = JSON.parse(JSON.stringify(this.state.editingCredit))
     if (!editingCredit.schoolId) {
       editingCredit.schoolError = true
@@ -388,8 +405,11 @@ class CreditExchange extends React.Component {
     }
   }
   postCredit = () => {
+    let { posting, editingId } = this.state
+    if (posting) {
+      return
+    }
     let editingCredit = JSON.parse(JSON.stringify(this.state.editingCredit))
-    let { editingId } = this.state
     let resource = '/api/credits/add'
     let body = {
       schoolId: editingCredit.schoolId,
@@ -401,7 +421,8 @@ class CreditExchange extends React.Component {
           giftId = parseInt(item.giftId, 10)
         let newItem = {
           credits: credits,
-          giftId: giftId,
+          // giftId: giftId,
+          bonusId: giftId, // change 'giftId' to 'bonusId' to server.
           deviceType: item.deviceType
         }
         body.creditsItems.push(newItem)
@@ -412,6 +433,9 @@ class CreditExchange extends React.Component {
       resource = '/api/credits/update'
     }
     const cb = json => {
+      this.setState({
+        posting: false
+      })
       if (json.data.id) {
         let { page, schoolId } = this.props
         const body = {
@@ -426,7 +450,13 @@ class CreditExchange extends React.Component {
       }
     }
     console.log(body)
-    AjaxHandler.ajax(resource, body, cb)
+    this.setState({
+      posting: true
+    })
+    AjaxHandler.ajax(resource, body, cb, null, {
+      thisObj: this,
+      clearPosting: true
+    })
   }
   checkEmpty = editingCredit => {
     let items = editingCredit.items
@@ -491,20 +521,37 @@ class CreditExchange extends React.Component {
     })
   }
   checkExist = (schoolId, callback) => {
+    let { checking } = this.state
+    if (checking) {
+      return
+    }
     let resource = '/api/credits/check'
     const body = {
       schoolId: parseInt(schoolId, 10)
     }
     const cb = json => {
+      let nextState = {
+        checking: false
+      }
       if (json.data.result) {
-        Noti.hintWarning('', '该学校已有兑换规则！')
+        // Noti.hintWarning('', '该学校已有兑换规则！')
+        let editingCredit = JSON.parse(JSON.stringify(this.state.editingCredit))
+        editingCredit.existError = true
+        nextState.editingCredit = editingCredit
       } else {
         if (callback) {
           callback()
         }
       }
+      this.setState(nextState)
     }
-    AjaxHandler.ajax(resource, body, cb)
+    this.setState({
+      checking: true
+    })
+    AjaxHandler.ajax(resource, body, cb, null, {
+      thisObj: this,
+      clearChecking: true
+    })
   }
   changeEditingCredit = e => {
     let v = e.target.value
@@ -613,6 +660,7 @@ class CreditExchange extends React.Component {
       editingDeviceType,
       editingGiftId
     } = this.state
+    let editingSchoolId = editingCredit.schoolId ? editingCredit.schoolId : ''
     const { page, schoolId, gifts } = this.props
 
     // editing items in build/edit credit exchange.
@@ -696,11 +744,14 @@ class CreditExchange extends React.Component {
               <li>
                 <p style={{ width: '85px' }}>选择学校:</p>
                 <SchoolSelectorWithoutAll
-                  selectedSchool={editingCredit.schoolId}
+                  selectedSchool={editingSchoolId}
                   changeSchool={this.changeEditingSchool}
                 />
                 {editingCredit.schoolError ? (
                   <span className="checkInvalid">学校不能为空！</span>
+                ) : null}
+                {editingCredit.existError ? (
+                  <span className="checkInvalid">该学校已设置兑换规则！</span>
                 ) : null}
               </li>
               {editingItems}

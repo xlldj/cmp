@@ -294,7 +294,8 @@ const initialUserState = {
   userList: {
     page: 1,
     schoolId: selectedSchool,
-    selectKey: ''
+    selectKey: '',
+    userTransfer: 'all'
   }
 }
 const changeUser = (state = initialUserState, action) => {

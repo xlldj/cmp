@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import AjaxHandler from '../../util/ajax'
 import SearchLine from '../component/searchLine'
 import SchoolSelector from '../component/schoolSelector'
+import BasicSelector from '../component/basicSelector'
 import Time from '../../util/time'
 import CONSTANTS from '../../constants'
 import { checkObject } from '../../util/checkSame'
@@ -14,6 +15,7 @@ import { withRouter } from 'react-router-dom'
 import { changeUser } from '../../actions'
 const subModule = 'userList'
 
+const { USERORIGIN } = CONSTANTS
 const SIZE = CONSTANTS.PAGINATION
 
 class UserTable extends React.Component {
@@ -111,13 +113,16 @@ class UserTable extends React.Component {
 
   componentDidMount() {
     this.props.hide(false)
-    let { page, schoolId, selectKey } = this.props
+    let { page, schoolId, selectKey, userTransfer } = this.props
     const body = {
       page: page,
       size: SIZE
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
+    }
+    if (userTransfer !== 'all') {
+      body.userTransfer = parseInt(userTransfer, 10)
     }
     if (selectKey) {
       body.selectKey = selectKey
@@ -131,16 +136,26 @@ class UserTable extends React.Component {
     this.props.hide(true)
   }
   componentWillReceiveProps(nextProps) {
-    if (checkObject(this.props, nextProps, ['page', 'schoolId', 'selectKey'])) {
+    if (
+      checkObject(this.props, nextProps, [
+        'page',
+        'schoolId',
+        'selectKey',
+        'userTransfer'
+      ])
+    ) {
       return
     }
-    let { page, schoolId, selectKey } = nextProps
+    let { page, schoolId, selectKey, userTransfer } = nextProps
     const body = {
       page: page,
       size: SIZE
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
+    }
+    if (userTransfer !== 'all') {
+      body.userTransfer = parseInt(userTransfer, 10)
     }
     if (selectKey) {
       body.selectKey = selectKey
@@ -177,16 +192,32 @@ class UserTable extends React.Component {
     let page = pageObj.current
     this.props.changeUser(subModule, { page: page })
   }
+  changeUserTransfer = v => {
+    let { userTransfer } = this.props
+    if (userTransfer === v) {
+      return
+    }
+    this.props.changeUser(subModule, { page: 1, userTransfer: v })
+  }
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page, schoolId } = this.props
+    const { page, schoolId, userTransfer } = this.props
 
     return (
       <div className="contentArea">
         <SearchLine
+          leftDespTitle1={`当前用户数量：${total ? total : 0}`}
           searchInputText="手机号/手机型号"
           selector1={
+            <BasicSelector
+              allTitle="所有用户"
+              selectedOpt={userTransfer}
+              staticOpts={USERORIGIN}
+              changeOpt={this.changeUserTransfer}
+            />
+          }
+          selector2={
             <SchoolSelector
               selectedSchool={schoolId}
               changeSchool={this.changeSchool}
@@ -216,7 +247,8 @@ class UserTable extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
   schoolId: state.changeUser[subModule].schoolId,
   selectKey: state.changeUser[subModule].selectKey,
-  page: state.changeUser[subModule].page
+  page: state.changeUser[subModule].page,
+  userTransfer: state.changeUser[subModule].userTransfer
 })
 
 export default withRouter(
