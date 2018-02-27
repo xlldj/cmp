@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
-const Fragment = React.Fragment
 
 const SEX = {
   1: '男',
