@@ -246,7 +246,7 @@ class UserInfo extends React.Component {
               <span>校ok迁移用户</span>
             </li>
           ) : null}
-          {data.credits ? (
+          {data.credits !== undefined ? (
             <li>
               <p>用户积分:</p>
               {data.credits}
