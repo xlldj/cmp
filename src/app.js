@@ -1,18 +1,13 @@
 import React from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { asyncComponent } from './pages/component/asyncComponent'
 import { setUserInfo } from './actions'
 import { setLog, getLog, getStore, removeStore } from './util/storage'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-const Log = asyncComponent(() =>
-  import(/* webpackChunkName: "log" */ './pages/log/log')
-)
-const Main = asyncComponent(() =>
-  import(/* webpackChunkName: "main" */ './pages/main')
-)
+import Main from './pages/main'
+import Log from './pages/log/log'
 
 class App extends React.Component {
   state = {

@@ -1,4 +1,6 @@
 import React from 'react'
+import { Map, is } from 'immutable'
+
 import AjaxHandler from '../../util/ajax'
 import { getStore, getLocal, setLocal } from '../../util/storage'
 import CONSTANTS from '../../constants'
@@ -25,6 +27,14 @@ class SchoolSelector extends React.Component {
     if (!schoolSet) {
       this.fetchSchools()
     }
+  }
+  shouldComponentUpdate(nextProps) {
+    let nextPropsMap = Map(nextProps),
+      thisPropsMap = Map(this.props)
+    if (is(nextPropsMap, thisPropsMap)) {
+      return false
+    }
+    return true
   }
   fetchSchools = () => {
     let resource = '/school/list'

@@ -54,8 +54,10 @@ AjaxHandler.tiForBug = () =>
     AjaxHandler.showingBug = false
   }, 4000)
 
-/* fetch has no timeout originally, so give a timeout promise to compete. If timeout happens first, Hint error. */
-/* But Notice, the ajax may be successful (Especially under slow network) */
+/**
+ * fetch has no timeout originally, so give a timeout promise to compete. If timeout happens first, Hint error.
+ * But Notice, the ajax may be successful (Especially under slow network)
+ */
 const abortablePromise = (
   fetch_promise,
   cb,
@@ -219,6 +221,17 @@ const abortablePromise = (
   return abortable_promise
 }
 
+/**
+ * for ajax
+ * @function ajax
+ * @param {String}      resource         pathname of api
+ * @param {Object}      body             request body
+ * @param {function}    cb               callback for success ajax
+ * @param {? function}  serviceErrorCb   error callback for service error, this callback will end error handling. A service error is a response with json.error.
+ * @param {? Object}    options          other options, mostly for setState in component
+ * @param {? errorCb}   errorCb          callback for general error, this callback won't end error handling.
+ * @return {Promise}
+ */
 AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options, errorCb) => {
   /* ----handle the 'api' ----- */
   /* this is because cmp used a node.js server as a mock server at the beginning. And I used '/api' to distinguish it from Java server api */

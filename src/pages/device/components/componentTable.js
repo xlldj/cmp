@@ -131,7 +131,6 @@ class ComponentTable extends React.Component {
       if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
       } else {
-        /*--------redirect --------*/
         if (json.data) {
           const body = {
             page: this.props.page,

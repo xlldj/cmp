@@ -42,14 +42,12 @@ import {
 } from '../actions'
 import { heartBeat, stopBeat } from '../tasks/heartBeat'
 
+import DeviceDisp from './device/deviceDisp'
 const Welcome = asyncComponent(() =>
   import(/* webpackChunkName: "welcome" */ './welcome/welcome')
 )
 const SchoolDisp = asyncComponent(() =>
   import(/* webpackChunkName: "school" */ './school/schoolDisp')
-)
-const DeviceDisp = asyncComponent(() =>
-  import(/* webpackChunkName: "device" */ './device/deviceDisp')
 )
 const OrderDisp = asyncComponent(() =>
   import(/* webpackChunkName: "order" */ './order/orderDisp')

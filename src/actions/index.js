@@ -3,6 +3,8 @@ import AjaxHandler from '../util/ajax'
 import { buildAuthenData } from '../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../util/storage'
 
+import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
+
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
   return {
@@ -168,15 +170,6 @@ export const changeSchool = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_DEVICE = 'CHANGE_DEVICE'
-export const changeDevice = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_DEVICE,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_ORDER = 'CHANGE_ORDER'
 export const changeOrder = (subModule, keyValuePair) => {
   return {
@@ -266,3 +259,5 @@ export const changeStat = (subModule, keyValuePair) => {
     keyValuePair
   }
 }
+
+export { CHANGE_DEVICE, changeDevice, fetchDeviceList }

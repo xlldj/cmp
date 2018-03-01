@@ -124,7 +124,6 @@ class MyMenu extends React.Component {
     }
   }
   changeMenu = pathname => {
-    // 只有在不是由导航栏点击改变url时，才会触发changemenu，因此只要打开就可以了，不用管关闭组标签
     let path = pathname || window.location.pathname,
       nextState = {}
     let parentPath = path.split('/')[1] || ''

@@ -23,7 +23,6 @@ const setUserInfo = (state = initialUserInfo, action) => {
   const { type } = action
   if (type === ActionTypes.SET_USERINFO) {
     const value = action.value
-    console.log(value)
     return Object.assign({}, state, value)
   }
   return state
@@ -90,6 +89,7 @@ const setRoleList = (state = initialRoleList, action) => {
   return state
 }
 
+// fetch School List, since most pages use this data
 const initialSchools = {
   recent: [],
   schools: [],
@@ -108,6 +108,7 @@ const setSchoolList = (state = initialSchools, action) => {
   return state
 }
 
+// state of 'school' Module
 const initialSchoolState = {
   schoolList: {
     page: 1,
@@ -133,10 +134,16 @@ const initialDeviceState = {
     page: 1,
     schoolId: selectedSchool,
     deviceType: 'all',
-    selectKey: ''
+    selectKey: '',
+    loading: true,
+    dataSource: [],
+    total: ''
   },
   components: {
-    page: 1
+    page: 1,
+    dataSource: [],
+    total: 0,
+    loading: false
   },
   prepay: {
     page: 1,
@@ -200,7 +207,7 @@ const changeOrder = (state = initialOrderState, action) => {
 
   if (type === ActionTypes.CHANGE_ORDER) {
     const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
+    return { ...state, ...{ [subModule]: keyValuePair } }
   }
   return state
 }
