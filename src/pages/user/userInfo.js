@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
-
+const { Fragment } = React
 const SEX = {
   1: '男',
   2: '女'
@@ -240,16 +240,16 @@ class UserInfo extends React.Component {
           </li>
           {/* show this when user is from othen platform */}
           {data.userTransfer && data.userTransfer === 1 ? (
-            <li>
-              <p>用户类别:</p>
-              <span>校ok迁移用户</span>
-            </li>
-          ) : null}
-          {data.credits !== undefined ? (
-            <li>
-              <p>用户积分:</p>
-              {data.credits}
-            </li>
+            <Fragment>
+              <li>
+                <p>用户类别:</p>
+                <span>校ok迁移用户</span>
+              </li>
+              <li>
+                <p>校ok账户:</p>
+                <span>{data.originalAccount}</span>
+              </li>
+            </Fragment>
           ) : null}
           <li>
             <p>手机号:</p>
@@ -279,6 +279,12 @@ class UserInfo extends React.Component {
             <p>账户余额:</p>
             {data.balance ? '¥' + data.balance : '暂无'}
           </li>
+          {data.credits !== undefined ? (
+            <li>
+              <p>用户积分:</p>
+              {data.credits}
+            </li>
+          ) : null}
           <li>
             <p>注册时间:</p>
             {time}
