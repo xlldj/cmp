@@ -49,6 +49,9 @@ const Welcome = asyncComponent(() =>
 const SchoolDisp = asyncComponent(() =>
   import(/* webpackChunkName: "school" */ './school/schoolDisp')
 )
+const HeaterDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "heater" */ './heater/heaterDisp')
+)
 const OrderDisp = asyncComponent(() =>
   import(/* webpackChunkName: "order" */ './order/orderDisp')
 )
@@ -455,6 +458,10 @@ class Main extends React.Component {
               <Route
                 path="/school"
                 render={props => <SchoolDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/heater"
+                render={props => <HeaterDisp hide={this.hide} {...props} />}
               />
               <Route
                 path="/device"

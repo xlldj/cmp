@@ -11,10 +11,12 @@ import STAT from './stat'
 import TASK from './task'
 import USER from './user'
 import VERSION from './version'
+import HEATER from './heater'
 
 const CONSTANTS = {
   ...BASIC,
   ...SCHOOL,
+  ...HEATER,
   ...DEVICE,
   ...EMPLOYEE,
   ...FUND,

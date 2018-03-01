@@ -1484,6 +1484,70 @@ button.grayBackColor:linked {
   display: inline-block;
   height: 4px;
 }
+/* for phase tab */
+.queryPanel {
+  padding: 10px 20px;
+}
+.queryPanel .queryLine {
+  height: 40px;
+}
+.queryPanel li {
+  display: inline-block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+.queryPanel li button {
+  margin-right: 15px;
+}
+.queryPanel li span {
+  margin-right: 7px;
+}
+.queryPanel button {
+  height: 20px !important;
+  padding: 0px 5px;
+}
+.phaseLine {
+  height: 50px;
+  line-height: 40px;
+  border-bottom: 1px solid #ddd;
+}
+.phaseLine .navLink a {
+  display: inline-block;
+  line-height: 50px;
+  padding: 0 20px;
+}
+.phaseLine .navLink a:first-child {
+  margin-right: 0;
+}
+.phaseLine,
+.queryLine {
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+}
+.phaseLine .block,
+.queryLine .block {
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+}
+.phaseLine .block .select,
+.queryLine .block .select {
+  margin-left: 10px;
+}
+.phaseLine .block .select .select-item,
+.queryLine .block .select .select-item {
+  width: 105px;
+  margin-right: 5px;
+}
+.phaseLine .block .select .select-item:first-child,
+.queryLine .block .select .select-item:first-child {
+  margin-left: 10px;
+}
+.phaseLine .block .rightBtn,
+.queryLine .block .rightBtn {
+  margin-right: 30px;
+}
 @media screen and (min-width: 1440px) {
   body {
     font-size: 12px;

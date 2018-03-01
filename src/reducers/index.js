@@ -129,6 +129,30 @@ const changeSchool = (state = initialSchoolState, action) => {
   return state
 }
 
+const initialHeaterState = {
+  heaterList: {
+    page: 1,
+    schoolId: selectedSchool,
+    heaterStatus: 1, // 1 for unregisterd, 2 for registerd.
+    loading: true,
+    dataSource: [],
+    total: ''
+  },
+  heaterStatus: {
+    heaterStatus: 1, // 1 for '实时', 2 for  '设置',
+    schoolId: selectedSchool
+  }
+}
+const changeHeater = (state = initialHeaterState, action) => {
+  const { type } = action
+
+  if (type === ActionTypes.CHANGE_HEATER) {
+    const { subModule, keyValuePair } = action
+    return merge({}, state, { [subModule]: keyValuePair })
+  }
+  return state
+}
+
 const initialDeviceState = {
   deviceList: {
     page: 1,
@@ -469,6 +493,7 @@ const changeStat = (state = initialStatState, action) => {
 
 const rootReducer = combineReducers({
   changeSchool,
+  changeHeater,
   changeDevice,
   changeOrder,
   changeFund,

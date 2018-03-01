@@ -40,6 +40,29 @@ const BASIC = {
       ]
     },
     {
+      name: '热水机组',
+      path: 'heater',
+      key: 12,
+      icon: 'home',
+      children: [
+        {
+          path: 'list',
+          name: '机组列表',
+          key: 0
+        },
+        {
+          path: 'status',
+          name: '工作状态',
+          key: 1
+        },
+        {
+          path: 'maintain',
+          name: '维护管理',
+          key: 2
+        }
+      ]
+    },
+    {
       name: '设备管理',
       path: 'device',
       key: 1,

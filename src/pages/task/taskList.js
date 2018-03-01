@@ -846,7 +846,7 @@ class TaskList extends React.Component {
                 已完结
               </a>
             </div>
-            <div className="task-select">
+            <div className="select">
               <SchoolSelector
                 className="select-item"
                 selectedSchool={main_schoolId}
@@ -873,8 +873,8 @@ class TaskList extends React.Component {
           </div>
         </div>
 
-        <div className="task-queryPanel">
-          <div className="task-queryLine">
+        <div className="queryPanel">
+          <div className="queryLine">
             <div className="block">
               <span>{TIMELABEL[main_phase]}:</span>
               <CheckSelect
@@ -901,7 +901,7 @@ class TaskList extends React.Component {
             </div>
           </div>
 
-          <div className="task-queryLine">
+          <div className="queryLine">
             <div className="block">
               <span>任务类型:</span>
               <CheckSelect

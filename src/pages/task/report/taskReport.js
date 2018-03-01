@@ -1192,7 +1192,7 @@ class TaskList extends React.Component {
                 绩效考核
               </a>
             </div>
-            <div className="task-select">
+            <div className="select">
               <SchoolSelector
                 className="select-item"
                 selectedSchool={schoolId}
@@ -1215,8 +1215,8 @@ class TaskList extends React.Component {
           ) : null}
         </div>
 
-        <div className="task-queryPanel">
-          <div className="task-queryLine">
+        <div className="queryPanel">
+          <div className="queryLine">
             <div className="block">
               <span>{TIMELABEL[mainCate]}:</span>
               <CheckSelect
