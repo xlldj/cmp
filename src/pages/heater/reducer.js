@@ -7,7 +7,7 @@ const initialHeaterState = {
   heaterList: {
     page: 1,
     schoolId: selectedSchool,
-    heaterStatus: 1, // 1 for unregisterd, 2 for registerd.
+    tabIndex: 1, // 1 for unregisterd, 2 for registerd.
     loading: true,
     dataSource: [],
     total: ''

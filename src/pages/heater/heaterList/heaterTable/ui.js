@@ -7,9 +7,13 @@ import PhaseLine from '../../../component/phaseLine'
 import SchoolSelector from '../../../component/schoolSelector'
 import CONSTANTS from '../../../../constants'
 
-const typeName = CONSTANTS.DEVICETYPE
 const SIZE = CONSTANTS.PAGINATION
-const { HEATER_LIST_PAGE_TABS, HEATER_LIST_TAB_REGISTERD } = CONSTANTS
+const {
+  DEVICETYPE,
+  HEATER_LIST_PAGE_TABS,
+  HEATER_LIST_TAB_REGISTERD
+} = CONSTANTS
+const subModule = 'heaterList'
 
 class HeaterTable extends React.Component {
   constructor(props) {
@@ -40,7 +44,7 @@ class HeaterTable extends React.Component {
         title: '设备类型',
         dataIndex: 'type',
         width: '25%',
-        render: (text, record, index) => typeName[record.type]
+        render: (text, record, index) => DEVICETYPE[record.type]
       },
       {
         title: <p className="lastCol">操作</p>,
@@ -71,13 +75,21 @@ class HeaterTable extends React.Component {
     if (schoolId === value) {
       return
     }
-    this.props.changeDevice('deviceList', { page: 1, schoolId: value })
+    this.props.changeHeater(subModule, { page: 1, schoolId: value })
   }
   changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeDevice('deviceList', { page: page })
+    this.props.changeHeater(subModule, { page: page })
   }
-  changeTab = v => {}
+  changeTab = v => {
+    let { tabIndex } = this.props
+    if (tabIndex === v) {
+      return
+    }
+    this.props.changeHeater(subModule, {
+      tabIndex: v
+    })
+  }
 
   render() {
     const { page, schoolId, dataSource, loading, total, tabIndex } = this.props
@@ -90,7 +102,7 @@ class HeaterTable extends React.Component {
       />
     )
     return (
-      <div className="contentArea">
+      <div className="heaterTableWrapper">
         <PhaseLine
           value={tabIndex}
           staticPhase={HEATER_LIST_PAGE_TABS}

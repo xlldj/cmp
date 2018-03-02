@@ -8,7 +8,7 @@ import { checkObject } from '../../../../util/checkSame'
 import HeaterTable from './ui'
 
 const handleHeaterList = (newProps, oldProps, thisObj) => {
-  if (checkObject(newProps, oldProps, ['page', 'schoolId', 'heaterStatus'])) {
+  if (checkObject(newProps, oldProps, ['page', 'schoolId', 'tabIndex'])) {
     return
   }
   newProps.fetchHeaterList(newProps)
@@ -18,7 +18,7 @@ const mapStateToProps = (state, ownProps) => ({
   total: state.heaterModule.heaterList.total,
   loading: state.heaterModule.heaterList.loading,
   schoolId: state.heaterModule.heaterList.schoolId,
-  heaterStatus: state.heaterModule.heaterList.heaterStatus,
+  tabIndex: state.heaterModule.heaterList.tabIndex,
   page: state.heaterModule.heaterList.page,
   schools: state.setSchoolList.schools
 })

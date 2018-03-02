@@ -1,4 +1,5 @@
-import AjaxHandler from '../../util/ajax'
+// import AjaxHandler from '../../util/ajax'
+import AjaxHandler from '../../mock/ajax'
 import CONSTANTS from '../../constants'
 const { PAGINATION } = CONSTANTS
 
@@ -12,7 +13,7 @@ export const changeHeater = (subModule, keyValuePair) => {
 }
 
 export const fetchHeaterList = newProps => {
-  let { page, schoolId, heaterStatus } = newProps
+  let { page, schoolId, tabIndex } = newProps
   const clearLoading = dispatch => {
     dispatch({
       type: CHANGE_HEATER,
@@ -34,19 +35,19 @@ export const fetchHeaterList = newProps => {
     const body = {
       page: page,
       size: PAGINATION
-      // heaterStatus: heaterStatus
+      // tabIndex: tabIndex
     }
 
-    if (heaterStatus === 2 && schoolId !== 'all') {
+    if (tabIndex === 2 && schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    let resource = '/api/heater/list'
+    let resource = '/api/machine/unit/list'
     const cb = json => {
       dispatch({
         type: CHANGE_HEATER,
         subModule: 'heaterList',
         keyValuePair: {
-          dataSource: json.data.heaters,
+          dataSource: json.data.machineUnits,
           total: json.data.total,
           loading: false
         }
