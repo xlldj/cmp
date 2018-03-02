@@ -181,7 +181,7 @@ class ComponentTable extends React.Component {
 // export default ComponentTable
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.changeDevice[subModule].page
+  page: state.deviceModule[subModule].page
 })
 
 export default withRouter(

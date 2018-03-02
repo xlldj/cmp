@@ -604,12 +604,12 @@ class RankPanel extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    schoolId: state.changeStat[subModule].schoolId,
-    timeSpan: state.changeStat[subModule].timeSpan,
-    page: state.changeStat[subModule].page,
-    currentRank: state.changeStat[subModule].currentRank,
-    startTime: state.changeStat[subModule].startTime,
-    endTime: state.changeStat[subModule].endTime,
+    schoolId: state.statModule[subModule].schoolId,
+    timeSpan: state.statModule[subModule].timeSpan,
+    page: state.statModule[subModule].page,
+    currentRank: state.statModule[subModule].currentRank,
+    startTime: state.statModule[subModule].startTime,
+    endTime: state.statModule[subModule].endTime,
     schools: state.setSchoolList.schools,
     schoolSet: state.setSchoolList.schoolSet
   }

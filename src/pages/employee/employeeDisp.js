@@ -11,7 +11,7 @@ import { withRouter } from 'react-router-dom'
 import { changeEmployee } from '../../actions'
 
 const EmployeeContainer = asyncComponent(() =>
-  import(/* webpackChunkName: "employeeContainer" */ './employeeContainer')
+  import(/* webpackChunkName: "employeeContainer" */ './employeeList/employeeContainer')
 )
 const AuthenContainer = asyncComponent(() =>
   import(/* webpackChunkName: "authenContainer" */ './authen/authenContainer')

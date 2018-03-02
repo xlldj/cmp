@@ -3,18 +3,18 @@ import { Link } from 'react-router-dom'
 
 import { Table, Popconfirm } from 'antd'
 
-import Noti from '../../util/noti'
-import Time from '../../util/time'
-import AjaxHandler from '../../util/ajax'
-import SearchLine from '../component/searchLine'
-import BasicSelector from '../component/basicSelector'
-import CONSTANTS from '../../constants'
-import { checkObject } from '../../util/checkSame'
+import Noti from '../../../util/noti'
+import Time from '../../../util/time'
+import AjaxHandler from '../../../util/ajax'
+import SearchLine from '../../component/searchLine'
+import BasicSelector from '../../component/basicSelector'
+import CONSTANTS from '../../../constants'
+import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeNotify } from '../../actions'
+import { changeNotify } from '../../../actions'
 
 const SIZE = CONSTANTS.PAGINATION
 const NOTIFYTYPES = CONSTANTS.NOTIFYTYPES
@@ -298,8 +298,8 @@ class NotifyTable extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    type: state.changeNotify.notify.type,
-    page: state.changeNotify.notify.page,
+    type: state.notifyModule.notify.type,
+    page: state.notifyModule.notify.page,
     forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }

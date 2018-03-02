@@ -261,8 +261,8 @@ class SchoolList extends React.Component {
 // export default SchoolList
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeSchool.schoolList.schoolId,
-  page: state.changeSchool.schoolList.page
+  schoolId: state.schoolModule.schoolList.schoolId,
+  page: state.schoolModule.schoolList.page
 })
 
 export default withRouter(

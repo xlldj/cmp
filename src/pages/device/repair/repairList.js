@@ -347,10 +347,10 @@ class RepairList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeDevice[subModule].schoolId,
-  deviceType: state.changeDevice[subModule].deviceType,
-  status: state.changeDevice[subModule].status,
-  page: state.changeDevice[subModule].page
+  schoolId: state.deviceModule[subModule].schoolId,
+  deviceType: state.deviceModule[subModule].deviceType,
+  status: state.deviceModule[subModule].status,
+  page: state.deviceModule[subModule].page
 })
 
 export default withRouter(

@@ -12,7 +12,7 @@ import { withRouter } from 'react-router-dom'
 import { changeNotify } from '../../actions'
 
 const NotifyContainer = asyncComponent(() =>
-  import(/* webpackChunkName: "notifyContainer" */ './notifyContainer')
+  import(/* webpackChunkName: "notifyContainer" */ './notifyList/notifyContainer')
 )
 const CensorContainer = asyncComponent(() =>
   import(/* webpackChunkName: "censorContainer" */ './censor/censorContainer')

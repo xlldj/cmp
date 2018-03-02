@@ -439,14 +439,14 @@ class FundTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeFund[subModule].schoolId,
-  type: state.changeFund[subModule].type,
-  status: state.changeFund[subModule].status,
-  selectKey: state.changeFund[subModule].selectKey,
-  page: state.changeFund[subModule].page,
-  startTime: state.changeFund[subModule].startTime,
-  endTime: state.changeFund[subModule].endTime,
-  userType: state.changeFund[subModule].userType
+  schoolId: state.fundModule[subModule].schoolId,
+  type: state.fundModule[subModule].type,
+  status: state.fundModule[subModule].status,
+  selectKey: state.fundModule[subModule].selectKey,
+  page: state.fundModule[subModule].page,
+  startTime: state.fundModule[subModule].startTime,
+  endTime: state.fundModule[subModule].endTime,
+  userType: state.fundModule[subModule].userType
 })
 
 export default withRouter(

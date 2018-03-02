@@ -12,7 +12,7 @@ import { changeTask, setTagList } from '../../actions'
 
 import { getLocal } from '../../util/storage'
 const TaskList = asyncComponent(() =>
-  import(/* webpackChunkName: "taskList" */ './taskList')
+  import(/* webpackChunkName: "taskList" */ './taskList/taskList')
 )
 const TaskReport = asyncComponent(() =>
   import(/* webpackChunkName: "taskReport" */ './report/taskReport')
@@ -20,11 +20,7 @@ const TaskReport = asyncComponent(() =>
 
 const breadcrumbNameMap = {
   '/list': '工单列表',
-  '/log': '工作记录列表',
-  '/log/add': '创建工作记录',
-  '/log/detail': '详情',
-  '/complaint': '账单投诉',
-  '/feedback': '意见反馈'
+  '/report': '工作报表'
 }
 
 class TaskDisp extends React.Component {

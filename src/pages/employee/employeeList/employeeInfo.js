@@ -20,18 +20,18 @@
 
 import React from 'react'
 import { Button } from 'antd'
-import AjaxHandler from '../../util/ajax'
-import Noti from '../../util/noti'
-import { setStore } from '../../util/storage'
-import MultiSelectModal from '../component/multiSelectModal'
-import SchoolMutilSelect from '../component/schoolMultiSelectModal'
-import AuthenDataTable from '../component/authenDataTable'
-import { buildAuthenBaseOnfull } from '../../util/authenDataHandle'
+import AjaxHandler from '../../../util/ajax'
+import Noti from '../../../util/noti'
+import { setStore } from '../../../util/storage'
+import MultiSelectModal from '../../component/multiSelectModal'
+import SchoolMutilSelect from '../../component/schoolMultiSelectModal'
+import AuthenDataTable from '../../component/authenDataTable'
+import { buildAuthenBaseOnfull } from '../../../util/authenDataHandle'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { setAuthenData, setRoleList, setUserInfo } from '../../actions'
+import { setAuthenData, setRoleList, setUserInfo } from '../../../actions'
 
 const backTitle = {
   fromFund: '返回资金详情'

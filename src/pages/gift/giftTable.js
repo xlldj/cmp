@@ -218,8 +218,8 @@ class GiftTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  deviceType: state.changeGift[subModule].deviceType,
-  page: state.changeGift[subModule].page
+  deviceType: state.giftModule[subModule].deviceType,
+  page: state.giftModule[subModule].page
 })
 
 export default withRouter(

@@ -1,7 +1,6 @@
 import React from 'react'
 import { Route, Switch } from 'react-router-dom'
-import { asyncComponent } from '../component/asyncComponent'
-import './style/style.css'
+import { asyncComponent } from '../../component/asyncComponent'
 
 const NotifyTable = asyncComponent(() =>
   import(/* webpackChunkName: "notifyTable" */ './notifyTable')

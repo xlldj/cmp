@@ -6,18 +6,18 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Table, Button, Popconfirm, Modal } from 'antd'
-import Noti from '../../util/noti'
-import AjaxHandler from '../../util/ajax'
-import SearchLine from '../component/searchLine'
-import CONSTANTS from '../../constants'
-import SchoolSelector from '../component/schoolSelector'
+import Noti from '../../../util/noti'
+import AjaxHandler from '../../../util/ajax'
+import SearchLine from '../../component/searchLine'
+import CONSTANTS from '../../../constants'
+import SchoolSelector from '../../component/schoolSelector'
 
-import { checkObject } from '../../util/checkSame'
+import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeEmployee } from '../../actions'
+import { changeEmployee } from '../../../actions'
 const subModule = 'employeeList'
 
 const SIZE = CONSTANTS.PAGINATION
@@ -348,9 +348,9 @@ class EmployeeList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  selectKey: state.changeEmployee[subModule].selectKey,
-  page: state.changeEmployee[subModule].page,
-  schoolId: state.changeEmployee[subModule].schoolId,
+  selectKey: state.employeeModule[subModule].selectKey,
+  page: state.employeeModule[subModule].page,
+  schoolId: state.employeeModule[subModule].schoolId,
   forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 

@@ -1,10 +1,10 @@
 import React from 'react'
 import { Button, Radio, Modal } from 'antd'
-import SchoolSelector from '../component/schoolSelectorWithoutAll'
-import BasicSelector from '../component/basicSelectorWithoutAll'
-import DeviceSelector from '../component/deviceWithoutAll'
-import CONSTANTS from '../../constants'
-import AjaxHandler from '../../util/ajax'
+import SchoolSelector from '../../component/schoolSelectorWithoutAll'
+import BasicSelector from '../../component/basicSelectorWithoutAll'
+import DeviceSelector from '../../component/deviceWithoutAll'
+import CONSTANTS from '../../../constants'
+import AjaxHandler from '../../../util/ajax'
 // import { locale } from 'moment'
 const { EMPLOYEE_REPAIRMAN } = CONSTANTS
 

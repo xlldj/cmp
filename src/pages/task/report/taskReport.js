@@ -3,6 +3,7 @@ import { Table, Button, Popconfirm, Modal } from 'antd'
 
 import ProgressBar from '../../component/progressBar'
 import RangeSelect from '../../component/rangeSelect'
+import PhaseLine from '../../component/phaseLine'
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'
@@ -37,7 +38,8 @@ const {
   ASSESS_CUSTOM,
   ASSESS_REPAIRMAN,
   ORDER,
-  ORDERBYS
+  ORDERBYS,
+  TASK_REPORT_PAGE_TABS
 } = CONSTANTS
 const SIZE = CONSTANTS.PAGINATION
 
@@ -58,10 +60,9 @@ const TIMELABEL = {
 /*------rule表示顺序或倒序，1为倒序，默认值----------------------------------*/
 /*------sourcetype不传表示所有，我用0代替，1为体现，2为维修-------------------*/
 
-class TaskList extends React.Component {
+class TaskReport extends React.Component {
   static propTypes = {
-    report: PropTypes.object.isRequired,
-    forbiddenStatus: PropTypes.object.isRequired
+    report: PropTypes.object.isRequired
   }
   constructor(props) {
     super(props)
@@ -400,7 +401,6 @@ class TaskList extends React.Component {
   // fetch task/list
   fetchReports = (resource, body, cate) => {
     const cb = json => {
-      console.log(json.data)
       let nextState = {
         loading: false,
         total: json.data.total
@@ -575,6 +575,7 @@ class TaskList extends React.Component {
     }
   }
 
+  /*
   changeCate = e => {
     try {
       e.preventDefault()
@@ -582,6 +583,17 @@ class TaskList extends React.Component {
       let { mainCate } = this.props[subModule]
       if (mainCate !== key) {
         this.props.changeTask(subModule, { mainCate: key })
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+    */
+  changeCate = v => {
+    try {
+      let { mainCate } = this.props[subModule]
+      if (mainCate !== v) {
+        this.props.changeTask(subModule, { mainCate: v })
       }
     } catch (e) {
       console.log(e)
@@ -964,43 +976,25 @@ class TaskList extends React.Component {
     AjaxHandler.ajax(resource, body, cb);
     */
   }
-  render() {
-    const { isCs, csOnline } = this.props.user
-    let {
-      mainCate,
-      schoolId,
-      panel_rangeIndex,
-      panel_page,
-      assess_dim
-    } = this.props[subModule]
-    const { forbiddenStatus } = this.props
+  getTables = () => {
+    let { mainCate, panel_page, assess_dim } = this.props[subModule]
     // console.log(dataSource)
-    const {
-      loading,
-      startTime,
-      endTime,
-      dataSource,
-      total,
-      showBuildTag,
-      note,
-      noteError,
-      tagExistError,
-      tagLengthError
-    } = this.state
+    const { loading, dataSource, total } = this.state
 
     let page = panel_page[mainCate]
     let max = 1
     // unused is used to keep 'max' is the real max
-    let unused =
+    if (
       mainCate === REPORT_CATE_COMPLAINT - 1 &&
       dataSource &&
-      dataSource.length > 0 &&
+      dataSource.length > 0
+    ) {
       dataSource.forEach(r => {
         if (r.amount > max) {
           max = r.amount
         }
       })
-
+    }
     const sumTable = mainCate === REPORT_CATE_SUM - 1 && (
       <Table
         bordered
@@ -1132,25 +1126,64 @@ class TaskList extends React.Component {
         />
       )
 
-    const assessRepairmanTable = mainCate === REPORT_CATE_ASSESS - 1 &&
-      assess_dim === ASSESS_REPAIRMAN && (
-        <Table
-          bordered
-          loading={loading}
-          rowKey={record => record.id}
-          pagination={{
-            pageSize: SIZE,
-            current: page,
-            total: total
-          }}
-          dataSource={dataSource}
-          columns={this.assessRepairmanColumns}
-          onChange={this.changeTable}
-          onRowClick={this.selectRow}
-          rowClassName={this.setRowClass}
-        />
-      )
+    const assessRepairmanTable = (mainCate === REPORT_CATE_ASSESS - 1) &
+      (assess_dim === ASSESS_REPAIRMAN) && (
+      <Table
+        bordered
+        loading={loading}
+        rowKey={record => record.id}
+        pagination={{
+          pageSize: SIZE,
+          current: page,
+          total: total
+        }}
+        dataSource={dataSource}
+        columns={this.assessRepairmanColumns}
+        onChange={this.changeTable}
+        onRowClick={this.selectRow}
+        rowClassName={this.setRowClass}
+      />
+    )
+    return {
+      sumTable,
+      complaintTable,
+      assessSchoolTable,
+      assessCustomTable,
+      assessRepairmanTable
+    }
+  }
+  render() {
+    const { isCs, csOnline } = this.props.user
+    let { mainCate, schoolId, panel_rangeIndex, assess_dim } = this.props[
+      subModule
+    ]
+    // console.log(dataSource)
+    const {
+      loading,
+      startTime,
+      endTime,
+      showBuildTag,
+      note,
+      noteError,
+      tagExistError,
+      tagLengthError
+    } = this.state
+    const {
+      sumTable,
+      complaintTable,
+      assessSchoolTable,
+      assessCustomTable,
+      assessRepairmanTable
+    } = this.getTables()
 
+    const selector1 = (
+      <SchoolSelector
+        key="selector1"
+        className="select-item"
+        selectedSchool={schoolId}
+        changeSchool={this.changeSchool}
+      />
+    )
     return (
       <div className="taskPanelWrapper" ref="wrapper">
         {loading ? <div className="loadingMask" /> : null}
@@ -1166,54 +1199,12 @@ class TaskList extends React.Component {
             </div>
           </div>
         ) : null}
-        <div className="phaseLine">
-          <div className="block">
-            <div className="navLink" onClick={this.changeCate}>
-              <a
-                href=""
-                className={mainCate === 0 ? 'active' : ''}
-                data-key={0}
-              >
-                工作情况
-              </a>
-              <a
-                href=""
-                id="test"
-                className={mainCate === 1 ? 'active' : ''}
-                data-key={1}
-              >
-                投诉分析
-              </a>
-              <a
-                href=""
-                className={mainCate === 2 ? 'active' : ''}
-                data-key={2}
-              >
-                绩效考核
-              </a>
-            </div>
-            <div className="select">
-              <SchoolSelector
-                className="select-item"
-                selectedSchool={schoolId}
-                changeSchool={this.changeSchool}
-              />
-            </div>
-          </div>
-          {mainCate === REPORT_CATE_COMPLAINT - 1 ? (
-            <div className="block">
-              {forbiddenStatus.BUILD_COMPLAINT_TAG ? null : (
-                <Button
-                  type="primary"
-                  className="rightBtn"
-                  onClick={this.addTag}
-                >
-                  添加投诉标签
-                </Button>
-              )}
-            </div>
-          ) : null}
-        </div>
+        <PhaseLine
+          value={mainCate}
+          staticPhase={TASK_REPORT_PAGE_TABS}
+          selectors={[selector1]}
+          changePhase={this.changeCate}
+        />
 
         <div className="queryPanel">
           <div className="queryLine">
@@ -1308,9 +1299,8 @@ class TaskList extends React.Component {
 // export default TaskList
 
 const mapStateToProps = (state, ownProps) => ({
-  report: state.changeTask[subModule],
+  report: state.taskModule[subModule],
   user: state.setUserInfo,
-  forbiddenStatus: state.setAuthenData.forbiddenStatus,
   tagInfo: state.setTagList
 })
 
@@ -1320,5 +1310,5 @@ export default withRouter(
     setUserInfo,
     setTagList,
     changeOnline
-  })(TaskList)
+  })(TaskReport)
 )

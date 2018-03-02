@@ -1,5 +1,19 @@
 const TASK = {
   /* TASK */
+  TASK_LIST_PAGE_TABS: [
+    {
+      value: 0,
+      text: '待处理'
+    },
+    {
+      value: 1,
+      text: '处理中'
+    },
+    {
+      value: 2,
+      text: '已完结'
+    }
+  ],
   TASK_DETAIL_LIST_LENGTH: 5,
   CREATEWORKTYPE: { 1: '工作记录', 2: '指派任务' },
   COMPLAINTTYPES: {
@@ -57,6 +71,21 @@ const TASK = {
   ASSESS_SCHOOL: 1,
   ASSESS_CUSTOM: 2,
   ASSESS_REPAIRMAN: 3,
+  TASK_REPORT_PAGE_TABS: [
+    {
+      value: 0,
+      text: '工作情况'
+    },
+    {
+      value: 1,
+      text: '投诉分析'
+    },
+    {
+      value: 2,
+      text: '绩效考核'
+    }
+  ],
+
   // order userd in task/report
   ORDER: { descend: 1, ascend: 2 },
   ORDER_DESCEND: 1,

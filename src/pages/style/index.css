@@ -1,4 +1,15 @@
 /* GLOBAL STYLE*/
+.horiCenter {
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+.flexCenter {
+  display: inline-flex;
+  flex: none;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+}
 html {
   font-size: 12px;
 }
@@ -1547,6 +1558,15 @@ button.grayBackColor:linked {
 .phaseLine .block .rightBtn,
 .queryLine .block .rightBtn {
   margin-right: 30px;
+}
+/* for hintBox */
+.hintBox {
+  border-width: 2px;
+  border-style: solid;
+  padding: 7px 15px;
+}
+.hintBox li {
+  list-style: none;
 }
 @media screen and (min-width: 1440px) {
   body {

@@ -354,12 +354,12 @@ class AbnormalTable extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    schoolId: state.changeOrder[subModule].schoolId,
-    deviceType: state.changeOrder[subModule].deviceType,
-    selectKey: state.changeOrder[subModule].selectKey,
-    page: state.changeOrder[subModule].page,
-    startTime: state.changeOrder[subModule].startTime,
-    endTime: state.changeOrder[subModule].endTime
+    schoolId: state.orderModule[subModule].schoolId,
+    deviceType: state.orderModule[subModule].deviceType,
+    selectKey: state.orderModule[subModule].selectKey,
+    page: state.orderModule[subModule].page,
+    startTime: state.orderModule[subModule].startTime,
+    endTime: state.orderModule[subModule].endTime
   }
 }
 

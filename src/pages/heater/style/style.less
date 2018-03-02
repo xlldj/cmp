@@ -1,3 +1,22 @@
-div{
-  display: block;
+.liveMapWrapper{
+  img{
+    height: 300px;
+  }
+}
+.liveStatusWrapper{
+  .liveMapWrapper{
+    position: relative;
+    .thermometer{
+      position: absolute;
+      height: 140px;
+      top: 120px;
+      left: 340px;
+    }
+    .waterpipeHint{
+      position: absolute;
+      left: 520px;
+      bottom: 120px;
+      width: fit-content;
+    }
+  }
 }

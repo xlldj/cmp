@@ -154,7 +154,7 @@ class OverView extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    schoolId: state.changeStat[subModule].schoolId
+    schoolId: state.statModule[subModule].schoolId
   }
 }
 

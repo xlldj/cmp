@@ -245,10 +245,10 @@ class UserTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeUser[subModule].schoolId,
-  selectKey: state.changeUser[subModule].selectKey,
-  page: state.changeUser[subModule].page,
-  userTransfer: state.changeUser[subModule].userTransfer
+  schoolId: state.userModule[subModule].schoolId,
+  selectKey: state.userModule[subModule].selectKey,
+  page: state.userModule[subModule].page,
+  userTransfer: state.userModule[subModule].userTransfer
 })
 
 export default withRouter(

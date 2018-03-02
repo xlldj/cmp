@@ -1,25 +1,26 @@
 import React from 'react'
 import { Table, Button } from 'antd'
 
-import RangeSelect from '../component/rangeSelect'
-import SearchInput from '../component/searchInput.js'
-import Time from '../../util/time'
-import AjaxHandler from '../../util/ajax'
-import CONSTANTS from '../../constants'
-import SchoolSelector from '../component/schoolSelector'
-import BasicSelectorWithoutAll from '../component/basicSelectorWithoutAll'
-import CheckSelect from '../component/checkSelect'
-import { checkObject } from '../../util/checkSame'
+import PhaseLine from '../../component/phaseLine'
+import RangeSelect from '../../component/rangeSelect'
+import SearchInput from '../../component/searchInput.js'
+import Time from '../../../util/time'
+import AjaxHandler from '../../../util/ajax'
+import CONSTANTS from '../../../constants'
+import SchoolSelector from '../../component/schoolSelector'
+import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
+import CheckSelect from '../../component/checkSelect'
+import { checkObject } from '../../../util/checkSame'
 import TaskDetail from './taskDetail'
 import BuildTask from './buildTask'
-import selectedImg from '../assets/selected.png'
-import Noti from '../../util/noti'
-import notworking from '../assets/notworking.jpg'
+import selectedImg from '../../assets/selected.png'
+import Noti from '../../../util/noti'
+import notworking from '../../assets/notworking.jpg'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeTask, setUserInfo, changeOnline } from '../../actions'
+import { changeTask, setUserInfo, changeOnline } from '../../../actions'
 const subModule = 'taskList'
 const classLevel = {
   1: '',
@@ -72,10 +73,18 @@ const ALLTAG = {
   1: false,
   2: true
 }
+const {
+  TASK_PENDING,
+  TASK_ASSIGNED,
+  TASK_ACCEPTED,
+  TASK_REFUSED,
+  TASK_FINISHED,
+  TASK_LIST_PAGE_TABS
+} = CONSTANTS
 const STATUS_LIST = {
-  0: [CONSTANTS.TASK_PENDING],
-  1: [CONSTANTS.TASK_ASSIGNED, CONSTANTS.TASK_ACCEPTED, CONSTANTS.TASK_REFUSED],
-  2: [CONSTANTS.TASK_FINISHED]
+  0: [TASK_PENDING],
+  1: [TASK_ASSIGNED, TASK_ACCEPTED, TASK_REFUSED],
+  2: [TASK_FINISHED]
 }
 
 const SIZE = CONSTANTS.PAGINATION
@@ -432,6 +441,7 @@ class TaskList extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
 
+  /*
   changePhase = e => {
     try {
       e.preventDefault()
@@ -442,6 +452,13 @@ class TaskList extends React.Component {
       }
     } catch (e) {
       console.log(e)
+    }
+  }
+  */
+  changePhase = v => {
+    let { main_phase } = this.props.taskList
+    if (main_phase !== v) {
+      this.props.changeTask(subModule, { main_phase: v })
     }
   }
   changeSchool = v => {
@@ -808,6 +825,23 @@ class TaskList extends React.Component {
       }
     ]
 
+    const selector1 = (
+      <SchoolSelector
+        key="schoolSelector"
+        className="select-item"
+        selectedSchool={main_schoolId}
+        changeSchool={this.changeSchool}
+      />
+    )
+    const selector2 = (
+      <BasicSelectorWithoutAll
+        key="mineSelector"
+        className="select-item"
+        selectedOpt={main_mine}
+        staticOpts={TARGETS}
+        changeOpt={this.changeAll}
+      />
+    )
     return (
       <div className="taskPanelWrapper" ref="wrapper">
         {isCs && !csOnline ? (
@@ -821,45 +855,12 @@ class TaskList extends React.Component {
             </div>
           </div>
         ) : null}
-        <div className="phaseLine">
-          <div className="block">
-            <div className="navLink" onClick={this.changePhase}>
-              <a
-                href=""
-                className={main_phase === 0 ? 'active' : ''}
-                data-key={0}
-              >
-                待处理
-              </a>
-              <a
-                href=""
-                className={main_phase === 1 ? 'active' : ''}
-                data-key={1}
-              >
-                处理中
-              </a>
-              <a
-                href=""
-                className={main_phase === 2 ? 'active' : ''}
-                data-key={2}
-              >
-                已完结
-              </a>
-            </div>
-            <div className="select">
-              <SchoolSelector
-                className="select-item"
-                selectedSchool={main_schoolId}
-                changeSchool={this.changeSchool}
-              />
-              <BasicSelectorWithoutAll
-                className="select-item"
-                selectedOpt={main_mine}
-                staticOpts={TARGETS}
-                changeOpt={this.changeAll}
-              />
-            </div>
-          </div>
+        <PhaseLine
+          value={main_phase}
+          staticPhase={TASK_LIST_PAGE_TABS}
+          selectors={[selector1, selector2]}
+          changePhase={this.changePhase}
+        >
           <div className="block">
             {forbiddenStatus.BUILD_TASK ? null : (
               <Button
@@ -871,7 +872,7 @@ class TaskList extends React.Component {
               </Button>
             )}
           </div>
-        </div>
+        </PhaseLine>
 
         <div className="queryPanel">
           <div className="queryLine">
@@ -954,7 +955,7 @@ class TaskList extends React.Component {
 // export default TaskList
 
 const mapStateToProps = (state, ownProps) => ({
-  taskList: state.changeTask[subModule],
+  taskList: state.taskModule[subModule],
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   user: state.setUserInfo
 })

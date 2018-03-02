@@ -19,6 +19,15 @@
   justify-content: @justifyContent;
   align-items: @alignItems;
 }
+// horizontal center aligned block
+.horiCenter{
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+// children horizontal aligned block */
+.flexCenter{
+  .fi(@justifyContent: center; @alignItems: center)
+}
 
 html{
   font-size: 12px;
@@ -1490,6 +1499,16 @@ button.grayBackColor:linked{
     .rightBtn{
       margin-right: 30px;
     }
+  }
+}
+
+/* for hintBox */
+.hintBox{
+  border-width: 2px;
+  border-style: solid;
+  padding: 7px 15px;
+  li{
+    list-style: none;
   }
 }
 

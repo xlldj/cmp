@@ -4,7 +4,11 @@ import { buildAuthenData } from '../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../util/storage'
 
 import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
-import { CHANGE_HEATER, changeHeater, fetchHeaterList } from './heater'
+import {
+  CHANGE_HEATER,
+  changeHeater,
+  fetchHeaterList
+} from '../pages/heater/action'
 
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {

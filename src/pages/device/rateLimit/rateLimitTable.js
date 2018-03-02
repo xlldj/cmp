@@ -198,8 +198,8 @@ class RateLimitTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeDevice[subModule].schoolId,
-  page: state.changeDevice[subModule].page
+  schoolId: state.deviceModule[subModule].schoolId,
+  page: state.deviceModule[subModule].page
 })
 
 export default withRouter(

@@ -3,6 +3,8 @@ import { merge } from 'lodash'
 import { combineReducers } from 'redux'
 import { getLocal } from '../util/storage'
 import Time from '../util/time'
+
+import heaterModule from '../pages/heater/reducer'
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
 if (recentSchools) {
@@ -119,7 +121,7 @@ const initialSchoolState = {
     schoolId: selectedSchool
   }
 }
-const changeSchool = (state = initialSchoolState, action) => {
+const schoolModule = (state = initialSchoolState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_SCHOOL) {
@@ -129,6 +131,7 @@ const changeSchool = (state = initialSchoolState, action) => {
   return state
 }
 
+/*
 const initialHeaterState = {
   heaterList: {
     page: 1,
@@ -143,7 +146,7 @@ const initialHeaterState = {
     schoolId: selectedSchool
   }
 }
-const changeHeater = (state = initialHeaterState, action) => {
+const heaterModule = (state = initialHeaterState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_HEATER) {
@@ -152,6 +155,7 @@ const changeHeater = (state = initialHeaterState, action) => {
   }
   return state
 }
+*/
 
 const initialDeviceState = {
   deviceList: {
@@ -195,7 +199,7 @@ const initialDeviceState = {
     page: 1
   }
 }
-const changeDevice = (state = initialDeviceState, action) => {
+const deviceModule = (state = initialDeviceState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_DEVICE) {
@@ -226,12 +230,13 @@ const initialOrderState = {
     userType: 'all'
   }
 }
-const changeOrder = (state = initialOrderState, action) => {
+const orderModule = (state = initialOrderState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_ORDER) {
     const { subModule, keyValuePair } = action
-    return { ...state, ...{ [subModule]: keyValuePair } }
+    // return { ...state, ...{ [subModule]: keyValuePair } }
+    return merge({}, state, { [subModule]: keyValuePair })
   }
   return state
 }
@@ -267,7 +272,7 @@ const initialFundState = {
     userType: 'all'
   }
 }
-const changeFund = (state = initialFundState, action) => {
+const fundModule = (state = initialFundState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_FUND) {
@@ -292,7 +297,7 @@ const initialGiftState = {
     schoolId: selectedSchool
   }
 }
-const changeGift = (state = initialGiftState, action) => {
+const giftModule = (state = initialGiftState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_GIFT) {
@@ -310,7 +315,7 @@ const initialLostState = {
     type: 'all'
   }
 }
-const changeLost = (state = initialLostState, action) => {
+const lostModule = (state = initialLostState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_LOST) {
@@ -329,7 +334,7 @@ const initialUserState = {
     userTransfer: 'all'
   }
 }
-const changeUser = (state = initialUserState, action) => {
+const userModule = (state = initialUserState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_USER) {
@@ -382,7 +387,7 @@ const initialTaskState = {
     assess_dim: 1 // 考核维度，1: '学校', 2: '客服', 3: '维修员'
   }
 }
-const changeTask = (state = initialTaskState, action) => {
+const taskModule = (state = initialTaskState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_TASK) {
@@ -409,7 +414,7 @@ const initialEmployeeState = {
     page: 1
   }
 }
-const changeEmployee = (state = initialEmployeeState, action) => {
+const employeeModule = (state = initialEmployeeState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_EMPLOYEE) {
@@ -429,7 +434,7 @@ const initialNotifyState = {
     page: 1
   }
 }
-const changeNotify = (state = initialNotifyState, action) => {
+const notifyModule = (state = initialNotifyState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_NOTIFY) {
@@ -445,7 +450,7 @@ const initialVersionState = {
     page: 1
   }
 }
-const changeVersion = (state = initialVersionState, action) => {
+const versionModule = (state = initialVersionState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_VERSION) {
@@ -481,7 +486,7 @@ const initialStatState = {
     endTime: ''
   }
 }
-const changeStat = (state = initialStatState, action) => {
+const statModule = (state = initialStatState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_STAT) {
@@ -492,20 +497,20 @@ const changeStat = (state = initialStatState, action) => {
 }
 
 const rootReducer = combineReducers({
-  changeSchool,
-  changeHeater,
-  changeDevice,
-  changeOrder,
-  changeFund,
-  changeGift,
-  changeLost,
-  changeUser,
-  changeTask,
-  changeEmployee,
-  changeNotify,
-  changeVersion,
+  schoolModule,
+  heaterModule,
+  deviceModule,
+  orderModule,
+  fundModule,
+  giftModule,
+  lostModule,
+  userModule,
+  taskModule,
+  employeeModule,
+  notifyModule,
+  versionModule,
   setSchoolList,
-  changeStat,
+  statModule,
   setAuthenData,
   setRoleList,
   setTagList,

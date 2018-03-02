@@ -1,13 +1,13 @@
-import React from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { asyncComponent } from '../component/asyncComponent';
+import React from 'react'
+import { Route, Switch } from 'react-router-dom'
+import { asyncComponent } from '../../component/asyncComponent'
 
 const EmployeeList = asyncComponent(() =>
   import(/* webpackChunkName: "employeeList" */ './employeeList')
-);
+)
 const EmployeeInfo = asyncComponent(() =>
   import(/* webpackChunkName: "employeeInfo" */ './employeeInfo')
-);
+)
 
 class EmployeeContainer extends React.Component {
   render() {
@@ -28,8 +28,8 @@ class EmployeeContainer extends React.Component {
           />
         </Switch>
       </div>
-    );
+    )
   }
 }
 
-export default EmployeeContainer;
+export default EmployeeContainer

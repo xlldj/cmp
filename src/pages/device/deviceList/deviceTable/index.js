@@ -21,13 +21,13 @@ const handleDeviceList = (newProps, oldProps, thisObj) => {
   newProps.fetchDeviceList(newProps)
 }
 const mapStateToProps = (state, ownProps) => ({
-  dataSource: state.changeDevice.deviceList.dataSource,
-  total: state.changeDevice.deviceList.total,
-  loading: state.changeDevice.deviceList.loading,
-  schoolId: state.changeDevice.deviceList.schoolId,
-  deviceType: state.changeDevice.deviceList.deviceType,
-  selectKey: state.changeDevice.deviceList.selectKey,
-  page: state.changeDevice.deviceList.page,
+  dataSource: state.deviceModule.deviceList.dataSource,
+  total: state.deviceModule.deviceList.total,
+  loading: state.deviceModule.deviceList.loading,
+  schoolId: state.deviceModule.deviceList.schoolId,
+  deviceType: state.deviceModule.deviceList.deviceType,
+  selectKey: state.deviceModule.deviceList.selectKey,
+  page: state.deviceModule.deviceList.page,
   schools: state.setSchoolList.schools
 })
 

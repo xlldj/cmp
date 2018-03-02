@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom'
 
 import { Table } from 'antd'
 
-import SearchLine from '../../../component/searchLine'
+import PhaseLine from '../../../component/phaseLine'
 import SchoolSelector from '../../../component/schoolSelector'
 import CONSTANTS from '../../../../constants'
 
 const typeName = CONSTANTS.DEVICETYPE
 const SIZE = CONSTANTS.PAGINATION
+const { HEATER_LIST_PAGE_TABS, HEATER_LIST_TAB_REGISTERD } = CONSTANTS
 
 class HeaterTable extends React.Component {
   constructor(props) {
@@ -76,19 +77,25 @@ class HeaterTable extends React.Component {
     let page = pageObj.current
     this.props.changeDevice('deviceList', { page: page })
   }
+  changeTab = v => {}
 
   render() {
-    const { page, schoolId, dataSource, loading, total } = this.props
-
+    const { page, schoolId, dataSource, loading, total, tabIndex } = this.props
+    const selector1 = (
+      <SchoolSelector
+        key={'schoolSelector'}
+        className="select-item"
+        selectedSchool={schoolId}
+        changeSchool={this.changeSchool}
+      />
+    )
     return (
       <div className="contentArea">
-        <SearchLine
-          selector1={
-            <SchoolSelector
-              selectedSchool={schoolId}
-              changeSchool={this.changeSchool}
-            />
-          }
+        <PhaseLine
+          value={tabIndex}
+          staticPhase={HEATER_LIST_PAGE_TABS}
+          selectors={tabIndex === HEATER_LIST_TAB_REGISTERD ? [selector1] : []}
+          changePhase={this.changeTab}
         />
 
         <div className="tableList">

@@ -1074,15 +1074,15 @@ class Charts extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    schoolId: state.changeStat[subModule].schoolId,
-    timeSpan: state.changeStat[subModule].timeSpan,
-    currentChart: state.changeStat[subModule].currentChart,
-    target: state.changeStat[subModule].target,
-    compare: state.changeStat[subModule].compare,
-    currentMonth: state.changeStat[subModule].currentMonth,
-    monthStr: state.changeStat[subModule].monthStr,
-    startTime: state.changeStat[subModule].startTime,
-    endTime: state.changeStat[subModule].endTime,
+    schoolId: state.statModule[subModule].schoolId,
+    timeSpan: state.statModule[subModule].timeSpan,
+    currentChart: state.statModule[subModule].currentChart,
+    target: state.statModule[subModule].target,
+    compare: state.statModule[subModule].compare,
+    currentMonth: state.statModule[subModule].currentMonth,
+    monthStr: state.statModule[subModule].monthStr,
+    startTime: state.statModule[subModule].startTime,
+    endTime: state.statModule[subModule].endTime,
     schools: state.setSchoolList.schools,
     schoolSet: state.setSchoolList.schoolSet
   }

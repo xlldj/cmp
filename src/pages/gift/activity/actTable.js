@@ -262,8 +262,8 @@ class ActTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeGift[subModule].schoolId,
-  page: state.changeGift[subModule].page
+  schoolId: state.giftModule[subModule].schoolId,
+  page: state.giftModule[subModule].page
 })
 
 export default withRouter(

@@ -167,7 +167,7 @@ class VersionTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.changeVersion[subModule].page
+  page: state.versionModule[subModule].page
 })
 
 export default withRouter(

@@ -205,9 +205,9 @@ class LostTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeLost[subModule].schoolId,
-  type: state.changeLost[subModule].type,
-  page: state.changeLost[subModule].page
+  schoolId: state.lostModule[subModule].schoolId,
+  type: state.lostModule[subModule].type,
+  page: state.lostModule[subModule].page
 })
 
 export default withRouter(

@@ -283,9 +283,9 @@ class AbnormalOrder extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  selectKey: state.changeFund[subModule].selectKey,
-  page: state.changeFund[subModule].page,
-  schoolId: state.changeFund[subModule].schoolId
+  selectKey: state.fundModule[subModule].selectKey,
+  page: state.fundModule[subModule].page,
+  schoolId: state.fundModule[subModule].schoolId
 })
 
 export default withRouter(

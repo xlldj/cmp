@@ -223,7 +223,7 @@ class CensorTable extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    page: state.changeNotify[subModule].page
+    page: state.notifyModule[subModule].page
   }
 }
 

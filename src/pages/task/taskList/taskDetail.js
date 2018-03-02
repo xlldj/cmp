@@ -10,19 +10,19 @@ import {
   Pagination
 } from 'antd'
 
-import Time from '../../util/time'
-import Noti from '../../util/noti'
-import AjaxHandler from '../../util/ajax'
-import CONSTANTS from '../../constants'
-import LoadingMask from '../component/loadingMask'
-import RepairmanTable from '../component/repairmanChoose'
-import EmployeeChoose from '../component/employeeChoose'
-import BasicSelector from '../component/basicSelectorWithoutAll'
-import DepartmentChoose from '../component/departmentChoose'
-import { checkObject } from '../../util/checkSame'
-import closeBtn from '../assets/close.png'
-import { mul, add } from '../../util/numberHandle'
-import Format from '../../util/format'
+import Time from '../../../util/time'
+import Noti from '../../../util/noti'
+import AjaxHandler from '../../../util/ajax'
+import CONSTANTS from '../../../constants'
+import LoadingMask from '../../component/loadingMask'
+import RepairmanTable from '../../component/repairmanChoose'
+import EmployeeChoose from '../../component/employeeChoose'
+import BasicSelector from '../../component/basicSelectorWithoutAll'
+import DepartmentChoose from '../../component/departmentChoose'
+import { checkObject } from '../../../util/checkSame'
+import closeBtn from '../../assets/close.png'
+import { mul, add } from '../../../util/numberHandle'
+import Format from '../../../util/format'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -32,7 +32,7 @@ import {
   changeOrder,
   changeDevice,
   changeFund
-} from '../../actions'
+} from '../../../actions'
 const {
   TASK_BUILD_CMP,
   TASK_TYPE_FEEDBACK,
@@ -2177,7 +2177,7 @@ class TaskDetail extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  taskList: state.changeTask[subModule],
+  taskList: state.taskModule[subModule],
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   tags: state.setTagList
 })

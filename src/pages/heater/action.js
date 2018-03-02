@@ -1,5 +1,5 @@
-import AjaxHandler from '../util/ajax'
-import CONSTANTS from '../constants'
+import AjaxHandler from '../../util/ajax'
+import CONSTANTS from '../../constants'
 const { PAGINATION } = CONSTANTS
 
 export const CHANGE_HEATER = 'CHANGE_HEATER'

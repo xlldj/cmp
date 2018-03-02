@@ -793,8 +793,8 @@ class CreditExchange extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeGift[subModule].schoolId,
-  page: state.changeGift[subModule].page,
+  schoolId: state.giftModule[subModule].schoolId,
+  page: state.giftModule[subModule].page,
   giftSet: state.setGifts.giftSet,
   gifts: state.setGifts.gifts
 })

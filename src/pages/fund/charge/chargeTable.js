@@ -170,8 +170,8 @@ class ChargeTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeFund[subModule].schoolId,
-  page: state.changeFund[subModule].page
+  schoolId: state.fundModule[subModule].schoolId,
+  page: state.fundModule[subModule].page
 })
 
 export default withRouter(

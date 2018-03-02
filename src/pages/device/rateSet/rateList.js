@@ -272,8 +272,8 @@ class RateList extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.changeDevice[subModule].page,
-  schoolId: state.changeDevice[subModule].schoolId
+  page: state.deviceModule[subModule].page,
+  schoolId: state.deviceModule[subModule].schoolId
 })
 
 export default withRouter(

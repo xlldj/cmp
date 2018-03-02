@@ -14,12 +14,12 @@ const handleHeaterList = (newProps, oldProps, thisObj) => {
   newProps.fetchHeaterList(newProps)
 }
 const mapStateToProps = (state, ownProps) => ({
-  dataSource: state.changeHeater.heaterList.dataSource,
-  total: state.changeHeater.heaterList.total,
-  loading: state.changeHeater.heaterList.loading,
-  schoolId: state.changeHeater.heaterList.schoolId,
-  heaterStatus: state.changeHeater.heaterList.heaterStatus,
-  page: state.changeHeater.heaterList.page,
+  dataSource: state.heaterModule.heaterList.dataSource,
+  total: state.heaterModule.heaterList.total,
+  loading: state.heaterModule.heaterList.loading,
+  schoolId: state.heaterModule.heaterList.schoolId,
+  heaterStatus: state.heaterModule.heaterList.heaterStatus,
+  page: state.heaterModule.heaterList.page,
   schools: state.setSchoolList.schools
 })
 

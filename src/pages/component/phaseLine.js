@@ -34,6 +34,7 @@ const PhaseLine = props => {
         </div>
         <div className="select">{selectors}</div>
       </div>
+      {props.children ? props.children : null}
     </div>
   )
 }

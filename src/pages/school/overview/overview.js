@@ -549,8 +549,8 @@ class Overview extends React.Component {
 // export default Overview
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeSchool[subModule].schoolId,
-  page: state.changeSchool[subModule].page,
+  schoolId: state.schoolModule[subModule].schoolId,
+  page: state.schoolModule[subModule].page,
   schools: state.setSchoolList.schools
 })
 

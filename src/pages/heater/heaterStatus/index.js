@@ -1,10 +1,7 @@
 import React from 'react'
-import { Table, Button } from 'antd'
 
+import LiveStatus from './liveStatus'
 import PhaseLine from '../../component/phaseLine'
-import CheckSelect from '../../component/checkSelect'
-import Time from '../../../util/time'
-import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'
 
@@ -21,7 +18,7 @@ class HeaterStatus extends React.Component {
   changeTab = v => {}
   changeHeaterBlock = v => {}
   render() {
-    const { heaterStatus, schoolId } = this.props
+    const { tabIndex, schoolId } = this.props
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}
@@ -30,38 +27,24 @@ class HeaterStatus extends React.Component {
         changeSchool={this.changeSchool}
       />
     )
-    const heaterBlocks = {
-      1: '热水机组1',
-      2: '热水机组2'
-    }
     return (
-      <div className="taskPanelWrapper" ref="wrapper">
+      <div>
         <PhaseLine
-          value={heaterStatus}
+          value={tabIndex}
           staticPhase={HEATER_STATUS_PAGE_TABS}
           selectors={[selector1]}
           changePhase={this.changeTab}
         />
 
-        <div className="queryPanel">
-          <div className="queryLine">
-            <div className="block">
-              <CheckSelect
-                options={heaterBlocks}
-                value={1}
-                onClick={this.changeHeaterBlock}
-              />
-            </div>
-          </div>
-        </div>
+        {tabIndex === 1 ? <LiveStatus hide={this.props.hide} /> : null}
       </div>
     )
   }
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.changeHeater[subModule].schoolId,
-  heaterStatus: state.changeHeater[subModule].heaterStatus
+  schoolId: state.heaterModule[subModule].schoolId,
+  tabIndex: state.heaterModule[subModule].tabIndex
 })
 
 export default withRouter(

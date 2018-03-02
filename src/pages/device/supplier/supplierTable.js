@@ -163,7 +163,7 @@ class SupplierTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.changeDevice[subModule].page
+  page: state.deviceModule[subModule].page
 })
 
 export default withRouter(

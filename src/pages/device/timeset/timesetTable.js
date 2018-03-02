@@ -224,8 +224,8 @@ class TimesetTable extends React.Component {
 // export default TimesetTable
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.changeDevice[subModule].page,
-  schoolId: state.changeDevice[subModule].schoolId
+  page: state.deviceModule[subModule].page,
+  schoolId: state.deviceModule[subModule].schoolId
 })
 
 export default withRouter(
