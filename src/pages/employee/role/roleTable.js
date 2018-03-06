@@ -203,7 +203,7 @@ class RoleTable extends React.Component {
 const mapStateToProps = (state, ownProps) => ({
   roles: state.setRoleList.roles,
   rolesSet: state.setRoleList.rolesSet,
-  page: state.changeEmployee[subModule].page
+  page: state.employeeModule[subModule].page
 })
 
 export default withRouter(
