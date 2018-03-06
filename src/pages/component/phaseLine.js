@@ -1,7 +1,7 @@
 import React from 'react'
 
 const PhaseLine = props => {
-  const { value, staticPhase, selectors } = props
+  const { value, staticPhase, selectors, noBorder } = props
   const staticOptions =
     staticPhase &&
     staticPhase.map((option, index) => (
@@ -25,9 +25,9 @@ const PhaseLine = props => {
       console.log(e)
     }
   }
-
+  const style = noBorder ? { borderBottomWidth: 0 } : {}
   return (
-    <div className="phaseLine">
+    <div className="phaseLine" style={style}>
       <div className="block">
         <div className="navLink" onClick={changePhase}>
           {staticOptions}

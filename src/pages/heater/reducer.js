@@ -7,10 +7,15 @@ const initialHeaterState = {
   heaterList: {
     page: 1,
     schoolId: selectedSchool,
-    tabIndex: 1, // 1 for unregisterd, 2 for registerd.
+    tabIndex: 2, // 1 for unregisterd, 2 for registerd.
     loading: true,
     dataSource: [],
     total: ''
+  },
+  heaterUnits: {
+    page: 1,
+    schoolId: selectedSchool,
+    machineUnitId: 0
   },
   heaterStatus: {
     tabIndex: 1, // 1 for '实时', 2 for  '设置',
@@ -24,7 +29,7 @@ const initialHeaterState = {
     }
   }
 }
-const changeHeater = (state = initialHeaterState, action) => {
+const heaterModule = (state = initialHeaterState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_HEATER) {
@@ -34,4 +39,4 @@ const changeHeater = (state = initialHeaterState, action) => {
   return state
 }
 
-export default changeHeater
+export default heaterModule

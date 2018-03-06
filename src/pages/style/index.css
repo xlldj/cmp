@@ -1337,16 +1337,12 @@ button.grayBackColor:linked {
   max-width: 1920px;
   margin: 0 auto;
 }
+#root .container .content .main .disp .contentArea .tableList {
+  padding: 0;
+}
 #root .container .content .main .disp .contentArea .navLink {
   width: 50%;
   position: absolute;
-}
-#root .container .content .main .disp .contentArea .tableList .firstCol {
-  padding-left: 20px;
-}
-#root .container .content .main .disp .contentArea .tableList .lastCol {
-  text-align: right;
-  padding-right: 20px;
 }
 #root .container .content .main .disp .contentArea .linkBtn {
   position: absolute;
@@ -1567,6 +1563,14 @@ button.grayBackColor:linked {
 }
 .hintBox li {
   list-style: none;
+}
+/* for table */
+.tableList .firstCol {
+  padding-left: 20px;
+}
+.tableList .lastCol {
+  text-align: right;
+  padding-right: 20px;
 }
 @media screen and (min-width: 1440px) {
   body {

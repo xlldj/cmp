@@ -22,6 +22,8 @@ const HeaterStatus = asyncComponent(() =>
 
 const breadcrumbNameMap = {
   '/list': '机组列表',
+  '/list/detail': '机组信息',
+  '/list/unit/list': '机组设备详情',
   '/status': '工作状态'
 }
 
@@ -50,18 +52,15 @@ class HeaterDisp extends React.Component {
         <div className="disp">
           <Switch>
             <Route
-              exact
               path="/heater/list"
               render={props => <HeaterList hide={this.props.hide} {...props} />}
             />
             <Route
-              exact
               path="/heater/status"
               render={props => (
                 <HeaterStatus hide={this.props.hide} {...props} />
               )}
             />
-
             <Route
               exact
               path="/heater"

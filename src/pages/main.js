@@ -407,7 +407,7 @@ class Main extends React.Component {
   }
   refresh = () => {
     let { pathname } = this.props.history.location
-    window.location.assign(pathname)
+    // window.location.assign(pathname)
   }
   changeWidth = hasChildren => {
     this.setState({

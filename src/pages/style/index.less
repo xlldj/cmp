@@ -1260,18 +1260,12 @@ button.grayBackColor:linked{
             position: relative;
             max-width: 1920px;
             margin:0 auto;
+            .tableList{
+              padding: 0
+            }
             .navLink{
               width: 50%;
               position: absolute;
-            }
-            .tableList{
-              .firstCol{
-                padding-left: 20px;
-              }
-              .lastCol{
-                text-align: right;
-                padding-right: 20px;
-              }
             }
             .linkBtn{
               position: absolute;
@@ -1512,6 +1506,16 @@ button.grayBackColor:linked{
   }
 }
 
+/* for table */
+.tableList{
+  .firstCol{
+    padding-left: 20px;
+  }
+  .lastCol{
+    text-align: right;
+    padding-right: 20px;
+  }
+}
 
 
 @media screen and (min-width: 1440px) {

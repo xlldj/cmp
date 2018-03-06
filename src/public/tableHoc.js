@@ -25,10 +25,6 @@ function tableHoc(WrappedComponent, handleData) {
       }
       return true
     }
-    changePage = pageObj => {
-      let page = pageObj.current
-      this.props.changeDevice('deviceList', { page: page })
-    }
 
     render() {
       return <WrappedComponent {...this.props} />

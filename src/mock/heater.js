@@ -8,12 +8,12 @@ const machineUnit_list = {
         electricMeterRate: 0,
         emissionReductionParam: 0,
         id: 1,
-        imei: 'string',
+        imei: 'imei',
         lastLoginTime: '2018-03-02T08:46:43.185Z',
         loginCount: 0,
         machineCount: 0,
         name: 'string',
-        registerTime: '2018-03-02T08:46:43.185Z',
+        registerTime: 1520216955000,
         schoolName: 'string',
         status: 0
       }
@@ -21,11 +21,45 @@ const machineUnit_list = {
     total: 1
   }
 }
+const machineUnit_one = {
+  data: {
+    backWaterPump: 0,
+    buildingIds: [0],
+    configStatus: 0,
+    electricMeterRate: 0,
+    emissionReductionParam: 0,
+    hotWaterModelId: 0,
+    id: 0,
+    imei: 'string',
+    inverter: 0,
+    lastLoginTime: '2018-03-05T03:36:45.493Z',
+    loginCount: 0,
+    name: 'string',
+    registerTime: '2018-03-05T03:36:45.493Z',
+    replenishmentWaterPump: 0,
+    replyWaterPump: 0,
+    schoolId: 0,
+    solarEnergy: 0,
+    startup: 0,
+    waterHeater: 0,
+    waterTanks: [
+      {
+        area: 0,
+        height: 0,
+        no: 0,
+        range: 0
+      }
+    ]
+  }
+}
 
 const heaterHandler = (resource, body, cb) => {
   if (resource === '/machine/unit/list') {
     let json = machineUnit_list
-    return Promise.resolve().then(cb(json))
+    return Promise.resolve().then(() => json)
+  } else if (resource === '/machine/unit/one') {
+    let json = machineUnit_one
+    return Promise.resolve().then(() => json)
   } else if (resource === '/machine/unit/add') {
     console.log(body)
     machineUnit_list.data.machineUnit_list.push(

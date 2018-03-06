@@ -6,63 +6,134 @@ import { Table } from 'antd'
 import PhaseLine from '../../../component/phaseLine'
 import SchoolSelector from '../../../component/schoolSelector'
 import CONSTANTS from '../../../../constants'
+import Time from '../../../../util/time'
 
 const SIZE = CONSTANTS.PAGINATION
-const {
-  DEVICETYPE,
-  HEATER_LIST_PAGE_TABS,
-  HEATER_LIST_TAB_REGISTERD
-} = CONSTANTS
+const { HEATER_LIST_PAGE_TABS, HEATER_LIST_TAB_REGISTERD } = CONSTANTS
 const subModule = 'heaterList'
 
 class HeaterTable extends React.Component {
   constructor(props) {
     super(props)
-    this.columns = [
+    this.unregisterdColumns = [
       {
-        title: '学校',
-        dataIndex: 'schoolId',
-        className: 'firstCol',
-        render: (text, record, index) => {
-          if (this.props.schools.length) {
-            let sch = this.props.schools.find((r, i) => {
-              return r.id === record.schoolId
-            })
-            return sch.name
-          } else {
-            return ''
-          }
-        }
+        title: 'IMEI',
+        dataIndex: 'imei',
+        className: 'firstCol'
       },
       {
-        title: '设备位置',
-        dataIndex: 'location',
-        width: '25%',
-        render: (text, record) => (text ? text : '暂无')
+        title: '申请注册时间',
+        dataIndex: 'registerTime',
+        width: '20%',
+        render: (text, record) =>
+          record.registerTime ? Time.getTimeStr(record.registerTime) : ''
       },
       {
-        title: '设备类型',
-        dataIndex: 'type',
-        width: '25%',
-        render: (text, record, index) => DEVICETYPE[record.type]
+        title: '上次登录时间',
+        dataIndex: 'lastLoginTime',
+        width: '20%',
+        render: (text, record, index) =>
+          record.lastLoginTime ? Time.getTimeStr(record.lastLoginTime) : ''
+      },
+      {
+        title: '累计登录次数',
+        dataIndex: 'loginCount',
+        width: '20%'
       },
       {
         title: <p className="lastCol">操作</p>,
         dataIndex: 'operation',
-        width: '25%',
+        width: '12%',
         render: (text, record, index) => {
           let addr = {
-            pathname: `/device/list/deviceInfo/:${record.id}`,
-            state: {
-              id: record.id,
-              deviceType: record.type,
-              residenceId: record.residenceId
-            }
+            pathname: `/heater/list/detail/:${record.id}`
           }
           return (
             <div className="editable-row-operations lastCol">
               <span>
-                <Link to={addr}>详情</Link>
+                <Link to={addr}>立即注册</Link>
+              </span>
+            </div>
+          )
+        }
+      }
+    ]
+
+    this.registerdColumns = [
+      {
+        title: '机组名称',
+        dataIndex: 'name',
+        className: 'firstCol',
+        width: '11%'
+      },
+      {
+        title: '所在学校',
+        dataIndex: 'schoolName',
+        width: '11%'
+      },
+      {
+        title: '供水楼栋',
+        dataIndex: 'buildingNames',
+        width: '12%',
+        render: (text, record, index) =>
+          record.buildingNames ? record.buildingNames.join('、') : ''
+      },
+      {
+        title: 'IMEI',
+        dataIndex: 'imei',
+        width: '12%'
+      },
+      {
+        title: '设备个数',
+        dataIndex: 'machineCount',
+        width: '10%',
+        render: (text, record) => (
+          <span>
+            {record.machineCount}
+            <Link
+              to={{
+                pathname: `/heater/list/units/:${record.id}`,
+                state: { schoolId: this.props.schoolId }
+              }}
+            >
+              (查看详情)
+            </Link>
+          </span>
+        )
+      },
+      {
+        title: '电表倍率',
+        dataIndex: 'electricMeterRate',
+        width: '7%'
+      },
+      {
+        title: '减排参数',
+        dataIndex: 'emissionReductionParam',
+        width: '6%'
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'registerTime',
+        width: '12%',
+        render: (text, record) =>
+          record.registerTime ? Time.getTimeStr(record.registerTime) : ''
+      },
+      {
+        title: '配置下发',
+        dataIndex: 'configStatus',
+        width: '12%'
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        render: (text, record, index) => {
+          let addr = {
+            pathname: `/heater/list/detail/:${record.id}`
+          }
+          return (
+            <div className="editable-row-operations lastCol">
+              <span>
+                <Link to={addr}>编辑</Link>
               </span>
             </div>
           )
@@ -93,6 +164,7 @@ class HeaterTable extends React.Component {
 
   render() {
     const { page, schoolId, dataSource, loading, total, tabIndex } = this.props
+    console.log(schoolId)
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}
@@ -117,7 +189,9 @@ class HeaterTable extends React.Component {
             rowKey={record => record.id}
             pagination={{ pageSize: SIZE, current: page, total: total }}
             dataSource={dataSource}
-            columns={this.columns}
+            columns={
+              tabIndex === 1 ? this.unregisterdColumns : this.registerdColumns
+            }
             onChange={this.changePage}
           />
         </div>
