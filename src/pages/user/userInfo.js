@@ -251,15 +251,11 @@ class UserInfo extends React.Component {
               </li>
               <li>
                 <p>校ok迁移金额:</p>
-                <span>{data.originalBalance ? data.originalBalance : 0}</span>
+                <span>
+                  {data.originalBalance ? `¥${data.originalBalance}` : 0}
+                </span>
               </li>
             </Fragment>
-          ) : null}
-          {data.credits !== undefined ? (
-            <li>
-              <p>用户积分:</p>
-              {data.credits}
-            </li>
           ) : null}
           <li>
             <p>手机号:</p>
@@ -289,6 +285,12 @@ class UserInfo extends React.Component {
             <p>账户余额:</p>
             {data.balance ? '¥' + data.balance : '暂无'}
           </li>
+          {data.credits !== undefined ? (
+            <li>
+              <p>用户积分:</p>
+              {data.credits}
+            </li>
+          ) : null}
           <li>
             <p>注册时间:</p>
             {time}
