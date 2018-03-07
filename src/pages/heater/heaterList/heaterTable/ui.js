@@ -96,8 +96,7 @@ class HeaterTable extends React.Component {
             {record.machineCount}
             <Link
               to={{
-                pathname: `/heater/list/units/:${record.id}`,
-                state: { schoolId: this.props.schoolId }
+                pathname: `/heater/list/units/:${record.id}`
               }}
             >
               (查看详情)
@@ -168,7 +167,6 @@ class HeaterTable extends React.Component {
 
   render() {
     const { page, schoolId, dataSource, loading, total, tabIndex } = this.props
-    console.log('loading in ui is: ', loading)
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}

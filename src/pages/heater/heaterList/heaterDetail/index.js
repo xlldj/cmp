@@ -73,7 +73,6 @@ class HeaterDetail extends React.PureComponent {
       if (json && json.data) {
         let { waterTanks } = this.state
         let wts_in_json = json.data.waterTanks
-        console.log(typeof wts_in_json[0].height)
         console.log(json.data)
         wts_in_json.forEach((wt_in_json, i) => {
           let the_wt_in_state = waterTanks.filter(

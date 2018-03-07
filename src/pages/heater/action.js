@@ -13,7 +13,7 @@ export const changeHeater = (subModule, keyValuePair) => {
 }
 
 export const fetchHeaterList = newProps => {
-  let { page, schoolId, tabIndex, loading } = newProps
+  let { page, schoolId, tabIndex } = newProps
   const clearLoading = dispatch => {
     dispatch({
       type: CHANGE_HEATER,
@@ -43,6 +43,7 @@ export const fetchHeaterList = newProps => {
     let resource = '/api/machine/unit/list'
 
     return AjaxHandler.fetch(resource, body, null, null).then(json => {
+      console.log(json)
       if (json.data) {
         dispatch({
           type: CHANGE_HEATER,

@@ -24,6 +24,7 @@ const subModule = 'heaterUnits'
 class HeaterUnits extends React.PureComponent {
   constructor(props) {
     super(props)
+    console.log(props)
     this.state = {
       dataSource: [],
       loading: false,
@@ -77,12 +78,23 @@ class HeaterUnits extends React.PureComponent {
   }
   componentDidMount() {
     this.props.hide(false)
-    let { schoolId } = this.props.location.state
     let machineUnitId = parseInt(this.props.match.params.id.slice(1), 10)
-    this.props.changeHeater(subModule, {
-      schoolId: schoolId ? parseInt(schoolId, 10) : 0,
-      machineUnitId: machineUnitId
-    })
+    // 'machineUnitId' is from url query,
+    // if it differs from props.machineUnitId, change the props.
+    // else fetch the heaterUnit info, and then set schoolId and fetch heaterUnits
+    if (machineUnitId !== this.props.machineUnitId) {
+      this.props.changeHeater(subModule, {
+        machineUnitId: machineUnitId
+      })
+    } else {
+      const body = {
+        page: 1,
+        size: SIZE,
+        status: HEATER_STATUS_REGISTERD
+      }
+
+      return this.fetchHeaterOfSchool()
+    }
   }
   componentWillUnmount() {
     this.props.hide(true)
@@ -102,22 +114,26 @@ class HeaterUnits extends React.PureComponent {
         status: HEATER_STATUS_REGISTERD,
         schoolId: nextProps.schoolId
       }
-      this.fetchHeaterOfSchool(body)
+      if (nextProps.schoolId !== 'all') {
+        this.fetchHeaterOfSchool(body)
+      }
     } else {
       this.fetchData(nextProps)
     }
   }
   fetchHeaterOfSchool = body => {
-    let resource = '/machine/unit/list'
+    let resource = '/machine/list'
     AjaxHandler.fetch(resource, body).then(json => {
       // set result as options of machine unit select
-      this.setState({
-        machineUnits: json.data.machineUnits
-      })
+      if (json.data) {
+        this.setState({
+          machineUnits: json.data.machineUnits
+        })
+      }
     })
   }
   fetchData = props => {
-    let { schoolId, page, machineUnitId } = props
+    let { schoolId, page, machineUnitId } = props || this.props
     const body = {
       size: SIZE,
       machineUnitId,
@@ -154,6 +170,7 @@ class HeaterUnits extends React.PureComponent {
   render() {
     const { dataSource, loading, total } = this.state
     const { page, schoolId } = this.props
+    console.log(schoolId)
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}
