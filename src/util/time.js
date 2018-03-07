@@ -110,6 +110,19 @@ Time.getMonthEnd = t => {
   a.setHours(0, 0, 0)
   return Date.parse(a)
 }
+/* -----当前月最后一天的23:59:59---------- */
+Time.getMonthEndNot0 = t => {
+  let a = new Date(t)
+  a.setDate(1)
+  let m = a.getMonth()
+  if (m === 11) {
+    a.setFullYear(a.getFullYear() + 1, 0)
+  } else {
+    a.setMonth(m + 1)
+  }
+  a.setHours(0, 0, 0)
+  return Date.parse(a) - 1000
+}
 
 Time.getYestodayStart = () => {
   let t = new Date()
