@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Button, Modal, Popconfirm } from 'antd'
 import Time from '../../util/time'
 import Noti from '../../util/noti'
@@ -246,10 +246,20 @@ class UserInfo extends React.Component {
                 <span>校ok迁移用户</span>
               </li>
               <li>
-                <p>校ok账户:</p>
-                <span>{data.originalAccount}</span>
+                <p>原校ok账号:</p>
+                <span>{data.originalAccount ? data.originalAccount : ''}</span>
+              </li>
+              <li>
+                <p>校ok迁移金额:</p>
+                <span>{data.originalBalance ? data.originalBalance : 0}</span>
               </li>
             </Fragment>
+          ) : null}
+          {data.credits !== undefined ? (
+            <li>
+              <p>用户积分:</p>
+              {data.credits}
+            </li>
           ) : null}
           <li>
             <p>手机号:</p>
