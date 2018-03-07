@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Button, Modal, Popconfirm } from 'antd'
 import Time from '../../util/time'
 import Noti from '../../util/noti'
@@ -240,10 +240,20 @@ class UserInfo extends React.Component {
           </li>
           {/* show this when user is from othen platform */}
           {data.userTransfer && data.userTransfer === 1 ? (
-            <li>
-              <p>用户类别:</p>
-              <span>校ok迁移用户</span>
-            </li>
+            <Fragment>
+              <li>
+                <p>用户类别:</p>
+                <span>校ok迁移用户</span>
+              </li>
+              <li>
+                <p>原校ok账号:</p>
+                <span>{data.originalAccount ? data.originalAccount : ''}</span>
+              </li>
+              <li>
+                <p>校ok迁移金额:</p>
+                <span>{data.originalBalance ? data.originalBalance : 0}</span>
+              </li>
+            </Fragment>
           ) : null}
           {data.credits !== undefined ? (
             <li>
