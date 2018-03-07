@@ -9,7 +9,11 @@ import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
 
 const SIZE = CONSTANTS.PAGINATION
-const { HEATER_LIST_PAGE_TABS, HEATER_LIST_TAB_REGISTERD } = CONSTANTS
+const {
+  HEATER_LIST_PAGE_TABS,
+  HEATER_LIST_TAB_REGISTERD,
+  HEATER_LIST_TAB_UNREGISTERD
+} = CONSTANTS
 const subModule = 'heaterList'
 
 class HeaterTable extends React.Component {
@@ -23,10 +27,10 @@ class HeaterTable extends React.Component {
       },
       {
         title: '申请注册时间',
-        dataIndex: 'registerTime',
+        dataIndex: 'createTime',
         width: '20%',
         render: (text, record) =>
-          record.registerTime ? Time.getTimeStr(record.registerTime) : ''
+          record.createTime ? Time.getTimeStr(record.createTime) : ''
       },
       {
         title: '上次登录时间',
@@ -109,7 +113,7 @@ class HeaterTable extends React.Component {
       {
         title: '减排参数',
         dataIndex: 'emissionReductionParam',
-        width: '6%'
+        width: '7%'
       },
       {
         title: '创建时间',
@@ -164,7 +168,7 @@ class HeaterTable extends React.Component {
 
   render() {
     const { page, schoolId, dataSource, loading, total, tabIndex } = this.props
-    console.log(schoolId)
+    console.log('loading in ui is: ', loading)
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}
@@ -190,7 +194,9 @@ class HeaterTable extends React.Component {
             pagination={{ pageSize: SIZE, current: page, total: total }}
             dataSource={dataSource}
             columns={
-              tabIndex === 1 ? this.unregisterdColumns : this.registerdColumns
+              tabIndex === HEATER_LIST_TAB_UNREGISTERD
+                ? this.unregisterdColumns
+                : this.registerdColumns
             }
             onChange={this.changePage}
           />

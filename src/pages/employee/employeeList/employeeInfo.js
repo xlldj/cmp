@@ -614,7 +614,7 @@ class EmployeeInfo extends React.Component {
             </a>
             {schoolLimit ? selectedSchoolItems : <span>不限制学校</span>}
             {schoolError ? (
-              <span className="checkInvalid">请为选择最少一个学校！</span>
+              <span className="checkInvalid">请选择最少一个学校！</span>
             ) : null}
           </li>
           <li className="itemsWrapper">

@@ -9,10 +9,17 @@ const HEATER = {
       text: '已注册机组'
     }
   ],
-  HEATER_LIST_TAB_UNGISTERD: 1,
+  HEATER_LIST_TAB_UNREGISTERD: 1,
   HEATER_LIST_TAB_REGISTERD: 2,
   HEATER_STATUS_UNREGISTERD: 1,
   HEATER_STATUS_REGISTERD: 2,
+  EFFECTIVE: {
+    1: true,
+    2: false
+  },
+  EFFECTIVE_YES: 1,
+  EFFECTIVE_NO: 2,
+
   /* heater status page */
   HEATER_STATUS_PAGE_TABS: [
     {

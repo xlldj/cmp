@@ -1,6 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { Map, is } from 'immutable'
 
 import { Table } from 'antd'
 
@@ -8,8 +6,8 @@ import PhaseLine from '../../../component/phaseLine'
 import SchoolSelector from '../../../component/schoolSelector'
 import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
-// import AjaxHandler from '../../../../util/ajax'
-import AjaxHandler from '../../../../mock/ajax'
+import AjaxHandler from '../../../../util/ajax'
+// import AjaxHandler from '../../../../mock/ajax'
 import { checkObject } from '../../../../util/checkSame'
 
 import { connect } from 'react-redux'
@@ -18,8 +16,6 @@ import { changeHeater } from '../../../../actions'
 
 const {
   PAGINATION: SIZE,
-  HEATER_LIST_PAGE_TABS,
-  HEATER_LIST_TAB_REGISTERD,
   HEATER_UNIT_DEVICE_TYPE,
   HEATER_STATUS_REGISTERD
 } = CONSTANTS
@@ -28,10 +24,15 @@ const subModule = 'heaterUnits'
 class HeaterUnits extends React.PureComponent {
   constructor(props) {
     super(props)
+    this.state = {
+      dataSource: [],
+      loading: false,
+      total: ''
+    }
     this.columns = [
       {
         title: '机组名称',
-        dataIndex: 'name',
+        dataIndex: 'nameUnit',
         className: 'firstCol',
         text: this.heaterUnitName
       },
@@ -76,7 +77,6 @@ class HeaterUnits extends React.PureComponent {
   }
   componentDidMount() {
     this.props.hide(false)
-    console.log(this.props.location)
     let { schoolId } = this.props.location.state
     let machineUnitId = parseInt(this.props.match.params.id.slice(1), 10)
     this.props.changeHeater(subModule, {
@@ -152,8 +152,8 @@ class HeaterUnits extends React.PureComponent {
     this.props.changeHeater(subModule, { page: page })
   }
   render() {
-    const { page, schoolId, dataSource, loading, total } = this.props
-    console.log(schoolId)
+    const { dataSource, loading, total } = this.state
+    const { page, schoolId } = this.props
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}

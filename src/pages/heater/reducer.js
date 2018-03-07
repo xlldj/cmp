@@ -1,14 +1,14 @@
 import getDefaultSchool from '../../util/defaultSchool'
 import * as ActionTypes from './action'
-import { merge } from 'lodash'
+import { merge, isArray } from 'lodash'
 let selectedSchool = getDefaultSchool()
 
 const initialHeaterState = {
   heaterList: {
     page: 1,
     schoolId: selectedSchool,
-    tabIndex: 2, // 1 for unregisterd, 2 for registerd.
-    loading: true,
+    tabIndex: 1, // 1 for unregisterd, 2 for registerd.
+    loading: false,
     dataSource: [],
     total: ''
   },
@@ -33,7 +33,12 @@ const heaterModule = (state = initialHeaterState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_HEATER) {
+    console.log(
+      'heaterModule changed, and loading is: ',
+      action.keyValuePair.loading
+    )
     const { subModule, keyValuePair } = action
+    console.log(state.heaterList, keyValuePair)
     return merge({}, state, { [subModule]: keyValuePair })
   }
   return state

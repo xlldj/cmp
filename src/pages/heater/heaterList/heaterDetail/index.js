@@ -1,41 +1,37 @@
-/* this is a version with different timeset for different building of same school */
 import React, { Fragment } from 'react'
-import moment from 'moment'
-import TimePicker from 'rc-time-picker'
 import 'rc-time-picker/assets/index.css'
+import { cloneDeep } from 'lodash'
 
 import { Button, Checkbox } from 'antd'
 
-// import AjaxHandler from '../../../../util/ajax'
-import AjaxHandler from '../../../../mock/ajax'
+import AjaxHandler from '../../../../util/ajax'
 import MultiSelectModal from '../../../component/multiSelectModal'
 import Noti from '../../../../util/noti'
-import AddPlusAbs from '../../../component/addPlusAbs'
 import SchoolSelectWithoutAll from '../../../component/schoolSelectorWithoutAll'
-// import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../../../constants'
-import BasicSelector from '../../../component/basicSelectorWithoutAll'
 
-const { DEVICE_TYPE_HEATER } = CONSTANTS
-const OPTIONS = {
-  1: '热水器'
-}
+const {
+  HEATER_STATUS_REGISTERD,
+  EFFECTIVE,
+  EFFECTIVE_YES,
+  EFFECTIVE_NO
+} = CONSTANTS
 
-class HeaterDetail extends React.Component {
+class HeaterDetail extends React.PureComponent {
   constructor(props) {
     super(props)
     let waterTanks = [
       {
-        area: 0,
-        height: 0,
-        no: 0,
-        range: 0
+        area: '',
+        height: '',
+        no: 1,
+        range: ''
       },
       {
-        area: 0,
-        height: 0,
-        no: 0,
-        range: 0
+        area: '',
+        height: '',
+        no: 2,
+        range: ''
       }
     ]
     this.state = {
@@ -48,16 +44,16 @@ class HeaterDetail extends React.Component {
       name: '',
       nameError: false,
       hotWaterModelId: '',
-      waterHeater: 0,
-      replyWaterPump: 0,
-      backWaterPump: 0,
+      waterHeater: '',
+      replyWaterPump: '',
+      backWaterPump: '',
       electricMeterRate: '',
       emissionReductionParam: '',
       replenishmentWaterPump: '',
-      solarEnergy: false,
-      inverter: false,
+      solarEnergy: 2,
       waterTanks,
-      buildings: [],
+      residences: [],
+      residenceError: false,
       showBuildingSelect: false
     }
     this.buildingColumns = [
@@ -72,19 +68,37 @@ class HeaterDetail extends React.Component {
     let { id } = this.state
     let body = { id }
     let resource = '/api/machine/unit/one'
-    let ajax = AjaxHandler.ajax(resource, body, null)
+    let ajax = AjaxHandler.fetch(resource, body, null)
     ajax.then(json => {
-      console.log(json)
-      this.setState(json.data, () => {
-        if (json.data.schoolId) {
-          this.fetchBuildings()
-        }
-      })
+      if (json && json.data) {
+        let { waterTanks } = this.state
+        let wts_in_json = json.data.waterTanks
+        console.log(typeof wts_in_json[0].height)
+        console.log(json.data)
+        wts_in_json.forEach((wt_in_json, i) => {
+          let the_wt_in_state = waterTanks.filter(
+            wt_in_state => wt_in_state.no === wt_in_json.no
+          )
+          if (the_wt_in_state) {
+            the_wt_in_state = cloneDeep(wt_in_json)
+          }
+        })
+        console.log(waterTanks)
+        this.setState({ ...json.data, waterTanks }, () => {
+          console.log(this.state.waterTanks)
+          if (json.data.schoolId) {
+            this.fetchBuildings()
+          }
+        })
+      } else {
+        this.setState({
+          loading: false
+        })
+      }
     })
   }
 
   componentDidMount() {
-    console.log('mount')
     this.props.hide(false)
     if (this.props.match.params.id) {
       let id = parseInt(this.props.match.params.id.slice(1), 10)
@@ -100,186 +114,94 @@ class HeaterDetail extends React.Component {
     this.props.hide(true)
   }
   confirm = () => {
-    let { selectedSchool, deviceType } = this.state
-    if (!selectedSchool || selectedSchool === '0') {
+    let { name, schoolId, residences } = this.state
+    if (!schoolId || schoolId === '0') {
       return this.setState({
         schoolError: true
       })
     }
-    if (!deviceType || deviceType === '0') {
+    if (!name) {
       return this.setState({
-        deviceTypeError: true
+        nameError: true
       })
     }
-    const items = JSON.parse(JSON.stringify(this.state.items))
-    for (let i = 0; i < items.length; i++) {
-      let r = items[i]
-      if (r.timeValueError) {
-        return
-      }
-      let start = moment(r.startTime),
-        end = moment(r.endTime)
-      if (start >= end) {
-        r.timeValueError = true
-        return this.setState({
-          items: items
-        })
-      }
-    }
-
-    const buildingTimesets = JSON.parse(
-      JSON.stringify(this.state.buildingTimesets)
-    )
-    for (let i = 0; i < buildingTimesets.length; i++) {
-      let r = buildingTimesets[i]
-      if (!r.buildingId) {
-        r.buildingError = true
-        return this.setState({
-          buildingTimesets: buildingTimesets
-        })
-      }
-      for (let j = 0; j < r.items.length; j++) {
-        let item = r.items[j]
-        let start = moment(item.startTime),
-          end = moment(item.endTime)
-        if (start >= end) {
-          item.timeValueError = true
-          return this.setState({
-            buildingTimesets: buildingTimesets
-          })
-        }
-      }
-    }
-    let buildingIds = {},
-      dups = []
-    buildingTimesets.forEach((r, i) => {
-      if (buildingIds[r.buildingId]) {
-        dups.push(i)
-      } else {
-        buildingIds[r.buildingId] = 1
-      }
-    })
-    if (dups.length > 0) {
-      dups.reverse().forEach(r => {
-        buildingTimesets.splice(r, 1)
+    let selectedResidences =
+      residences && residences.filter(r => r.selected === true)
+    if (!selectedResidences || selectedResidences.length === 0) {
+      return this.setState({
+        residenceError: true
       })
     }
-    this.checkExist(this.postData)
-    // this.postData()
+    this.postData()
   }
   postData = () => {
-    let { selectedSchool, deviceType } = this.state
-    const items = JSON.parse(JSON.stringify(this.state.items))
-    const buildingTimesets = JSON.parse(
-      JSON.stringify(this.state.buildingTimesets)
+    let {
+      status,
+      id,
+      imei,
+      name,
+      schoolId,
+      hotWaterModelId,
+      waterHeater,
+      replyWaterPump,
+      replenishmentWaterPump,
+      backWaterPump,
+      electricMeterRate,
+      emissionReductionParam,
+      solarEnergy,
+      residences
+    } = this.state
+    // filter the wt whose params are set
+    let waterTanks = this.state.waterTanks.filter(
+      w => w.height && w.range && w.area && w.no
     )
-    items.forEach((r, i) => {
-      let startTime = {
-        hour: moment(r.startTime).hour(),
-        minute: moment(r.startTime).minute()
+    let buildingIds = residences.filter(r => r.selected === true).map(r => r.id)
+
+    let body = {
+      id,
+      schoolId,
+      name,
+      imei,
+      buildingIds,
+      solarEnergy
+    }
+    if (electricMeterRate) {
+      body.electricMeterRate = electricMeterRate
+    }
+    if (emissionReductionParam) {
+      body.emissionReductionParam = emissionReductionParam
+    }
+    if (waterTanks && waterTanks.length > 0) {
+      body.waterTanks = waterTanks
+    }
+    if (hotWaterModelId) {
+      body.hotWaterModelId = hotWaterModelId
+    }
+    if (waterHeater) {
+      body.waterHeater = waterHeater
+    }
+    if (backWaterPump) {
+      body.backWaterPump = backWaterPump
+    }
+    if (replyWaterPump) {
+      body.replyWaterPump = replyWaterPump
+    }
+    if (replenishmentWaterPump) {
+      body.replenishmentWaterPump = replenishmentWaterPump
+    }
+    let resource = '/api/machine/unit/register'
+    if (status === HEATER_STATUS_REGISTERD) {
+      body.id = id
+      resource = '/api/machine/unit/update'
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (json && json.data) {
+        Noti.hintSuccessAndBack(this.props.history)
       }
-      let endTime = {
-        hour: moment(r.endTime).hour(),
-        minute: moment(r.endTime).minute()
-      }
-      r.startTime = startTime
-      r.endTime = endTime
-      delete r.timeValueError
     })
-    const body = {
-      items: items,
-      deviceType: parseInt(deviceType, 10),
-      schoolId: parseInt(selectedSchool, 10)
-    }
-    if (buildingTimesets.length > 0) {
-      buildingTimesets.forEach(r => {
-        if (r.items.length > 0) {
-          r.items.forEach(item => {
-            let startTime = {
-              hour: moment(item.startTime).hour(),
-              minute: moment(item.startTime).minute()
-            }
-            let endTime = {
-              hour: moment(item.endTime).hour(),
-              minute: moment(item.endTime).minute()
-            }
-            item.startTime = startTime
-            item.endTime = endTime
-            delete item.timeValueError
-          })
-        }
-        r.buildingId = parseInt(r.buildingId, 10)
-        delete r.buildingError
-      })
-      body.buildingTimesets = buildingTimesets
-    }
-    let resource
-    if (this.props.match.params.id) {
-      body.id = parseInt(this.props.match.params.id.slice(1), 10)
-      resource = '/api/time/range/water/update'
-    } else {
-      resource = '/api/time/range/water/add'
-    }
-    const cb = json => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
-        /*--------redirect --------*/
-        if (json.data) {
-          Noti.hintSuccess(this.props.history, '/device/timeset')
-        }
-      }
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
   cancel = () => {
     this.props.history.goBack()
-  }
-  add = () => {
-    const items = JSON.parse(JSON.stringify(this.state.items))
-    items.push({
-      startTime: moment('1/1/2017 0:0'),
-      endTime: moment('1/1/2017 23:59')
-    })
-    this.setState({
-      items: items
-    })
-  }
-  abstract = () => {
-    const items = JSON.parse(JSON.stringify(this.state.items))
-    items.pop()
-    this.setState({
-      items: items
-    })
-  }
-  handleStartTime = (v, i) => {
-    let items = JSON.parse(JSON.stringify(this.state.items)),
-      nextState = {}
-    items[i].startTime = v
-    nextState.items = items
-    let start = v.valueOf(),
-      end = moment(items[i].endTime).valueOf()
-    if (start >= end) {
-      items[i].timeValueError = true
-    } else if (items[i].timeValueError) {
-      items[i].timeValueError = false
-    }
-    this.setState(nextState)
-  }
-  handleEndTime = (v, i) => {
-    let items = JSON.parse(JSON.stringify(this.state.items)),
-      nextState = {}
-    items[i].endTime = v
-    nextState.items = items
-    let end = v.valueOf(),
-      start = moment(items[i].startTime).valueOf()
-    if (start >= end) {
-      items[i].timeValueError = true
-    } else if (items[i].timeValueError) {
-      items[i].timeValueError = false
-    }
-
-    this.setState(nextState)
   }
   fetchBuildings = () => {
     let { schoolId } = this.state
@@ -290,21 +212,21 @@ class HeaterDetail extends React.Component {
       residenceLevel: 1
     }
     let resource = '/api/residence/list'
-    const cb = json => {
-      try {
-        let data = json.data.residences
-        let buildings = {}
-        data.forEach(r => {
-          buildings[r.id] = r.name
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (json && json.data) {
+        let { buildingIds } = this.state
+        let { residences } = json.data
+        buildingIds.forEach(b => {
+          let r = residences.find(re => re.id === b)
+          if (r) {
+            r.selected = true
+          }
         })
         this.setState({
-          buildings: buildings
+          residences
         })
-      } catch (e) {
-        console.log(e)
       }
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    })
   }
   changeSchool = v => {
     if (!v) {
@@ -312,14 +234,11 @@ class HeaterDetail extends React.Component {
         schoolError: true
       })
     }
-    let nextState = {}
+    let nextState = { schoolId: parseInt(v, 10) }
     if (this.state.schoolError) {
       nextState.schoolError = false
     }
-    nextState.selectedSchool = parseInt(v, 10)
-    this.setState(nextState)
-    this.fetchBuildings(v)
-    this.fetchDeviceTypes(v)
+    this.setState(nextState, this.fetchBuildings)
   }
   checkSchool = v => {
     if (!v || v === '0') {
@@ -330,84 +249,10 @@ class HeaterDetail extends React.Component {
     this.setState({
       schoolError: false
     })
-    /*let {selectedSchool, deviceType} = this.state
-    if (parseInt(selectedSchool, 10) && parseInt(deviceType, 10)) {
-      this.checkExist(null)
-    }*/
-  }
-  changeDevice = v => {
-    if (!v) {
-      return this.setState({
-        deviceTypeError: true
-      })
-    }
-    let nextState = {}
-    if (this.state.deviceTypeError) {
-      nextState.deviceTypeError = false
-    }
-    nextState.deviceType = v
-    this.setState(nextState)
-  }
-  checkDevice = v => {
-    if (!v || v === '0') {
-      return this.setState({
-        deviceTypeError: true
-      })
-    }
-    this.setState({
-      deviceTypeError: false
-    })
-    /*let {selectedSchool, deviceType} = this.state
-    if (parseInt(selectedSchool, 10) && parseInt(deviceType, 10)) {
-      this.checkExist(null)
-    }*/
-  }
-  checkExist = callback => {
-    let {
-      selectedSchool,
-      deviceType,
-      id,
-      initialSchool,
-      initialDT
-    } = this.state
-    if (
-      id &&
-      parseInt(selectedSchool, 10) === initialSchool &&
-      parseInt(deviceType, 10) === initialDT
-    ) {
-      if (callback) {
-        callback()
-      }
-      return
-    }
-    let resource = '/time/range/water/check'
-    const body = {
-      schoolId: parseInt(selectedSchool, 10),
-      deviceType: parseInt(deviceType, 10)
-    }
-    const cb = json => {
-      if (json.error) {
-        throw json.error.displayMessage || json.error
-      } else {
-        if (json.data.result) {
-          Noti.hintLock(
-            '操作出错',
-            '当前学校已有该类型设备的供水时间设置，请勿重复添加'
-          )
-        } else {
-          if (callback) {
-            callback()
-          }
-        }
-      }
-    }
-    AjaxHandler.ajax(resource, body, cb)
   }
 
   changeBuilding = (v, i) => {
-    let buildingTimesets = JSON.parse(
-      JSON.stringify(this.state.buildingTimesets)
-    )
+    let buildingTimesets = cloneDeep(this.state.buildingTimesets)
     buildingTimesets[i].buildingId = v
     buildingTimesets[i].buildingError = false
     this.setState({
@@ -425,13 +270,113 @@ class HeaterDetail extends React.Component {
       showBuildingSelect: false
     })
   }
+  setResidences = data => {
+    let residences = cloneDeep(data)
+    let nextState = {
+      residences,
+      showBuildingSelect: false
+    }
+    let selectedResidence = residences.filter(r => r.selected === true)
+    if (selectedResidence.length === 0) {
+      nextState.residenceError = true
+    } else if (this.state.residenceError) {
+      nextState.residenceError = false
+    }
+    this.setState(nextState)
+  }
 
+  changename = e => {
+    let v = e.target.value
+    this.setState({
+      name: v
+    })
+  }
+  checkname = e => {
+    let v = e.target.value.trim()
+    if (!v) {
+      return this.setState({
+        nameError: true,
+        name: v
+      })
+    }
+    if (this.state.nameError) {
+      this.setState({
+        nameError: false,
+        name: v
+      })
+    }
+  }
+  changehotWaterModelId = e => {
+    this.setState({
+      hotWaterModelId: e.target.value
+    })
+  }
+  changewaterHeater = e => {
+    this.setState({
+      waterHeater: parseInt(e.target.value, 10)
+    })
+  }
+  changereplyWaterPump = e => {
+    this.setState({
+      replyWaterPump: parseInt(e.target.value, 10)
+    })
+  }
+  changebackWaterPump = e => {
+    this.setState({
+      backWaterPump: parseInt(e.target.value, 10)
+    })
+  }
+  changeelectricMeterRate = e => {
+    this.setState({
+      electricMeterRate: parseInt(e.target.value, 10)
+    })
+  }
+  changeemissionReductionParam = e => {
+    this.setState({
+      emissionReductionParam: parseInt(e.target.value, 10)
+    })
+  }
+  changereplenishmentWaterPump = e => {
+    this.setState({
+      replenishmentWaterPump: parseInt(e.target.value, 10)
+    })
+  }
+  changesolarEnergy = e => {
+    this.setState({
+      solarEnergy: e.target.checked ? EFFECTIVE_YES : EFFECTIVE_NO
+    })
+  }
+  changeWaterHeight = (e, i) => {
+    let waterTanks = cloneDeep(this.state.waterTanks)
+    waterTanks[i].height = parseInt(e.target.value, 10)
+    // waterTanks[i].height = e.target.value
+    this.setState({
+      waterTanks
+    })
+  }
+  changeWaterRange = (e, i) => {
+    let waterTanks = cloneDeep(this.state.waterTanks)
+    waterTanks[i].range = parseInt(e.target.value, 10)
+    // waterTanks[i].height = e.target.value
+    this.setState({
+      waterTanks
+    })
+  }
+  changeWaterArea = (e, i) => {
+    let waterTanks = cloneDeep(this.state.waterTanks)
+    waterTanks[i].area = +e.target.value
+    // waterTanks[i].height = e.target.value
+    this.setState({
+      waterTanks
+    })
+  }
   render() {
     let {
-      id,
       imei,
       name,
+      nameError,
       schoolId,
+      schoolError,
       hotWaterModelId,
       waterHeater,
       replyWaterPump,
@@ -440,142 +385,150 @@ class HeaterDetail extends React.Component {
       electricMeterRate,
       emissionReductionParam,
       solarEnergy,
-      inverter,
       showBuildingSelect,
-      buildings,
+      residences,
+      residenceError,
       waterTanks
     } = this.state
     const waterTankItems =
       waterTanks &&
       waterTanks.map((water, index) => (
-        <Fragment>
-          <li>
+        <Fragment key={`frag${index}`}>
+          <li key={index}>
             <p>水箱{index + 1}高度</p>
             <input
+              type="number"
               value={water.height}
-              onChange={this.changeWaterHeight}
-              onBlur={this.checkWaterHeight}
+              onChange={e => this.changeWaterHeight(e, index)}
             />
           </li>
-          <li>
+          <li key={index + 'range'}>
             <p>水位传感器{index + 1}量程</p>
             <input
+              type="number"
               value={water.range}
-              onChange={this.changeWaterRange}
-              onBlur={this.checkWaterRange}
+              onChange={e => this.changeWaterRange(e, index)}
             />
           </li>
-          <li>
+          <li key={`${index}area`}>
             <p>水箱{index + 1}面积</p>
             <input
+              type="number"
               value={water.area}
-              onChange={this.changeWaterArea}
-              onBlur={this.checkWaterArea}
+              onChange={e => this.changeWaterArea(e, index)}
             />
           </li>
         </Fragment>
       ))
 
+    const selectedResidence =
+      residences && residences.filter(r => r.selected === true)
+    const residenceItems =
+      selectedResidence &&
+      selectedResidence.map((resi, i) => <span key={resi.id}>{resi.name}</span>)
     return (
       <div className="infoList timeset">
         <ul>
           <li>
             <p>IMEI</p>
-            <input
-              value={imei}
-              onChange={this.changeImei}
-              onBlur={this.checkImei}
+            <span>{imei}</span>
+          </li>
+          <li>
+            <p>选择学校:</p>
+            <SchoolSelectWithoutAll
+              width={CONSTANTS.SELECTWIDTH}
+              selectedSchool={schoolId.toString()}
+              changeSchool={this.changeSchool}
+              checkSchool={this.checkSchool}
             />
+
+            {schoolError ? (
+              <span className="checkInvalid">请至少选择一栋楼！</span>
+            ) : null}
           </li>
           <li>
             <p>楼栋</p>
             <a className="mgr10" onClick={this.showBuildingSelect} href="">
               点击选择
             </a>
-          </li>
-          <li>
-            <p>选择学校:</p>
-            <SchoolSelectWithoutAll
-              disabled={id}
-              width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
-              selectedSchool={schoolId.toString()}
-              changeSchool={this.changeSchool}
-              checkSchool={this.checkSchool}
-            />
+            {residenceItems}
+            {residenceError ? (
+              <span className="checkInvalid">请至少选择一栋楼！</span>
+            ) : null}
           </li>
           <li>
             <p>名称</p>
             <input
               value={name}
-              onChange={this.changeImei}
-              onBlur={this.checkImei}
+              onChange={this.changename}
+              onBlur={this.checkname}
             />
+            {nameError ? (
+              <span className="checkInvalid">请至少选择一栋楼！</span>
+            ) : null}
           </li>
           <li>
             <p>热水机型号</p>
             <input
               value={hotWaterModelId}
               onChange={this.changehotWaterModelId}
-              onBlur={this.checkhotWaterModelId}
             />
           </li>
           <li>
             <p>热水机数量</p>
             <input
+              type="number"
               value={waterHeater}
               onChange={this.changewaterHeater}
-              onBlur={this.checkwaterHeater}
             />
           </li>
           <li>
             <p>供水水泵数量</p>
             <input
+              type="number"
               value={replyWaterPump}
               onChange={this.changereplyWaterPump}
-              onBlur={this.checkreplyWaterPump}
             />
           </li>
           <li>
             <p>补水水泵数量</p>
             <input
+              type="number"
               value={replenishmentWaterPump}
               onChange={this.changereplenishmentWaterPump}
-              onBlur={this.checkreplenishmentWaterPump}
             />
           </li>
           <li>
             <p>回水水泵数量</p>
             <input
+              type="number"
               value={backWaterPump}
               onChange={this.changebackWaterPump}
-              onBlur={this.checkbackWaterPump}
             />
           </li>
           {waterTankItems}
           <li>
             <p>电表倍率</p>
             <input
+              type="number"
               value={electricMeterRate}
               onChange={this.changeelectricMeterRate}
-              onBlur={this.checkelectricMeterRate}
             />
           </li>
           <li>
             <p>减排参数</p>
             <input
+              type="number"
               value={emissionReductionParam}
               onChange={this.changeemissionReductionParam}
-              onBlur={this.checkemissionReductionParam}
             />
           </li>
           <li>
             <p>是否存在太阳能</p>
-            <Checkbox onChange={this.changesolarEnergy} value={solarEnergy} />
-          </li>
-          <li>
-            <p>是否存在变频器</p>
-            <Checkbox onChange={this.changeinverter} value={inverter} />
+            <Checkbox
+              onChange={this.changesolarEnergy}
+              checked={EFFECTIVE[solarEnergy]}
+            />
           </li>
         </ul>
 
@@ -588,9 +541,9 @@ class HeaterDetail extends React.Component {
 
         <MultiSelectModal
           closeModal={this.closeBuildingSelect}
-          confirm={this.setBuildings}
+          confirm={this.setResidences}
           show={showBuildingSelect}
-          dataSource={buildings}
+          dataSource={residences}
           columns={this.buildingColumns}
         />
       </div>
