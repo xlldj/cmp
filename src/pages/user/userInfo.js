@@ -55,6 +55,7 @@ class UserInfo extends React.Component {
         this.setState({
           data: json.data
         })
+        // 如果是迁移用户，fetch该学校的迁移红包
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -251,6 +252,18 @@ class UserInfo extends React.Component {
               </li>
               <li>
                 <p>校ok迁移金额:</p>
+                <span>
+                  {data.originalBalance ? `¥${data.originalBalance}` : 0}
+                </span>
+              </li>
+              <li>
+                <p>校ok迁移红包:</p>
+                <span>
+                  {data.originalBalance ? `¥${data.originalBalance}` : 0}
+                </span>
+              </li>
+              <li>
+                <p>已领取迁移红包:</p>
                 <span>
                   {data.originalBalance ? `¥${data.originalBalance}` : 0}
                 </span>
