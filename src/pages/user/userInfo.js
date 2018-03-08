@@ -218,6 +218,9 @@ class UserInfo extends React.Component {
     let { data, cancelDefriending, reseting } = this.state
     const { forbiddenStatus } = this.props
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
+    const receivedUserTransferBonusItems =
+      data.receivedUserTransferBonus &&
+      data.receivedUserTransferBonus.join('、')
     return (
       <div className="infoList">
         <ul>
@@ -259,14 +262,14 @@ class UserInfo extends React.Component {
               <li>
                 <p>校ok迁移红包:</p>
                 <span>
-                  {data.originalBalance ? `¥${data.originalBalance}` : 0}
+                  {data.receivedUserTransferBonus
+                    ? receivedUserTransferBonusItems
+                    : ''}
                 </span>
               </li>
               <li>
                 <p>已领取迁移红包:</p>
-                <span>
-                  {data.originalBalance ? `¥${data.originalBalance}` : 0}
-                </span>
+                <span>{data.ifReceiveUserTransferBonus ? '是' : '否'}</span>
               </li>
             </Fragment>
           ) : null}
