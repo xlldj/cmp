@@ -21,6 +21,8 @@ const HEATER = {
   EFFECTIVE_NO: 2,
 
   /* heater status page */
+  HEATER_STATUS_TAB_LIVE: 1,
+  HEATER_STATUS_TAB_CONFIG: 2,
   HEATER_STATUS_PAGE_TABS: [
     {
       value: 1,
@@ -34,6 +36,7 @@ const HEATER = {
   HINT_PIPE_INVERSE: 1,
   HINT_PIPE_SUPPLY: 2,
   HINT_PIPE_BACKUP: 3,
+
   AREADATAS: [
     {
       key: 1,

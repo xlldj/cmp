@@ -19,6 +19,7 @@ class CheckSelector extends React.Component {
   render() {
     let { options, value } = this.props
     let optionArr = obj2arr(options)
+    console.log(optionArr)
     const optionItems =
       optionArr &&
       optionArr.map((o, i) => (

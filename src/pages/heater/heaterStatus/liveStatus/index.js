@@ -36,6 +36,10 @@ class LiveStatus extends React.Component {
   }
   componentDidMount() {
     this.props.hide(false)
+    let { machineUnitId } = this.props
+    if (machineUnitId) {
+      this.fetchMachineStatus()
+    }
   }
   changeTab = v => {}
   changeHeaterUnit = v => {}
@@ -46,8 +50,7 @@ class LiveStatus extends React.Component {
     })
   }
   getTexts = key => {
-    const { unitData } = this.props
-    const { waterBackupState, waterSupplyState, waterInverseState } = unitData
+    const { waterBackupState, waterSupplyState, waterInverseState } = this.state
     const Hint_Texts = {
       1: [
         { label: '补水温度', value: '18度' },
@@ -70,16 +73,10 @@ class LiveStatus extends React.Component {
         }
       ]
     }
-    return Hint_Texts[key]
+    return Hint_Texts[key] || ''
   }
   render() {
-    const { showingHintKey } = this.state
-    const { heaterTabIndex, unitData } = this.props
-    const { pipeRuning } = unitData
-    const heaterBlocks = {
-      1: '热水机组1',
-      2: '热水机组2'
-    }
+    const { showingHintKey, pipeRuning } = this.state
     const areas =
       AREADATAS &&
       AREADATAS.map(data => (
@@ -94,18 +91,6 @@ class LiveStatus extends React.Component {
 
     return (
       <div className="liveStatusWrapper">
-        <div className="queryPanel">
-          <div className="queryLine">
-            <div className="block">
-              <CheckSelect
-                options={heaterBlocks}
-                value={heaterTabIndex}
-                onClick={this.changeHeaterUnit}
-              />
-            </div>
-          </div>
-        </div>
-
         <div className="liveMapWrapper flexCenter horiCenter">
           <img src={warmer} alt="warmer" />
           <img src={tank_0} alt="tank" />
@@ -131,13 +116,4 @@ class LiveStatus extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  heaterTabIndex: state.heaterModule[subModule].heaterTabIndex,
-  unitData: state.heaterModule[subModule].unitData
-})
-
-export default withRouter(
-  connect(mapStateToProps, {
-    changeHeater
-  })(LiveStatus)
-)
+export default LiveStatus

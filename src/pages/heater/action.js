@@ -1,7 +1,5 @@
 import AjaxHandler from '../../util/ajax'
 // import AjaxHandler from '../../mock/ajax'
-import CONSTANTS from '../../constants'
-const { PAGINATION, HEATER_STATUS_REGISTERD } = CONSTANTS
 
 export const CHANGE_HEATER = 'CHANGE_HEATER'
 export const changeHeater = (subModule, keyValuePair) => {
@@ -12,12 +10,11 @@ export const changeHeater = (subModule, keyValuePair) => {
   }
 }
 
-export const fetchHeaterList = newProps => {
-  let { page, schoolId, tabIndex } = newProps
+export const fetchHeaterList = (body, subModule) => {
   const clearLoading = dispatch => {
     dispatch({
       type: CHANGE_HEATER,
-      subModule: 'heaterList',
+      subModule,
       keyValuePair: {
         loading: false
       }
@@ -26,28 +23,20 @@ export const fetchHeaterList = newProps => {
   return dispatch => {
     dispatch({
       type: CHANGE_HEATER,
-      subModule: 'heaterList',
+      subModule,
       keyValuePair: {
         loading: true
       }
     })
-    const body = {
-      page: page,
-      size: PAGINATION,
-      status: tabIndex
-    }
 
-    if (tabIndex === HEATER_STATUS_REGISTERD && schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10)
-    }
     let resource = '/api/machine/unit/list'
 
     return AjaxHandler.fetch(resource, body, null, null).then(json => {
       console.log(json)
-      if (json.data) {
+      if (json && json.data) {
         dispatch({
           type: CHANGE_HEATER,
-          subModule: 'heaterList',
+          subModule,
           keyValuePair: {
             dataSource: json.data.machineUnits,
             total: json.data.total,

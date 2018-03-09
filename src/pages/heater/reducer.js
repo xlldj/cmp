@@ -1,6 +1,5 @@
 import getDefaultSchool from '../../util/defaultSchool'
 import * as ActionTypes from './action'
-import { mergeWith, isArray } from 'lodash'
 let selectedSchool = getDefaultSchool()
 
 const initialHeaterState = {
@@ -19,7 +18,9 @@ const initialHeaterState = {
   },
   heaterStatus: {
     tabIndex: 1, // 1 for '实时', 2 for  '设置',
-    schoolId: selectedSchool
+    schoolId: selectedSchool,
+    machineUnitId: 0,
+    machineUnits: []
   },
   liveStatus: {
     heaterTabIndex: 1,

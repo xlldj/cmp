@@ -3,7 +3,8 @@ import React from 'react'
 import { Table } from 'antd'
 
 import PhaseLine from '../../../component/phaseLine'
-import SchoolSelector from '../../../component/schoolSelector'
+import SchoolSelector from '../../../component/schoolSelectorWithoutAll'
+import BasicSelector from '../../../component/basicSelectorWithoutAll'
 import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
 import AjaxHandler from '../../../../util/ajax'
@@ -86,15 +87,25 @@ class HeaterUnits extends React.PureComponent {
       this.props.changeHeater(subModule, {
         machineUnitId: machineUnitId
       })
+      this.fetchHeaterOfSchool()
     } else {
-      const body = {
-        page: 1,
-        size: SIZE,
-        status: HEATER_STATUS_REGISTERD
-      }
-
-      return this.fetchHeaterOfSchool()
+      this.fetchDevicesOfUnit()
+      this.fetchHeaterInfo()
     }
+  }
+  fetchHeaterInfo() {
+    let { machineUnitId } = this.props
+    let resource = '/machine/unit/one'
+    const body = {
+      id: machineUnitId
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (json && json.data) {
+        this.props.changeHeater(subModule, {
+          schoolId: json.data.schoolId
+        })
+      }
+    })
   }
   componentWillUnmount() {
     this.props.hide(true)
@@ -108,36 +119,49 @@ class HeaterUnits extends React.PureComponent {
     }
     if (!checkObject(nextProps, this.props, ['schoolId'])) {
       // If 'schoolId' changed, refetch heater units agian. Always set page to 1.
-      const body = {
-        page: 1,
-        size: SIZE,
-        status: HEATER_STATUS_REGISTERD,
-        schoolId: nextProps.schoolId
-      }
-      if (nextProps.schoolId !== 'all') {
-        this.fetchHeaterOfSchool(body)
-      }
+      this.fetchHeaterOfSchool(nextProps)
     } else {
-      this.fetchData(nextProps)
+      this.fetchDevicesOfUnit(nextProps)
     }
   }
-  fetchHeaterOfSchool = body => {
-    let resource = '/machine/list'
+  fetchHeaterOfSchool = props => {
+    // fetch all heater units of the school
+    let { schoolId } = props || this.props
+    let resource = '/machine/unit/list'
+    const body = {
+      page: 1,
+      size: 10000,
+      status: HEATER_STATUS_REGISTERD
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
     AjaxHandler.fetch(resource, body).then(json => {
       // set result as options of machine unit select
       if (json.data) {
+        let { machineUnits } = json.data
         this.setState({
-          machineUnits: json.data.machineUnits
+          machineUnits
         })
+        // if current machineUnitId is not in machineUnits, set first item as machineUnitId
+        let exist = machineUnits.findIndex(
+          m => m.id === this.props.machineUnitId
+        )
+        if (exist === -1) {
+          this.props.changeHeater(subModule, {
+            machineUnitId:
+              (machineUnits && machineUnits[0] && machineUnits[0].id) || 0
+          })
+        }
       }
     })
   }
-  fetchData = props => {
+  fetchDevicesOfUnit = props => {
     let { schoolId, page, machineUnitId } = props || this.props
     const body = {
       size: SIZE,
       machineUnitId,
-      schoolId,
+      schoolId: parseInt(schoolId, 10),
       page
     }
     const resource = '/machine/list'
@@ -147,29 +171,39 @@ class HeaterUnits extends React.PureComponent {
     }).then(json => {
       // set results as dataSource
       console.log(json)
-      this.setState({
-        dataSource: json.data.machines,
-        total: json.data.total
-      })
+      if (json && json.data) {
+        this.setState({
+          dataSource: json.data.machines,
+          total: json.data.total,
+          loading: false
+        })
+      }
     })
   }
   changeSchool = value => {
     let { schoolId } = this.props
-    if (schoolId === value) {
+    let v = parseInt(value, 10)
+    if (schoolId === v) {
       return
     }
+    console.log('schoolId is changed: ', schoolId)
     this.props.changeHeater(subModule, {
       page: 1,
-      schoolId: value
+      schoolId: v
     })
   }
   changePage = pageObj => {
     let page = pageObj.current
     this.props.changeHeater(subModule, { page: page })
   }
+  changeHeaterUnit = v => {
+    this.props.changeHeater(subModule, {
+      machineUnitId: parseInt(v, 10)
+    })
+  }
   render() {
-    const { dataSource, loading, total } = this.state
-    const { page, schoolId } = this.props
+    const { dataSource, loading, total, machineUnits } = this.state
+    const { page, schoolId, machineUnitId } = this.props
     console.log(schoolId)
     const selector1 = (
       <SchoolSelector
@@ -179,9 +213,21 @@ class HeaterUnits extends React.PureComponent {
         changeSchool={this.changeSchool}
       />
     )
+    const unitsOpts = {}
+    machineUnits && machineUnits.forEach(m => (unitsOpts[m.id] = m.name))
+    const unitsSelector = (
+      <BasicSelector
+        key="unitsSelector"
+        className="select-item"
+        selectedOpt={machineUnitId}
+        staticOpts={unitsOpts}
+        notFoundTitle="无"
+        changeOpt={this.changeHeaterUnit}
+      />
+    )
     return (
       <div className="heaterUnitsWrapper">
-        <PhaseLine selectors={[selector1]} noBorder={true} />
+        <PhaseLine selectors={[selector1, unitsSelector]} noBorder={true} />
 
         <div className="tableList">
           <Table
