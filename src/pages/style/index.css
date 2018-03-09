@@ -57,6 +57,13 @@ textarea {
   outline: none;
   padding-left: 6px !important;
 }
+input.shortInput {
+  width: 45px;
+  text-align: center;
+}
+.horiInput.horiInput input {
+  margin-right: 10px;
+}
 textarea {
   padding: 4px;
   resize: none;
@@ -155,6 +162,10 @@ button.grayBackColor:linked {
 .inlineLeft {
   text-align: left;
 }
+/* seperator */
+.seperator {
+  margin: 0 10px;
+}
 /* for time picker in gift/act and notify */
 .timePicker {
   width: 140px !important;
@@ -163,6 +174,13 @@ button.grayBackColor:linked {
 }
 .timePicker input {
   width: 150px;
+}
+/* remove icon in antd timepicker */
+.ant-time-picker .ant-time-picker-input {
+  text-align: center;
+}
+.ant-time-picker .ant-time-picker-icon {
+  visibility: hidden;
 }
 /* for placeholder */
 ::-webkit-input-placeholder {
@@ -411,11 +429,7 @@ button.grayBackColor:linked {
 .addPlusabs button:first-child {
   margin-right: 12px;
 }
-/* -----info area----- */
-.infoBlockList {
-  margin: 16px;
-}
-.infoBlockList .btnArea {
+.btnArea {
   display: inline-flex;
   flex: none;
   flex-wrap: nowrap;
@@ -425,11 +439,15 @@ button.grayBackColor:linked {
   padding: 20px;
   background-color: #ebf4fd;
 }
-.infoBlockList .btnArea > button {
+.btnArea > button {
   margin-right: 10px;
 }
-.infoBlockList .btnArea > button:last-child {
+.btnArea > button:last-child {
   margin-right: 0;
+}
+/* -----info area----- */
+.infoBlockList {
+  margin: 16px;
 }
 .infoBlock {
   display: flex;
@@ -799,6 +817,46 @@ button.grayBackColor:linked {
 }
 .infoList .select {
   width: 140px;
+}
+/* for new info zone layout */
+.infoZone {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+.infoZone .header {
+  height: 50px;
+  line-height: 50px;
+  width: 100%;
+  font-size: 1.2em;
+  color: #333;
+}
+.infoZone input {
+  line-height: 26px;
+}
+.infoZone label {
+  display: inline-block;
+  width: 100px;
+  color: #333;
+}
+.infoZone .row {
+  height: 50px;
+  line-height: 50px;
+  width: 100%;
+  color: #999;
+}
+.infoZone .rows {
+  display: inline-flex;
+  width: 100%;
+  color: #999;
+}
+.infoZone .rows .horiInput {
+  padding-bottom: 10px;
+}
+.infoZone .rows .horiInput .horiInputTitle {
+  padding-bottom: 5px;
+}
+.infoZone:last-child {
+  border-bottom: none;
 }
 .timepicker input {
   width: 50px;

@@ -71,9 +71,18 @@ class HeaterStatus extends React.Component {
       tabIndex: parseInt(v, 10)
     })
   }
-  changeHeaterBlock = v => {}
+  changeSchool = v => {
+    this.props.changeHeater(subModule, {
+      schoolId: parseInt(v, 10)
+    })
+  }
+  changeMachineUnitId = v => {
+    this.props.changeHeater(subModule, {
+      machineUnitId: parseInt(v, 10)
+    })
+  }
   render() {
-    const { tabIndex, schoolId, machineUnits } = this.props
+    const { tabIndex, schoolId, machineUnitId, machineUnits } = this.props
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}
@@ -97,8 +106,8 @@ class HeaterStatus extends React.Component {
             <div className="block">
               <CheckSelect
                 options={heaterBlocks}
-                value={tabIndex}
-                onClick={this.changeHeaterUnit}
+                value={machineUnitId}
+                onClick={this.changeMachineUnitId}
               />
             </div>
           </div>

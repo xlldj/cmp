@@ -1,16 +1,60 @@
 import React from 'react'
 
-import PhaseLine from '../../../component/phaseLine'
+import { Button } from 'antd'
+
+import UnitDeviceBlock from './unitDeviceBlock'
+import TimeRangeLine from './timeRangeLine'
+import HoriInput from '../../../component/horiInput'
+import LabelInput from '../../../component/labelInput'
 import CONSTANTS from '../../../../constants'
 import AjaxHandler from '../../../../util/ajax'
+import { deepCopy } from '../../../../util/copy'
 import { checkObject } from '../../../../util/checkSame'
 
-const subModule = 'heaterStatus'
 const {
-  HEATER_STATUS_PAGE_TABS,
-  HEATER_STATUS_REGISTERD,
-  PAGINATION: SIZE
+  PAGINATION: SIZE,
+  WARMER_IN_UNIT,
+  REPLY_IN_UNIT,
+  REPLENISH_IN_UNIT,
+  SOLAR_IN_UNIT,
+  UNIT_DEVICE_STATUS,
+  DEVICE_UNIT_ENABLE,
+  DEVICE_UNIT_DISABLE,
+  PARAMNAMES
 } = CONSTANTS
+const TIMERANGES = []
+const timeRange = {
+  endTime: '',
+  no: 0,
+  startTime: '',
+  status: DEVICE_UNIT_DISABLE,
+  height: '',
+  temperature: '',
+  remperatureDelta: ''
+}
+for (let i = 0; i < 4; i++) {
+  TIMERANGES.push(deepCopy(timeRange))
+}
+const heaterLimitParam = {
+  enterTemperature: 0,
+  existTemperature: 0,
+  maxTime: 0,
+  temperatureDelta: 0
+}
+const waterCompensatorLimitParam = {
+  temperatureDelta: 0,
+  waterLevelDelta: 0
+}
+const waterFeederLimitParam = {
+  openStopWaterLevelDelta: 0,
+  returnWaterExitTemperatureDelta: 0,
+  returnWaterOpenStopTemperatureDelta: 0,
+  waterProtection: 0
+}
+const solarEnergyLimitParam = {
+  openStopTemperatureDelta: 0,
+  waterTankTemperature: 0
+}
 
 class StatusConfig extends React.Component {
   state = {
@@ -29,26 +73,522 @@ class StatusConfig extends React.Component {
     }
     this.fetchConfigOfMachine(nextProps)
   }
-  fetchConfigOfMachine = key => {}
   fetchConfigOfMachine = props => {
     let { machineUnitId } = props || this.props
     const body = {
-      id: machineUnitId
+      id: parseInt(machineUnitId, 10)
     }
     const resource = '/machine/unit/config/one'
     AjaxHandler.fetch(resource, body).then(json => {
       console.log(json)
       if (json && json.data) {
+        let { machines } = json.data
+        machines.forEach(m => {
+          if (!m.machineTimeRanges || m.machineTimeRanges.length < 4) {
+            m.machineTimeRanges = TIMERANGES
+          } else if (m.machineTimeRanges.length < 4) {
+            while (m.machineTimeRanges.length < 4) {
+              m.machineTimeRanges.push(deepCopy(timeRange))
+            }
+          }
+          // if is warmer, add or update 'heaterLimitParam'
+          if (m.type === WARMER_IN_UNIT && !m.heaterLimitParam) {
+            m.heaterLimitParam = deepCopy(heaterLimitParam)
+          } else if (m.type === REPLY_IN_UNIT && !m.waterFeederLimitParam) {
+            m.waterFeederLimitParam = deepCopy(waterFeederLimitParam)
+          } else if (
+            m.type === REPLENISH_IN_UNIT &&
+            !m.waterCompensatorLimitParam
+          ) {
+            m.waterCompensatorLimitParam = deepCopy(waterCompensatorLimitParam)
+          } else if (m.type === SOLAR_IN_UNIT && !m.solarEnergyLimitParam) {
+            m.solarEnergyLimitParam = deepCopy(solarEnergyLimitParam)
+          }
+        })
         this.setState(json.data)
       }
     })
   }
-  changeTab = v => {}
-  changeHeaterBlock = v => {}
-  render() {
-    const { machineUnitId, machineUnits } = this.props
 
-    return <div />
+  changeStartTime = (v, id, i) => {
+    console.log(v, id, i)
+
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.machineTimeRanges[i].startTime = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeEndTime = (v, id, i) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.machineTimeRanges[i].endTime = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeTemp = (e, id, i) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.machineTimeRanges[i].temperature = e.target.value
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeHeight = (e, id, i) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.machineTimeRanges[i].height = e.target.value
+      this.setState({
+        machines
+      })
+    }
+  }
+
+  changeDeviceInUnitStatus = (checked, id, i) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.machineTimeRanges[i].status = checked
+        ? DEVICE_UNIT_ENABLE
+        : DEVICE_UNIT_DISABLE
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeTempDelta = (e, id, i) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.machineTimeRanges[i].temperatureDelta = e.target.value
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeEnterTemp = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.heaterLimitParam.enterTemperature = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeMaxTime = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.heaterLimitParam.maxTime = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeExitTemperature = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.heaterLimitParam.exitTemperature = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeWarmerTempDelta = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.heaterLimitParam.temperatureDelta = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeWaterProtection = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.waterFeederLimitParam.waterProtection = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeWaterLevelSwitchDelta = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.waterFeederLimitParam.openStopWaterLevelDelta = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeWaterTempSwitchDelta = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.waterFeederLimitParam.returnWaterOpenStopTemperatureDelta = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeWaterExitTempDelta = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.waterFeederLimitParam.returnWaterExitTemperatureDelta = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeWaterLevelDelta = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.waterCompensatorLimitParam.waterLevelDelta = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeTemperatureDelta = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.waterCompensatorLimitParam.temperatureDelta = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeOpenStopTemperatureDelta = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.solarEnergyLimitParam.openStopTemperatureDelta = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  changeWaterTankTemperature = (v, id) => {
+    let machines = deepCopy(this.state.machines)
+    let machine = machines.find(m => m.id === id)
+    if (machine) {
+      machine.solarEnergyLimitParam.waterTankTemperature = v
+      this.setState({
+        machines
+      })
+    }
+  }
+  checkTimeItemComplete = (t, type) => {
+    let complete = true
+    switch (type) {
+      case WARMER_IN_UNIT:
+        complete = t.temperature && t.startTime && t.endTime
+        break
+      case REPLY_IN_UNIT:
+        complete = t.startTime && t.endTime
+        break
+      case REPLENISH_IN_UNIT:
+        complete = t.startTime && t.endTime && t.height && t.temperature
+        break
+      case SOLAR_IN_UNIT:
+        complete =
+          t.startTime && t.endTime && t.temperature && t.temperatureDelta
+        break
+      default:
+        break
+    }
+    return complete
+  }
+  confirm = () => {
+    let machines = deepCopy(this.state.machines)
+    for (let i = 0, l = machines.length; i < l; i++) {
+      let m = machines[i]
+      if (m.machineTimeRanges) {
+        for (let j = 0, ll = m.machineTimeRanges.length; j < ll; j++) {
+          let t = m.machineTimeRanges[j]
+          if (t.status === DEVICE_UNIT_ENABLE) {
+            let complete = this.checkTimeItemComplete(t, m.type)
+            if (!complete) {
+              t.error = true
+              return this.setState({ machines })
+            }
+          }
+        }
+      }
+    }
+  }
+
+  render() {
+    const { machines } = this.state
+    const warmers = machines && machines.filter(m => m.type === WARMER_IN_UNIT)
+    const warmerItems =
+      warmers &&
+      warmers.map((w, ind) => {
+        const timeRanges = w.machineTimeRanges.map((t, i) => (
+          <TimeRangeLine
+            className="row"
+            key={t.no || i + 1}
+            label={`第${i + 1}时段`}
+            startTime={t.startTime || ''}
+            endTime={t.endTime || ''}
+            checked={t.status ? UNIT_DEVICE_STATUS[t.status] : false}
+            toggleSwitch={checked =>
+              this.changeDeviceInUnitStatus(checked, w.id, i)
+            }
+            changeStartTime={v => this.changeStartTime(v, w.id, i)}
+            changeEndTime={v => this.changeEndTime(v, w.id, i)}
+          >
+            <span className="seperator">加热温度</span>
+            <input
+              type="number"
+              className="shortInput"
+              value={t.temperature || ''}
+              onChange={e => this.changeTemp(e, w.id, i)}
+            />
+          </TimeRangeLine>
+        ))
+        return (
+          <UnitDeviceBlock key={w.id || ind + 1} title={w.name || '热水机'}>
+            {timeRanges}
+            <div className="rows">
+              <label>化霜:</label>
+              <div>
+                <HoriInput
+                  title="投入温度"
+                  type="number"
+                  value={w.heaterLimitParam.enterTemperature || ''}
+                  onChange={v => this.changeEnterTemp(v, w.id)}
+                  deno="℃"
+                />
+                <HoriInput
+                  title="最大时间"
+                  type="number"
+                  value={w.heaterLimitParam.maxTime || ''}
+                  onChange={v => this.changeMaxTime(v, w.id)}
+                  deno="分钟"
+                />
+                <HoriInput
+                  type="number"
+                  title="退出温度"
+                  value={w.heaterLimitParam.exitTemperature || ''}
+                  onChange={v => this.changeExitTemperature(v, w.id)}
+                  deno="℃"
+                />
+              </div>
+            </div>
+            <div className="row">
+              <LabelInput
+                className="row"
+                title="压缩机启停温差"
+                value={w.heaterLimitParam.temperatureDelta}
+                onChange={v => this.changeWarmerTempDelta(v, w.id)}
+                deno="%"
+              />
+            </div>
+          </UnitDeviceBlock>
+        )
+      })
+    const replys = machines && machines.filter(m => m.type === REPLY_IN_UNIT)
+    const replyItems =
+      replys &&
+      replys.map((w, ind) => {
+        const timeRanges = w.machineTimeRanges.map((t, i) => (
+          <TimeRangeLine
+            className="row"
+            key={t.no || i + 1}
+            label={`第${i + 1}时段`}
+            startTime={t.startTime || ''}
+            endTime={t.endTime || ''}
+            checked={t.status ? UNIT_DEVICE_STATUS[t.status] : false}
+            toggleSwitch={e => this.changeDeviceInUnitStatus(e, w.id, i)}
+          />
+        ))
+        return (
+          <UnitDeviceBlock key={w.id || ind + 1} title={w.name || '供水'}>
+            {timeRanges}
+            <LabelInput
+              className="row"
+              title="缺水保护"
+              value={w.waterFeederLimitParam.waterProtection}
+              onChange={v => this.changeWaterProtection(v, w.id)}
+              deno="%"
+            />
+            <LabelInput
+              className="row"
+              title="启停水位差"
+              value={w.waterFeederLimitParam.openStopWaterLevelDelta}
+              onChange={e => this.changeWaterLevelSwitchDelta(e, w.id)}
+              deno="%"
+            />
+            <LabelInput
+              className="row"
+              title="回水开停温差"
+              value={
+                w.waterFeederLimitParam.returnWaterOpenStopTemperatureDelta
+              }
+              onChange={e => this.changeWaterTempSwitchDelta(e, w.id)}
+              deno="℃"
+            />
+            <LabelInput
+              className="row"
+              title="回水退出温差"
+              value={w.waterFeederLimitParam.returnWaterExitTemperatureDelta}
+              onChange={e => this.changeWaterExitTempDelta(e, w.id)}
+              deno="℃"
+            />
+          </UnitDeviceBlock>
+        )
+      })
+    const compensators =
+      machines && machines.filter(m => m.type === REPLENISH_IN_UNIT)
+    const compensatorsItems =
+      compensators &&
+      compensators.map((w, ind) => {
+        const timeRanges = w.machineTimeRanges.map((t, i) => (
+          <TimeRangeLine
+            className="row"
+            key={t.no || i + 1}
+            label={`第${i + 1}时段`}
+            startTime={t.startTime || ''}
+            endTime={t.endTime || ''}
+            checked={t.status ? UNIT_DEVICE_STATUS[t.status] : false}
+            toggleSwitch={checked =>
+              this.changeDeviceInUnitStatus(checked, w.id, i)
+            }
+            changeStartTime={v => this.changeStartTime(v, w.id, i)}
+            changeEndTime={v => this.changeEndTime(v, w.id, i)}
+          >
+            <span className="seperator">高度</span>
+            <input
+              type="number"
+              className="shortInput"
+              value={t.height || ''}
+              onChange={e => this.changeHeight(e, w.id, i)}
+            />
+            <span className="seperator">温度</span>
+            <input
+              type="number"
+              className="shortInput"
+              value={t.temperature || ''}
+              onChange={e => this.changeTemp(e, w.id, i)}
+            />
+          </TimeRangeLine>
+        ))
+        return (
+          <UnitDeviceBlock key={w.id || ind + 1} title={w.name || '热水机'}>
+            {timeRanges}
+            <LabelInput
+              className="row"
+              title="水位差"
+              value={w.waterCompensatorLimitParam.waterLevelDelta}
+              onChange={e => this.changeWaterLevelDelta(e, w.id)}
+              deno="%"
+            />
+            <LabelInput
+              className="row"
+              title="温度差"
+              value={w.waterCompensatorLimitParam.temperatureDelta}
+              onChange={e => this.changeTemperatureDelta(e, w.id)}
+              deno="%"
+            />
+          </UnitDeviceBlock>
+        )
+      })
+
+    const solars = machines && machines.filter(m => m.type === SOLAR_IN_UNIT)
+    const solarItems =
+      solars &&
+      solars.map((w, ind) => {
+        const timeRanges = w.machineTimeRanges.map((t, i) => (
+          <TimeRangeLine
+            className="row"
+            key={t.no || i + 1}
+            label={`第${i + 1}时段`}
+            startTime={t.startTime || ''}
+            endTime={t.endTime || ''}
+            checked={t.status ? UNIT_DEVICE_STATUS[t.status] : false}
+            toggleSwitch={checked =>
+              this.changeDeviceInUnitStatus(checked, w.id, i)
+            }
+            changeStartTime={v => this.changeStartTime(v, w.id, i)}
+            changeEndTime={v => this.changeEndTime(v, w.id, i)}
+            showErrorHint={t.error || false}
+          >
+            <span className="seperator">启动温差</span>
+            <input
+              type="number"
+              className="shortInput"
+              value={t.temperatureDelta || ''}
+              onChange={e => this.changeTempDelta(e, w.id, i)}
+            />
+            <span className="seperator">水箱最高温度</span>
+            <input
+              type="number"
+              className="shortInput"
+              value={t.temperature || ''}
+              onChange={e => this.changeTemp(e, w.id, i)}
+            />
+          </TimeRangeLine>
+        ))
+        return (
+          <UnitDeviceBlock
+            className="noBdr"
+            key={w.id || ind + 1}
+            title={w.name || '太阳能'}
+          >
+            {timeRanges}
+            <LabelInput
+              className="row"
+              title="启停温差"
+              value={w.solarEnergyLimitParam.openStopTemperatureDelta}
+              onChange={v => this.changeOpenStopTemperatureDelta(v, w.id)}
+              deno="℃"
+            />
+            <LabelInput
+              className="row"
+              title="水箱温度"
+              value={w.solarEnergyLimitParam.waterTankTemperature}
+              onChange={v => this.changeWaterTankTemperature(v, w.id)}
+              deno="℃"
+            />
+          </UnitDeviceBlock>
+        )
+      })
+    return (
+      <div className="heaterStatusConfig">
+        <div className="heaterStatusConfigSet">
+          {warmerItems}
+          {replyItems}
+          {compensatorsItems}
+          {solarItems}
+          <div className="btnArea">
+            <Button type="primary" onClick={this.confirm}>
+              提交设置
+            </Button>
+          </div>
+        </div>
+        <div className="heaterStatusAiSet">
+          <Button type="primary">一键配置机组参数</Button>
+        </div>
+      </div>
+    )
   }
 }
 

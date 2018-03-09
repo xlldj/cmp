@@ -12,7 +12,10 @@ const SIZE = CONSTANTS.PAGINATION
 const {
   HEATER_LIST_PAGE_TABS,
   HEATER_LIST_TAB_REGISTERD,
-  HEATER_LIST_TAB_UNREGISTERD
+  HEATER_LIST_TAB_UNREGISTERD,
+  HEATER_CONFIG_NEED_DELIVERY,
+  HEATER_CONFIG_DELIVERED,
+  HEATER_CONFIG_DELIVERY_FAIL
 } = CONSTANTS
 const subModule = 'heaterList'
 
@@ -124,7 +127,37 @@ class HeaterTable extends React.Component {
       {
         title: '配置下发',
         dataIndex: 'configStatus',
-        width: '12%'
+        width: '12%',
+        render: (text, record) => {
+          let statusItem
+          switch (record.configStatus) {
+            case HEATER_CONFIG_NEED_DELIVERY:
+              statusItem = (
+                <a href="" onClick={e => this.executeConfig(e, record.id)}>
+                  立即下发
+                </a>
+              )
+              break
+            case HEATER_CONFIG_DELIVERY_FAIL:
+              statusItem = (
+                <span>
+                  下发失败<a
+                    href=""
+                    onClick={e => this.executeConfig(e, record.id)}
+                  >
+                    重新下发
+                  </a>
+                </span>
+              )
+              break
+            case HEATER_CONFIG_DELIVERED:
+              statusItem = <span>下发成功</span>
+              break
+            default:
+              return '未知'
+          }
+          return statusItem
+        }
       },
       {
         title: <p className="lastCol">操作</p>,

@@ -29,53 +29,9 @@ class HeaterUnits extends React.PureComponent {
     this.state = {
       dataSource: [],
       loading: false,
-      total: ''
+      total: '',
+      machineUnits: []
     }
-    this.columns = [
-      {
-        title: '机组名称',
-        dataIndex: 'nameUnit',
-        className: 'firstCol',
-        text: this.heaterUnitName
-      },
-      {
-        title: '设备名称',
-        dataIndex: 'name',
-        width: '20%'
-      },
-      {
-        title: '设备类型',
-        dataIndex: 'type',
-        width: '20%',
-        render: (text, record, index) =>
-          record.type ? HEATER_UNIT_DEVICE_TYPE(record.lastLoginTime) : ''
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-        width: '20%',
-        render: (text, record) =>
-          record.createTime ? Time.getTimeStr(record.createTime) : ''
-      },
-      {
-        title: <p className="lastCol">操作</p>,
-        dataIndex: 'operation',
-        width: '12%',
-        render: (text, record, index) => (
-          <div className="editable-row-operations lastCol">
-            <span>
-              <a href="" onClick={e => this.editUnit(e, record.id)}>
-                编辑
-              </a>
-              <span className="ant-divider" />
-              <a href="" onClick={e => this.deleteUnit(e, record.id)}>
-                删除
-              </a>
-            </span>
-          </div>
-        )
-      }
-    ]
   }
   componentDidMount() {
     this.props.hide(false)
@@ -121,6 +77,16 @@ class HeaterUnits extends React.PureComponent {
       // If 'schoolId' changed, refetch heater units agian. Always set page to 1.
       this.fetchHeaterOfSchool(nextProps)
     } else {
+      if (!checkObject(nextProps, this.props, ['machineUnitId'])) {
+        let index = this.state.machineUnits.findIndex(
+          u => u.id === parseInt(nextProps.machineUnitId, 10)
+        )
+        if (index !== -1) {
+          this.setState({
+            heaterUnitName: this.state.machineUnits[index].name
+          })
+        }
+      }
       this.fetchDevicesOfUnit(nextProps)
     }
   }
@@ -138,11 +104,9 @@ class HeaterUnits extends React.PureComponent {
     }
     AjaxHandler.fetch(resource, body).then(json => {
       // set result as options of machine unit select
-      if (json.data) {
+      if (json && json.data) {
         let { machineUnits } = json.data
-        this.setState({
-          machineUnits
-        })
+        let nextState = { machineUnits }
         // if current machineUnitId is not in machineUnits, set first item as machineUnitId
         let exist = machineUnits.findIndex(
           m => m.id === this.props.machineUnitId
@@ -152,7 +116,13 @@ class HeaterUnits extends React.PureComponent {
             machineUnitId:
               (machineUnits && machineUnits[0] && machineUnits[0].id) || 0
           })
+        } else {
+          let name = machineUnits[exist].name
+          this.setState({
+            heaterUnitName: name || ''
+          })
         }
+        this.setState(nextState)
       }
     })
   }
@@ -202,7 +172,13 @@ class HeaterUnits extends React.PureComponent {
     })
   }
   render() {
-    const { dataSource, loading, total, machineUnits } = this.state
+    const {
+      dataSource,
+      loading,
+      total,
+      machineUnits,
+      heaterUnitName
+    } = this.state
     const { page, schoolId, machineUnitId } = this.props
     console.log(schoolId)
     const selector1 = (
@@ -225,6 +201,52 @@ class HeaterUnits extends React.PureComponent {
         changeOpt={this.changeHeaterUnit}
       />
     )
+
+    const columns = [
+      {
+        title: '机组名称',
+        dataIndex: 'nameUnit',
+        className: 'firstCol',
+        render: () => heaterUnitName
+      },
+      {
+        title: '设备名称',
+        dataIndex: 'name',
+        width: '20%'
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'type',
+        width: '20%',
+        render: (text, record, index) =>
+          record.type ? HEATER_UNIT_DEVICE_TYPE[record.type] : ''
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'createTime',
+        width: '20%',
+        render: (text, record) =>
+          record.createTime ? Time.getTimeStr(record.createTime) : ''
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        width: '12%',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <span>
+              <a href="" onClick={e => this.editUnit(e, record.id)}>
+                编辑
+              </a>
+              <span className="ant-divider" />
+              <a href="" onClick={e => this.deleteUnit(e, record.id)}>
+                删除
+              </a>
+            </span>
+          </div>
+        )
+      }
+    ]
     return (
       <div className="heaterUnitsWrapper">
         <PhaseLine selectors={[selector1, unitsSelector]} noBorder={true} />
@@ -236,7 +258,7 @@ class HeaterUnits extends React.PureComponent {
             rowKey={record => record.id}
             pagination={{ pageSize: SIZE, current: page, total: total }}
             dataSource={dataSource}
-            columns={this.columns}
+            columns={columns}
             onChange={this.changePage}
           />
         </div>

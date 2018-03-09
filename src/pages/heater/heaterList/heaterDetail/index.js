@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react'
 import 'rc-time-picker/assets/index.css'
-import { cloneDeep } from 'lodash'
 
 import { Button, Checkbox } from 'antd'
 
@@ -9,6 +8,7 @@ import MultiSelectModal from '../../../component/multiSelectModal'
 import Noti from '../../../../util/noti'
 import SchoolSelectWithoutAll from '../../../component/schoolSelectorWithoutAll'
 import CONSTANTS from '../../../../constants'
+import { deepCopy } from '../../../../util/copy'
 
 const {
   HEATER_STATUS_REGISTERD,
@@ -75,11 +75,11 @@ class HeaterDetail extends React.PureComponent {
         let wts_in_json = json.data.waterTanks
         console.log(json.data)
         wts_in_json.forEach((wt_in_json, i) => {
-          let the_wt_in_state = waterTanks.filter(
+          let the_wt_in_state = waterTanks.findIndex(
             wt_in_state => wt_in_state.no === wt_in_json.no
           )
-          if (the_wt_in_state) {
-            the_wt_in_state = cloneDeep(wt_in_json)
+          if (the_wt_in_state !== -1) {
+            waterTanks[the_wt_in_state] = deepCopy(wt_in_json)
           }
         })
         console.log(waterTanks)
@@ -251,7 +251,7 @@ class HeaterDetail extends React.PureComponent {
   }
 
   changeBuilding = (v, i) => {
-    let buildingTimesets = cloneDeep(this.state.buildingTimesets)
+    let buildingTimesets = deepCopy(this.state.buildingTimesets)
     buildingTimesets[i].buildingId = v
     buildingTimesets[i].buildingError = false
     this.setState({
@@ -270,7 +270,7 @@ class HeaterDetail extends React.PureComponent {
     })
   }
   setResidences = data => {
-    let residences = cloneDeep(data)
+    let residences = deepCopy(data)
     let nextState = {
       residences,
       showBuildingSelect: false
@@ -346,7 +346,7 @@ class HeaterDetail extends React.PureComponent {
     })
   }
   changeWaterHeight = (e, i) => {
-    let waterTanks = cloneDeep(this.state.waterTanks)
+    let waterTanks = deepCopy(this.state.waterTanks)
     waterTanks[i].height = parseInt(e.target.value, 10)
     // waterTanks[i].height = e.target.value
     this.setState({
@@ -354,7 +354,7 @@ class HeaterDetail extends React.PureComponent {
     })
   }
   changeWaterRange = (e, i) => {
-    let waterTanks = cloneDeep(this.state.waterTanks)
+    let waterTanks = deepCopy(this.state.waterTanks)
     waterTanks[i].range = parseInt(e.target.value, 10)
     // waterTanks[i].height = e.target.value
     this.setState({
@@ -362,7 +362,7 @@ class HeaterDetail extends React.PureComponent {
     })
   }
   changeWaterArea = (e, i) => {
-    let waterTanks = cloneDeep(this.state.waterTanks)
+    let waterTanks = deepCopy(this.state.waterTanks)
     waterTanks[i].area = +e.target.value
     // waterTanks[i].height = e.target.value
     this.setState({

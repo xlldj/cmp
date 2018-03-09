@@ -17,7 +17,7 @@ const initialHeaterState = {
     machineUnitId: 0
   },
   heaterStatus: {
-    tabIndex: 1, // 1 for '实时', 2 for  '设置',
+    tabIndex: 2, // 1 for '实时', 2 for  '设置',
     schoolId: selectedSchool,
     machineUnitId: 0,
     machineUnits: []

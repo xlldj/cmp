@@ -22,3 +22,35 @@
   bottom: 120px;
   width: fit-content;
 }
+.heaterStatusConfig {
+  box-sizing: border-box;
+  border-top: 1px solid #eee;
+  height: calc(100vh - 110px - 70px);
+  overflow: hidden;
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+}
+.heaterStatusConfig .heaterStatusConfigSet {
+  width: 80%;
+  height: 100%;
+  padding: 10px 0px 30px 20px;
+  overflow: scroll;
+  border-right: 1px solid #eee;
+  background: #f9f9f9;
+}
+.heaterStatusConfig .heaterStatusConfigSet .btnArea {
+  width: calc(100% - 10px);
+  margin-top: 20px;
+}
+.heaterStatusConfig .heaterStatusConfigSet .noBdr {
+  border: none;
+}
+.heaterStatusConfig .heaterStatusAiSet {
+  width: 20%;
+}
+.heaterStatusConfig .heaterStatusAiSet button {
+  margin-top: 40px;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
