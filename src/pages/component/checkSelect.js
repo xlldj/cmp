@@ -17,9 +17,8 @@ class CheckSelector extends React.Component {
     }
   }
   render() {
-    let { options, value } = this.props
+    let { options, value, noOptionTitle } = this.props
     let optionArr = obj2arr(options)
-    console.log(optionArr)
     const optionItems =
       optionArr &&
       optionArr.map((o, i) => (
@@ -34,7 +33,11 @@ class CheckSelector extends React.Component {
 
     return (
       <ul className="checkSelect" onClick={this.onClick}>
-        {optionItems}
+        {optionItems.length > 0 ? (
+          optionItems
+        ) : (
+          <li>{noOptionTitle || '无'}</li>
+        )}
       </ul>
     )
   }

@@ -4,9 +4,8 @@ import LiveStatus from './liveStatus'
 import StatusConfig from './statusConfig'
 import PhaseLine from '../../component/phaseLine'
 import CONSTANTS from '../../../constants'
-import SchoolSelector from '../../component/schoolSelector'
+import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import CheckSelect from '../../component/checkSelect'
-import AjaxHandler from '../../../util/ajax'
 import { checkObject } from '../../../util/checkSame'
 
 import { connect } from 'react-redux'
@@ -106,6 +105,7 @@ class HeaterStatus extends React.Component {
             <div className="block">
               <CheckSelect
                 options={heaterBlocks}
+                noOptionTitle="无机组"
                 value={machineUnitId}
                 onClick={this.changeMachineUnitId}
               />

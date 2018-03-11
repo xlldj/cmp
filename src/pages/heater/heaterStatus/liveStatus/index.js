@@ -1,7 +1,6 @@
 import React from 'react'
 
 import HintBox from '../../../component/hintBox'
-import CheckSelect from '../../../component/checkSelect'
 import CONSTANTS from '../../../../constants'
 
 import warmer from '../../../assets/warmer.jpg'
@@ -10,10 +9,6 @@ import waterpipe_s from '../../../assets/waterpipe_s.gif'
 import waterpipe_m from '../../../assets/waterpipe_m.gif'
 import thermometer from '../../../assets/thermometer.png'
 
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeHeater } from '../../../../actions'
-const subModule = 'liveStatus'
 const SWITCH_ENUM = {
   1: '开启',
   2: '关闭'

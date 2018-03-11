@@ -8,24 +8,24 @@ import HoriInput from '../../../component/horiInput'
 import LabelInput from '../../../component/labelInput'
 import CONSTANTS from '../../../../constants'
 import AjaxHandler from '../../../../util/ajax'
+import Noti from '../../../../util/noti'
 import { deepCopy } from '../../../../util/copy'
 import { checkObject } from '../../../../util/checkSame'
+import { deleteEmptyKeyInObject } from '../../../../util/types'
 
 const {
-  PAGINATION: SIZE,
   WARMER_IN_UNIT,
   REPLY_IN_UNIT,
   REPLENISH_IN_UNIT,
   SOLAR_IN_UNIT,
   UNIT_DEVICE_STATUS,
   DEVICE_UNIT_ENABLE,
-  DEVICE_UNIT_DISABLE,
-  PARAMNAMES
+  DEVICE_UNIT_DISABLE
 } = CONSTANTS
 const TIMERANGES = []
 const timeRange = {
   endTime: '',
-  no: 0,
+  no: '',
   startTime: '',
   status: DEVICE_UNIT_DISABLE,
   height: '',
@@ -33,27 +33,29 @@ const timeRange = {
   remperatureDelta: ''
 }
 for (let i = 0; i < 4; i++) {
+  let t = deepCopy(timeRange)
+  t.no = i + 1
   TIMERANGES.push(deepCopy(timeRange))
 }
 const heaterLimitParam = {
-  enterTemperature: 0,
-  existTemperature: 0,
-  maxTime: 0,
-  temperatureDelta: 0
+  enterTemperature: '',
+  exitTemperature: '',
+  maxTime: '',
+  temperatureDelta: ''
 }
 const waterCompensatorLimitParam = {
-  temperatureDelta: 0,
-  waterLevelDelta: 0
+  temperatureDelta: '',
+  waterLevelDelta: ''
 }
 const waterFeederLimitParam = {
-  openStopWaterLevelDelta: 0,
-  returnWaterExitTemperatureDelta: 0,
-  returnWaterOpenStopTemperatureDelta: 0,
-  waterProtection: 0
+  openStopWaterLevelDelta: '',
+  returnWaterExitTemperatureDelta: '',
+  returnWaterOpenStopTemperatureDelta: '',
+  waterProtection: ''
 }
 const solarEnergyLimitParam = {
-  openStopTemperatureDelta: 0,
-  waterTankTemperature: 0
+  openStopTemperatureDelta: '',
+  waterTankTemperature: ''
 }
 
 class StatusConfig extends React.Component {
@@ -84,11 +86,13 @@ class StatusConfig extends React.Component {
       if (json && json.data) {
         let { machines } = json.data
         machines.forEach(m => {
-          if (!m.machineTimeRanges || m.machineTimeRanges.length < 4) {
+          if (!m.machineTimeRanges) {
             m.machineTimeRanges = TIMERANGES
           } else if (m.machineTimeRanges.length < 4) {
             while (m.machineTimeRanges.length < 4) {
-              m.machineTimeRanges.push(deepCopy(timeRange))
+              let tr = deepCopy(timeRange)
+              tr.no = m.machineTimeRanges.length + 1
+              m.machineTimeRanges.push(tr)
             }
           }
           // if is warmer, add or update 'heaterLimitParam'
@@ -109,14 +113,18 @@ class StatusConfig extends React.Component {
       }
     })
   }
-
   changeStartTime = (v, id, i) => {
     console.log(v, id, i)
 
     let machines = deepCopy(this.state.machines)
     let machine = machines.find(m => m.id === id)
     if (machine) {
-      machine.machineTimeRanges[i].startTime = v
+      let tr = machine.machineTimeRanges[i]
+      tr.startTime = v
+      if (tr.error) {
+        let complete = this.checkTimeItemComplete(tr, machine.type)
+        tr.error = !complete
+      }
       this.setState({
         machines
       })
@@ -126,7 +134,12 @@ class StatusConfig extends React.Component {
     let machines = deepCopy(this.state.machines)
     let machine = machines.find(m => m.id === id)
     if (machine) {
-      machine.machineTimeRanges[i].endTime = v
+      let tr = machine.machineTimeRanges[i]
+      tr.endTime = v
+      if (tr.error) {
+        let complete = this.checkTimeItemComplete(tr, machine.type)
+        tr.error = !complete
+      }
       this.setState({
         machines
       })
@@ -136,7 +149,12 @@ class StatusConfig extends React.Component {
     let machines = deepCopy(this.state.machines)
     let machine = machines.find(m => m.id === id)
     if (machine) {
-      machine.machineTimeRanges[i].temperature = e.target.value
+      let tr = machine.machineTimeRanges[i]
+      tr.temperature = e.target.value
+      if (tr.error) {
+        let complete = this.checkTimeItemComplete(tr, machine.type)
+        tr.error = !complete
+      }
       this.setState({
         machines
       })
@@ -146,7 +164,12 @@ class StatusConfig extends React.Component {
     let machines = deepCopy(this.state.machines)
     let machine = machines.find(m => m.id === id)
     if (machine) {
-      machine.machineTimeRanges[i].height = e.target.value
+      let tr = machine.machineTimeRanges[i]
+      tr.height = e.target.value
+      if (tr.error) {
+        let complete = this.checkTimeItemComplete(tr, machine.type)
+        tr.error = !complete
+      }
       this.setState({
         machines
       })
@@ -157,9 +180,11 @@ class StatusConfig extends React.Component {
     let machines = deepCopy(this.state.machines)
     let machine = machines.find(m => m.id === id)
     if (machine) {
-      machine.machineTimeRanges[i].status = checked
-        ? DEVICE_UNIT_ENABLE
-        : DEVICE_UNIT_DISABLE
+      let tr = machine.machineTimeRanges[i]
+      tr.status = checked ? DEVICE_UNIT_ENABLE : DEVICE_UNIT_DISABLE
+      if (!checked && tr.error) {
+        tr.error = false
+      }
       this.setState({
         machines
       })
@@ -169,7 +194,12 @@ class StatusConfig extends React.Component {
     let machines = deepCopy(this.state.machines)
     let machine = machines.find(m => m.id === id)
     if (machine) {
-      machine.machineTimeRanges[i].temperatureDelta = e.target.value
+      let tr = machine.machineTimeRanges[i]
+      tr.temperatureDelta = e.target.value
+      if (tr.error) {
+        let complete = this.checkTimeItemComplete(tr, machine.type)
+        tr.error = !complete
+      }
       this.setState({
         machines
       })
@@ -327,11 +357,124 @@ class StatusConfig extends React.Component {
             let complete = this.checkTimeItemComplete(t, m.type)
             if (!complete) {
               t.error = true
+              Noti.hintLock(
+                '提交出错',
+                '当前已开启的时间选项中有未填完的信息！'
+              )
               return this.setState({ machines })
             }
           }
         }
       }
+    }
+    this.handleData()
+  }
+  handleData = () => {
+    let machines = deepCopy(this.state.machines)
+    // delete useless timeranges
+    machines.forEach(m => {
+      if (m.machineTimeRanges) {
+        for (let l = m.machineTimeRanges.length, i = l - 1; i >= 0; i--) {
+          let tr = m.machineTimeRanges[i]
+          if (tr.status === DEVICE_UNIT_DISABLE) {
+            m.machineTimeRanges.splice(i, 1)
+          } else {
+            delete tr.error
+          }
+        }
+        // sequence the timeRange 'no', incase there are 1, 2 without 3. Which will cause trouble when fetch data again.
+        // When m.machineTimeRanges < 4, I will fill its length to 4. And each has a 'no' in order.
+        m.machineTimeRanges.forEach((tr, i) => {
+          deleteEmptyKeyInObject(tr)
+          tr.no = i + 1
+          // if tr.startTime is set by input, it will be a string. Or else it will be a number.
+          tr.startTime =
+            typeof tr.startTime === 'string'
+              ? Date.parse(tr.startTime)
+              : tr.startTime
+          tr.endTime =
+            typeof tr.endTime === 'string' ? Date.parse(tr.endTime) : tr.endTime
+        })
+      }
+      if (m.machineTimeRanges.length === 0) {
+        delete m.machineTimeRanges
+      }
+    })
+    // delete useless params and trim
+    machines.forEach(m => this.deleteParams(m))
+    this.postMessage(machines)
+  }
+  postMessage = machines => {
+    let { machineUnitId, schoolId } = this.props
+    const resource = '/api/machine/unit/config/update'
+    const body = {
+      machines,
+      machineUnitId,
+      schoolId: parseInt(schoolId, 10)
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (json && json.data) {
+        Noti.hintOk('提交成功', '该设置已提交给服务器')
+      }
+    })
+  }
+  deleteParams = m => {
+    let param
+    switch (m.type) {
+      case WARMER_IN_UNIT:
+        param = m.heaterLimitParam
+        param.enterTemperature = parseInt(param.enterTemperature, 10)
+        param.exitTemperature = parseInt(param.exitTemperature, 10)
+        param.maxTime = parseInt(param.maxTime, 10)
+        param.temperatureDelta = parseInt(param.temperatureDelta, 10)
+        deleteEmptyKeyInObject(param)
+        if (Object.keys(param).length === 0) {
+          delete m.heaterLimitParam
+        }
+        break
+      case REPLY_IN_UNIT:
+        param = m.waterFeederLimitParam
+        param.openStopWaterLevelDelta = parseInt(
+          param.openStopWaterLevelDelta,
+          10
+        )
+        param.returnWaterExitTemperatureDelta = parseInt(
+          param.returnWaterExitTemperatureDelta,
+          10
+        )
+        param.returnWaterOpenStopTemperatureDelta = parseInt(
+          param.returnWaterOpenStopTemperatureDelta,
+          10
+        )
+        param.waterProtection = parseInt(param.waterProtection, 10)
+        deleteEmptyKeyInObject(param)
+        if (Object.keys(param).length === 0) {
+          delete m.waterFeederLimitParam
+        }
+        break
+      case REPLENISH_IN_UNIT:
+        param = m.waterCompensatorLimitParam
+        param.temperatureDelta = parseInt(param.temperatureDelta, 10)
+        param.waterLevelDelta = parseInt(param.waterLevelDelta, 10)
+        deleteEmptyKeyInObject(param)
+        if (Object.keys(param).length === 0) {
+          delete m.waterCompensatorLimitParam
+        }
+        break
+      case SOLAR_IN_UNIT:
+        param = m.solarEnergyLimitParam
+        param.openStopTemperatureDelta = parseInt(
+          param.openStopTemperatureDelta,
+          10
+        )
+        param.waterTankTemperature = parseInt(param.waterTankTemperature, 10)
+        deleteEmptyKeyInObject(param)
+        if (Object.keys(param).length === 0) {
+          delete m.solarEnergyLimitParam
+        }
+        break
+      default:
+        break
     }
   }
 
@@ -354,6 +497,7 @@ class StatusConfig extends React.Component {
             }
             changeStartTime={v => this.changeStartTime(v, w.id, i)}
             changeEndTime={v => this.changeEndTime(v, w.id, i)}
+            showErrorHint={t.error}
           >
             <span className="seperator">加热温度</span>
             <input
@@ -418,6 +562,7 @@ class StatusConfig extends React.Component {
             endTime={t.endTime || ''}
             checked={t.status ? UNIT_DEVICE_STATUS[t.status] : false}
             toggleSwitch={e => this.changeDeviceInUnitStatus(e, w.id, i)}
+            showErrorHint={t.error}
           />
         ))
         return (
@@ -474,6 +619,7 @@ class StatusConfig extends React.Component {
             }
             changeStartTime={v => this.changeStartTime(v, w.id, i)}
             changeEndTime={v => this.changeEndTime(v, w.id, i)}
+            showErrorHint={t.error}
           >
             <span className="seperator">高度</span>
             <input
@@ -573,7 +719,7 @@ class StatusConfig extends React.Component {
       })
     return (
       <div className="heaterStatusConfig">
-        <div className="heaterStatusConfigSet">
+        <div className="heaterStatusConfigSet scrollBar">
           {warmerItems}
           {replyItems}
           {compensatorsItems}
