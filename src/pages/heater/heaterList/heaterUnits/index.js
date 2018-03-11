@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Table } from 'antd'
+import { Table, Modal, Button } from 'antd'
 
 import PhaseLine from '../../../component/phaseLine'
 import SchoolSelector from '../../../component/schoolSelectorWithoutAll'
@@ -9,6 +9,7 @@ import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
 import AjaxHandler from '../../../../util/ajax'
 // import AjaxHandler from '../../../../mock/ajax'
+import Noti from '../../../../util/noti'
 import { checkObject } from '../../../../util/checkSame'
 
 import { connect } from 'react-redux'
@@ -39,6 +40,7 @@ class HeaterUnits extends React.PureComponent {
     // 'machineUnitId' is from url query,
     // if it differs from props.machineUnitId, change the props.
     // else fetch the heaterUnit info, and then set schoolId and fetch heaterUnits
+    console.log(machineUnitId, this.props.machineUnitId)
     if (machineUnitId !== this.props.machineUnitId) {
       this.props.changeHeater(subModule, {
         machineUnitId: machineUnitId
@@ -49,8 +51,11 @@ class HeaterUnits extends React.PureComponent {
       this.fetchHeaterInfo()
     }
   }
-  fetchHeaterInfo() {
-    let { machineUnitId } = this.props
+  fetchHeaterInfo(props) {
+    let { machineUnitId } = props || this.props
+    if (!machineUnitId) {
+      return
+    }
     let resource = '/machine/unit/one'
     const body = {
       id: machineUnitId
@@ -75,9 +80,22 @@ class HeaterUnits extends React.PureComponent {
     }
     if (!checkObject(nextProps, this.props, ['schoolId'])) {
       // If 'schoolId' changed, refetch heater units agian. Always set page to 1.
+      /*
+        ways to change schoolId:
+          1. click through select
+          2. componentDidMount changed id from reducer, then fetch the school of the machine, and the school is just not the corresponding one.
+      */
       this.fetchHeaterOfSchool(nextProps)
     } else {
       if (!checkObject(nextProps, this.props, ['machineUnitId'])) {
+        /*
+          3 ways to change 'machineUnitId':
+            1. click the option in select. the index below will always exist
+            2. componentDidMount changed default id from reducer.
+            3. select another school.
+          2 and 3 need to fetch schoolId of the machineUnitId
+        */
+
         let index = this.state.machineUnits.findIndex(
           u => u.id === parseInt(nextProps.machineUnitId, 10)
         )
@@ -85,6 +103,8 @@ class HeaterUnits extends React.PureComponent {
           this.setState({
             heaterUnitName: this.state.machineUnits[index].name
           })
+        } else {
+          this.fetchHeaterInfo(nextProps)
         }
       }
       this.fetchDevicesOfUnit(nextProps)
@@ -171,13 +191,84 @@ class HeaterUnits extends React.PureComponent {
       machineUnitId: parseInt(v, 10)
     })
   }
+  deleteUnit = (e, id) => {
+    e.preventDefault()
+    let resource = '/api/machine/delete'
+    const body = {
+      id
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (json && json.data) {
+        Noti.hintOk('删除成功', '成功删除该设备')
+        this.fetchDevicesOfUnit()
+      }
+    })
+  }
+  editUnit = (e, id) => {
+    e.preventDefault()
+    let data = this.state.dataSource.find(d => d.id === id)
+    let { name, type } = data || {}
+    this.setState({
+      editingName: name || '',
+      editingType: type || '',
+      editingId: id,
+      showEditingModal: true
+    })
+  }
+  cancelEdit = () => {
+    this.setState({
+      editingName: '',
+      editingType: '',
+      editingId: 0,
+      showEditingModal: false
+    })
+  }
+  changeEditingType = v => {
+    this.setState({
+      editingType: v
+    })
+  }
+  changeEditingName = e => {
+    this.setState({
+      editingName: e.target.value
+    })
+  }
+  confirmEdit = () => {
+    let { editingName, editingType, editingId } = this.state
+    if (!editingName || !editingType) {
+      return
+    }
+    let resource = '/api/machine/update'
+    const body = {
+      machineId: editingId,
+      type: parseInt(editingType, 10),
+      name: editingName.trim()
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (json && json.data) {
+        Noti.hintOk('编辑成功', '更改已提交给服务器')
+        this.setState(
+          {
+            editingId: 0,
+            editingName: '',
+            editingType: '',
+            showEditingModal: false
+          },
+          this.fetchDevicesOfUnit()
+        )
+      }
+    })
+  }
   render() {
     const {
       dataSource,
       loading,
       total,
       machineUnits,
-      heaterUnitName
+      heaterUnitName,
+      editingName,
+      editingType,
+      showEditingModal
     } = this.state
     const { page, schoolId, machineUnitId } = this.props
     console.log(schoolId)
@@ -262,6 +353,34 @@ class HeaterUnits extends React.PureComponent {
             onChange={this.changePage}
           />
         </div>
+        <Modal
+          wrapClassName="modal"
+          width={300}
+          title="编辑"
+          visible={showEditingModal}
+          onCancel={this.cancelEdit}
+          footer={null}
+          header={null}
+          okText=""
+        >
+          <ul className="form">
+            <li>
+              <label>类型</label>
+              <BasicSelector
+                staticOpts={HEATER_UNIT_DEVICE_TYPE}
+                selectedOpt={editingType}
+                changeOpt={this.changeEditingType}
+              />
+            </li>
+            <li>
+              <label>名称</label>
+              <input value={editingName} onChange={this.changeEditingName} />
+            </li>
+          </ul>
+          <Button className="center" type="primary" onClick={this.confirmEdit}>
+            提交
+          </Button>
+        </Modal>
       </div>
     )
   }
