@@ -49,6 +49,7 @@ class OrderTable extends React.Component {
       loading: false,
       total: 0,
       totalIncome: 0,
+      totalChargeback: 0,
       searchingText: '',
       subStartTime: this.props.startTime,
       subEndTime: this.props.endTime
@@ -160,7 +161,8 @@ class OrderTable extends React.Component {
             })
           nextState.dataSource = json.data.orders
           nextState.total = json.data.total
-          nextState.totalIncome = json.data.totalIncome
+          nextState.totalIncome = json.data.totalIncome || 0
+          nextState.totalChargeback = json.data.totalChargeback || 0
         }
       }
       this.setState(nextState)
@@ -390,6 +392,7 @@ class OrderTable extends React.Component {
       dataSource,
       total,
       totalIncome,
+      totalChargeback,
       loading,
       subStartTime,
       subEndTime
@@ -439,7 +442,10 @@ class OrderTable extends React.Component {
           }
         />
 
-        <p className="profitBanner">总收益: {totalIncome}元</p>
+        <p className="profitBanner">
+          <span>总收益(使用结束): {totalIncome}元</span>
+          <span className="seperator">已退单: {totalChargeback}元</span>
+        </p>
 
         <div className="tableList">
           <Table
