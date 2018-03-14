@@ -162,9 +162,9 @@ button.grayBackColor:linked {
 .inlineLeft {
   text-align: left;
 }
-/* seperator */
+/* for seperator */
 .seperator {
-  margin: 0 10px;
+  margin: 0 20px;
 }
 /* for time picker in gift/act and notify */
 .timePicker {
