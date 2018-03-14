@@ -12,7 +12,7 @@ const initialState = {
     record_total: 2,
     record_startTime: '',
     record_endTime: '',
-    record_page: '',
+    record_page: 1,
     record_dataSource: [
       {
         name: 'sdf',
@@ -48,7 +48,7 @@ const initialState = {
     report_total: '',
     report_startTime: '',
     report_endTime: '',
-    report_page: '',
+    report_page: 1,
     report_dataSource: [],
     report_searchKey: '',
     report_timeType: 1,
@@ -65,7 +65,7 @@ const initialState = {
     detail_total: '',
     detail_startTime: '',
     detail_endTime: '',
-    detail_page: '',
+    detail_page: 1,
     detail_dataSource: [],
     detail_timeType: 1,
     detail_formType: 1,

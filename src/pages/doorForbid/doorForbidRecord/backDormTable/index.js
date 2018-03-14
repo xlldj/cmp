@@ -85,7 +85,6 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
   if (schoolId !== 'all') {
     body.schoolId = schoolId
   }
-  debugger
   body.tabIndex = tabIndex
   body.page = page
   body.size = CONSTANTS.PAGINATION
