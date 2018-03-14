@@ -63,6 +63,19 @@ const BASIC = {
       ]
     },
     {
+      name: '门禁管理',
+      path: 'doorForbid',
+      key: 13,
+      icon: 'home',
+      children: [
+        {
+          path: 'record',
+          name: '门禁记录',
+          key: 0
+        }
+      ]
+    },
+    {
       name: '设备管理',
       path: 'device',
       key: 1,

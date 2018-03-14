@@ -324,6 +324,12 @@ button.grayBackColor:linked {
 .multiSelectModalHeader .hint {
   line-height: 40px;
 }
+.multiSelectModalHeader .allChooseButton {
+  padding: 3px;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-right: 15px;
+}
 /* for form style */
 .formContent {
   width: 100%;

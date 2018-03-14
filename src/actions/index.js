@@ -10,6 +10,12 @@ import {
   fetchHeaterList
 } from '../pages/heater/action'
 
+import {
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList
+} from '../pages/doorForbid/action'
+
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
   return {
@@ -271,5 +277,8 @@ export {
   fetchDeviceList,
   CHANGE_HEATER,
   changeHeater,
-  fetchHeaterList
+  fetchHeaterList,
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList
 }

@@ -5,6 +5,8 @@ import { getLocal } from '../util/storage'
 import Time from '../util/time'
 
 import heaterModule from '../pages/heater/reducer'
+import doorForbidModule from '../pages/doorForbid/reducer'
+
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
 if (recentSchools) {
@@ -499,6 +501,7 @@ const statModule = (state = initialStatState, action) => {
 const rootReducer = combineReducers({
   schoolModule,
   heaterModule,
+  doorForbidModule,
   deviceModule,
   orderModule,
   fundModule,

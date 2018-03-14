@@ -109,4 +109,26 @@ Format.rangeToHour = o => {
     o.startTime.minute
   )}-${Format.adding0(o.endTime.hour)}:${Format.adding0(o.endTime.minute)}`
 }
+
+Format.minIntToHourMinStr = minInt => {
+  var hourMinStr = ''
+  var hour = minInt / 60
+  if (hour === 0) {
+    hourMinStr = '00:'
+  } else if (hour < 10) {
+    hourMinStr += '0' + hour + ':'
+  } else {
+    hourMinStr = hour + ':'
+  }
+
+  var min = minInt % 60
+  if (min === 0) {
+    hourMinStr += '00'
+  } else if (min < 10) {
+    hourMinStr += '0' + min
+  } else {
+    hourMinStr = min
+  }
+  return hourMinStr
+}
 export default Format
