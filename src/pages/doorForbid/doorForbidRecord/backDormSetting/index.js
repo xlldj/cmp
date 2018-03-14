@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import TimePicker from 'rc-time-picker'
+import 'rc-time-picker/assets/index.css'
 import moment from '../../../../util/myMoment'
 import { Button } from 'antd'
 import SchoolSelector from '../../../component/schoolSelector'
@@ -430,7 +431,7 @@ class BackDormSettingInfo extends React.Component {
                   allowEmpty={false}
                   showSecond={false}
                   value={moment({
-                    hour: record.normalTime / 60,
+                    hour: Math.floor(record.normalTime / 60),
                     minute: record.normalTime % 60
                   })}
                   onChange={event => {
@@ -443,7 +444,7 @@ class BackDormSettingInfo extends React.Component {
                   allowEmpty={false}
                   showSecond={false}
                   value={moment({
-                    hour: record.lateTime / 60,
+                    hour: Math.floor(record.lateTime / 60),
                     minute: record.lateTime % 60
                   })}
                   onChange={event => {
@@ -465,7 +466,7 @@ class BackDormSettingInfo extends React.Component {
                 allowEmpty={false}
                 showSecond={false}
                 value={moment({
-                  hour: record.lateTime / 60,
+                  hour: Math.floor(record.lateTime / 60),
                   minute: record.lateTime % 60
                 })}
                 onChange={event => {
@@ -478,7 +479,7 @@ class BackDormSettingInfo extends React.Component {
                 allowEmpty={false}
                 showSecond={false}
                 value={moment({
-                  hour: record.notReturnTime / 60,
+                  hour: Math.floor(record.notReturnTime / 60),
                   minute: record.notReturnTime % 60
                 })}
                 onChange={event => {
@@ -499,7 +500,7 @@ class BackDormSettingInfo extends React.Component {
                 allowEmpty={false}
                 showSecond={false}
                 value={moment({
-                  hour: record.notReturnTime / 60,
+                  hour: Math.floor(record.notReturnTime / 60),
                   minute: record.notReturnTime % 60
                 })}
                 onChange={event => {

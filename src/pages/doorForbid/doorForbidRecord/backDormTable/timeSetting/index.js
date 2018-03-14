@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Table } from 'antd'
@@ -68,8 +68,8 @@ class BackDormTimeTable extends React.Component {
   showBackDormTimeString = itemsDic => {
     let items = itemsDic.items
     console.log(items)
-    var titleString = ''
-    items.forEach(r => {
+
+    let result = items.map((r, index) => {
       var subItems = r.items
 
       var timeTipString = ''
@@ -82,40 +82,21 @@ class BackDormTimeTable extends React.Component {
         }
       })
 
-      if (titleString !== '') {
-        titleString += ' \r ' + timeTipString
-      } else {
-        titleString = timeTipString
-      }
-
       var normalString = Format.minIntToHourMinStr(r.items[0].normalTime)
       var lateString = Format.minIntToHourMinStr(r.items[0].lateTime)
       var notReturnString = Format.minIntToHourMinStr(r.items[0].notReturnTime)
-      var subTitle =
-        '正常归寝: ' +
-        normalString +
-        '~' +
-        lateString +
-        '、晚归: ' +
-        lateString +
-        '~' +
-        notReturnString +
-        '、未归: ' +
-        notReturnString +
-        '以后'
+      var subTitle = `正常归寝: ${normalString}~${lateString}、晚归: ${lateString}~${notReturnString}、未归: ${notReturnString}以后`
 
-      titleString += ' \n ' + subTitle
+      return (
+        <Fragment>
+          <p>{timeTipString}</p>
+          <p>{subTitle}</p>
+        </Fragment>
+      )
     })
-    return titleString
+    return result
   }
 
-  hourminString = timeValue => {
-    var newTimeString = ''
-    var hour = timeValue / 60
-    if (hour < 10) {
-      newTimeString
-    }
-  }
   changePage = pageObj => {
     let page = pageObj.current
     this.props.changeDoorForbid(subModule, { timeSetting_page: page })

@@ -48,28 +48,28 @@ class BackDormReportTable extends React.Component {
       {
         title: '总打卡次数',
         dataIndex: 'total',
-        orderBy: 'csFinished',
+        orderBy: 'total',
         width: '8%',
         sorter: true
       },
       {
         title: '异常打卡次数',
         dataIndex: 'abnormal',
-        orderBy: 'csFinished',
+        orderBy: 'abnormal',
         width: '8%',
         sorter: true
       },
       {
         title: '正常归寝次数',
         dataIndex: 'normal',
-        orderBy: 'csFinished',
+        orderBy: 'normal',
         width: '8%',
         sorter: true
       },
       {
         title: '晚归次数',
         dataIndex: 'late',
-        orderBy: 'csFinished',
+        orderBy: 'late',
         width: '8%',
         sorter: true
       },
@@ -77,13 +77,34 @@ class BackDormReportTable extends React.Component {
       {
         title: '未归次数',
         dataIndex: 'notReturn',
-        orderBy: 'csFinished',
+        orderBy: 'notReturn',
         width: '8%'
       }
     ]
   }
 
+  changeTable = (pageObj, filters, sorter) => {
+    debugger
+    console.log(sorter)
+    let { order, field } = sorter
+    let { report_order, report_orderBy } = this.props
+    if (order) {
+      report_orderBy = field
+      report_order = order === 'ascend' ? 1 : 2
+    } else {
+      report_orderBy = ''
+      report_order = 0
+    }
+    let page = pageObj.current
+
+    this.props.changeDoorForbid(subModule, {
+      report_page: page,
+      report_orderBy: report_orderBy,
+      report_order: report_order
+    })
+  }
   changePage = pageObj => {
+    debugger
     let page = pageObj.current
     this.props.changeDoorForbid(subModule, { report_page: page })
   }
@@ -218,7 +239,7 @@ class BackDormReportTable extends React.Component {
             }}
             dataSource={report_dataSource}
             columns={this.columns}
-            onChange={this.changePage}
+            onChange={this.changeTable}
           />
         </div>
       </div>
@@ -235,7 +256,9 @@ const mapStateToProps = state => ({
   report_dataSource: state.doorForbidModule[subModule].report_dataSource,
   report_searchKey: state.doorForbidModule[subModule].report_searchKey,
   report_timeType: state.doorForbidModule[subModule].report_timeType,
-  report_sexType: state.doorForbidModule[subModule].report_sexType
+  report_sexType: state.doorForbidModule[subModule].report_sexType,
+  report_orderBy: state.doorForbidModule[subModule].report_orderBy,
+  report_order: state.doorForbidModule[subModule].report_order
 })
 export default withRouter(
   connect(mapStateToProps, {

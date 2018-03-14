@@ -123,7 +123,6 @@ class BackDormRecordTable extends React.Component {
       record_timeType,
       record_sexType,
       record_backDormStatus,
-      record_selectedId,
       record_selectedRowIndex
     } = this.props
 
@@ -193,12 +192,11 @@ class BackDormRecordTable extends React.Component {
       }
     ]
     const backDormStateTitle =
-      (record_backDormStatus === 1
-        ? '所有'
-        : CONSTANTS.DOORFORBID_RECORD_BACKDORM_STATUS[record_backDormStatus]) +
-      '人数:' +
-      record_total +
-      '人'
+      record_backDormStatus === 1
+        ? `所有人数:${record_total}人`
+        : `${
+            CONSTANTS.DOORFORBID_RECORD_BACKDORM_STATUS[record_backDormStatus]
+          }人数:${record_total}人`
     return (
       <div className="doorForbidReportTab">
         <div className="queryPanel">
@@ -288,7 +286,6 @@ const mapStateToProps = state => ({
   record_sexType: state.doorForbidModule[subModule].record_sexType,
   record_backDormStatus:
     state.doorForbidModule[subModule].record_backDormStatus,
-  record_selectedId: state.doorForbidModule[subModule].record_selectedId,
   record_selectedRowIndex:
     state.doorForbidModule[subModule].record_selectedRowIndex
 })

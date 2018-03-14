@@ -112,7 +112,7 @@ Format.rangeToHour = o => {
 
 Format.minIntToHourMinStr = minInt => {
   var hourMinStr = ''
-  var hour = minInt / 60
+  var hour = Math.floor(minInt / 60)
   if (hour === 0) {
     hourMinStr = '00:'
   } else if (hour < 10) {

@@ -19,14 +19,27 @@ const dayTypeMap = {
 }
 
 const handleDoorForbidList = (newProps, oldProps, thisObj) => {
-  if (checkObject(newProps, oldProps, ['page', 'schoolId', 'tabIndex'])) {
-    return
-  }
-  let { schoolId, page, tabIndex, buildingId } = newProps
+  let { schoolId, tabIndex, buildingId } = newProps
   const body = {}
   if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_RECORD) {
+    if (
+      checkObject(newProps, oldProps, [
+        'schoolId',
+        'tabIndex',
+        'record_page',
+        'record_timeType',
+        'record_sexType',
+        'record_backDormStatus',
+        'record_startTime',
+        'record_endTime',
+        'record_searchKey'
+      ])
+    ) {
+      return
+    }
     //start backDorm_record request
     let {
+      record_page,
       record_timeType,
       record_sexType,
       record_backDormStatus,
@@ -34,6 +47,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       record_endTime,
       record_searchKey
     } = newProps
+    body.page = record_page
     if (record_timeType !== 1) {
       body.dayType = dayTypeMap[record_timeType]
     }
@@ -52,14 +66,39 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       body.selectKey = record_searchKey
     }
   } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_REPORT) {
+    if (
+      checkObject(newProps, oldProps, [
+        'schoolId',
+        'tabIndex',
+        'report_page',
+        'report_timeType',
+        'report_sexType',
+        'report_startTime',
+        'report_endTime',
+        'report_searchKey',
+        'report_orderBy',
+        'report_order'
+      ])
+    ) {
+      return
+    }
     //start backDorm_report request
     let {
+      report_page,
       report_timeType,
       report_sexType,
       report_startTime,
       report_endTime,
-      report_searchKey
+      report_searchKey,
+      report_orderBy,
+      report_order
     } = newProps
+
+    body.page = report_page
+    if (report_order !== 0 && report_orderBy !== '') {
+      body.orderBy = report_orderBy
+      body.order = report_order
+    }
     if (report_timeType !== 1) {
       body.dayType = report_timeType === 1 ? 3 : 5
     }
@@ -76,7 +115,18 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       body.selectKey = report_searchKey
     }
   } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_TIME) {
+    if (
+      checkObject(newProps, oldProps, [
+        'schoolId',
+        'tabIndex',
+        'timeSetting_page'
+      ])
+    ) {
+      return
+    }
     //start backDorm_timeSetting request
+    let { timeSetting_page } = newProps
+    body.page = timeSetting_page
   }
 
   if (buildingId !== 'all') {
@@ -86,7 +136,6 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     body.schoolId = schoolId
   }
   body.tabIndex = tabIndex
-  body.page = page
   body.size = CONSTANTS.PAGINATION
   newProps.fetchDoorForbidList(body, subModule)
 }
