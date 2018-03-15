@@ -13,7 +13,9 @@ const getClientEnvironment = require('./env')
 const paths = require('./paths')
 const fs = require('fs')
 const lessToJs = require('less-vars-to-js')
-const themeVariables = lessToJs(fs.readFileSync(path.join(__dirname, './theme-vars.less'), 'utf8'))
+const themeVariables = lessToJs(
+  fs.readFileSync(path.join(__dirname, './theme-vars.less'), 'utf8')
+)
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -41,8 +43,7 @@ module.exports = {
       require.resolve('./polyfills'),
       require.resolve('react-error-overlay'),
       paths.appIndexJs
-    ],
-    vendor: ['react', 'antd', 'react-router']
+    ]
   },
   output: {
     path: paths.appBuild,
@@ -70,7 +71,6 @@ module.exports = {
     // for React Native Web.
     extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
     alias: {
-
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web'
@@ -94,7 +94,6 @@ module.exports = {
           {
             options: {
               formatter: eslintFormatter
-
             },
             loader: require.resolve('eslint-loader')
           }
@@ -133,7 +132,8 @@ module.exports = {
           {
             loader: require.resolve('babel-loader'),
             query: {
-              presets: ['es2015', 'stage-0', 'react']
+              presets: ['es2015', 'stage-0', 'react'],
+              plugins: [['import', { libraryName: 'antd' }]]
             }
           }
         ]
@@ -141,13 +141,9 @@ module.exports = {
       {
         test: /\.less$/,
         use: [
-          {loader: 'style-loader'},
-          {loader: 'css-loader'},
-          {loader: 'less-loader',
-            options: {
-              modifyVars: themeVariables
-            }
-          }
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          { loader: 'less-loader' }
         ]
       },
       // "postcss" loader applies autoprefixer to our CSS.
@@ -205,10 +201,6 @@ module.exports = {
     }),
     // Add module names to factory functions so they appear in browser profiler.
     new webpack.NamedModulesPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.bundle.js'
-    }),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
     new webpack.DefinePlugin(env.stringified),
