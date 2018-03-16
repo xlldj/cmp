@@ -13,7 +13,13 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDoorForbid } from '../../../../../actions'
 
-const SIZE = CONSTANTS.PAGINATION
+const {
+  PAGINATION: SIZE,
+  DOORFORBID_RECORD_BACKDORM_STATUS,
+  DOORFORBID_RECORD_TIME,
+  DOORFORBID_SEX,
+  SEX
+} = CONSTANTS
 const subModule = 'backDormRecord'
 
 class BackDormRecordTable extends React.Component {
@@ -145,8 +151,6 @@ class BackDormRecordTable extends React.Component {
         title: '学号',
         dataIndex: 'studentNo',
         width: '12%'
-        // render: (text, record) =>
-        //   record.createTime ? Time.getTimeStr(record.createTime) : ''
       },
       {
         title: '手机号',
@@ -155,8 +159,10 @@ class BackDormRecordTable extends React.Component {
       },
       {
         title: '性别',
-        dataIndex: 'sex',
-        width: '8%'
+        width: '8%',
+        render: (text, record) => {
+          return SEX[record.sex]
+        }
       },
       {
         title: '年级',
@@ -170,15 +176,17 @@ class BackDormRecordTable extends React.Component {
       },
       {
         title: '最近一次打卡',
-        dataIndex: 'lastCheckTime',
-        width: '12%'
+        width: '12%',
+        render: (text, record) => {
+          var wbTitle = record.lastCheckType === 1 ? '归寝' : '出寝'
+          return `${Time.getTimeStr(record.lastCheckTime)} ${wbTitle}`
+        }
       },
       {
         title: '归寝状态',
-        dataIndex: 'lastCheckType',
         width: '12%',
-        render: (text, record, index) => {
-          switch (record.lastCheckType) {
+        render: (text, record) => {
+          switch (record.status) {
             case 1:
               return <Badge status="success" text="已归寝" />
             case 2:
@@ -195,7 +203,7 @@ class BackDormRecordTable extends React.Component {
       record_backDormStatus === 1
         ? `所有人数:${record_total}人`
         : `${
-            CONSTANTS.DOORFORBID_RECORD_BACKDORM_STATUS[record_backDormStatus]
+            DOORFORBID_RECORD_BACKDORM_STATUS[record_backDormStatus]
           }人数:${record_total}人`
     return (
       <div className="doorForbidReportTab">
@@ -204,7 +212,7 @@ class BackDormRecordTable extends React.Component {
             <div className="block">
               <span>时间筛选:</span>
               <CheckSelect
-                options={CONSTANTS.DOORFORBID_RECORD_TIME}
+                options={DOORFORBID_RECORD_TIME}
                 value={record_timeType}
                 onClick={this.changeTimeType}
               />
@@ -217,7 +225,7 @@ class BackDormRecordTable extends React.Component {
                 confirm={this.confirmTimeRange}
               />
             </div>
-            <div className="block">
+            <div className="doorForbidSearchBox">
               <SearchInput
                 placeholder="姓名/手机号/宿舍"
                 searchingText={record_searchKey}
@@ -231,7 +239,7 @@ class BackDormRecordTable extends React.Component {
             <div className="block">
               <span>性别筛选:</span>
               <CheckSelect
-                options={CONSTANTS.DOORFORBID_SEX}
+                options={DOORFORBID_SEX}
                 value={record_sexType}
                 onClick={this.changeSexType}
               />
@@ -242,7 +250,7 @@ class BackDormRecordTable extends React.Component {
             <div className="block">
               <span>归寝状态:</span>
               <CheckSelect
-                options={CONSTANTS.DOORFORBID_RECORD_BACKDORM_STATUS}
+                options={DOORFORBID_RECORD_BACKDORM_STATUS}
                 value={record_backDormStatus}
                 onClick={this.changeBackDormStatus}
               />

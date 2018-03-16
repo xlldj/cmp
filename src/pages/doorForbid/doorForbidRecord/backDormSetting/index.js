@@ -14,7 +14,7 @@ import { withRouter } from 'react-router-dom'
 import { changeDoorForbid } from '../../../../actions'
 
 import {
-  fetchAddSchollTimeRange,
+  fetchSaveSchollTimeRange,
   checkSchoolTimeRangeExist,
   fetchDoorFobidSchoolSettingList
 } from '../../action'
@@ -114,6 +114,37 @@ class BackDormSettingInfo extends React.Component {
 
   componentWillReceiveProps(nextProps) {}
 
+  checkSelectTimeRange = (
+    allSelectedItems,
+    index,
+    normalT,
+    lateT,
+    notReturnT
+  ) => {
+    if (isNaN(lateT) || isNaN(normalT) || isNaN(notReturnT)) {
+      return
+    }
+    if (normalT >= lateT) {
+      allSelectedItems[index].lateTimeError = true
+    } else if (allSelectedItems[index].lateTimeError) {
+      allSelectedItems[index].lateTimeError = false
+    }
+
+    if (lateT >= notReturnT) {
+      allSelectedItems[index].notReturnTimeError = true
+    } else if (allSelectedItems[index].notReturnTimeError) {
+      allSelectedItems[index].notReturnTimeError = false
+    }
+
+    allSelectedItems[index].normalTime = normalT
+    allSelectedItems[index].lateTime = lateT
+    allSelectedItems[index].notReturnTime = notReturnT
+
+    this.setState({
+      allSelectedItems: allSelectedItems
+    })
+  }
+
   changeSchool = value => {
     let { schoolId } = this.state
     if (schoolId === value) {
@@ -185,7 +216,7 @@ class BackDormSettingInfo extends React.Component {
         this.props.history.goBack()
       }
     }
-    fetchAddSchollTimeRange(body, callBack)
+    fetchSaveSchollTimeRange(body, callBack)
   }
   backButtonClick = e => {
     this.props.history.goBack()
@@ -269,13 +300,16 @@ class BackDormSettingInfo extends React.Component {
       JSON.stringify(this.state.allSelectedItems)
     )
     let normalT = event.toObject().hours * 60 + event.toObject().minutes
-    if (isNaN(normalT)) {
-      return
-    }
-    allSelectedItems[index].normalTime = normalT
-    this.setState({
-      allSelectedItems: allSelectedItems
-    })
+    let lateT = allSelectedItems[index].lateTime
+    let notReturnT = allSelectedItems[index].notReturnTime
+
+    this.checkSelectTimeRange(
+      allSelectedItems,
+      index,
+      normalT,
+      lateT,
+      notReturnT
+    )
   }
   changeLateTime = (event, index) => {
     let allSelectedItems = JSON.parse(
@@ -283,47 +317,32 @@ class BackDormSettingInfo extends React.Component {
     )
     let lateT = event.toObject().hours * 60 + event.toObject().minutes
     let normalT = allSelectedItems[index].normalTime
-    if (isNaN(lateT)) {
-      return
-    }
-    if (normalT >= lateT) {
-      allSelectedItems[index].lateTimeError = true
-    } else if (allSelectedItems[index].lateTimeError) {
-      allSelectedItems[index].lateTimeError = false
-    }
-
     let notReturnT = allSelectedItems[index].notReturnTime
-    if (lateT >= notReturnT) {
-      allSelectedItems[index].notReturnTimeError = true
-    } else if (allSelectedItems[index].notReturnTimeError) {
-      allSelectedItems[index].notReturnTimeError = false
-    }
 
-    allSelectedItems[index].lateTime = lateT
-
-    this.setState({
-      allSelectedItems: allSelectedItems
-    })
+    this.checkSelectTimeRange(
+      allSelectedItems,
+      index,
+      normalT,
+      lateT,
+      notReturnT
+    )
   }
+
   changeNotReturnTime = (event, index) => {
     let allSelectedItems = JSON.parse(
       JSON.stringify(this.state.allSelectedItems)
     )
     let notReturnT = event.toObject().hours * 60 + event.toObject().minutes
-    if (isNaN(notReturnT)) {
-      return
-    }
     let lateT = allSelectedItems[index].lateTime
-    if (lateT >= notReturnT) {
-      allSelectedItems[index].notReturnTimeError = true
-    } else if (allSelectedItems[index].notReturnTimeError) {
-      allSelectedItems[index].notReturnTimeError = false
-    }
-    allSelectedItems[index].notReturnTime = notReturnT
+    let normalT = allSelectedItems[index].normalTime
 
-    this.setState({
-      allSelectedItems: allSelectedItems
-    })
+    this.checkSelectTimeRange(
+      allSelectedItems,
+      index,
+      normalT,
+      lateT,
+      notReturnT
+    )
   }
 
   timeRangeConfirm = data => {

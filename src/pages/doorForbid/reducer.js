@@ -9,11 +9,26 @@ const initialState = {
     buildingId: 'all', //default all 所有楼栋
     buildingMap: {},
     record_loading: false,
-    record_total: 0,
+    record_total: 1,
     record_startTime: '',
     record_endTime: '',
     record_page: 1,
-    record_dataSource: [],
+    record_dataSource: [
+      {
+        name: 'sdf',
+        studentNo: '12345w4',
+        mobile: 1234567043,
+        sex: 1,
+        lastCheckType: 1,
+        lastCheckTime: 1521094562000,
+        nickName: 'sdfsaf',
+        grade: '2010',
+        status: 1,
+        id: 1,
+        schoolName: '地方发送',
+        dormitory: '的沙发沙发'
+      }
+    ],
     record_searchKey: '',
     record_backDormStatus: 1, //归寝状态
     record_timeType: 1,
@@ -21,7 +36,7 @@ const initialState = {
     record_selectedRowIndex: -1,
 
     report_loading: false,
-    report_total: 0,
+    report_total: 100,
     report_startTime: '',
     report_endTime: '',
     report_page: 1,
@@ -34,17 +49,39 @@ const initialState = {
 
     timeSetting_loading: false,
     timeSetting_total: 0,
-    timeSetting_page: '',
+    timeSetting_page: 1,
     timeSetting_dataSource: [],
 
     detail_show: false,
     detail_recordInfo: {},
     detail_loading: false,
-    detail_total: '',
+    detail_total: 3,
     detail_startTime: '',
     detail_endTime: '',
     detail_page: 1,
-    detail_dataSource: [],
+    detail_dataSource: [
+      {
+        dir: 1,
+        id: 2,
+        model: 'eeeee',
+        status: 1,
+        time: 'sd fsa f '
+      },
+      {
+        dir: 2,
+        id: 3,
+        model: 'wwwwwww',
+        status: 2,
+        time: 'sd234 '
+      },
+      {
+        dir: 1,
+        id: 4,
+        model: 'qqqqqq',
+        status: 3,
+        time: '1234 fsa f '
+      }
+    ],
     detail_timeType: 1,
     detail_formType: 1,
 

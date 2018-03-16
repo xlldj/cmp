@@ -11,7 +11,12 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDoorForbid } from '../../../../../actions'
 
-const SIZE = CONSTANTS.PAGINATION
+const {
+  DOORFORBID_ORDER,
+  PAGINATION: SIZE,
+  DOORFORBID_REPORT_TIME,
+  DOORFORBID_SEX
+} = CONSTANTS
 const subModule = 'backDormRecord'
 
 class BackDormReportTable extends React.Component {
@@ -48,28 +53,24 @@ class BackDormReportTable extends React.Component {
       {
         title: '总打卡次数',
         dataIndex: 'total',
-        orderBy: 'total',
         width: '8%',
         sorter: true
       },
       {
         title: '异常打卡次数',
         dataIndex: 'abnormal',
-        orderBy: 'abnormal',
         width: '8%',
         sorter: true
       },
       {
         title: '正常归寝次数',
         dataIndex: 'normal',
-        orderBy: 'normal',
         width: '8%',
         sorter: true
       },
       {
         title: '晚归次数',
         dataIndex: 'late',
-        orderBy: 'late',
         width: '8%',
         sorter: true
       },
@@ -77,7 +78,6 @@ class BackDormReportTable extends React.Component {
       {
         title: '未归次数',
         dataIndex: 'notReturn',
-        orderBy: 'notReturn',
         width: '8%'
       }
     ]
@@ -90,7 +90,7 @@ class BackDormReportTable extends React.Component {
     let { report_order, report_orderBy } = this.props
     if (order) {
       report_orderBy = field
-      report_order = order === 'ascend' ? 1 : 2
+      report_order = DOORFORBID_ORDER[order]
     } else {
       report_orderBy = ''
       report_order = 0
@@ -192,7 +192,7 @@ class BackDormReportTable extends React.Component {
             <div className="block">
               <span>时间筛选:</span>
               <CheckSelect
-                options={CONSTANTS.DOORFORBID_REPORT_TIME}
+                options={DOORFORBID_REPORT_TIME}
                 value={report_timeType}
                 onClick={this.changeTimeType}
               />
@@ -205,7 +205,7 @@ class BackDormReportTable extends React.Component {
                 confirm={this.confirmTimeRange}
               />
             </div>
-            <div className="block">
+            <div className="doorForbidSearchBox">
               <SearchInput
                 placeholder="姓名/手机号/宿舍"
                 searchingText={report_searchKey}
@@ -219,7 +219,7 @@ class BackDormReportTable extends React.Component {
             <div className="block">
               <span>性别筛选:</span>
               <CheckSelect
-                options={CONSTANTS.DOORFORBID_SEX}
+                options={DOORFORBID_SEX}
                 value={report_sexType}
                 onClick={this.changeSexType}
               />

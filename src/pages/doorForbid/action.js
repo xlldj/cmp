@@ -3,6 +3,13 @@ import AjaxHandler from '../../util/ajax'
 import DOORFORBID from '../../constants/doorForbid'
 import Noti from '../../util/noti'
 
+const {
+  DOORFORBID_URL,
+  DOORFORBID_PAGE_TAB_RECORD,
+  DOORFORBID_PAGE_TAB_REPORT,
+  DOORFORBID_PAGE_TAB_TIME
+} = DOORFORBID
+
 export const CHANGE_DOORFORBID = 'CHANGE_DOORFORBID'
 export const changeDoorForbid = (subModule, keyValuePair) => {
   return {
@@ -12,14 +19,33 @@ export const changeDoorForbid = (subModule, keyValuePair) => {
   }
 }
 
-export const fetchDoorForbidList = (body, subModule) => {
-  let { tabIndex } = body
+/**
+ * 请求门禁记录中的列表
+ * @param {*} tabIndex 选择的tab 1record 2report 3timeSetting
+ * @param {*} body 请求body体
+ * @param {*} subModule reducer定义的subModule
+ */
+export const fetchDoorForbidList = (tabIndex, body, subModule) => {
+  if (tabIndex === DOORFORBID_PAGE_TAB_RECORD) {
+    return fetchDoorForbidRecordList(body, subModule)
+  } else if (tabIndex === DOORFORBID_PAGE_TAB_REPORT) {
+    return fetchDoorForbidReportList(body, subModule)
+  } else if (tabIndex === DOORFORBID_PAGE_TAB_TIME) {
+    return fetchDoorForbidTimeSettingList(body, subModule)
+  }
+}
+/**
+ * 归寝记录 列表
+ * @param {*} body 请求body体
+ * @param {*} subModule
+ */
+const fetchDoorForbidRecordList = (body, subModule) => {
   const clearLoading = dispatch => {
     dispatch({
       type: CHANGE_DOORFORBID,
       subModule,
       keyValuePair: {
-        loading: false
+        record_loading: false
       }
     })
   }
@@ -28,53 +54,24 @@ export const fetchDoorForbidList = (body, subModule) => {
       type: CHANGE_DOORFORBID,
       subModule,
       keyValuePair: {
-        loading: true
+        record_loading: true
       }
     })
 
-    let resource = '/api'
-    if (tabIndex === DOORFORBID.DOORFORBID_PAGE_TAB_RECORD) {
-      resource = DOORFORBID.DOORFORBID_URL.recordList
-    } else if (tabIndex === DOORFORBID.DOORFORBID_PAGE_TAB_REPORT) {
-      resource = DOORFORBID.DOORFORBID_URL.reportList
-    } else if (tabIndex === DOORFORBID.DOORFORBID_PAGE_TAB_TIME) {
-      resource = DOORFORBID.DOORFORBID_URL.timeList
-    }
+    let resource = DOORFORBID_URL.recordList
     return AjaxHandler.fetch(resource, body, null, null).then(json => {
       console.log(json)
 
       if (json && json.data) {
-        if (tabIndex === DOORFORBID.DOORFORBID_PAGE_TAB_RECORD) {
-          dispatch({
-            type: CHANGE_DOORFORBID,
-            subModule,
-            keyValuePair: {
-              record_dataSource: json.data.gateRecords,
-              record_total: json.data.total,
-              record_loading: false
-            }
-          })
-        } else if (tabIndex === DOORFORBID.DOORFORBID_PAGE_TAB_REPORT) {
-          dispatch({
-            type: CHANGE_DOORFORBID,
-            subModule,
-            keyValuePair: {
-              report_dataSource: json.data.gateReports,
-              report_total: json.data.total,
-              report_loading: false
-            }
-          })
-        } else if (tabIndex === DOORFORBID.DOORFORBID_PAGE_TAB_TIME) {
-          dispatch({
-            type: CHANGE_DOORFORBID,
-            subModule,
-            keyValuePair: {
-              timeSetting_dataSource: json.data.gateTimes,
-              timeSetting_total: json.data.total,
-              timeSetting_loading: false
-            }
-          })
-        }
+        dispatch({
+          type: CHANGE_DOORFORBID,
+          subModule,
+          keyValuePair: {
+            record_dataSource: json.data.gateRecords,
+            record_total: json.data.total,
+            record_loading: false
+          }
+        })
       } else {
         clearLoading(dispatch)
       }
@@ -82,6 +79,104 @@ export const fetchDoorForbidList = (body, subModule) => {
   }
 }
 
+/**
+ * 归寝报表 列表
+ * @param {*} body 请求body体
+ * @param {*} subModule
+ */
+const fetchDoorForbidReportList = (body, subModule) => {
+  const clearLoading = dispatch => {
+    dispatch({
+      type: CHANGE_DOORFORBID,
+      subModule,
+      keyValuePair: {
+        report_loading: false
+      }
+    })
+  }
+  return dispatch => {
+    dispatch({
+      type: CHANGE_DOORFORBID,
+      subModule,
+      keyValuePair: {
+        report_loading: true
+      }
+    })
+
+    let resource = DOORFORBID_URL.reportList
+
+    return AjaxHandler.fetch(resource, body, null, null).then(json => {
+      console.log(json)
+
+      if (json && json.data) {
+        dispatch({
+          type: CHANGE_DOORFORBID,
+          subModule,
+          keyValuePair: {
+            report_dataSource: json.data.gateReports,
+            report_total: json.data.total,
+            report_loading: false
+          }
+        })
+      } else {
+        clearLoading(dispatch)
+      }
+    })
+  }
+}
+
+/**
+ * 归寝时间段 列表
+ * @param {*} body 请求body体
+ * @param {*} subModule
+ */
+const fetchDoorForbidTimeSettingList = (body, subModule) => {
+  const clearLoading = dispatch => {
+    dispatch({
+      type: CHANGE_DOORFORBID,
+      subModule,
+      keyValuePair: {
+        timeSetting_loading: false
+      }
+    })
+  }
+  return dispatch => {
+    dispatch({
+      type: CHANGE_DOORFORBID,
+      subModule,
+      keyValuePair: {
+        timeSetting_loading: true
+      }
+    })
+
+    let resource = DOORFORBID_URL.timeList
+
+    return AjaxHandler.fetch(resource, body, null, null).then(json => {
+      console.log(json)
+
+      if (json && json.data) {
+        dispatch({
+          type: CHANGE_DOORFORBID,
+          subModule,
+          keyValuePair: {
+            timeSetting_dataSource: json.data.gateTimes,
+            timeSetting_total: json.data.total,
+            timeSetting_loading: false
+          }
+        })
+      } else {
+        clearLoading(dispatch)
+      }
+    })
+  }
+}
+
+/**
+ * 学校楼栋列表
+ * @param {schoolId} id
+ * @param {*} props 调用函数的props 用于数据改变 页面即时刷新
+ * @param {*} subModule
+ */
 export const fetchBuildings = (id, props, subModule) => {
   let schoolId = parseInt(id, 10)
   const body = {
@@ -109,15 +204,94 @@ export const fetchBuildings = (id, props, subModule) => {
   AjaxHandler.ajax(resource, body, cb)
 }
 
-export const fetchDetailRecordList = (body, subModule) => {}
+/**
+ * 用户归寝记录查询
+ * @param {*} body 请求的body体
+ * @param {*} subModule
+ */
+export const fetchDetailRecordList = (body, subModule) => {
+  const clearLoading = dispatch => {
+    dispatch({
+      type: CHANGE_DOORFORBID,
+      subModule,
+      keyValuePair: {
+        detail_loading: false
+      }
+    })
+  }
+  return dispatch => {
+    dispatch({
+      type: CHANGE_DOORFORBID,
+      subModule,
+      keyValuePair: {
+        detail_loading: true
+      }
+    })
 
+    let resource = DOORFORBID_URL.recordUserList
+    return AjaxHandler.fetch(resource, body, null, null).then(json => {
+      console.log(json)
+
+      if (json && json.data) {
+        dispatch({
+          type: CHANGE_DOORFORBID,
+          subModule,
+          keyValuePair: {
+            detail_dataSource: json.data.gateRecords,
+            detail_total: json.data.total,
+            detail_loading: false
+          }
+        })
+      } else {
+        clearLoading(dispatch)
+      }
+    })
+  }
+}
+
+/**
+ * 解除绑定
+ * @param {*} body 请求body体
+ * @param {*} callBack 请求回调
+ */
+export const fetchUnbindUserInDorm = (body, callBack) => {
+  let resource = DOORFORBID_URL.recordHandle
+  const cb = json => {
+    if (callBack) {
+      callBack(json.data.result)
+    }
+  }
+  AjaxHandler.ajax(resource, body, cb)
+}
+
+/**
+ * 修改打卡记录或归寝报表 异常
+ * @param {*} body 请求body体
+ * @param {*} callBack 请求回调
+ */
+export const fetchChangeBackDormStatus = (body, callBack) => {
+  let resource = DOORFORBID_URL.recordHandle
+  const cb = json => {
+    if (callBack) {
+      callBack(json.data.result)
+    }
+  }
+  AjaxHandler.ajax(resource, body, cb)
+}
+
+/**
+ * 获取时间段设置详情
+ * @param {schoolId} schoolId
+ * @param {调用函数的props 用于数据改变 页面即时刷新} props
+ * @param {subModule} subModule
+ */
 export const fetchDoorFobidSchoolSettingList = (schoolId, props, subModule) => {
   const body = {
     page: 1,
     size: 1000,
     id: schoolId
   }
-  let resource = '/api/gate/time/one'
+  let resource = DOORFORBID_URL.timeOne
   const cb = json => {
     try {
       let data = json.data.items
@@ -130,7 +304,6 @@ export const fetchDoorFobidSchoolSettingList = (schoolId, props, subModule) => {
 
         itemData.forEach((subRecord, index) => {
           selectedDays[index] = subRecord.day
-          // itemDays[index] = subRecord.day
           newItemMap.normalTime = subRecord.normalTime
           newItemMap.lateTime = subRecord.lateTime
           newItemMap.notReturnTime = subRecord.notReturnTime
@@ -150,8 +323,13 @@ export const fetchDoorFobidSchoolSettingList = (schoolId, props, subModule) => {
   AjaxHandler.ajax(resource, body, cb)
 }
 
+/**
+ * 校验选中的学校是否可以设置时间段
+ * @param {schoolId} schoolId
+ * @param {回调 true 请求成功 false 请求失败} callBack
+ */
 export const checkSchoolTimeRangeExist = (schoolId, callBack) => {
-  let resource = '/api/gate/time/check'
+  let resource = DOORFORBID_URL.timeCheck
   const body = {
     id: schoolId
   }
@@ -167,11 +345,14 @@ export const checkSchoolTimeRangeExist = (schoolId, callBack) => {
   }
   AjaxHandler.ajax(resource, body, cb)
 }
-export const fetchDoorFobidSchoolSettingCheck = (body, subModule) => {}
-// export const fetchUserBackDormDetail = (body, resp) => {}
 
-export const fetchAddSchollTimeRange = (body, callBack) => {
-  let resource = '/api/gate/time/save'
+/**
+ * 保存时间段
+ * @param {请求的body体} body
+ * @param {回调} callBack 返回data.result
+ */
+export const fetchSaveSchollTimeRange = (body, callBack) => {
+  let resource = DOORFORBID_URL.timeSave
   const cb = json => {
     if (callBack) {
       callBack(json.data.result)

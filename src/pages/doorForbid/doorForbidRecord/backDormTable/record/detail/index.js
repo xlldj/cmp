@@ -11,16 +11,29 @@ import RangeSelect from '../../../../../component/rangeSelect'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import '../../../../style/style.css'
+import { changeDoorForbid } from '../../../../../../actions'
 
 import {
-  changeDoorForbid,
-  fetchDoorForbidList
-} from '../../../../../../actions'
+  fetchChangeBackDormStatus,
+  fetchUnbindUserInDorm
+} from '../../../../action'
 
-const SIZE = CONSTANTS.PAGINATION
+const {
+  PAGINATION: SIZE,
+  DOORFORBID_RECORD_TIME,
+  DOORFORBID_FORM,
+  DOORFORBID_DAYTYPE,
+  DOORFORBID_RECORD_BACKDORM_STATUS,
+  SEX
+} = CONSTANTS
 const subModule = 'backDormRecord'
 
+const serverDayMap = {
+  2: 0,
+  3: 1,
+  4: 6,
+  5: 29
+}
 class BackDormRecordDetail extends React.Component {
   componentWillReceiveProps(nextProps) {
     try {
@@ -32,9 +45,19 @@ class BackDormRecordDetail extends React.Component {
   }
 
   handleDoorForbidDetail = (newProps, oldProps) => {
-    if (checkObject(newProps, oldProps, ['page', 'schoolId'])) {
+    if (
+      checkObject(newProps, oldProps, [
+        'detail_page',
+        'detail_formType',
+        'detail_timeType',
+        'detail_show',
+        'detail_startTime',
+        'detail_endTime'
+      ])
+    ) {
       return
     }
+
     if (!checkObject(newProps, oldProps, ['detail_show'])) {
       let { detail_show } = newProps
       let root = document.getElementById('root')
@@ -42,24 +65,38 @@ class BackDormRecordDetail extends React.Component {
         root.addEventListener('click', this.closeDetail, false)
       } else {
         root.removeEventListener('click', this.closeDetail, false)
+        return
       }
     }
-    let { schoolId, page, buildingId } = newProps
+
+    let {
+      detail_startTime,
+      detail_endTime,
+      detail_page,
+      detail_timeType,
+      detail_formType
+    } = newProps
     const body = {}
 
-    if (buildingId !== 'all') {
-      body.buildingId = buildingId
+    body.page = detail_page
+    if (detail_timeType !== 1) {
+      body.dayType = DOORFORBID_DAYTYPE[detail_timeType]
     }
-    if (schoolId !== 'all') {
-      body.schoolId = schoolId
+    if (detail_formType !== 1) {
+      body.sex = detail_formType - 1
     }
-    body.page = page
-    body.size = CONSTANTS.PAGINATION
+
+    if (detail_startTime !== '' && detail_endTime !== '') {
+      body.startTime = detail_startTime
+      body.endTime = detail_endTime
+    }
+
+    body.size = SIZE
     newProps.fetchDetailRecordList(body, subModule)
   }
 
   componentDidMount() {
-    this.columns = [
+    this.signInColumns = [
       {
         title: '时间',
         dataIndex: 'time',
@@ -68,7 +105,10 @@ class BackDormRecordDetail extends React.Component {
       {
         title: '目的',
         dataIndex: 'dir',
-        width: '25%'
+        width: '25%',
+        render: (text, record) => {
+          return record.dir === 1 ? '归寝' : '出寝'
+        }
       },
       {
         title: '打卡手机型号',
@@ -78,7 +118,60 @@ class BackDormRecordDetail extends React.Component {
       {
         title: '标记',
         dataIndex: 'status',
-        width: '25%'
+        width: '25%',
+        render: (text, record, index) => {
+          return record.status === 1 ? null : (
+            <div>
+              <ul>
+                <li>
+                  <a className="exceptionTipColor">异常</a>
+                  <Button
+                    className="cancelExceptionBtn"
+                    type="primary"
+                    onClick={event => {
+                      this.fixUnExceptionButtonClicked(event, record, index)
+                    }}
+                  >
+                    取消异常
+                  </Button>
+                </li>
+              </ul>
+            </div>
+          )
+        }
+      }
+    ]
+
+    this.backDormColumns = [
+      {
+        title: '时间',
+        dataIndex: 'time',
+        className: 'firstCol'
+      },
+      {
+        title: '归寝状态',
+        dataIndex: 'status',
+        width: '25%',
+        render: (text, record) => {
+          return DOORFORBID_RECORD_BACKDORM_STATUS[record.status + 1]
+        }
+      },
+      {
+        title: '操作',
+        width: '25%',
+        render: (text, record, index) => {
+          return record.status === 1 ? null : (
+            <Button
+              className="leftBtn"
+              type="primary"
+              onClick={event => {
+                this.fixUnExceptionButtonClicked(event, record, index)
+              }}
+            >
+              改为已归寝
+            </Button>
+          )
+        }
       }
     ]
   }
@@ -100,19 +193,7 @@ class BackDormRecordDetail extends React.Component {
       return
     }
     if (detail_show) {
-      this.props.changeDoorForbid(subModule, {
-        record_selectedRowIndex: -1,
-        detail_show: false,
-        detail_recordInfo: {},
-        detail_loading: false,
-        detail_total: '',
-        detail_startTime: '',
-        detail_endTime: '',
-        detail_page: '',
-        detail_dataSource: [],
-        detail_timeType: 1,
-        detail_formType: 1
-      })
+      this.closeButtonClick(null)
     }
   }
 
@@ -176,7 +257,7 @@ class BackDormRecordDetail extends React.Component {
 
   closeButtonClick = e => {
     this.props.changeDoorForbid(subModule, {
-      selectedRowIndex: -1,
+      record_selectedRowIndex: -1,
       detail_show: false,
       detail_recordInfo: {},
       detail_loading: false,
@@ -190,7 +271,37 @@ class BackDormRecordDetail extends React.Component {
     })
   }
 
-  unbindButtonClicked = e => {}
+  unbindButtonClicked = e => {
+    let detail_id = this.props
+    const body = {}
+    body.id = detail_id
+
+    const callBack = result => {
+      if (result === true) {
+      }
+    }
+    fetchUnbindUserInDorm(body, callBack)
+  }
+
+  fixUnExceptionButtonClicked = (e, record, index) => {
+    let detail_dataSource = JSON.parse(
+      JSON.stringify(this.props.detail_dataSource)
+    )
+    let { detail_formType, detail_timeType } = this.props
+    const body = {}
+    body.type = detail_formType
+    body.id = record.id
+
+    if (detail_timeType !== 1) {
+      body.day = serverDayMap[detail_timeType]
+    }
+    const callBack = result => {
+      if (result === true) {
+        detail_dataSource[index].status = 1
+      }
+    }
+    fetchChangeBackDormStatus(body, callBack)
+  }
   render() {
     const {
       detail_recordInfo,
@@ -217,7 +328,6 @@ class BackDormRecordDetail extends React.Component {
       lastCheckType
     } = detail_recordInfo
 
-    // const { loading } = this.state
     return (
       <div
         className={
@@ -260,7 +370,7 @@ class BackDormRecordDetail extends React.Component {
             </li>
             <li>
               <label>性别:</label>
-              <span>{sex === 1 ? '男' : '女'}</span>
+              <span>{SEX[sex]}</span>
             </li>
             <li>
               <label>年级:</label>
@@ -304,7 +414,7 @@ class BackDormRecordDetail extends React.Component {
             <div className="block">
               <span>时间筛选:</span>
               <CheckSelect
-                options={CONSTANTS.DOORFORBID_RECORD_TIME}
+                options={DOORFORBID_RECORD_TIME}
                 value={detail_timeType}
                 onClick={this.changeTimeType}
               />
@@ -323,7 +433,7 @@ class BackDormRecordDetail extends React.Component {
             <div className="block">
               <span>表格类型:</span>
               <CheckSelect
-                options={CONSTANTS.DOORFORBID_FORM}
+                options={DOORFORBID_FORM}
                 value={detail_formType}
                 onClick={this.changeformType}
               />
@@ -342,7 +452,9 @@ class BackDormRecordDetail extends React.Component {
               total: detail_total
             }}
             dataSource={detail_dataSource}
-            columns={this.columns}
+            columns={
+              detail_formType === 1 ? this.signInColumns : this.backDormColumns
+            }
             onChange={this.changePage}
           />
         </div>
@@ -363,9 +475,9 @@ const mapStateToProps = state => ({
   detail_formType: state.doorForbidModule[subModule].detail_formType,
   detail_recordInfo: state.doorForbidModule[subModule].detail_recordInfo
 })
+
 export default withRouter(
   connect(mapStateToProps, {
-    changeDoorForbid,
-    fetchDoorForbidList
+    changeDoorForbid
   })(BackDormRecordDetail)
 )

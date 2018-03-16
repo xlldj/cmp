@@ -19,10 +19,10 @@ const DOORFORBID = {
 
   DOORFORBID_URL: {
     recordList: '/api/gate/record/list',
-    recordHandle: 'api/gate/record/handle',
-    recordOne: 'api/gate/record/one',
+    recordHandle: '/api/gate/record/handle',
+    recordUserList: '/api/gate/record/user/list',
     reportList: '/api/gate/report/list',
-    timeAdd: '/api/gate/time/add',
+    timeSave: '/api/gate/time/save',
     timeCheck: '/api/gate/time/check',
     timeDelete: '/api/gate/time/delete',
     timeList: '/api/gate/time/list',
@@ -63,13 +63,6 @@ const DOORFORBID = {
   },
 
   DOORFORBID_WEEK: {
-    周一: 1,
-    周二: 2,
-    周三: 3,
-    周四: 4,
-    周五: 5,
-    周六: 6,
-    周日: 7,
     1: '周一',
     2: '周二',
     3: '周三',
@@ -77,6 +70,18 @@ const DOORFORBID = {
     5: '周五',
     6: '周六',
     7: '周日'
+  },
+
+  DOORFORBID_ORDER: {
+    descend: 1,
+    ascend: 2
+  },
+  DOORFORBID_DAYTYPE: {
+    1: 0,
+    2: 1,
+    3: 9,
+    4: 3,
+    5: 5
   }
 }
 

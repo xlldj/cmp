@@ -6,22 +6,22 @@ import { changeDoorForbid, fetchDoorForbidList } from '../../../../actions'
 
 import { checkObject } from '../../../../util/checkSame'
 import BackDormTable from './ui'
-import CONSTANTS from '../../../../constants/doorForbid'
+import CONSTANTS from '../../../../constants'
+
+const {
+  DOORFORBID_PAGE_TAB_RECORD,
+  DOORFORBID_PAGE_TAB_REPORT,
+  DOORFORBID_PAGE_TAB_TIME,
+  PAGINATION: SIZE,
+  DOORFORBID_DAYTYPE
+} = CONSTANTS
 
 const subModule = 'backDormRecord'
-
-const dayTypeMap = {
-  1: 0,
-  2: 1,
-  3: 9,
-  4: 3,
-  5: 5
-}
 
 const handleDoorForbidList = (newProps, oldProps, thisObj) => {
   let { schoolId, tabIndex, buildingId } = newProps
   const body = {}
-  if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_RECORD) {
+  if (tabIndex === DOORFORBID_PAGE_TAB_RECORD) {
     if (
       checkObject(newProps, oldProps, [
         'schoolId',
@@ -49,7 +49,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     } = newProps
     body.page = record_page
     if (record_timeType !== 1) {
-      body.dayType = dayTypeMap[record_timeType]
+      body.dayType = DOORFORBID_DAYTYPE[record_timeType]
     }
     if (record_sexType !== 1) {
       body.sex = record_sexType - 1
@@ -65,7 +65,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     if (record_searchKey !== '') {
       body.selectKey = record_searchKey
     }
-  } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_REPORT) {
+  } else if (tabIndex === DOORFORBID_PAGE_TAB_REPORT) {
     if (
       checkObject(newProps, oldProps, [
         'schoolId',
@@ -114,7 +114,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     if (report_searchKey !== '') {
       body.selectKey = report_searchKey
     }
-  } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_TIME) {
+  } else if (tabIndex === DOORFORBID_PAGE_TAB_TIME) {
     if (
       checkObject(newProps, oldProps, [
         'schoolId',
@@ -135,9 +135,8 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
   if (schoolId !== 'all') {
     body.schoolId = schoolId
   }
-  body.tabIndex = tabIndex
-  body.size = CONSTANTS.PAGINATION
-  newProps.fetchDoorForbidList(body, subModule)
+  body.size = SIZE
+  newProps.fetchDoorForbidList(tabIndex, body, subModule)
 }
 
 const mapStateToProps = state => ({

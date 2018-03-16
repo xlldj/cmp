@@ -11,7 +11,7 @@ import { changeDoorForbid } from '../../../../../actions'
 
 import Format from '../../../../../util/format'
 
-const SIZE = CONSTANTS.PAGINATION
+const { PAGINATION: SIZE, DOORFORBID_WEEK } = CONSTANTS
 const subModule = 'backDormRecord'
 
 class BackDormTimeTable extends React.Component {
@@ -76,9 +76,9 @@ class BackDormTimeTable extends React.Component {
       subItems.forEach(value => {
         var day = value.day
         if (timeTipString === '') {
-          timeTipString += CONSTANTS.DOORFORBID_WEEK[day]
+          timeTipString += DOORFORBID_WEEK[day]
         } else {
-          timeTipString += '、' + CONSTANTS.DOORFORBID_WEEK[day]
+          timeTipString += `、${DOORFORBID_WEEK[day]}`
         }
       })
 
@@ -112,11 +112,12 @@ class BackDormTimeTable extends React.Component {
 
     return (
       <div className="doorForbidTimeTab">
+        {/* <div className="phaseLine" /> */}
         <div className="tableList">
           <Table
             loading={timeSetting_loading}
             bordered
-            rowKey={record => record.id}
+            rowKey={record => record.schoolId}
             pagination={{
               pageSize: SIZE,
               current: timeSetting_page,

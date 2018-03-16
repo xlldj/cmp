@@ -1,8 +1,6 @@
 import React from 'react'
 
 import { Button } from 'antd'
-import SearchLine from '../../../component/searchLine'
-import { browserHistory } from 'react-router'
 
 import PhaseLine from '../../../component/phaseLine'
 import SchoolSelector from '../../../component/schoolSelector'
@@ -12,10 +10,15 @@ import CONSTANTS from '../../../../constants/doorForbid'
 import BackDormTimeTable from './timeSetting'
 import BackDormReportTable from './report'
 import BackDormRecordTable from './record'
-
 import BackDormRecordDetail from './record/detail'
 import { fetchBuildings } from '../../action'
 
+const {
+  DOORFORBID_PAGE_TAB_RECORD,
+  DOORFORBID_PAGE_TAB_REPORT,
+  DOORFORBID_PAGE_TAB_TIME,
+  DOORFORBID_PAGE_TABS
+} = CONSTANTS
 const subModule = 'backDormRecord'
 
 class BackDormTable extends React.Component {
@@ -32,19 +35,19 @@ class BackDormTable extends React.Component {
       return
     }
 
-    if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_RECORD) {
+    if (tabIndex === DOORFORBID_PAGE_TAB_RECORD) {
       this.props.changeDoorForbid(subModule, {
         record_page: 1,
         schoolId: value,
         buildingId: 'all'
       })
-    } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_REPORT) {
+    } else if (tabIndex === DOORFORBID_PAGE_TAB_REPORT) {
       this.props.changeDoorForbid(subModule, {
         report_page: 1,
         schoolId: value,
         buildingId: 'all'
       })
-    } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_TIME) {
+    } else if (tabIndex === DOORFORBID_PAGE_TAB_TIME) {
       this.props.changeDoorForbid(subModule, {
         timeSetting_page: 1,
         schoolId: value,
@@ -69,17 +72,17 @@ class BackDormTable extends React.Component {
     if (buildingId === v) {
       return
     }
-    if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_RECORD) {
+    if (tabIndex === DOORFORBID_PAGE_TAB_RECORD) {
       this.props.changeDoorForbid(subModule, {
         record_page: 1,
         buildingId: v
       })
-    } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_REPORT) {
+    } else if (tabIndex === DOORFORBID_PAGE_TAB_REPORT) {
       this.props.changeDoorForbid(subModule, {
         report_page: 1,
         buildingId: v
       })
-    } else if (tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_TIME) {
+    } else if (tabIndex === DOORFORBID_PAGE_TAB_TIME) {
       this.props.changeDoorForbid(subModule, {
         timeSetting_page: 1,
         buildingId: v
@@ -121,16 +124,16 @@ class BackDormTable extends React.Component {
       <div className="doorForbidWrapper" ref="wrapper">
         <PhaseLine
           value={tabIndex}
-          staticPhase={CONSTANTS.DOORFORBID_PAGE_TABS}
+          staticPhase={DOORFORBID_PAGE_TABS}
           selectors={
-            tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_TIME
+            tabIndex === DOORFORBID_PAGE_TAB_TIME
               ? [selector1]
               : [selector1, selector2]
           }
           changePhase={this.changeTab}
         >
           <div className="block">
-            {tabIndex !== CONSTANTS.DOORFORBID_PAGE_TAB_TIME ? null : (
+            {tabIndex !== DOORFORBID_PAGE_TAB_TIME ? null : (
               <Button
                 type="primary"
                 className="rightBtn"
@@ -142,15 +145,13 @@ class BackDormTable extends React.Component {
           </div>
         </PhaseLine>
 
-        {tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_RECORD ? (
+        {tabIndex === DOORFORBID_PAGE_TAB_RECORD ? (
           <BackDormRecordTable />
         ) : null}
-        {tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_REPORT ? (
+        {tabIndex === DOORFORBID_PAGE_TAB_REPORT ? (
           <BackDormReportTable />
         ) : null}
-        {tabIndex === CONSTANTS.DOORFORBID_PAGE_TAB_TIME ? (
-          <BackDormTimeTable />
-        ) : null}
+        {tabIndex === DOORFORBID_PAGE_TAB_TIME ? <BackDormTimeTable /> : null}
 
         <div ref="detailWrapper">
           <BackDormRecordDetail show={detail_show} />
