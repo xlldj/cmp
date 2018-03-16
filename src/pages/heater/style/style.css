@@ -9,6 +9,10 @@
 }
 .liveStatusWrapper .liveMapWrapper {
   position: relative;
+  margin-top: 3rem;
+}
+.liveStatusWrapper .liveMapWrapper .tankImg {
+  cursor: pointer;
 }
 .liveStatusWrapper .liveMapWrapper .thermometer {
   position: absolute;
@@ -16,10 +20,65 @@
   top: 120px;
   left: 340px;
 }
-.liveStatusWrapper .liveMapWrapper .waterpipeHint {
+.liveStatusWrapper .liveMapWrapper .redThermo,
+.liveStatusWrapper .liveMapWrapper .blueThermo {
+  width: 6px;
+  height: 81px;
+  border-radius: 3px;
+  background-color: #eee;
+}
+.liveStatusWrapper .liveMapWrapper .redThermo {
   position: absolute;
+  top: 151px;
+  left: 372px;
+}
+.liveStatusWrapper .liveMapWrapper .blueThermo {
+  position: absolute;
+  top: 144px;
+  left: 386px;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHintWrapper {
+  position: absolute;
+  left: 480px;
+  bottom: 120px;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHintWrapper .hintBox {
+  margin-bottom: 10px;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHintWrapper .hintBox:last-child {
+  margin-bottom: 0;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHint {
   left: 520px;
   bottom: 120px;
+  width: fit-content;
+}
+.liveStatusWrapper .liveMapWrapper .tankHintWrapper {
+  position: absolute;
+  left: 250px;
+  top: 320px;
+}
+.liveStatusWrapper .liveMapWrapper .tankHintWrapper .hintBox {
+  display: inline-block;
+  margin-right: 10px;
+}
+.liveStatusWrapper .liveMapWrapper .tankHintWrapper .hintBox::last-child {
+  margin-right: 0;
+}
+.liveStatusWrapper .liveMapWrapper .warmerHintWrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 10px;
+  left: -120px;
+  height: 100%;
+  max-height: 100%;
+}
+.liveStatusWrapper .liveMapWrapper .commonHint {
+  position: absolute;
+  left: 40px;
+  top: 20px;
   width: fit-content;
 }
 .heaterStatusConfig {

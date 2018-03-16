@@ -29,7 +29,7 @@ const TimeRangeLine = props => {
         onChange={props.toggleSwitch}
       />
       {showErrorHint ? (
-        <span className="checkInvalid">请填写完整信息！</span>
+        <span className="checkInvalid">请先填写左侧信息！</span>
       ) : null}
     </div>
   )

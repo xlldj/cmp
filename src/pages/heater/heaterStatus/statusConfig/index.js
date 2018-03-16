@@ -181,8 +181,11 @@ class StatusConfig extends React.Component {
     let machine = machines.find(m => m.id === id)
     if (machine) {
       let tr = machine.machineTimeRanges[i]
-      tr.status = checked ? DEVICE_UNIT_ENABLE : DEVICE_UNIT_DISABLE
-      if (!checked && tr.error) {
+      let complete = this.checkTimeItemComplete(tr, machine.type)
+      if (!complete) {
+        tr.error = true
+      } else {
+        tr.status = checked ? DEVICE_UNIT_ENABLE : DEVICE_UNIT_DISABLE
         tr.error = false
       }
       this.setState({

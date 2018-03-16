@@ -2,7 +2,7 @@
   "name": "xiaolian",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001/",
+  "proxy": "http://10.0.0.5:3030/",
   "devDependencies": {
     "babel-plugin-import": "^1.4.0",
     "babel-plugin-transform-imports": "^1.4.1",

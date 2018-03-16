@@ -42,3 +42,27 @@ export function deleteEmptyKeyInObject(o) {
     }
   }
 }
+export function safeGet(o, keys) {
+  if (!o) {
+    return undefined
+  }
+  let keyArr = keys.split('.'),
+    result = o
+  for (let key of keyArr) {
+    if (hasOwn(result, key)) {
+      result = result[key]
+    } else {
+      return undefined
+    }
+  }
+  return result
+}
+
+function hasOwn(o, key) {
+  if (key in o) {
+    if (o.hasOwnProperty(key)) {
+      return true
+    }
+  }
+  return false
+}

@@ -1568,6 +1568,15 @@ button.grayBackColor:linked {
   display: inline-block;
   height: 4px;
 }
+.verticalRect {
+  position: relative;
+  overflow: hidden;
+}
+.verticalRect .verticalRect-innerDiv {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
 /* for phase tab */
 .queryPanel {
   padding: 10px 20px;
@@ -1634,12 +1643,16 @@ button.grayBackColor:linked {
 }
 /* for hintBox */
 .hintBox {
-  border-width: 2px;
+  border-width: 1px;
   border-style: solid;
   padding: 7px 15px;
+  width: fit-content;
 }
 .hintBox li {
   list-style: none;
+}
+.hintBox li label {
+  margin-right: 10px;
 }
 /* for table */
 .tableList .firstCol {

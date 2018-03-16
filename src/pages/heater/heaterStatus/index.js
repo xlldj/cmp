@@ -57,7 +57,8 @@ class HeaterStatus extends React.Component {
         nextProps.machineUnits[0] &&
         nextProps.machineUnits[0].id
       ) {
-        if (nextProps.machineUnits[0].id !== this.props.machineUnitId) {
+        // if (nextProps.machineUnits[0].id !== this.props.machineUnitId) {
+        if (nextProps.machineUnits.indexOf(this.props.machineUnitId) === -1) {
           this.props.changeHeater(subModule, {
             machineUnitId: nextProps.machineUnits[0].id
           })

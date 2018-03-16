@@ -1520,6 +1520,15 @@ button.grayBackColor:linked{
     height: 4px;
   }
 }
+.verticalRect{
+  position: relative;
+  overflow: hidden;
+  .verticalRect-innerDiv{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+}
 
 /* for phase tab */
 .queryPanel{
@@ -1583,11 +1592,15 @@ button.grayBackColor:linked{
 
 /* for hintBox */
 .hintBox{
-  border-width: 2px;
+  border-width: 1px;
   border-style: solid;
   padding: 7px 15px;
+  width: fit-content;
   li{
     list-style: none;
+    label{
+      margin-right: 10px;
+    }
   }
 }
 
