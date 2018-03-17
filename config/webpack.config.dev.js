@@ -69,7 +69,10 @@ module.exports = {
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-      'react-native': 'react-native-web'
+      'react-native': 'react-native-web',
+      moment: 'moment/min/moment.min.js',
+      react: 'react/dist/react.js',
+      'react-dom': 'react-dom/dist/react-dom.js'
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -126,7 +129,7 @@ module.exports = {
         include: paths.appSrc,
         use: [
           {
-            loader: require.resolve('babel-loader'),
+            loader: require.resolve('babel-loader?cacheDirectory=true'),
             query: {
               presets: ['es2015', 'stage-0', 'react'],
               plugins: [['import', { libraryName: 'antd' }]]
