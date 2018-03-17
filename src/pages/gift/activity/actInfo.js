@@ -880,7 +880,9 @@ class ActInfo extends React.Component {
                 选择红包
               </a>
               {amountError ? (
-                <span className="checkInvalid">未选择红包！</span>
+                <span className="checkInvalid">
+                  未选择红包,已选择后不能清零！
+                </span>
               ) : null}
             </li>
           ) : null}
@@ -1080,28 +1082,23 @@ class GiftTable extends React.Component {
     if (
       JSON.stringify(nextProps.gifts) !== JSON.stringify(this.state.dataSource)
     ) {
-      let data = JSON.parse(JSON.stringify(nextProps.gifts))
-      if (data.length > 0) {
-        data.forEach((r, i) => {
+      let dataSource = JSON.parse(JSON.stringify(nextProps.gifts)),
+        all = JSON.parse(JSON.stringify(nextProps.gifts))
+      if (all.length > 0) {
+        dataSource.forEach((r, i) => {
           if (!r.count) {
             r.count = 0
           }
         })
-        nextState.allTypeData = JSON.parse(JSON.stringify(data))
-        nextState.dataSource = data
+        all.forEach((r, i) => (r.count = 0))
+        nextState.allTypeData = all
+        nextState.dataSource = dataSource
       }
     }
     if (nextProps.total !== this.state.total) {
       nextState.total = nextProps.total
     }
     this.setState(nextState)
-  }
-  confirm = () => {
-    this.props.closeModal()
-    this.props.setGift(
-      JSON.parse(JSON.stringify(this.state.dataSource)),
-      this.state.total
-    )
   }
   changeDevice = v => {
     console.log(v)
@@ -1110,16 +1107,22 @@ class GiftTable extends React.Component {
     if (v === 'all') {
       return this.setState({
         dataSource: data,
-        selectedDevice: 'all'
+        selectedDevice: 'all',
+        total: 0,
+        page: 1
       })
     }
     let newData = data.filter((r, i) => r.deviceType === parseInt(v, 10))
+
     this.setState({
       dataSource: newData,
-      selectedDevice: v
+      selectedDevice: v,
+      total: 0,
+      page: 1
     })
   }
-  add = (e, i) => {
+  add = (e, id) => {
+    /*
     let gifts = JSON.parse(JSON.stringify(this.state.dataSource)),
       total = this.state.total,
       all = JSON.parse(JSON.stringify(this.state.allTypeData)),
@@ -1132,16 +1135,42 @@ class GiftTable extends React.Component {
       dataSource: gifts,
       total: total
     })
-  }
-  minus = (e, i) => {
+    */
     let gifts = JSON.parse(JSON.stringify(this.state.dataSource)),
-      total = this.state.total
-    gifts[i].count--
-    total--
+      total = this.state.total,
+      gift = gifts.find(r => r.id === id)
+    if (gift) {
+      gift.count++
+      total++
+      this.setState({
+        dataSource: gifts,
+        total: total
+      })
+    }
+  }
+  minus = (e, id) => {
+    let gifts = JSON.parse(JSON.stringify(this.state.dataSource)),
+      total = this.state.total,
+      gift = gifts.find(r => r.id === id)
+    if (gift) {
+      gift.count--
+      total--
+      this.setState({
+        dataSource: gifts,
+        total: total
+      })
+    }
+  }
+  confirm = () => {
     this.setState({
-      dataSource: gifts,
-      total: total
+      selectedDevice: 'all',
+      total: 0
     })
+    this.props.closeModal()
+    this.props.setGift(
+      JSON.parse(JSON.stringify(this.state.dataSource)),
+      this.state.total
+    )
   }
   cancel = () => {
     //clear all the data
@@ -1152,7 +1181,8 @@ class GiftTable extends React.Component {
     this.setState({
       allTypeData: all,
       dataSource: JSON.parse(JSON.stringify(all)),
-      total: 0
+      total: 0,
+      selectedDevice: 'all'
     })
     this.props.closeModal()
   }
@@ -1221,32 +1251,34 @@ class GiftTable extends React.Component {
         title: <p style={{ textAlign: 'center' }}>操作</p>,
         dataIndex: 'operation',
         width: '100px',
-        render: (text, record, index) => (
-          <div
-            style={{ textAlign: 'center' }}
-            className="editable-row-operations optInDeposit"
-          >
-            <div>
-              {dataSource[index].count > 0 ? (
-                <Button
-                  onClick={e => this.minus(e, index)}
-                  type="primary"
-                  size="small"
-                >
-                  -
-                </Button>
-              ) : null}
-            </div>
-            <div className="giftCount">{record.count}</div>
-            <Button
-              onClick={e => this.add(e, index)}
-              type="primary"
-              size="small"
+        render: (text, record, index) => {
+          return (
+            <div
+              style={{ textAlign: 'center' }}
+              className="editable-row-operations optInDeposit"
             >
-              +
-            </Button>
-          </div>
-        )
+              <div>
+                {record.count > 0 ? (
+                  <Button
+                    onClick={e => this.minus(e, record.id)}
+                    type="primary"
+                    size="small"
+                  >
+                    -
+                  </Button>
+                ) : null}
+              </div>
+              <div className="giftCount">{record.count}</div>
+              <Button
+                onClick={e => this.add(e, record.id)}
+                type="primary"
+                size="small"
+              >
+                +
+              </Button>
+            </div>
+          )
+        }
       }
     ]
     return (
