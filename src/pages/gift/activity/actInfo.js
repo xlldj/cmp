@@ -1101,15 +1101,12 @@ class GiftTable extends React.Component {
     this.setState(nextState)
   }
   changeDevice = v => {
-    console.log(v)
     let data = JSON.parse(JSON.stringify(this.state.allTypeData))
-    console.log(data)
     if (v === 'all') {
       return this.setState({
         dataSource: data,
         selectedDevice: 'all',
-        total: 0,
-        page: 1
+        total: 0
       })
     }
     let newData = data.filter((r, i) => r.deviceType === parseInt(v, 10))
@@ -1117,8 +1114,7 @@ class GiftTable extends React.Component {
     this.setState({
       dataSource: newData,
       selectedDevice: v,
-      total: 0,
-      page: 1
+      total: 0
     })
   }
   add = (e, id) => {
