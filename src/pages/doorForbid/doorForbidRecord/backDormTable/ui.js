@@ -3,7 +3,7 @@ import React from 'react'
 import { Button } from 'antd'
 
 import PhaseLine from '../../../component/phaseLine'
-import SchoolSelector from '../../../component/schoolSelector'
+import SchoolSelector from '../../../component/schoolSelectorWithoutAll'
 import BasicSelector from '../../../component/basicSelector'
 import CONSTANTS from '../../../../constants/doorForbid'
 

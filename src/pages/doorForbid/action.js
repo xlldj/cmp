@@ -113,7 +113,7 @@ const fetchDoorForbidReportList = (body, subModule) => {
           type: CHANGE_DOORFORBID,
           subModule,
           keyValuePair: {
-            report_dataSource: json.data.gateReports,
+            report_dataSource: json.data.gateRecords,
             report_total: json.data.total,
             report_loading: false
           }
@@ -208,8 +208,9 @@ export const fetchBuildings = (id, props, subModule) => {
  * 用户归寝记录查询
  * @param {*} body 请求的body体
  * @param {*} subModule
+ * @param {*} formType 1 打卡记录 2归寝记录
  */
-export const fetchDetailRecordList = (body, subModule) => {
+export const fetchDetailRecordList = (body, subModule, formType) => {
   const clearLoading = dispatch => {
     dispatch({
       type: CHANGE_DOORFORBID,
@@ -228,7 +229,10 @@ export const fetchDetailRecordList = (body, subModule) => {
       }
     })
 
-    let resource = DOORFORBID_URL.recordUserList
+    let resource =
+      formType === 1
+        ? DOORFORBID_URL.recordUserList
+        : DOORFORBID_URL.reportUserList
     return AjaxHandler.fetch(resource, body, null, null).then(json => {
       console.log(json)
 
@@ -237,7 +241,10 @@ export const fetchDetailRecordList = (body, subModule) => {
           type: CHANGE_DOORFORBID,
           subModule,
           keyValuePair: {
-            detail_dataSource: json.data.gateRecords,
+            detail_dataSource:
+              formType === 1
+                ? json.data.gateRecords
+                : json.data.userReturnReports,
             detail_total: json.data.total,
             detail_loading: false
           }
@@ -255,7 +262,7 @@ export const fetchDetailRecordList = (body, subModule) => {
  * @param {*} callBack 请求回调
  */
 export const fetchUnbindUserInDorm = (body, callBack) => {
-  let resource = DOORFORBID_URL.recordHandle
+  let resource = DOORFORBID_URL.unbind
   const cb = json => {
     if (callBack) {
       callBack(json.data.result)
@@ -304,7 +311,6 @@ export const fetchDoorFobidSchoolSettingList = (schoolId, props, subModule) => {
 
         itemData.forEach((subRecord, index) => {
           selectedDays[index] = subRecord.day
-          newItemMap.normalTime = subRecord.normalTime
           newItemMap.lateTime = subRecord.lateTime
           newItemMap.notReturnTime = subRecord.notReturnTime
         })

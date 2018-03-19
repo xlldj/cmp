@@ -28,8 +28,6 @@ class BackDormTimeTable extends React.Component {
       },
       {
         title: '归寝时间',
-        dataIndex: 'items',
-        width: '30%',
         render: (text, record) => {
           return this.showBackDormTimeString(record)
         }
@@ -47,7 +45,7 @@ class BackDormTimeTable extends React.Component {
       },
       {
         title: '操作',
-        dataIndex: 'operation',
+        width: '12%',
         className: 'lastCol',
         render: (text, record, index) => (
           <div key={`operation${index}`} className="editable-row-operations">
@@ -82,13 +80,12 @@ class BackDormTimeTable extends React.Component {
         }
       })
 
-      var normalString = Format.minIntToHourMinStr(r.items[0].normalTime)
       var lateString = Format.minIntToHourMinStr(r.items[0].lateTime)
       var notReturnString = Format.minIntToHourMinStr(r.items[0].notReturnTime)
-      var subTitle = `正常归寝: ${normalString}~${lateString}、晚归: ${lateString}~${notReturnString}、未归: ${notReturnString}以后`
+      var subTitle = `正常归寝: ${lateString}以前、晚归: ${lateString}~${notReturnString}、未归: ${notReturnString}以后`
 
       return (
-        <Fragment>
+        <Fragment key={index}>
           <p>{timeTipString}</p>
           <p>{subTitle}</p>
         </Fragment>

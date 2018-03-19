@@ -13,7 +13,8 @@ import {
 import {
   CHANGE_DOORFORBID,
   changeDoorForbid,
-  fetchDoorForbidList
+  fetchDoorForbidList,
+  fetchDetailRecordList
 } from '../pages/doorForbid/action'
 
 export const SET_USERINFO = 'SET_USERINFO'
@@ -280,5 +281,6 @@ export {
   fetchHeaterList,
   CHANGE_DOORFORBID,
   changeDoorForbid,
-  fetchDoorForbidList
+  fetchDoorForbidList,
+  fetchDetailRecordList
 }

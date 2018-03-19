@@ -11,7 +11,10 @@ import RangeSelect from '../../../../../component/rangeSelect'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { changeDoorForbid } from '../../../../../../actions'
+import {
+  changeDoorForbid,
+  fetchDetailRecordList
+} from '../../../../../../actions'
 
 import {
   fetchChangeBackDormStatus,
@@ -23,8 +26,8 @@ const {
   DOORFORBID_RECORD_TIME,
   DOORFORBID_FORM,
   DOORFORBID_DAYTYPE,
-  DOORFORBID_RECORD_BACKDORM_STATUS,
-  SEX
+  DOORFORBID_RECORD_BACKDORM_STATUS
+  // SEX
 } = CONSTANTS
 const subModule = 'backDormRecord'
 
@@ -69,6 +72,10 @@ class BackDormRecordDetail extends React.Component {
       }
     }
 
+    this.forceRefresh(newProps)
+  }
+
+  forceRefresh = newProps => {
     let {
       detail_startTime,
       detail_endTime,
@@ -82,9 +89,6 @@ class BackDormRecordDetail extends React.Component {
     if (detail_timeType !== 1) {
       body.dayType = DOORFORBID_DAYTYPE[detail_timeType]
     }
-    if (detail_formType !== 1) {
-      body.sex = detail_formType - 1
-    }
 
     if (detail_startTime !== '' && detail_endTime !== '') {
       body.startTime = detail_startTime
@@ -92,7 +96,7 @@ class BackDormRecordDetail extends React.Component {
     }
 
     body.size = SIZE
-    newProps.fetchDetailRecordList(body, subModule)
+    newProps.fetchDetailRecordList(body, subModule, detail_formType)
   }
 
   componentDidMount() {
@@ -272,12 +276,17 @@ class BackDormRecordDetail extends React.Component {
   }
 
   unbindButtonClicked = e => {
-    let detail_id = this.props
+    let { detail_unbindCount, detail_recordInfo } = this.props
+    let { userId } = detail_recordInfo
     const body = {}
-    body.id = detail_id
+    body.id = userId
 
     const callBack = result => {
       if (result === true) {
+        this.closeButtonClick(null)
+        this.props.changeDoorForbid(subModule, {
+          detail_unbindCount: detail_unbindCount + 1
+        })
       }
     }
     fetchUnbindUserInDorm(body, callBack)
@@ -290,7 +299,11 @@ class BackDormRecordDetail extends React.Component {
     let { detail_formType, detail_timeType } = this.props
     const body = {}
     body.type = detail_formType
-    body.id = record.id
+    if (detail_formType === 1) {
+      body.checkLogId = record.id
+    } else {
+      body.id = record.userId
+    }
 
     if (detail_timeType !== 1) {
       body.day = serverDayMap[detail_timeType]
@@ -298,6 +311,10 @@ class BackDormRecordDetail extends React.Component {
     const callBack = result => {
       if (result === true) {
         detail_dataSource[index].status = 1
+        this.props.changeDoorForbid(subModule, {
+          detail_dataSource: detail_dataSource
+        })
+        this.forceRefresh(this.props)
       }
     }
     fetchChangeBackDormStatus(body, callBack)
@@ -321,11 +338,11 @@ class BackDormRecordDetail extends React.Component {
       name,
       studentNo,
       mobile,
-      sex,
+      // sex,
       grade,
       dormitory,
       schoolName,
-      lastCheckType
+      status
     } = detail_recordInfo
 
     return (
@@ -350,7 +367,7 @@ class BackDormRecordDetail extends React.Component {
         </div>
 
         <div className="backDormDetail-content">
-          <h3>{name + ' ' + schoolName}</h3>
+          <h3>{`${name || ''} ${schoolName || ''}`}</h3>
           <ul className="detaiList">
             <li>
               <label>手机号:</label>
@@ -368,10 +385,10 @@ class BackDormRecordDetail extends React.Component {
               <label>姓名:</label>
               <span>{name}</span>
             </li>
-            <li>
+            {/* <li>
               <label>性别:</label>
               <span>{SEX[sex]}</span>
-            </li>
+            </li> */}
             <li>
               <label>年级:</label>
               <span>{grade}</span>
@@ -385,14 +402,10 @@ class BackDormRecordDetail extends React.Component {
               <label>当前归寝状态: </label>
               <Badge
                 status={
-                  lastCheckType === 1
-                    ? 'success'
-                    : lastCheckType === 2 ? 'warning' : 'error'
+                  status === 1 ? 'success' : status === 2 ? 'warning' : 'error'
                 }
                 text={
-                  lastCheckType === 1
-                    ? '已归寝'
-                    : lastCheckType === 2 ? '晚归寝' : '未归寝'
+                  status === 1 ? '已归寝' : status === 2 ? '晚归寝' : '未归寝'
                 }
               />
             </li>
@@ -445,7 +458,8 @@ class BackDormRecordDetail extends React.Component {
           <Table
             loading={detail_loading}
             bordered
-            rowKey={record => record.id}
+            // rowKey={detail_formType === 1 ? 'id' : (record, index) => index}
+            rowKey={(record, index) => record.id || index}
             pagination={{
               pageSize: SIZE,
               current: detail_page,
@@ -473,11 +487,13 @@ const mapStateToProps = state => ({
   detail_dataSource: state.doorForbidModule[subModule].detail_dataSource,
   detail_timeType: state.doorForbidModule[subModule].detail_timeType,
   detail_formType: state.doorForbidModule[subModule].detail_formType,
-  detail_recordInfo: state.doorForbidModule[subModule].detail_recordInfo
+  detail_recordInfo: state.doorForbidModule[subModule].detail_recordInfo,
+  detail_unbindCount: state.doorForbidModule[subModule].detail_unbindCount
 })
 
 export default withRouter(
   connect(mapStateToProps, {
-    changeDoorForbid
+    changeDoorForbid,
+    fetchDetailRecordList
   })(BackDormRecordDetail)
 )

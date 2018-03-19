@@ -16,16 +16,18 @@ import { changeDoorForbid } from '../../../../../actions'
 const {
   PAGINATION: SIZE,
   DOORFORBID_RECORD_BACKDORM_STATUS,
-  DOORFORBID_RECORD_TIME,
-  DOORFORBID_SEX,
-  SEX
+  DOORFORBID_RECORD_TIME
+  // DOORFORBID_SEX,
+  // SEX
 } = CONSTANTS
 const subModule = 'backDormRecord'
 
 class BackDormRecordTable extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      searchingText: ''
+    }
   }
 
   changePage = pageObj => {
@@ -65,14 +67,20 @@ class BackDormRecordTable extends React.Component {
   }
   settingBackDormTime = v => {}
 
-  changeSearch = e => {
+  searchEnter = () => {
     let { record_searchKey } = this.props
-    if (record_searchKey !== e) {
+    let searchingText = this.state.searchingText.trim()
+    if (record_searchKey !== searchingText) {
       this.props.changeDoorForbid(subModule, {
-        record_searchKey: e,
+        record_searchKey: searchingText,
         page: 1
       })
     }
+  }
+  changeSearch = e => {
+    this.setState({
+      searchingText: e.target.value
+    })
   }
   changeSexType = e => {
     let { record_sexType } = this.props
@@ -125,13 +133,14 @@ class BackDormRecordTable extends React.Component {
       record_endTime,
       record_page,
       record_dataSource,
-      record_searchKey,
+      // record_searchKey,
       record_timeType,
-      record_sexType,
+      // record_sexType,
       record_backDormStatus,
       record_selectedRowIndex
     } = this.props
 
+    const { searchingText } = this.state
     this.columns = [
       {
         title: '姓名',
@@ -157,13 +166,13 @@ class BackDormRecordTable extends React.Component {
         dataIndex: 'mobile',
         width: '12%'
       },
-      {
-        title: '性别',
-        width: '8%',
-        render: (text, record) => {
-          return SEX[record.sex]
-        }
-      },
+      // {
+      //   title: '性别',
+      //   width: '8%',
+      //   render: (text, record) => {
+      //     return SEX[record.sex]
+      //   }
+      // },
       {
         title: '年级',
         dataIndex: 'grade',
@@ -178,8 +187,12 @@ class BackDormRecordTable extends React.Component {
         title: '最近一次打卡',
         width: '12%',
         render: (text, record) => {
-          var wbTitle = record.lastCheckType === 1 ? '归寝' : '出寝'
-          return `${Time.getTimeStr(record.lastCheckTime)} ${wbTitle}`
+          if (!!record.lastCheckTime && !!record.lastCheckType) {
+            var wbTitle = record.lastCheckType === 1 ? '归寝' : '出寝'
+            return `${Time.getTimeStr(record.lastCheckTime)} ${wbTitle}`
+          } else {
+            return '未打卡'
+          }
         }
       },
       {
@@ -228,14 +241,14 @@ class BackDormRecordTable extends React.Component {
             <div className="doorForbidSearchBox">
               <SearchInput
                 placeholder="姓名/手机号/宿舍"
-                searchingText={record_searchKey}
+                searchingText={searchingText}
                 pressEnter={this.searchEnter}
                 changeSearch={this.changeSearch}
               />
             </div>
           </div>
 
-          <div className="queryLine">
+          {/* <div className="queryLine">
             <div className="block">
               <span>性别筛选:</span>
               <CheckSelect
@@ -244,7 +257,7 @@ class BackDormRecordTable extends React.Component {
                 onClick={this.changeSexType}
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="queryLine">
             <div className="block">
@@ -265,7 +278,7 @@ class BackDormRecordTable extends React.Component {
           <Table
             loading={record_loading}
             bordered
-            rowKey={record => record.id}
+            rowKey={record => record.userId}
             pagination={{
               pageSize: SIZE,
               current: record_page,

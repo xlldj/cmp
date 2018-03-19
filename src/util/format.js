@@ -127,7 +127,7 @@ Format.minIntToHourMinStr = minInt => {
   } else if (min < 10) {
     hourMinStr += '0' + min
   } else {
-    hourMinStr = min
+    hourMinStr = hourMinStr + min
   }
   return hourMinStr
 }

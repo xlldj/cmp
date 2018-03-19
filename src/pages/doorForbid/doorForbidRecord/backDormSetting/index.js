@@ -3,7 +3,7 @@ import TimePicker from 'rc-time-picker'
 import 'rc-time-picker/assets/index.css'
 import moment from '../../../../util/myMoment'
 import { Button } from 'antd'
-import SchoolSelector from '../../../component/schoolSelector'
+import SchoolSelector from '../../../component/schoolSelectorWithoutAll'
 import CONSTANTS from '../../../../constants'
 import MultiSelectModal from '../../../component/multiSelectModal'
 import Noti from '../../../../util/noti'
@@ -22,7 +22,7 @@ import {
 import '../../style/style.css'
 
 const subModule = 'backDormRecord'
-
+const { SELECTWIDTH, DOORFORBID_WEEK } = CONSTANTS
 class BackDormSettingInfo extends React.Component {
   constructor(props) {
     super(props)
@@ -55,14 +55,12 @@ class BackDormSettingInfo extends React.Component {
 
   defaultItemsMap = e => {
     return {
-      normalTime: 0,
       lateTime: 1260,
       notReturnTime: 1380,
       timeRangeString: '',
       dayList: [], //[周一、周二]
       groupNo: 1,
       isSelected: false,
-      lateTimeError: false,
       notReturnTimeError: false
     }
   }
@@ -83,7 +81,7 @@ class BackDormSettingInfo extends React.Component {
         var subItems = item.items
         subItems.forEach(subItem => {
           hasSelectDayCount++
-          var dayTitle = CONSTANTS.DOORFORBID_WEEK[subItem.day]
+          var dayTitle = DOORFORBID_WEEK[subItem.day]
           subDayList.push(dayTitle)
           if (timeTipString === '') {
             timeTipString += dayTitle
@@ -92,7 +90,6 @@ class BackDormSettingInfo extends React.Component {
           }
         })
         itemMap.dayList = subDayList
-        itemMap.normalTime = item.items[0].normalTime
         itemMap.lateTime = item.items[0].lateTime
         itemMap.notReturnTime = item.items[0].notReturnTime
         itemMap.groupNo = item.items[0].groupNo
@@ -114,20 +111,9 @@ class BackDormSettingInfo extends React.Component {
 
   componentWillReceiveProps(nextProps) {}
 
-  checkSelectTimeRange = (
-    allSelectedItems,
-    index,
-    normalT,
-    lateT,
-    notReturnT
-  ) => {
-    if (isNaN(lateT) || isNaN(normalT) || isNaN(notReturnT)) {
+  checkSelectTimeRange = (allSelectedItems, index, lateT, notReturnT) => {
+    if (isNaN(lateT) || isNaN(notReturnT)) {
       return
-    }
-    if (normalT >= lateT) {
-      allSelectedItems[index].lateTimeError = true
-    } else if (allSelectedItems[index].lateTimeError) {
-      allSelectedItems[index].lateTimeError = false
     }
 
     if (lateT >= notReturnT) {
@@ -136,7 +122,6 @@ class BackDormSettingInfo extends React.Component {
       allSelectedItems[index].notReturnTimeError = false
     }
 
-    allSelectedItems[index].normalTime = normalT
     allSelectedItems[index].lateTime = lateT
     allSelectedItems[index].notReturnTime = notReturnT
 
@@ -186,18 +171,18 @@ class BackDormSettingInfo extends React.Component {
         var item = {}
         if (
           r.lateTime === '' ||
-          r.normalTime === '' ||
           r.notReturnTime === '' ||
           r.dayList.length === 0 ||
-          r.lateTimeError === true ||
           r.notReturnTimeError === true
         ) {
           Noti.hintWarning('操作有误', '还有信息未填全')
           executeError = true
         }
-        r.dayList.forEach(value => {
-          item.day = CONSTANTS.DOORFORBID_WEEK[value]
-          item.normalTime = r.normalTime
+
+        var dayLists = r.dayList
+        dayLists.forEach(value => {
+          console.log(value)
+          item.day = DOORFORBID_WEEK[value]
           item.lateTime = r.lateTime
           item.notReturnTime = r.notReturnTime
           item.groupNo = r.groupNo
@@ -295,37 +280,15 @@ class BackDormSettingInfo extends React.Component {
     } else {
     }
   }
-  changeNormalTime = (event, index) => {
-    let allSelectedItems = JSON.parse(
-      JSON.stringify(this.state.allSelectedItems)
-    )
-    let normalT = event.toObject().hours * 60 + event.toObject().minutes
-    let lateT = allSelectedItems[index].lateTime
-    let notReturnT = allSelectedItems[index].notReturnTime
 
-    this.checkSelectTimeRange(
-      allSelectedItems,
-      index,
-      normalT,
-      lateT,
-      notReturnT
-    )
-  }
   changeLateTime = (event, index) => {
     let allSelectedItems = JSON.parse(
       JSON.stringify(this.state.allSelectedItems)
     )
     let lateT = event.toObject().hours * 60 + event.toObject().minutes
-    let normalT = allSelectedItems[index].normalTime
     let notReturnT = allSelectedItems[index].notReturnTime
 
-    this.checkSelectTimeRange(
-      allSelectedItems,
-      index,
-      normalT,
-      lateT,
-      notReturnT
-    )
+    this.checkSelectTimeRange(allSelectedItems, index, lateT, notReturnT)
   }
 
   changeNotReturnTime = (event, index) => {
@@ -334,15 +297,7 @@ class BackDormSettingInfo extends React.Component {
     )
     let notReturnT = event.toObject().hours * 60 + event.toObject().minutes
     let lateT = allSelectedItems[index].lateTime
-    let normalT = allSelectedItems[index].normalTime
-
-    this.checkSelectTimeRange(
-      allSelectedItems,
-      index,
-      normalT,
-      lateT,
-      notReturnT
-    )
+    this.checkSelectTimeRange(allSelectedItems, index, lateT, notReturnT)
   }
 
   timeRangeConfirm = data => {
@@ -415,7 +370,7 @@ class BackDormSettingInfo extends React.Component {
       allSelectedItems &&
       allSelectedItems.map((record, index) => {
         return (
-          <Fragment>
+          <Fragment key={index}>
             <li>
               <p>时间段:</p>
               {record.timeRangeString}
@@ -450,19 +405,6 @@ class BackDormSettingInfo extends React.Component {
                   allowEmpty={false}
                   showSecond={false}
                   value={moment({
-                    hour: Math.floor(record.normalTime / 60),
-                    minute: record.normalTime % 60
-                  })}
-                  onChange={event => {
-                    this.changeNormalTime(event, index)
-                  }}
-                />
-                <span>至</span>
-                <TimePicker
-                  className="timepicker"
-                  allowEmpty={false}
-                  showSecond={false}
-                  value={moment({
                     hour: Math.floor(record.lateTime / 60),
                     minute: record.lateTime % 60
                   })}
@@ -470,11 +412,7 @@ class BackDormSettingInfo extends React.Component {
                     this.changeLateTime(event, index)
                   }}
                 />
-                {record.lateTimeError ? (
-                  <span className="checkInvalid">
-                    晚归寝时间不能早于正常时间！
-                  </span>
-                ) : null}
+                <span>以前</span>
               </div>
             </li>
 
@@ -507,7 +445,7 @@ class BackDormSettingInfo extends React.Component {
               />
               {record.notReturnTimeError ? (
                 <span className="checkInvalid">
-                  未归寝时间不能早于晚归寝时间！
+                  未归寝时间不能早于或等于晚归寝时间！
                 </span>
               ) : null}
             </li>
@@ -544,7 +482,7 @@ class BackDormSettingInfo extends React.Component {
             <p> 选择学校: </p>
             <SchoolSelector
               disable={id}
-              width={CONSTANTS.SELECTWIDTH}
+              width={SELECTWIDTH}
               className={id ? 'disabled' : ''}
               selectedSchool={schoolId}
               changeSchool={this.changeSchool}
@@ -565,7 +503,7 @@ class BackDormSettingInfo extends React.Component {
                 className="addBtn"
                 count={l}
                 onClick={this.addNewTimeRange}
-                width={CONSTANTS.SELECTWIDTH}
+                width={SELECTWIDTH}
               >
                 增加一个时段
               </Button>

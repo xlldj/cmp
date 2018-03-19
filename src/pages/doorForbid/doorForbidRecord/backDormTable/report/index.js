@@ -2,10 +2,8 @@ import React from 'react'
 
 import { Table } from 'antd'
 import CheckSelect from '../../../../component/checkSelect'
-import RangeSelect from '../../../../component/rangeSelect'
 import CONSTANTS from '../../../../../constants'
 import SearchInput from '../../../../component/searchInput'
-import Noti from '../../../../../util/noti'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -14,15 +12,17 @@ import { changeDoorForbid } from '../../../../../actions'
 const {
   DOORFORBID_ORDER,
   PAGINATION: SIZE,
-  DOORFORBID_REPORT_TIME,
-  DOORFORBID_SEX
+  DOORFORBID_REPORT_TIME
+  // DOORFORBID_SEX
 } = CONSTANTS
 const subModule = 'backDormRecord'
 
 class BackDormReportTable extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      searchingText: ''
+    }
     this.columns = [
       {
         title: '姓名',
@@ -84,7 +84,6 @@ class BackDormReportTable extends React.Component {
   }
 
   changeTable = (pageObj, filters, sorter) => {
-    debugger
     console.log(sorter)
     let { order, field } = sorter
     let { report_order, report_orderBy } = this.props
@@ -104,53 +103,28 @@ class BackDormReportTable extends React.Component {
     })
   }
   changePage = pageObj => {
-    debugger
     let page = pageObj.current
     this.props.changeDoorForbid(subModule, { report_page: page })
   }
 
-  changeStartTime = time => {
-    let { report_startTime } = this.props
-    if (report_startTime !== time) {
-      this.props.changeDoorForbid(subModule, {
-        report_startTime: time
-      })
-    }
-  }
-  changeEndTime = time => {
-    let { report_startTime, report_endTime } = this.props
-    if (report_startTime > time && report_startTime !== 0) {
-      Noti.hintLock('操作有误', '结束时间不能小于起始时间')
-      return
-    }
-    if (report_endTime !== time) {
-      this.props.changeDoorForbid(subModule, {
-        report_endTime: time
-      })
-    }
-  }
-
-  confirmTimeRange = () => {
-    let { report_startTime, report_endTime } = this.props
-    if (!report_startTime || !report_endTime) {
-      return
-    }
-
-    this.props.changeDoorForbid(subModule, {
-      report_timeType: 0
-    })
-  }
   settingBackDormTime = v => {}
 
-  changeSearch = e => {
+  searchEnter = () => {
     let { report_searchKey } = this.props
-    if (report_searchKey !== e) {
+    let searchingText = this.state.searchingText.trim()
+    if (report_searchKey !== searchingText) {
       this.props.changeDoorForbid(subModule, {
-        report_searchKey: e,
+        report_searchKey: searchingText,
         page: 1
       })
     }
   }
+  changeSearch = e => {
+    this.setState({
+      searchingText: e.target.value
+    })
+  }
+
   changeSexType = e => {
     let { report_sexType } = this.props
     if (report_sexType !== e) {
@@ -166,9 +140,7 @@ class BackDormReportTable extends React.Component {
     if (report_timeType !== e) {
       this.props.changeDoorForbid(subModule, {
         report_timeType: e,
-        page: 1,
-        report_startTime: '',
-        report_endTime: ''
+        page: 1
       })
     }
   }
@@ -176,15 +148,12 @@ class BackDormReportTable extends React.Component {
     const {
       report_loading,
       report_total,
-      report_startTime,
-      report_endTime,
       report_page,
       report_dataSource,
-      report_searchKey,
-      report_timeType,
-      report_sexType
+      report_timeType
+      // report_sexType
     } = this.props
-
+    const { searchingText } = this.state
     return (
       <div className="doorForbidReportTab">
         <div className="queryPanel">
@@ -196,26 +165,18 @@ class BackDormReportTable extends React.Component {
                 value={report_timeType}
                 onClick={this.changeTimeType}
               />
-              <RangeSelect
-                className="task-rangeSelect"
-                startTime={report_startTime}
-                endTime={report_endTime}
-                changeStartTime={this.changeStartTime}
-                changeEndTime={this.changeEndTime}
-                confirm={this.confirmTimeRange}
-              />
             </div>
             <div className="doorForbidSearchBox">
               <SearchInput
                 placeholder="姓名/手机号/宿舍"
-                searchingText={report_searchKey}
+                searchingText={searchingText}
                 pressEnter={this.searchEnter}
                 changeSearch={this.changeSearch}
               />
             </div>
           </div>
 
-          <div className="queryLine">
+          {/* <div className="queryLine">
             <div className="block">
               <span>性别筛选:</span>
               <CheckSelect
@@ -224,7 +185,7 @@ class BackDormReportTable extends React.Component {
                 onClick={this.changeSexType}
               />
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="tableList">
@@ -250,8 +211,6 @@ class BackDormReportTable extends React.Component {
 const mapStateToProps = state => ({
   report_loading: state.doorForbidModule[subModule].report_loading,
   report_total: state.doorForbidModule[subModule].report_total,
-  report_startTime: state.doorForbidModule[subModule].report_startTime,
-  report_endTime: state.doorForbidModule[subModule].report_endTime,
   report_page: state.doorForbidModule[subModule].report_page,
   report_dataSource: state.doorForbidModule[subModule].report_dataSource,
   report_searchKey: state.doorForbidModule[subModule].report_searchKey,

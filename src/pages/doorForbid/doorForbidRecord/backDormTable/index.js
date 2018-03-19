@@ -25,6 +25,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     if (
       checkObject(newProps, oldProps, [
         'schoolId',
+        'buildingId',
         'tabIndex',
         'record_page',
         'record_timeType',
@@ -32,7 +33,8 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
         'record_backDormStatus',
         'record_startTime',
         'record_endTime',
-        'record_searchKey'
+        'record_searchKey',
+        'detail_unbindCount'
       ])
     ) {
       return
@@ -47,7 +49,9 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       record_endTime,
       record_searchKey
     } = newProps
+
     body.page = record_page
+
     if (record_timeType !== 1) {
       body.dayType = DOORFORBID_DAYTYPE[record_timeType]
     }
@@ -69,12 +73,11 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     if (
       checkObject(newProps, oldProps, [
         'schoolId',
+        'buildingId',
         'tabIndex',
         'report_page',
         'report_timeType',
         'report_sexType',
-        'report_startTime',
-        'report_endTime',
         'report_searchKey',
         'report_orderBy',
         'report_order'
@@ -87,8 +90,6 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       report_page,
       report_timeType,
       report_sexType,
-      report_startTime,
-      report_endTime,
       report_searchKey,
       report_orderBy,
       report_order
@@ -106,11 +107,6 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       body.sex = report_sexType - 1
     }
 
-    if (report_startTime !== '' && report_endTime !== '') {
-      body.startTime = report_startTime
-      body.endTime = report_endTime
-    }
-
     if (report_searchKey !== '') {
       body.selectKey = report_searchKey
     }
@@ -118,6 +114,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     if (
       checkObject(newProps, oldProps, [
         'schoolId',
+        'buildingId',
         'tabIndex',
         'timeSetting_page'
       ])
@@ -154,16 +151,16 @@ const mapStateToProps = state => ({
   record_backDormStatus:
     state.doorForbidModule[subModule].record_backDormStatus,
 
-  report_startTime: state.doorForbidModule[subModule].report_startTime,
-  report_endTime: state.doorForbidModule[subModule].report_endTime,
   report_page: state.doorForbidModule[subModule].report_page,
   report_searchKey: state.doorForbidModule[subModule].report_searchKey,
   report_timeType: state.doorForbidModule[subModule].report_timeType,
   report_sexType: state.doorForbidModule[subModule].report_sexType,
-
+  report_orderBy: state.doorForbidModule[subModule].report_orderBy,
+  report_order: state.doorForbidModule[subModule].report_order,
   timeSetting_page: state.doorForbidModule[subModule].timeSetting_page,
 
-  detail_show: state.doorForbidModule[subModule].detail_show
+  detail_show: state.doorForbidModule[subModule].detail_show,
+  detail_unbindCount: state.doorForbidModule[subModule].detail_unbindCount
 })
 export default withRouter(
   connect(mapStateToProps, {

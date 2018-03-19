@@ -66,7 +66,7 @@ const BASIC = {
       name: '门禁管理',
       path: 'doorForbid',
       key: 13,
-      icon: 'home',
+      icon: 'appstore-o',
       children: [
         {
           path: 'record',
