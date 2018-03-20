@@ -2,8 +2,18 @@ import React from 'react'
 import { Button, Popconfirm, Checkbox } from 'antd'
 import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'
+import CONSTANTS from '../../../constants'
 
 const CheckboxGroup = Checkbox.Group
+const { BUSINESS } = CONSTANTS
+let busiArr = Object.keys(BUSINESS)
+const businessOpts =
+  busiArr &&
+  busiArr.map(k => (
+    <Checkbox value={+k} key={k}>
+      {BUSINESS[k]}
+    </Checkbox>
+  ))
 
 class SchoolBusiness extends React.Component {
   constructor(props) {
@@ -126,10 +136,7 @@ class SchoolBusiness extends React.Component {
           <li className="">
             <p>功能入口设置:</p>
             <CheckboxGroup value={businesses} onChange={this.changeBusiness}>
-              <Checkbox value={1}>热水器</Checkbox>
-              <Checkbox value={2}>饮水机</Checkbox>
-              <Checkbox value={3}>吹风机</Checkbox>
-              <Checkbox value={4}>洗衣机</Checkbox>
+              {businessOpts}
             </CheckboxGroup>
             {clearError ? (
               <span className="checkInvalid">功能入口不能为空！</span>
