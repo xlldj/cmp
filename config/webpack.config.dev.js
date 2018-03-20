@@ -129,7 +129,7 @@ module.exports = {
         include: paths.appSrc,
         use: [
           {
-            loader: require.resolve('babel-loader?cacheDirectory=true'),
+            loader: require.resolve('babel-loader'),
             query: {
               presets: ['es2015', 'stage-0', 'react'],
               plugins: [['import', { libraryName: 'antd' }]]
