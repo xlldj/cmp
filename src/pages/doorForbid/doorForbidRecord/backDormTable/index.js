@@ -130,7 +130,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     body.buildingId = buildingId
   }
   if (schoolId !== 'all') {
-    body.schoolId = schoolId
+    body.schoolId = parseInt(schoolId, 10)
   }
   body.size = SIZE
   newProps.fetchDoorForbidList(tabIndex, body, subModule)

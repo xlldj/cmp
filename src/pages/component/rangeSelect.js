@@ -25,14 +25,6 @@ class RangeSelector extends React.Component {
   }
   render() {
     const { startTime, endTime, className } = this.props
-    const disabledDate = function(current) {
-      // can not select days after today
-      if (!!current) {
-        debugger
-        return current && current.getTime() > Date.now()
-      }
-      return true
-    }
 
     return (
       <div className={className ? `rangeSelect ${className}` : 'rangeSelect '}>
@@ -43,7 +35,6 @@ class RangeSelector extends React.Component {
           format="YYYY-MM-DD HH:mm"
           value={startTime ? moment(startTime) : null}
           onChange={this.changeStartTime}
-          disabledDate={disabledDate}
         />
         <span className="rangeSelect-seperator">至</span>
         <DatePicker

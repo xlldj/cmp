@@ -194,7 +194,7 @@ class BackDormSettingInfo extends React.Component {
       return
     }
     body.items = items
-    body.schoolId = schoolId
+    body.schoolId = parseInt(schoolId, 10)
 
     const callBack = ok => {
       if (ok) {
