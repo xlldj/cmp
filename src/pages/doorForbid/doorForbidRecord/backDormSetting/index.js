@@ -116,10 +116,21 @@ class BackDormSettingInfo extends React.Component {
       return
     }
 
-    if (lateT >= notReturnT) {
+    var latHour = Math.floor(lateT / 60)
+    var latMin = Math.floor(lateT % 60)
+
+    var notReturnHour = Math.floor(notReturnT / 60)
+    var notReturnMin = Math.floor(notReturnT % 60)
+
+    //小时对比
+    if (latHour < 5 && (notReturnHour > 5 || notReturnHour < latHour)) {
       allSelectedItems[index].notReturnTimeError = true
-    } else if (allSelectedItems[index].notReturnTimeError) {
-      allSelectedItems[index].notReturnTimeError = false
+    } else {
+      if (latHour === notReturnHour && notReturnMin <= latMin) {
+        allSelectedItems[index].notReturnTimeError = true
+      } else {
+        allSelectedItems[index].notReturnTimeError = false
+      }
     }
 
     allSelectedItems[index].lateTime = lateT
@@ -168,7 +179,6 @@ class BackDormSettingInfo extends React.Component {
     var executeError = false
     allSelectedItems.forEach(r => {
       if (executeError === false) {
-        var item = {}
         if (
           r.lateTime === '' ||
           r.notReturnTime === '' ||
@@ -181,15 +191,17 @@ class BackDormSettingInfo extends React.Component {
 
         var dayLists = r.dayList
         dayLists.forEach(value => {
+          var item = {}
           console.log(value)
           item.day = DOORFORBID_WEEK[value]
           item.lateTime = r.lateTime
           item.notReturnTime = r.notReturnTime
           item.groupNo = r.groupNo
+          items.push(item)
         })
-        items.push(item)
       }
     })
+    debugger
     if (executeError) {
       return
     }
@@ -346,7 +358,9 @@ class BackDormSettingInfo extends React.Component {
     let allSelectedItems = JSON.parse(
       JSON.stringify(this.state.allSelectedItems)
     )
-    delete allSelectedItems[index]
+
+    allSelectedItems.splice(index, 1)
+
     allSelectedItems.forEach((item, i) => {
       item.groupNo = i + 1
     })
@@ -354,6 +368,25 @@ class BackDormSettingInfo extends React.Component {
       allSelectedItems: allSelectedItems
     })
   }
+
+  forbidNotReturnHours = record => {
+    var hour = Math.floor(record.lateTime / 60)
+    var list = []
+    if (hour > 5) {
+      for (let index = 5; index < hour; index++) {
+        list.push(index)
+      }
+    } else {
+      for (let index = 5; index < 24; index++) {
+        list.push(index)
+      }
+      for (let index = 0; index < hour; index++) {
+        list.push(index)
+      }
+    }
+    return list
+  }
+
   render() {
     let {
       id,
@@ -442,10 +475,14 @@ class BackDormSettingInfo extends React.Component {
                 onChange={event => {
                   this.changeNotReturnTime(event, index)
                 }}
+                hideDisabledOptions
+                disabledHours={event => {
+                  return this.forbidNotReturnHours(record)
+                }}
               />
               {record.notReturnTimeError ? (
                 <span className="checkInvalid">
-                  未归寝时间不能早于或等于晚归寝时间！
+                  未归寝时间需要在合理范围内,请重新选择！
                 </span>
               ) : null}
             </li>
@@ -462,6 +499,10 @@ class BackDormSettingInfo extends React.Component {
                 })}
                 onChange={event => {
                   this.changeNotReturnTime(event, index)
+                }}
+                hideDisabledOptions
+                disabledHours={event => {
+                  return this.forbidNotReturnHours(record)
                 }}
               />
               <span>以后</span>

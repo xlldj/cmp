@@ -100,9 +100,9 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       body.orderBy = report_orderBy
       body.order = report_order
     }
-    if (report_timeType !== 1) {
-      body.dayType = report_timeType === 1 ? 3 : 5
-    }
+
+    body.dayType = report_timeType === 1 ? 3 : 5
+
     if (report_sexType !== 1) {
       body.sex = report_sexType - 1
     }

@@ -164,7 +164,10 @@ class BackDormRecordTable extends React.Component {
       {
         title: '手机号',
         dataIndex: 'mobile',
-        width: '12%'
+        width: '12%',
+        render: (text, record) => {
+          return record.mobile || '未绑定'
+        }
       },
       // {
       //   title: '性别',
@@ -207,7 +210,7 @@ class BackDormRecordTable extends React.Component {
             case 3:
               return <Badge status="error" text="未归寝" />
             default:
-              return <Badge status="warning" text="未知" />
+              return '无'
           }
         }
       }
@@ -219,7 +222,7 @@ class BackDormRecordTable extends React.Component {
             DOORFORBID_RECORD_BACKDORM_STATUS[record_backDormStatus]
           }人数:${record_total}人`
     return (
-      <div className="doorForbidReportTab">
+      <div className="doorForbidRecordTab">
         <div className="queryPanel">
           <div className="queryLine">
             <div className="block">

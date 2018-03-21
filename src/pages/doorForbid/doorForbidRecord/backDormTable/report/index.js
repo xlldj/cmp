@@ -37,48 +37,45 @@ class BackDormReportTable extends React.Component {
       {
         title: '手机号',
         dataIndex: 'mobile',
-        width: '12%'
-      },
-      {
-        title: '性别',
-        dataIndex: 'sex',
-        width: '8%',
-        render: (text, record) => (record.sex === 1 ? '男' : '女')
+        width: '12%',
+        render: (text, record) => {
+          return record.mobile || '未绑定'
+        }
       },
       {
         title: '宿舍',
         dataIndex: 'dormitory',
-        width: '8%'
+        width: '15%'
       },
       {
         title: '总打卡次数',
         dataIndex: 'total',
-        width: '8%',
+        width: '10%',
         sorter: true
       },
       {
         title: '异常打卡次数',
         dataIndex: 'abnormal',
-        width: '8%',
+        width: '10%',
         sorter: true
       },
       {
         title: '正常归寝次数',
         dataIndex: 'normal',
-        width: '8%',
+        width: '10%',
         sorter: true
       },
       {
         title: '晚归次数',
         dataIndex: 'late',
-        width: '8%',
+        width: '10%',
         sorter: true
       },
 
       {
         title: '未归次数',
         dataIndex: 'notReturn',
-        width: '8%'
+        width: '10%'
       }
     ]
   }
@@ -192,7 +189,7 @@ class BackDormReportTable extends React.Component {
           <Table
             loading={report_loading}
             bordered
-            rowKey={record => record.id}
+            rowKey={record => record.memberId}
             pagination={{
               pageSize: SIZE,
               current: report_page,

@@ -113,10 +113,7 @@
 .checkSelect {
   margin-right: 10px;
 }
-.doorForbidWrapper .tableList {
-  padding: 0px 20px;
-}
-.doorForbidWrapper .tableList td {
+.doorForbidRecordTab .tableList td {
   cursor: pointer;
 }
 .doorForbidTimeTab .tableList {
@@ -159,6 +156,12 @@
 }
 .backDormDetailWrapper .backDormDetail-content .tableList {
   margin: 10px 0;
+}
+.backDormDetailWrapper .backDormDetail-content ul {
+  margin-top: 10px;
+}
+.backDormDetailWrapper .backDormDetail-content ul li {
+  margin-top: 5px;
 }
 .backDormDetailWrapper .taskDetail-sidebar {
   position: absolute;
@@ -284,4 +287,7 @@
 }
 .unbindButton {
   margin-top: 20px;
+}
+.allChooseButton {
+  margin-right: 10px;
 }

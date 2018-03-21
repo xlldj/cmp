@@ -121,7 +121,7 @@ class BackDormTable extends React.Component {
       />
     )
     return (
-      <div className="doorForbidWrapper" ref="wrapper">
+      <div className="panelWrapper doorForbidWrapper" ref="wrapper">
         <PhaseLine
           value={tabIndex}
           staticPhase={DOORFORBID_PAGE_TABS}
