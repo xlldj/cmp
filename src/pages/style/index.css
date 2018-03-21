@@ -57,6 +57,13 @@ textarea {
   outline: none;
   padding-left: 6px !important;
 }
+input.shortInput {
+  width: 45px;
+  text-align: center;
+}
+.horiInput.horiInput input {
+  margin-right: 10px;
+}
 textarea {
   padding: 4px;
   resize: none;
@@ -155,6 +162,16 @@ button.grayBackColor:linked {
 .inlineLeft {
   text-align: left;
 }
+/* for seperator */
+.seperator {
+  margin: 0 20px;
+}
+.leftSeperator {
+  margin-left: 10px;
+}
+.rightSeperator {
+  margin-right: 10px;
+}
 /* for time picker in gift/act and notify */
 .timePicker {
   width: 140px !important;
@@ -163,6 +180,13 @@ button.grayBackColor:linked {
 }
 .timePicker input {
   width: 150px;
+}
+/* remove icon in antd timepicker */
+.ant-time-picker .ant-time-picker-input {
+  text-align: center;
+}
+.ant-time-picker .ant-time-picker-icon {
+  visibility: hidden;
 }
 /* for placeholder */
 ::-webkit-input-placeholder {
@@ -324,12 +348,6 @@ button.grayBackColor:linked {
 .multiSelectModalHeader .hint {
   line-height: 40px;
 }
-.multiSelectModalHeader .allChooseButton {
-  padding: 3px;
-  padding-left: 8px;
-  padding-right: 8px;
-  margin-right: 15px;
-}
 /* for form style */
 .formContent {
   width: 100%;
@@ -417,11 +435,7 @@ button.grayBackColor:linked {
 .addPlusabs button:first-child {
   margin-right: 12px;
 }
-/* -----info area----- */
-.infoBlockList {
-  margin: 16px;
-}
-.infoBlockList .btnArea {
+.btnArea {
   display: inline-flex;
   flex: none;
   flex-wrap: nowrap;
@@ -431,11 +445,34 @@ button.grayBackColor:linked {
   padding: 20px;
   background-color: #ebf4fd;
 }
-.infoBlockList .btnArea > button {
+.btnArea > button {
   margin-right: 10px;
 }
-.infoBlockList .btnArea > button:last-child {
+.btnArea > button:last-child {
   margin-right: 0;
+}
+/* form */
+.form {
+  margin-bottom: 10px;
+}
+.form li {
+  width: 100%;
+  height: 40px;
+}
+.form li label {
+  display: inline-block;
+  width: 50px;
+}
+.form li input {
+  line-height: 28px;
+}
+.center {
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+/* -----info area----- */
+.infoBlockList {
+  margin: 16px;
 }
 .infoBlock {
   display: flex;
@@ -806,6 +843,46 @@ button.grayBackColor:linked {
 .infoList .select {
   width: 140px;
 }
+/* for new info zone layout */
+.infoZone {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+.infoZone .header {
+  height: 50px;
+  line-height: 50px;
+  width: 100%;
+  font-size: 1.2em;
+  color: #333;
+}
+.infoZone input {
+  line-height: 26px;
+}
+.infoZone label {
+  display: inline-block;
+  width: 100px;
+  color: #333;
+}
+.infoZone .row {
+  height: 50px;
+  line-height: 50px;
+  width: 100%;
+  color: #999;
+}
+.infoZone .rows {
+  display: inline-flex;
+  width: 100%;
+  color: #999;
+}
+.infoZone .rows .horiInput {
+  padding-bottom: 10px;
+}
+.infoZone .rows .horiInput .horiInputTitle {
+  padding-bottom: 5px;
+}
+.infoZone:last-child {
+  border-bottom: none;
+}
 .timepicker input {
   width: 50px;
 }
@@ -1012,6 +1089,84 @@ button.grayBackColor:linked {
 .rangeSelect .confirm {
   margin-left: 10px;
 }
+.panelWrapper .tableList {
+  padding: 0 20px;
+}
+.panelWrapper .tableList td,
+.panelWrapper .tableList td * {
+  cursor: pointer;
+}
+.detailPanelWrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+}
+.detailPanelWrapper .detailPanel-header {
+  display: inline-flex;
+  padding: 0 30px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+}
+.detailPanelWrapper .detailPanel-content {
+  width: 100%;
+  height: calc(100% - 50px);
+  padding: 20px 30px;
+  overflow-y: scroll;
+}
+.detailPanelWrapper .detailPanel-content .detailPanel-sidebar {
+  display: inline-block;
+  padding: 20px 30px;
+  height: auto;
+  border-right: 1px solid #ddd;
+}
+.detailPanelWrapper .detailPanel-content .detailPanel-content-title {
+  font-size: 20px;
+}
+.detailPanelWrapper .detailPanel-content .handleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.detailPanelWrapper .detailPanel-content .handleBtn button {
+  margin-right: 10px;
+}
+.detailPanelWrapper .detailPanel-content .handleBtn .hint {
+  display: inline-block;
+  margin-right: 10px;
+  color: #f5f5f5;
+}
+.detailPanelWrapper .detailPanel-content .processLogs {
+  margin: 0px -30px;
+  padding: 15px 30px;
+  border-top: 1px solid #ddd;
+}
+.detailPanelWrapper .detailPanel-content .processLogs ul {
+  margin-top: 15px;
+  border: 1px solid #ddd;
+}
+.detailPanelWrapper .detailPanel-content .detailList {
+  padding: 5px 0;
+}
+.selectedHintWraper {
+  position: relative;
+}
+.selectedImg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+}
+.selectedRow {
+  background: #ebf4fd;
+}
 .detailList li {
   height: 22px;
   line-height: 22px;
@@ -1021,11 +1176,11 @@ button.grayBackColor:linked {
   display: inline-block;
   margin-right: 10px;
 }
-.detailList li span {
+.detailList li > span {
   display: inline-block;
   width: calc(100% - 80px);
 }
-.detailList li span.inline {
+.detailList li > span.inline {
   display: inline;
 }
 .detailList li img {
@@ -1167,8 +1322,12 @@ button.grayBackColor:linked {
 .closeBtn img {
   height: 14px;
 }
-.selectedRow {
-  background: #ebf4fd;
+.task-loadWrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 50px);
+  top: 50px;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable {
@@ -1497,6 +1656,15 @@ button.grayBackColor:linked {
   display: inline-block;
   height: 4px;
 }
+.verticalRect {
+  position: relative;
+  overflow: hidden;
+}
+.verticalRect .verticalRect-innerDiv {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
 /* for phase tab */
 .queryPanel {
   padding: 10px 20px;
@@ -1504,15 +1672,15 @@ button.grayBackColor:linked {
 .queryPanel .queryLine {
   height: 40px;
 }
-.queryPanel li {
+.queryPanel > li {
   display: inline-block;
   margin-top: 10px;
   margin-bottom: 5px;
 }
-.queryPanel li button {
+.queryPanel > li button {
   margin-right: 15px;
 }
-.queryPanel li span {
+.queryPanel > li span {
   margin-right: 7px;
 }
 .queryPanel button {
@@ -1563,12 +1731,16 @@ button.grayBackColor:linked {
 }
 /* for hintBox */
 .hintBox {
-  border-width: 2px;
+  border-width: 1px;
   border-style: solid;
   padding: 7px 15px;
+  width: fit-content;
 }
 .hintBox li {
   list-style: none;
+}
+.hintBox li label {
+  margin-right: 10px;
 }
 /* for table */
 .tableList .firstCol {
