@@ -11,6 +11,13 @@ import {
 } from '../pages/heater/action'
 import { CHANGE_ORDER, changeOrder } from '../pages/order/action'
 
+import {
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList,
+  fetchDetailRecordList
+} from '../pages/doorForbid/action'
+
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
   return {
@@ -265,5 +272,9 @@ export {
   changeHeater,
   fetchHeaterList,
   CHANGE_ORDER,
-  changeOrder
+  changeOrder,
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList,
+  fetchDetailRecordList
 }
