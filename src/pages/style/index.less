@@ -1003,6 +1003,12 @@ button.grayBackColor:linked{
   }
 }
 
+// for new layout of content area
+.panelWrapper{
+  .tableList{
+    padding: 0 20px;
+  }
+}
 // for style like info in task/detail 
 .detailList{
   li{
@@ -1166,6 +1172,90 @@ button.grayBackColor:linked{
   img{
     height: 14px;
   }
+}
+.task-loadWrapper{
+  position: absolute;
+  width: 100%;
+  height: calc(~ '100% - 50px');
+  top: 50px;
+  background-color: rgba(255 , 255, 255, 0.5);
+}
+
+// for new detail panel
+.detailPanelWrapper{
+    position: fixed;
+    top: 0;
+    right: 0;
+
+    width: 70%;
+    height: 100%;
+
+    background: white;
+    box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+    z-index: 999;
+    // transition: width 1s;
+    // animation: slide 1s;
+    .detailPanel-header{
+      display: inline-flex;
+      padding: 0 30px;
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      height: 50px;
+      border-bottom: 1px solid #ddd;
+    }
+    .taskDetail-content, .taskDetail-sidebar{
+      display: inline-block;
+      padding: 20px 30px;
+      // min-height: 100%;
+      height: auto;
+      border-right: 1px solid #ddd;
+    }
+  .taskDetail-content{
+    width: 70%;
+    height: calc(~ '100% - 50px');
+    overflow-y: scroll;
+    h3{
+      font-size: 20px;
+    }
+    .handleBtn{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      button{
+        margin-right: 10px;
+      }
+      .hint{
+        display: inline-block;
+        margin-right: 10px;
+        color: @gray;
+      }
+    }
+    .processLogs{
+      margin: 0px -30px;
+      padding: 15px 30px;
+      border-top: 1px solid #ddd;
+      ul{
+        margin-top: 15px;
+        border: 1px solid #ddd;
+      }
+    }
+    .detailList{
+      margin: 10px 0;
+    }
+  }
+}
+
+// for new panel module
+.selectedHintWraper{
+  position: relative;
+}
+.selectedImg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
 }
 
 // for table rows
@@ -1536,7 +1626,7 @@ button.grayBackColor:linked{
   .queryLine{
     height: 40px;
   }
-  li{
+  &>li{
     display: inline-block;
     margin-top: 10px;
     margin-bottom: 5px;
@@ -1603,6 +1693,7 @@ button.grayBackColor:linked{
     }
   }
 }
+
 
 /* for table */
 .tableList{

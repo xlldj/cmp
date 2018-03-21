@@ -1,5 +1,5 @@
 import getDefaultSchool from '../../util/defaultSchool'
-import * as ActionTypes from './action'
+import * as ActionTypes from '../../actions'
 let selectedSchool = getDefaultSchool()
 
 const initialHeaterState = {

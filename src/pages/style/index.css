@@ -1083,6 +1083,9 @@ button.grayBackColor:linked {
 .rangeSelect .confirm {
   margin-left: 10px;
 }
+.panelWrapper .tableList {
+  padding: 0 20px;
+}
 .detailList li {
   height: 22px;
   line-height: 22px;
@@ -1237,6 +1240,82 @@ button.grayBackColor:linked {
 }
 .closeBtn img {
   height: 14px;
+}
+.task-loadWrapper {
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 50px);
+  top: 50px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.detailPanelWrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+}
+.detailPanelWrapper .detailPanel-header {
+  display: inline-flex;
+  padding: 0 30px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+}
+.detailPanelWrapper .taskDetail-content,
+.detailPanelWrapper .taskDetail-sidebar {
+  display: inline-block;
+  padding: 20px 30px;
+  height: auto;
+  border-right: 1px solid #ddd;
+}
+.detailPanelWrapper .taskDetail-content {
+  width: 70%;
+  height: calc(100% - 50px);
+  overflow-y: scroll;
+}
+.detailPanelWrapper .taskDetail-content h3 {
+  font-size: 20px;
+}
+.detailPanelWrapper .taskDetail-content .handleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.detailPanelWrapper .taskDetail-content .handleBtn button {
+  margin-right: 10px;
+}
+.detailPanelWrapper .taskDetail-content .handleBtn .hint {
+  display: inline-block;
+  margin-right: 10px;
+  color: #f5f5f5;
+}
+.detailPanelWrapper .taskDetail-content .processLogs {
+  margin: 0px -30px;
+  padding: 15px 30px;
+  border-top: 1px solid #ddd;
+}
+.detailPanelWrapper .taskDetail-content .processLogs ul {
+  margin-top: 15px;
+  border: 1px solid #ddd;
+}
+.detailPanelWrapper .taskDetail-content .detailList {
+  margin: 10px 0;
+}
+.selectedHintWraper {
+  position: relative;
+}
+.selectedImg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
 }
 .selectedRow {
   background: #ebf4fd;
@@ -1584,15 +1663,15 @@ button.grayBackColor:linked {
 .queryPanel .queryLine {
   height: 40px;
 }
-.queryPanel li {
+.queryPanel > li {
   display: inline-block;
   margin-top: 10px;
   margin-bottom: 5px;
 }
-.queryPanel li button {
+.queryPanel > li button {
   margin-right: 15px;
 }
-.queryPanel li span {
+.queryPanel > li span {
   margin-right: 7px;
 }
 .queryPanel button {

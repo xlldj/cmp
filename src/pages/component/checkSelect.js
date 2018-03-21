@@ -8,7 +8,12 @@ class CheckSelector extends React.Component {
   onClick = e => {
     try {
       e.preventDefault()
-      let key = parseInt(e.target.getAttribute('data-key'), 10)
+      let { allOptValue } = this.props
+      let v = e.target.getAttribute('data-key')
+      if (allOptValue && v === allOptValue) {
+        return this.props.onClick(v)
+      }
+      let key = parseInt(v, 10)
       if (isNumber(key) && this.props.onClick) {
         this.props.onClick(key)
       }
@@ -17,7 +22,7 @@ class CheckSelector extends React.Component {
     }
   }
   render() {
-    let { options, value, noOptionTitle } = this.props
+    let { options, value, noOptionTitle, allOptValue, allOptTitle } = this.props
     let optionArr = obj2arr(options)
     const optionItems =
       optionArr &&
@@ -33,6 +38,14 @@ class CheckSelector extends React.Component {
 
     return (
       <ul className="checkSelect" onClick={this.onClick}>
+        {allOptTitle && allOptValue ? (
+          <li
+            className={value.toString() === allOptValue ? 'active' : ''}
+            data-key={allOptValue}
+          >
+            {allOptTitle}
+          </li>
+        ) : null}
         {optionItems.length > 0 ? (
           optionItems
         ) : (

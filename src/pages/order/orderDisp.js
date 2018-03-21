@@ -13,10 +13,7 @@ import Time from '../../util/time'
 import './style/style.css'
 
 const OrderTable = asyncComponent(() =>
-  import(/* webpackChunkName: "orderTable" */ './orderTable')
-)
-const OrderInfo = asyncComponent(() =>
-  import(/* webpackChunkName: "orderInfo" */ './orderInfo')
+  import(/* webpackChunkName: "orderTable" */ './orderList/orderTable')
 )
 const AbnormalOrder = asyncComponent(() =>
   import(/* webpackChunkName: "abnormalOder" */ './abnormal/abnormalContainer')
@@ -96,10 +93,6 @@ class OrderDisp extends React.Component {
             exact
             path="/order/list"
             render={props => <OrderTable hide={this.props.hide} {...props} />}
-          />
-          <Route
-            path="/order/list/orderInfo/:id"
-            render={props => <OrderInfo hide={this.props.hide} {...props} />}
           />
           <Route
             path="/order/abnormal"

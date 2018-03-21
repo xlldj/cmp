@@ -366,12 +366,13 @@ class TaskList extends React.Component {
         if (main_schoolId !== 'all') {
           body.schoolId = parseInt(main_schoolId, 10)
         }
-        if (day !== 0) {
+        if (day !== 0 && day !== 100) {
+          // 100 is the value for selecting custom range.
           body.day = day
         }
-        if (startTime && endTime) {
-          body.startTime = startTime
-          body.endTime = endTime
+        if (panel_startTime[main_phase] && panel_endTime[main_phase]) {
+          body.startTime = panel_endTime[main_phase]
+          body.endTime = panel_endTime[main_phase]
         }
         if (panel_selectKey[main_phase]) {
           body.selectKey = panel_selectKey[main_phase]
@@ -555,7 +556,7 @@ class TaskList extends React.Component {
     panel_startTime[i] = startTime
     panel_endTime[i] = endTime
     panel_page[i] = 1
-    panel_rangeIndex[i] = 0
+    panel_rangeIndex[i] = 100
     panel_dataSource[i + 1] = [] // clear dataSource of the corresponding panel
     this.props.changeTask(subModule, {
       panel_startTime: panel_startTime,
