@@ -278,7 +278,7 @@ class BackDormRecordTable extends React.Component {
           <Table
             loading={record_loading}
             bordered
-            rowKey={record => record.userId}
+            rowKey={record => record.memberId}
             pagination={{
               pageSize: SIZE,
               current: record_page,

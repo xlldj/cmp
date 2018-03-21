@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table, Badge, Button } from 'antd'
+import { Table, Badge, Button, Popconfirm } from 'antd'
 import CONSTANTS from '../../../../../../constants'
 import LoadingMask from '../../../../../component/loadingMask'
 import closeBtn from '../../../../../assets/close.png'
@@ -31,12 +31,6 @@ const {
 } = CONSTANTS
 const subModule = 'backDormRecord'
 
-const serverDayMap = {
-  2: 0,
-  3: 1,
-  4: 6,
-  5: 29
-}
 class BackDormRecordDetail extends React.Component {
   componentWillReceiveProps(nextProps) {
     try {
@@ -81,11 +75,14 @@ class BackDormRecordDetail extends React.Component {
       detail_endTime,
       detail_page,
       detail_timeType,
-      detail_formType
+      detail_formType,
+      detail_recordInfo
     } = newProps
+    let { memberId } = detail_recordInfo
+
     const body = {}
 
-    body.page = detail_page
+    body.page = detail_page || 1
     if (detail_timeType !== 1) {
       body.dayType = DOORFORBID_DAYTYPE[detail_timeType]
     }
@@ -94,7 +91,9 @@ class BackDormRecordDetail extends React.Component {
       body.startTime = detail_startTime
       body.endTime = detail_endTime
     }
-
+    if (memberId) {
+      body.memberId = memberId
+    }
     body.size = SIZE
     newProps.fetchDetailRecordList(body, subModule, detail_formType)
   }
@@ -276,16 +275,21 @@ class BackDormRecordDetail extends React.Component {
   }
 
   unbindButtonClicked = e => {
-    let { detail_unbindCount, detail_recordInfo } = this.props
-    let { userId } = detail_recordInfo
+    let { detail_unbindCount } = this.props
+
+    let detail_recordInfo = JSON.parse(
+      JSON.stringify(this.props.detail_recordInfo)
+    )
+    let { memberId } = detail_recordInfo
     const body = {}
-    body.id = userId
+    body.id = memberId
 
     const callBack = result => {
       if (result === true) {
-        this.closeButtonClick(null)
+        detail_recordInfo.bindStatus = 1
         this.props.changeDoorForbid(subModule, {
-          detail_unbindCount: detail_unbindCount + 1
+          detail_unbindCount: detail_unbindCount + 1,
+          detail_recordInfo: detail_recordInfo
         })
       }
     }
@@ -296,18 +300,18 @@ class BackDormRecordDetail extends React.Component {
     let detail_dataSource = JSON.parse(
       JSON.stringify(this.props.detail_dataSource)
     )
-    let { detail_formType, detail_timeType } = this.props
+    let { detail_formType } = this.props
+
     const body = {}
     body.type = detail_formType
     if (detail_formType === 1) {
       body.checkLogId = record.id
     } else {
-      body.id = record.userId
+      body.memberId = record.memberId
     }
 
-    if (detail_timeType !== 1) {
-      body.day = serverDayMap[detail_timeType]
-    }
+    body.day = record.day
+
     const callBack = result => {
       if (result === true) {
         detail_dataSource[index].status = 1
@@ -342,7 +346,8 @@ class BackDormRecordDetail extends React.Component {
       grade,
       dormitory,
       schoolName,
-      status
+      status,
+      bindStatus
     } = detail_recordInfo
 
     return (
@@ -372,6 +377,10 @@ class BackDormRecordDetail extends React.Component {
             <li>
               <label>手机号:</label>
               <span>{mobile}</span>
+            </li>
+            <li>
+              <label>绑定状态:</label>
+              <span>{bindStatus === 2 ? '已绑定' : '未绑定'}</span>
             </li>
             <li>
               <label>昵称:</label>
@@ -410,16 +419,18 @@ class BackDormRecordDetail extends React.Component {
               />
             </li>
           </ul>
-
-          <div className="leftButton">
-            <Button
-              className="leftBtn"
-              type="primary"
-              onClick={this.unbindButtonClicked}
+          {bindStatus === 2 ? (
+            <Popconfirm
+              title="确定要解除绑定该用户吗?"
+              onConfirm={this.unbindButtonClicked}
+              okText="确认"
+              cancelText="取消"
             >
-              解除绑定
-            </Button>
-          </div>
+              <Button className="unbindButton" type="primary">
+                解除绑定
+              </Button>
+            </Popconfirm>
+          ) : null}
         </div>
 
         <div className="queryPanel">
