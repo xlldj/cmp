@@ -53,6 +53,7 @@ class HeaterDetail extends React.PureComponent {
       solarEnergy: 2,
       waterTanks,
       residences: [],
+      supplyWaterPressureRange: '',
       residenceError: false,
       showBuildingSelect: false
     }
@@ -147,6 +148,7 @@ class HeaterDetail extends React.PureComponent {
       backWaterPump,
       electricMeterRate,
       emissionReductionParam,
+      supplyWaterPressureRange,
       solarEnergy,
       residences
     } = this.state
@@ -187,6 +189,9 @@ class HeaterDetail extends React.PureComponent {
     }
     if (replenishmentWaterPump) {
       body.replenishmentWaterPump = replenishmentWaterPump
+    }
+    if (supplyWaterPressureRange) {
+      body.supplyWaterPressureRange = supplyWaterPressureRange
     }
     let resource = '/api/machine/unit/register'
     if (status === HEATER_STATUS_REGISTERD) {
@@ -369,6 +374,11 @@ class HeaterDetail extends React.PureComponent {
       waterTanks
     })
   }
+  changesupplyWaterPressureRange = e => {
+    this.setState({
+      supplyWaterPressureRange: parseInt(e.target.value, 10)
+    })
+  }
   render() {
     let {
       imei,
@@ -387,7 +397,8 @@ class HeaterDetail extends React.PureComponent {
       showBuildingSelect,
       residences,
       residenceError,
-      waterTanks
+      waterTanks,
+      supplyWaterPressureRange
     } = this.state
     const waterTankItems =
       waterTanks &&
@@ -520,6 +531,14 @@ class HeaterDetail extends React.PureComponent {
               type="number"
               value={emissionReductionParam}
               onChange={this.changeemissionReductionParam}
+            />
+          </li>
+          <li>
+            <p>供水压力量程</p>
+            <input
+              type="number"
+              value={supplyWaterPressureRange}
+              onChange={this.changesupplyWaterPressureRange}
             />
           </li>
           <li>
