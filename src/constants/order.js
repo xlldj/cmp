@@ -13,9 +13,17 @@ const ORDER = {
     }
   ],
   ORDER_DAY_SELECT: {
+    // for order table
     1: '今日',
     2: '近7日',
     3: '近30日'
-  }
+  },
+  ORDER_STAT_DAY_SELECT: {
+    // for order stat
+    1: '今日',
+    2: '近7日',
+    3: '近30日'
+  },
+  ORDER_LIST_TABLE: 1
 }
 export default ORDER

@@ -1,18 +1,21 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Popconfirm, Button, Modal } from 'antd'
+import { Popconfirm, Button, Modal, Badge } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../../constants'
 import Time from '../../../util/time'
 import Noti from '../../../util/noti'
 import LoadingMask from '../../component/loadingMask'
 import closeBtn from '../../assets/close.png'
+import { checkObject } from '../../../util/checkSame'
+const subModule = 'orderList'
+const { ORDERSTATUS } = CONSTANTS
 
 const { DEVICETYPE } = CONSTANTS
 const STATUSCLASS = {
   1: 'warning',
   2: 'success',
-  4: ''
+  4: 'default'
 }
 
 class OrderInfo extends React.Component {
@@ -42,8 +45,8 @@ class OrderInfo extends React.Component {
     }
   }
   fetchData = props => {
-    let { id } = props || this.props
-    const body = { id }
+    let { orderId } = props || this.props
+    const body = { id: orderId }
     let resource = '/api/order/details'
     const cb = json => {
       if (json.error) {
@@ -61,6 +64,24 @@ class OrderInfo extends React.Component {
 
   componentDidMount() {
     this.fetchData()
+    let id = this.props.orderId
+    this.setState({
+      id
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    try {
+      if (checkObject(this.props, nextProps, ['orderId'])) {
+        return
+      }
+      this.fetchData(nextProps)
+      this.setState({
+        id: nextProps.orderId
+      })
+    } catch (e) {
+      console.log(e)
+    }
   }
   back = () => {
     this.props.history.goBack()
@@ -146,11 +167,24 @@ class OrderInfo extends React.Component {
       modalMessage: v
     })
   }
+  showUserOrderList = e => {
+    let mobile = this.state.data.mobile
+    this.props.changeOrder(subModule, {
+      page: 1,
+      day: 0,
+      status: 'all',
+      selectKey: mobile,
+      showDetail: false,
+      selectedRowIndex: -1,
+      selectedDetailId: -1
+    })
+  }
   render() {
     let { data, modalClosable, detailLoading } = this.state
     const { schoolName, deviceLocation, prepay, orderNo, deviceType } =
       data || {}
     console.log(this.props)
+    console.log(ORDERSTATUS[data.status])
 
     const popTitle = (
       <p className="popTitle">
@@ -159,7 +193,7 @@ class OrderInfo extends React.Component {
     )
 
     return (
-      <div className="detailPanelWrapper slideLeft" ref="detailWrapper">
+      <div className="detailPanelWrapper orderInfo" ref="detailWrapper">
         {detailLoading ? (
           <div className="task-loadWrapper">
             <LoadingMask />
@@ -167,7 +201,7 @@ class OrderInfo extends React.Component {
         ) : null}
 
         <div className="detailPanel-header">
-          <h3>定单详情</h3>
+          <h3>设备订单详情</h3>
           <button className="closeBtn" onClick={this.close}>
             <img src={closeBtn} alt="X" />
           </button>
@@ -175,7 +209,8 @@ class OrderInfo extends React.Component {
 
         <div className="detailPanel-content">
           <h3 className="detailPanel-content-title">
-            {`${schoolName || ''}${deviceLocation || ''}`}
+            <span className="rightSeperator">{`${schoolName || ''}`}</span>
+            {`${deviceLocation || ''}`}
           </h3>
           <ul className="detailList">
             <li>
@@ -183,113 +218,122 @@ class OrderInfo extends React.Component {
               <span>{orderNo}</span>
             </li>
             <li>
-              <label>设备类型</label>
+              <label>设备类型:</label>
               <span>{DEVICETYPE[deviceType] || '未知'}</span>
             </li>
             <li>
-              <label>设备ID</label>
+              <label>设备ID:</label>
               <span>{data.macAddress || '暂无'}</span>
             </li>
           </ul>
           <ul className="detailList">
             <li>
               <label>用户手机:</label>
-              <span className="padR20">{data.mobile || '暂无'}</span>
-              <Link
-                to={{
-                  pathname: `/user/userInfo/:${data.userId}`,
-                  state: { path: 'fromOrder' }
-                }}
-              >
-                查看用户详情
-              </Link>
+              <span>
+                <span className="padR20">{data.mobile || '暂无'}</span>
+                <Link
+                  to={{
+                    pathname: `/user/userInfo/:${data.userId}`,
+                    state: { path: 'fromOrder' }
+                  }}
+                >
+                  查看用户详情
+                </Link>
+              </span>
             </li>
             <li>
-              <label>预付金额</label>
+              <label>预付金额:</label>
               <span>{prepay || '未知'}</span>
             </li>
             {data.status !== 1 ? (
               <li>
-                <label>实际消费</label>
-                <span className="shalowRed">{`${data.consume}`}</span>
+                <label>实际消费:</label>
+                <span className={data.bonusAmount ? '' : 'shalowRed'}>{`${
+                  data.consume
+                }`}</span>
               </li>
             ) : null}
             {data.bonusAmount ? (
               <li>
-                <p>代金券抵扣:</p>
+                <label>代金券抵扣:</label>
                 <span>{data.bonusAmount}</span>
               </li>
             ) : null}
-            {data.actualDebit ? (
+            {/* only show 'actualDebit' when used bonus' */}
+            {data.bonusAmount ? (
               <li>
-                <p>实际扣款</p>
-                <span>{data.actualDebit}</span>
+                <label>实际扣款:</label>
+                <span className="shalowRed">{data.actualDebit}</span>
               </li>
             ) : null}
-            {data.status !== 1 && data.odd ? (
-              <li>
-                <p>找零金额:</p>
-                <span>{data.odd ? data.odd : '未知'}</span>
-              </li>
-            ) : null}
+            <li>
+              <label>找零金额:</label>
+              {data.status !== 1 ? (
+                <span>{data.odd || '未知'}</span>
+              ) : (
+                <span className="shalowRed">待结账</span>
+              )}
+            </li>
             {data.status !== 1 ? (
               <li>
-                <p>结账方式:</p>
+                <label>结账方式:</label>
                 {data.checkoutByOther ? '代结账' : '自结账'}
               </li>
             ) : null}
           </ul>
-          <ul className="detailList">
+          <ul className="detailList ">
             <li>
-              <p>开始时间:</p>
+              <label>开始时间:</label>
               {Time.getTimeStr(data.createTime)}
             </li>
             {data.status !== 1 ? (
               <li>
-                <p>结束时间:</p>
+                <label>结束时间:</label>
                 {data.finishTime ? Time.getTimeStr(data.finishTime) : ''}
               </li>
             ) : null}
             <li>
-              <p>使用状态:</p>
-              <span className={STATUSCLASS[data.status]}>
-                {CONSTANTS.ORDERSTATUS[data.status]}
-              </span>
+              <label>使用状态:</label>
+              <Badge
+                text={ORDERSTATUS[data.status]}
+                status={STATUSCLASS[data.status]}
+              />
             </li>
 
-            {data.status !== 4 ? (
-              <li>
-                <p />
-                <Popconfirm title={popTitle} onConfirm={this.openModal}>
-                  <Button>退单</Button>
-                </Popconfirm>
-              </li>
-            ) : null}
             {data.status === 4 ? (
               <li>
-                <p>退单操作人:</p>
+                <label>退单操作人:</label>
                 <span>{data.chargebackExecutor}</span>
               </li>
             ) : null}
             {data.status === 4 ? (
-              <li>
-                <p>退单原因:</p>
+              <li className="high">
+                <label>退单原因:</label>
                 <span>{data.chargebackReason}</span>
-              </li>
-            ) : null}
-            {data.status === 4 && data.chargebackMoney ? (
-              <li>
-                <p>退还金额:</p>
-                <span>{data.chargebackMoney}</span>
               </li>
             ) : null}
             {data.status === 4 && data.chargebackBonus ? (
               <li>
-                <p>退还代金券:</p>
+                <label>退还代金券:</label>
                 <span>{data.chargebackBonus}</span>
               </li>
             ) : null}
+            {data.status === 4 && data.chargebackMoney ? (
+              <li>
+                <label>退还金额:</label>
+                <span>{data.chargebackMoney}</span>
+              </li>
+            ) : null}
           </ul>
+
+          {data.status !== 4 ? (
+            <Popconfirm title={popTitle} onConfirm={this.openModal}>
+              <Button className="rightSeperator">退单</Button>
+            </Popconfirm>
+          ) : null}
+          <Button type="primary" onClick={this.showUserOrderList}>
+            查看历史订单
+          </Button>
         </div>
 
         <Modal

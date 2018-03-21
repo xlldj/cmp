@@ -6,7 +6,7 @@ let selectedSchool = getDefaultSchool()
 
 const initialOrderState = {
   orderList: {
-    tabIndex: 1, // 1 for table, 2 for statistics
+    tabIndex: 2, // 1 for table, 2 for statistics
     page: 1,
     schoolId: selectedSchool,
     day: 1, // 1 for today, 2 for last 7 days , 3 for last 30 days, 0 for custom select
@@ -18,7 +18,11 @@ const initialOrderState = {
     endTime: '', // Time.getTodayEnd(),
     selectedRowIndex: '',
     selectedDetailId: '',
-    showDetail: false
+    showDetail: false,
+    // below is stat related state
+    stat_day: 1, // 1 for today, 'all' for '不限',
+    stat_dt: 1, // for devicetype of stat.
+    stat_page: 1
   },
   abnormal: {
     page: 1,

@@ -193,6 +193,12 @@ button.grayBackColor:linked{
 .seperator{
   margin: 0 20px;
 }
+.leftSeperator{
+  margin-left: 10px;
+}
+.rightSeperator{
+  margin-right: 10px;
+}
 
 /* for time picker in gift/act and notify */
 .timePicker{
@@ -867,7 +873,6 @@ button.grayBackColor:linked{
   font-size: 40px;
   color: #108EE9;
 }
-
 .nonBdr{
   outline: none;
   width: 80px;
@@ -1007,7 +1012,91 @@ button.grayBackColor:linked{
 .panelWrapper{
   .tableList{
     padding: 0 20px;
+    td, td *{
+      cursor: pointer;
+    }
   }
+}
+
+// for new detail panel
+.detailPanelWrapper{
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+  // transition: width 1s;
+  // animation: slide 1s;
+  .detailPanel-header{
+    display: inline-flex;
+    padding: 0 30px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+  }
+  .detailPanel-content{
+    width: 100%;
+    height: calc(~ '100% - 50px');
+    padding: 20px 30px;
+    overflow-y: scroll;
+    .detailPanel-sidebar{
+      display: inline-block;
+      padding: 20px 30px;
+      // min-height: 100%;
+      height: auto;
+      border-right: 1px solid #ddd;
+    }
+    .detailPanel-content-title{
+      font-size: 20px;
+    }
+    .handleBtn{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      button{
+        margin-right: 10px;
+      }
+      .hint{
+        display: inline-block;
+        margin-right: 10px;
+        color: @gray;
+      }
+    }
+    .processLogs{
+      margin: 0px -30px;
+      padding: 15px 30px;
+      border-top: 1px solid #ddd;
+      ul{
+        margin-top: 15px;
+        border: 1px solid #ddd;
+      }
+    }
+    .detailList{
+      padding: 5px 0;
+    }
+  }
+}
+
+// for new panel module
+.selectedHintWraper{
+  position: relative;
+}
+.selectedImg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+}
+
+// for table rows
+.selectedRow{
+  background: @blue;
 }
 // for style like info in task/detail 
 .detailList{
@@ -1019,11 +1108,11 @@ button.grayBackColor:linked{
       display: inline-block;
       margin-right: 10px;
     }
-    span{
+    &>span{
       display: inline-block;
       width: calc(~ '100% - 80px');
     }
-    span.inline{
+    &>span.inline{
       display: inline;
     }
     img{
@@ -1181,87 +1270,6 @@ button.grayBackColor:linked{
   background-color: rgba(255 , 255, 255, 0.5);
 }
 
-// for new detail panel
-.detailPanelWrapper{
-    position: fixed;
-    top: 0;
-    right: 0;
-
-    width: 70%;
-    height: 100%;
-
-    background: white;
-    box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
-    z-index: 999;
-    // transition: width 1s;
-    // animation: slide 1s;
-    .detailPanel-header{
-      display: inline-flex;
-      padding: 0 30px;
-      width: 100%;
-      align-items: center;
-      justify-content: space-between;
-      height: 50px;
-      border-bottom: 1px solid #ddd;
-    }
-    .taskDetail-content, .taskDetail-sidebar{
-      display: inline-block;
-      padding: 20px 30px;
-      // min-height: 100%;
-      height: auto;
-      border-right: 1px solid #ddd;
-    }
-  .taskDetail-content{
-    width: 70%;
-    height: calc(~ '100% - 50px');
-    overflow-y: scroll;
-    h3{
-      font-size: 20px;
-    }
-    .handleBtn{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      button{
-        margin-right: 10px;
-      }
-      .hint{
-        display: inline-block;
-        margin-right: 10px;
-        color: @gray;
-      }
-    }
-    .processLogs{
-      margin: 0px -30px;
-      padding: 15px 30px;
-      border-top: 1px solid #ddd;
-      ul{
-        margin-top: 15px;
-        border: 1px solid #ddd;
-      }
-    }
-    .detailList{
-      margin: 10px 0;
-    }
-  }
-}
-
-// for new panel module
-.selectedHintWraper{
-  position: relative;
-}
-.selectedImg{
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 24px;
-}
-
-// for table rows
-.selectedRow{
-  background: @blue;
-}
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable{
   margin:10px 40px 40px 40px;

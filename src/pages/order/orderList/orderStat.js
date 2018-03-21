@@ -1,16 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import { Table, Badge, Button } from 'antd'
+import { Table } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 import Time from '../../../util/time'
 import CONSTANTS from '../../../constants'
-import selectedImg from '../../assets/selected.png'
 
-import RangeSelect from '../../component/rangeSelect'
-import SearchInput from '../../component/searchInput'
 import CheckSelect from '../../component/checkSelect'
-import OrderDetail from './orderInfo'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -18,23 +14,13 @@ import { changeOrder } from '../../../actions'
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
 
-const {
-  PAGINATION: SIZE,
-  DEVICETYPE,
-  ORDER_DAY_SELECT,
-  ORDERUSERTYPES,
-  ORDERSTATUS
-} = CONSTANTS
+const { DEVICETYPE, ORDER_STAT_DAY_SELECT } = CONSTANTS
+const SIZE = 1
 
-const BACKTITLE = {
-  fromUser: '返回用户详情',
-  fromDevice: '返回设备详情',
-  fromTask: '返回工单'
-}
 /* state explanation */
 /* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
 /* subStartTime: 传给字组件searchLine的截止时间 */
-class OrderTable extends React.Component {
+class OrderStat extends React.Component {
   constructor(props) {
     super(props)
     let dataSource = []
@@ -48,6 +34,53 @@ class OrderTable extends React.Component {
       subStartTime: this.props.startTime,
       subEndTime: this.props.endTime
     }
+
+    this.columns = [
+      {
+        title: '学校',
+        dataIndex: 'schoolName'
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'deviceType',
+        width: '7%',
+        render: (text, record, index) => DEVICETYPE[record.deviceType]
+      },
+      {
+        title: '使用人数',
+        dataIndex: 'location',
+        width: '10%'
+      },
+      {
+        title: '开始时间',
+        dataIndex: 'createTime',
+        width: '10%',
+        render: (text, record, index) => {
+          return Time.getTimeStr(record.createTime)
+        }
+      },
+      {
+        title: '结束时间',
+        dataIndex: 'finishTime',
+        width: '10%',
+        render: (text, record, index) => {
+          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
+        }
+      },
+      {
+        title: '消费金额',
+        dataIndex: 'paymentType',
+        width: '8%',
+        className: 'shalowRed',
+        render: (text, record, index) => {
+          if (record.status !== 1) {
+            return `${record.consume}` || '暂无'
+          } else if (record.prepay) {
+            return `${record.prepay}`
+          }
+        }
+      }
+    ]
   }
   fetchData = props => {
     this.setState({
@@ -304,110 +337,9 @@ class OrderTable extends React.Component {
     }
   }
   render() {
-    const {
-      page,
-      deviceType,
-      status,
-      userType,
-      day,
-      selectedRowIndex,
-      showDetail,
-      selectedDetailId
-    } = this.props
-    const {
-      dataSource,
-      total,
-      totalIncome,
-      totalChargeback,
-      loading,
-      startTime,
-      endTime
-    } = this.state
-    const { state } = this.props.location
+    const { page, deviceType, day } = this.props
+    const { dataSource, total, loading } = this.state
 
-    const columns = [
-      {
-        title: '订单号',
-        dataIndex: 'orderNo',
-        width: '20%',
-        className: 'firstCol selectedHintWraper',
-        render: (text, record, index) => (
-          <span className="">
-            {index === selectedRowIndex ? (
-              <img src={selectedImg} alt="" className="selectedImg" />
-            ) : null}
-            {text}
-          </span>
-        )
-      },
-      {
-        title: '用户',
-        dataIndex: 'username',
-        width: '10%'
-      },
-      {
-        title: '使用设备',
-        dataIndex: 'deviceType',
-        width: '7%',
-        render: (text, record, index) => DEVICETYPE[record.deviceType]
-      },
-      {
-        title: '所在学校',
-        dataIndex: 'schoolName'
-      },
-      {
-        title: '设备地址',
-        dataIndex: 'location',
-        width: '10%'
-      },
-      {
-        title: '开始时间',
-        dataIndex: 'createTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return Time.getTimeStr(record.createTime)
-        }
-      },
-      {
-        title: '结束时间',
-        dataIndex: 'finishTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
-        }
-      },
-      {
-        title: '使用状态',
-        dataIndex: 'status',
-        width: '10%',
-        render: (text, record, index) => {
-          switch (record.status) {
-            case 1:
-              return <Badge status="warning" text="使用中" />
-            case 2:
-              return <Badge status="success" text="使用结束" />
-            case 4:
-              return <Badge status="default" text="已退单" />
-            case 3:
-              return <Badge status="warning" text="异常" />
-            default:
-              return <Badge status="warning" text="异常" />
-          }
-        }
-      },
-      {
-        title: '消费金额',
-        dataIndex: 'paymentType',
-        className: 'shalowRed',
-        render: (text, record, index) => {
-          if (record.status !== 1) {
-            return `${record.consume}` || '暂无'
-          } else if (record.prepay) {
-            return `${record.prepay}`
-          }
-        }
-      }
-    ]
     return (
       <div className="">
         <div className="queryPanel">
@@ -415,30 +347,11 @@ class OrderTable extends React.Component {
             <div className="block">
               <span>时间筛选:</span>
               <CheckSelect
-                options={ORDER_DAY_SELECT}
-                value={+day}
-                onClick={this.changeRange}
-              />
-              <RangeSelect
-                className="seperator"
-                startTime={startTime}
-                endTime={endTime}
-                changeStartTime={this.changeStartTime}
-                changeEndTime={this.changeEndTime}
-                confirm={this.confirmTimeRange}
-              />
-            </div>
-          </div>
-
-          <div className="queryLine">
-            <div className="block">
-              <span>用户类型:</span>
-              <CheckSelect
                 allOptTitle="不限"
                 allOptValue="all"
-                options={ORDERUSERTYPES}
-                value={userType}
-                onClick={this.changeUserType}
+                options={ORDER_STAT_DAY_SELECT}
+                value={+day}
+                onClick={this.changeRange}
               />
             </div>
           </div>
@@ -452,32 +365,6 @@ class OrderTable extends React.Component {
                 value={deviceType}
                 onClick={this.changeDevice}
               />
-            </div>
-            <div className="block">
-              <SearchInput
-                placeholder="宿舍/订单号/手机号"
-                searchingText={this.state.searchingText}
-                pressEnter={this.pressEnter}
-                changeSearch={this.changeSearch}
-              />
-            </div>
-          </div>
-          <div className="queryLine">
-            <div className="block">
-              <span>使用状态:</span>
-              <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
-                options={ORDERSTATUS}
-                value={status}
-                onClick={this.changeStatus}
-              />
-            </div>
-            <div className="block">
-              <span className="seperator">
-                总收益(使用结束): {totalIncome}元
-              </span>
-              <span>已退单: {totalChargeback}元</span>
             </div>
           </div>
         </div>
@@ -493,27 +380,12 @@ class OrderTable extends React.Component {
             }}
             dataSource={dataSource}
             rowKey={record => record.id}
-            columns={columns}
+            columns={this.columns}
             onChange={this.changePage}
             onRowClick={this.selectRow}
             rowClassName={this.setRowClass}
           />
         </div>
-
-        {showDetail ? (
-          <div ref="detailWrapper">
-            <OrderDetail
-              orderId={selectedDetailId}
-              changeOrder={this.props.changeOrder}
-              ref="detailWrapper"
-            />
-          </div>
-        ) : null}
-        {state ? (
-          <div className="btnRight">
-            <Button onClick={this.back}>{BACKTITLE[state.path]}</Button>
-          </div>
-        ) : null}
       </div>
     )
   }
@@ -523,22 +395,14 @@ const mapStateToProps = (state, ownProps) => {
   return {
     tabIndex: state.orderModule[subModule].tabIndex,
     schoolId: state.orderModule[subModule].schoolId,
-    day: state.orderModule[subModule].day,
-    deviceType: state.orderModule[subModule].deviceType,
-    status: state.orderModule[subModule].status,
-    userType: state.orderModule[subModule].userType,
-    selectKey: state.orderModule[subModule].selectKey,
-    page: state.orderModule[subModule].page,
-    startTime: state.orderModule[subModule].startTime,
-    endTime: state.orderModule[subModule].endTime,
-    selectedRowIndex: state.orderModule[subModule].selectedRowIndex,
-    selectedDetailId: state.orderModule[subModule].selectedDetailId,
-    showDetail: state.orderModule[subModule].showDetail
+    day: state.orderModule[subModule].stat_day,
+    deviceType: state.orderModule[subModule].stat_dt,
+    page: state.orderModule[subModule].stat_page
   }
 }
 
 export default withRouter(
   connect(mapStateToProps, {
     changeOrder
-  })(OrderTable)
+  })(OrderStat)
 )
