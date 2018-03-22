@@ -115,7 +115,10 @@ const fetchDoorForbidReportList = (body, subModule) => {
           keyValuePair: {
             report_dataSource: json.data.gateRecords,
             report_total: json.data.total,
-            report_loading: false
+            report_loading: false,
+            report_late: json.data.late,
+            report_normal: json.data.normal,
+            report_notReturn: json.data.notReturn
           }
         })
       } else {

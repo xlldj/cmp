@@ -29,6 +29,9 @@ const initialState = {
     report_sexType: 1,
     report_orderBy: '',
     report_order: 0, //1 asc 2 desc
+    report_late: 0,
+    report_normal: 0,
+    report_notReturn: 0,
 
     timeSetting_loading: false,
     timeSetting_total: 0,

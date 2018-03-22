@@ -147,10 +147,14 @@ class BackDormReportTable extends React.Component {
       report_total,
       report_page,
       report_dataSource,
-      report_timeType
+      report_timeType,
+      report_normal,
+      report_late,
+      report_notReturn
       // report_sexType
     } = this.props
     const { searchingText } = this.state
+
     return (
       <div className="doorForbidReportTab">
         <div className="queryPanel">
@@ -183,6 +187,23 @@ class BackDormReportTable extends React.Component {
               />
             </div>
           </div> */}
+
+          <div className="doorForbidQueryLine queryLine">
+            <div />
+            {report_timeType === 1 ? (
+              <div className="block">
+                <span className="doorForbidReportSpan">
+                  {`昨天正常归寝人数：${report_normal || 0}`}
+                </span>
+                <span className="doorForbidReportSpan">
+                  {`昨天晚归人数：${report_late || 0}`}
+                </span>
+                <span className="doorForbidReportSpan">
+                  {`昨天未归寝人数：${report_notReturn || 0}`}
+                </span>
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <div className="tableList">
@@ -214,7 +235,10 @@ const mapStateToProps = state => ({
   report_timeType: state.doorForbidModule[subModule].report_timeType,
   report_sexType: state.doorForbidModule[subModule].report_sexType,
   report_orderBy: state.doorForbidModule[subModule].report_orderBy,
-  report_order: state.doorForbidModule[subModule].report_order
+  report_order: state.doorForbidModule[subModule].report_order,
+  report_normal: state.doorForbidModule[subModule].report_normal,
+  report_late: state.doorForbidModule[subModule].report_late,
+  report_notReturn: state.doorForbidModule[subModule].report_notReturn
 })
 export default withRouter(
   connect(mapStateToProps, {

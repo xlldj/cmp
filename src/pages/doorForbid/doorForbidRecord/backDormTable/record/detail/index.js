@@ -353,9 +353,7 @@ class BackDormRecordDetail extends React.Component {
     return (
       <div
         className={
-          detail_show
-            ? 'backDormDetailWrapper slideLeft'
-            : 'backDormDetailWrapper hidden'
+          detail_show ? 'backDormDetailWrapper' : 'backDormDetailWrapper hidden'
         }
         ref="detailWrapper"
       >
@@ -371,105 +369,107 @@ class BackDormRecordDetail extends React.Component {
           </button>
         </div>
 
-        <div className="backDormDetail-content">
-          <h3>{`${name || ''} ${schoolName || ''}`}</h3>
-          <ul className="detaiList">
-            <li>
-              <label>手机号:</label>
-              <span>{mobile}</span>
-            </li>
-            <li>
-              <label>绑定状态:</label>
-              <span>{bindStatus === 2 ? '已绑定' : '未绑定'}</span>
-            </li>
-            <li>
-              <label>昵称:</label>
-              <span>{nickName}</span>
-            </li>
-            <li>
-              <label>学号:</label>
-              <span>{studentNo}</span>
-            </li>
-            <li>
-              <label>姓名:</label>
-              <span>{name}</span>
-            </li>
-            {/* <li>
+        <div className="backDormDetail-scrollContent">
+          <div className="backDormDetail-content">
+            <h3>{`${name || ''} ${schoolName || ''}`}</h3>
+            <ul className="detaiList">
+              <li>
+                <label>手机号:</label>
+                <span>{mobile}</span>
+              </li>
+              <li>
+                <label>绑定状态:</label>
+                <span>{bindStatus === 2 ? '已绑定' : '未绑定'}</span>
+              </li>
+              <li>
+                <label>昵称:</label>
+                <span>{nickName}</span>
+              </li>
+              <li>
+                <label>学号:</label>
+                <span>{studentNo}</span>
+              </li>
+              <li>
+                <label>姓名:</label>
+                <span>{name}</span>
+              </li>
+              {/* <li>
               <label>性别:</label>
               <span>{SEX[sex]}</span>
             </li> */}
-            <li>
-              <label>年级:</label>
-              <span>{grade}</span>
-            </li>
-            <li>
-              <label>宿舍:</label>
-              <span>{dormitory}</span>
-            </li>
+              <li>
+                <label>年级:</label>
+                <span>{grade}</span>
+              </li>
+              <li>
+                <label>宿舍:</label>
+                <span>{dormitory}</span>
+              </li>
 
-            <li>
-              <label>当前归寝状态: </label>
-              <Badge
-                status={
-                  status === 1 ? 'success' : status === 2 ? 'warning' : 'error'
-                }
-                text={
-                  status === 1 ? '已归寝' : status === 2 ? '晚归寝' : '未归寝'
-                }
-              />
-            </li>
-          </ul>
-          {bindStatus === 2 ? (
-            <Popconfirm
-              title="确定要解除绑定该用户吗?"
-              onConfirm={this.unbindButtonClicked}
-              okText="确认"
-              cancelText="取消"
-            >
-              <Button className="unbindButton" type="primary">
-                解除绑定
-              </Button>
-            </Popconfirm>
-          ) : null}
-        </div>
+              <li>
+                <label>当前归寝状态: </label>
+                <Badge
+                  status={
+                    status === 1
+                      ? 'success'
+                      : status === 2 ? 'warning' : 'error'
+                  }
+                  text={
+                    status === 1 ? '已归寝' : status === 2 ? '晚归寝' : '未归寝'
+                  }
+                />
+              </li>
+            </ul>
+            {bindStatus === 2 ? (
+              <Popconfirm
+                title="确定要解除绑定该用户吗?"
+                onConfirm={this.unbindButtonClicked}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button className="unbindButton" type="primary">
+                  解除绑定
+                </Button>
+              </Popconfirm>
+            ) : null}
+          </div>
 
-        <div className="queryPanel">
-          <div className="queryLine">
-            <div className="block">
-              <span>时间筛选:</span>
-              <CheckSelect
-                options={DOORFORBID_RECORD_TIME}
-                value={detail_timeType}
-                onClick={this.changeTimeType}
-              />
-              <RangeSelect
-                className="task-rangeSelect"
-                startTime={detail_startTime}
-                endTime={detail_endTime}
-                changeStartTime={this.changeStartTime}
-                changeEndTime={this.changeEndTime}
-                confirm={this.confirmTimeRange}
-              />
+          <div className="queryPanel">
+            <div className="queryLine">
+              <div className="block">
+                <span>时间筛选:</span>
+                <CheckSelect
+                  options={DOORFORBID_RECORD_TIME}
+                  value={detail_timeType}
+                  onClick={this.changeTimeType}
+                />
+                <RangeSelect
+                  className="task-rangeSelect"
+                  startTime={detail_startTime}
+                  endTime={detail_endTime}
+                  changeStartTime={this.changeStartTime}
+                  changeEndTime={this.changeEndTime}
+                  confirm={this.confirmTimeRange}
+                />
+              </div>
+            </div>
+
+            <div className="queryLine">
+              <div className="block">
+                <span>表格类型:</span>
+                <CheckSelect
+                  options={DOORFORBID_FORM}
+                  value={detail_formType}
+                  onClick={this.changeformType}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="queryLine">
-            <div className="block">
-              <span>表格类型:</span>
-              <CheckSelect
-                options={DOORFORBID_FORM}
-                value={detail_formType}
-                onClick={this.changeformType}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="tableList">
           <Table
+            className="backDormDetail-tableList"
             loading={detail_loading}
             bordered
-            // rowKey={detail_formType === 1 ? 'id' : (record, index) => index}
             rowKey={(record, index) => record.id || index}
             pagination={{
               pageSize: SIZE,

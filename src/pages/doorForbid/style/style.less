@@ -1,117 +1,9 @@
 @gray: #ddd;
-.taskNoteList{
-  .addWorkNote{
-    cursor: pointer;
-    font-size: 60px;
-    line-height: 150px;
-    text-align: center;
-    font-weight: 300;
-    color: #108EE9;
-  }
-}
+
 .disabled{
   background-color: #eee;
   border-radius: 5px;
 }
-.card{
-  border: 1px solid #eee;
-  border-radius: 5px;
-  width: 420px;
-  height: 160px;
-  margin-right: 15px;
-  margin-bottom: 25px;
-  font-size: 12px;
-  background-color: #fff;
-  .cardContent{
-    padding: 10px 14px;
-    padding-top: 15px;
-    height:115px;
-    color: #bbb;
-    .header{
-      width: 100%;
-      display: inline-flex;
-      justify-content: space-between;
-      margin-bottom: 7px;
-      h3{
-        font-size: 1.2em;
-        font-weight: 400;
-      }
-      .username{
-        color: #bbb;
-      }
-    }
-  }
-  .status{
-    box-sizing: border-box;
-    padding: 5px 14px;
-    width: 100%;
-    height: 45px;
-    font-size: 1em;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #eee;
-    .seperator{
-      display: inline-block;
-      width: 5px;
-    }
-  }
-}
-.cardPanel{
-  margin-top: 20px;
-  padding: 0px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-
-// style for complaint
-.complaint{
-  .thumbnailWrapper{
-    display: flex;
-    flex: none;
-    flex-wrap: nowrap;
-    li{
-      width: 30px;
-      height: 30px;
-      overflow: hidden;
-      img{
-        margin-left: 50%;
-        margin-top: 50%;
-        transform: translate(-50%, -50%);
-      }
-    }
-  }
-}
-
-.itemsWrapper{
-  padding-bottom: 10px;
-}
-
-.upload{
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  img{
-    position: absolute !important;
-    top: 0;
-  }
-}
-.checkInvalid{
-  text-align: left;
-}
-.inactive{
-  pointer-events: none;
-  cursor: not-allowed !important;
-  color: #999;
-  *{
-    cursor: not-allowed;
-  }
-}
-.taskLogInfo{
-  padding-top: 0;
-}
-
 
 // for new task module
 .selectedHintWraper{
@@ -156,7 +48,6 @@
   right: 0;
   width: 50%;
   height: 100%;
-
   background: white;
   box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
   z-index: 999;
@@ -171,66 +62,37 @@
     height: 50px;
     border-bottom: 1px solid #ddd;
   }
-  .backDormDetail-content, .taskDetail-sidebar{
-    display: inline-block;
-    padding: 20px 30px;
-    border-bottom: 1px solid #ddd;
-  }
-  .backDormDetail-content{
-    width: 100%;
-    overflow-y: scroll;
-    h3{
-      font-size: 20px;
-    }
-    .tableList{
-      margin: 10px 0;
-    }
-    ul{
-      margin-top: 10px;
-      li{
-        margin-top: 5px;
+  .backDormDetail-scrollContent{
+    .backDormDetail-content{
+      display: inline-block;
+      padding: 20px 30px;
+      border-bottom: 1px solid #ddd;
+      width: 100%;
+      h3{
+        font-size: 20px;
+      }
+      ul{
+        margin-top: 10px;
+        li{
+          margin-top: 5px;
+        }
       }
     }
-  }
-  .taskDetail-sidebar{
-    position: absolute;
-    width: 30%;
-    .detailList{
-      margin: 15px 0;
-    }
-  }
-}
-.leftButton{
-  padding: 10px 0px 0px 0px;
-}
-
-.taskDetail-panelWrapper{
-  padding: 10px 0px;
-  min-height: 180px;
-  .detailList{
-    padding: 15px 20px;
-    background-color: #f5f5f5;
-  }
-}
-.columnsWrapper{
-  li{
-    display: inline-flex;
-    justify-content: space-around;
-    min-height: 30px;
-    padding-left: 10px;
-    .column{
-      line-height: 30px;
-      display: inline-block;
-      min-width: 100px;
-    }
-    .column:last-child{
-      line-height: 22px;
-      padding-top: 5px;
-      padding-right: 10px;
+    .backDormDetail-tableList{
+      padding: 0px 20px;
+      margin: 0px;
+      // height: 30%;
     }
   }
 }
 
+.backDormDetail-scrollContent{
+  position: absolute;
+  width: 100%;
+  height: calc(~ '100% - 50px');
+  top: 50px;
+  overflow-y: scroll;
+}
 // show the header even loading, or else it can't be closed
 .backDorm-loadWrapper{
   position: absolute;
@@ -238,79 +100,6 @@
   height: calc(~ '100% - 50px');
   top: 50px;
   background-color: rgba(255 , 255, 255, 0.5);
-}
-
-.buildTask{
-  ul{
-    padding: 0;
-    background-color: white !important;
-    li p, li.itemsWrapper p{
-      width: 100px;
-      // width: 100px !important;
-    }
-    span.ant-radio+*{
-      padding-left: 0;
-    }
-  }
-  .btnArea{
-    padding: 0;
-    background-color: white;
-  }
-}
-.longText{
-  width: 190px;
-  height: 150px;
-  line-height: 22px;
-}
-.menuItem{
-  display: inline-block;
-  width: 100%;
-}
-.reassign{
-  .info ul li p{
-    width: 83px !important;
-  }
-}
-.taskMessage{
-  width: 100%;
-  textarea{
-    margin: 15px 0 8px;
-    width: 100%;
-    height: 150px;
-  }
-}
-.modalTitle{
-  font-size: 1.2em;
-  margin: 10px;
-}
-.offlineWrapper{
-  background: white;
-  .offline{
-    width: 120px;
-    text-align: center;
-    img{
-      width: 120px;
-    }
-  }
-}
-.leftHeader{
-  display: inline-block;
-  width: 100%;
-  text-align: left;
-}
-
-.ope{
-  display: inline-block;
-  width: 100%;
-  text-align: right;
-}
-.sliderWrapper{
-  display: inline-block;
-  width: 90%;
-}
-
-.amountHint{
-  vertical-align: middle;
 }
 
 .backDormWrapper{
@@ -325,6 +114,7 @@
   .searchInput{
     width: 130px;
   }
+  text-align: right;
 }
 .cancelExceptionBtn
 {
@@ -340,4 +130,10 @@
 
 .allChooseButton{
   margin-right: 10px;
+}
+.doorForbidReportSpan{
+  margin-right: 20px;
+}
+.doorForbidQueryLine{
+  height: 10px !important;  
 }

@@ -45,8 +45,9 @@ const DOORFORBID = {
   },
 
   DOORFORBID_REPORT_TIME: {
-    1: '近7天',
-    2: '近30天'
+    1: '昨天',
+    2: '近7天',
+    3: '近30天'
   },
   DOORFORBID_SEX: {
     1: '不限',
@@ -59,9 +60,8 @@ const DOORFORBID = {
   },
   DOORFORBID_RECORD_BACKDORM_STATUS: {
     1: '不限',
-    2: '已归寝',
-    3: '晚归寝',
-    4: '未归寝'
+    2: '归寝',
+    3: '出寝'
   },
 
   DOORFORBID_WEEK: {
@@ -91,6 +91,11 @@ const DOORFORBID = {
     3: 9,
     4: 3,
     5: 5
+  },
+  DOORFORBID_REPORT_DAYTYPE: {
+    1: 9,
+    2: 3,
+    3: 5
   }
 }
 

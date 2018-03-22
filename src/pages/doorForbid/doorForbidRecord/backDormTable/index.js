@@ -13,7 +13,8 @@ const {
   DOORFORBID_PAGE_TAB_REPORT,
   DOORFORBID_PAGE_TAB_TIME,
   PAGINATION: SIZE,
-  DOORFORBID_DAYTYPE
+  DOORFORBID_DAYTYPE,
+  DOORFORBID_REPORT_DAYTYPE
 } = CONSTANTS
 
 const subModule = 'backDormRecord'
@@ -101,7 +102,7 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
       body.order = report_order
     }
 
-    body.dayType = report_timeType === 1 ? 3 : 5
+    body.dayType = DOORFORBID_REPORT_DAYTYPE[report_timeType]
 
     if (report_sexType !== 1) {
       body.sex = report_sexType - 1
@@ -133,7 +134,12 @@ const handleDoorForbidList = (newProps, oldProps, thisObj) => {
     body.schoolId = parseInt(schoolId, 10)
   }
   body.size = SIZE
-  newProps.fetchDoorForbidList(tabIndex, body, subModule)
+
+  if (newProps.fetchDoorForbidList) {
+    newProps.fetchDoorForbidList(tabIndex, body, subModule)
+  } else {
+    console.log('fetchDoorForbidList 有bug')
+  }
 }
 
 const mapStateToProps = state => ({

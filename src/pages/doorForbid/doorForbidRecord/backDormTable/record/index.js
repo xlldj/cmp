@@ -1,8 +1,7 @@
 import React from 'react'
 
-import { Table, Badge } from 'antd'
+import { Table } from 'antd'
 import CheckSelect from '../../../../component/checkSelect'
-import RangeSelect from '../../../../component/rangeSelect'
 import CONSTANTS from '../../../../../constants'
 import Time from '../../../../../util/time'
 import SearchInput from '../../../../component/searchInput'
@@ -15,8 +14,7 @@ import { changeDoorForbid } from '../../../../../actions'
 
 const {
   PAGINATION: SIZE,
-  DOORFORBID_RECORD_BACKDORM_STATUS,
-  DOORFORBID_RECORD_TIME
+  DOORFORBID_RECORD_BACKDORM_STATUS
   // DOORFORBID_SEX,
   // SEX
 } = CONSTANTS
@@ -129,12 +127,9 @@ class BackDormRecordTable extends React.Component {
     const {
       record_loading,
       record_total,
-      record_startTime,
-      record_endTime,
       record_page,
       record_dataSource,
       // record_searchKey,
-      record_timeType,
       // record_sexType,
       record_backDormStatus,
       record_selectedRowIndex
@@ -197,22 +192,6 @@ class BackDormRecordTable extends React.Component {
             return '未打卡'
           }
         }
-      },
-      {
-        title: '归寝状态',
-        width: '12%',
-        render: (text, record) => {
-          switch (record.status) {
-            case 1:
-              return <Badge status="success" text="已归寝" />
-            case 2:
-              return <Badge status="warning" text="晚归寝" />
-            case 3:
-              return <Badge status="error" text="未归寝" />
-            default:
-              return '无'
-          }
-        }
       }
     ]
     const backDormStateTitle =
@@ -226,19 +205,11 @@ class BackDormRecordTable extends React.Component {
         <div className="queryPanel">
           <div className="queryLine">
             <div className="block">
-              <span>时间筛选:</span>
+              <span>最近一次打卡:</span>
               <CheckSelect
-                options={DOORFORBID_RECORD_TIME}
-                value={record_timeType}
-                onClick={this.changeTimeType}
-              />
-              <RangeSelect
-                className="task-rangeSelect"
-                startTime={record_startTime}
-                endTime={record_endTime}
-                changeStartTime={this.changeStartTime}
-                changeEndTime={this.changeEndTime}
-                confirm={this.confirmTimeRange}
+                options={DOORFORBID_RECORD_BACKDORM_STATUS}
+                value={record_backDormStatus}
+                onClick={this.changeBackDormStatus}
               />
             </div>
             <div className="doorForbidSearchBox">
@@ -250,27 +221,8 @@ class BackDormRecordTable extends React.Component {
               />
             </div>
           </div>
-
-          {/* <div className="queryLine">
-            <div className="block">
-              <span>性别筛选:</span>
-              <CheckSelect
-                options={DOORFORBID_SEX}
-                value={record_sexType}
-                onClick={this.changeSexType}
-              />
-            </div>
-          </div> */}
-
-          <div className="queryLine">
-            <div className="block">
-              <span>归寝状态:</span>
-              <CheckSelect
-                options={DOORFORBID_RECORD_BACKDORM_STATUS}
-                value={record_backDormStatus}
-                onClick={this.changeBackDormStatus}
-              />
-            </div>
+          <div className="doorForbidQueryLine queryLine">
+            <div> {<p />} </div>
             <div className="block">
               <span className="mgr10">{backDormStateTitle}</span>
             </div>
