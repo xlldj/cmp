@@ -44,7 +44,7 @@ export const changeOnline = () => {
         })
         setStore('online', 1)
         // each time change online, start heart beat.
-        heartBeat()
+        heartBeat(dispatch)
       }
     }
     return AjaxHandler.ajax(resource, body, cb)
@@ -62,7 +62,6 @@ export const changeOffline = (forceOffline, stillHasTaskCallback) => {
         let data = {}
         if (forceOffline || json.data.amount === 0) {
           data.csOnline = false
-
           // set data into store
           dispatch({
             type: 'SET_USERINFO',
