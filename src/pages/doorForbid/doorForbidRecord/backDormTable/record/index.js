@@ -24,7 +24,7 @@ class BackDormRecordTable extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      searchingText: ''
+      searchingText: props.record_searchKey
     }
   }
 
