@@ -86,9 +86,11 @@ class InfoSet extends React.Component {
             repairmans,
             finished,
             status,
-            rateDetails
+            rateDetails,
+            type
           } = json.data
           nextState.schoolName = schoolName
+          nextState.type = type ? type : ''
           nextState.buildingNamesSet = buildingNames ? true : false
           if (buildingNames) {
             nextState.buildingNames = buildingNames
@@ -101,6 +103,18 @@ class InfoSet extends React.Component {
             */
             nextState.businesses = businesses
             businesses.forEach(busi => {
+              if (busi === DEVICE_TYPE_ENTRANCE) {
+                return
+              }
+              let rateSet =
+                rateDetails &&
+                rateDetails.some(rate => {
+                  return rate.deviceType === busi
+                })
+              if (!rateSet) {
+                nextState.rateNotMatchBusiness = true
+              }
+              // if washer, ignore it
               if (busi === DEVICE_TYPE_WASHER) {
                 return
               }
@@ -109,18 +123,6 @@ class InfoSet extends React.Component {
                 prepayOptions.some(prepay => prepay.deviceType === busi)
               if (!prepaySet) {
                 nextState.prepayNotMatchBusiness = true
-              }
-              let rateSet =
-                rateDetails &&
-                rateDetails.some(rate => {
-                  // if entrance, ignore it
-                  if (rate.deviceType === DEVICE_TYPE_ENTRANCE) {
-                    return true
-                  }
-                  return rate.deviceType === busi
-                })
-              if (!rateSet) {
-                nextState.rateNotMatchBusiness = true
               }
             })
           }
