@@ -146,12 +146,14 @@ class BackDormTable extends React.Component {
         </PhaseLine>
 
         {tabIndex === DOORFORBID_PAGE_TAB_RECORD ? (
-          <BackDormRecordTable />
+          <BackDormRecordTable hide={this.props.hide} />
         ) : null}
         {tabIndex === DOORFORBID_PAGE_TAB_REPORT ? (
-          <BackDormReportTable />
+          <BackDormReportTable hide={this.props.hide} />
         ) : null}
-        {tabIndex === DOORFORBID_PAGE_TAB_TIME ? <BackDormTimeTable /> : null}
+        {tabIndex === DOORFORBID_PAGE_TAB_TIME ? (
+          <BackDormTimeTable hide={this.props.hide} />
+        ) : null}
 
         <div ref="detailWrapper">
           <BackDormRecordDetail show={detail_show} />

@@ -1,6 +1,21 @@
 import Noti from './noti'
 import { getToken } from './handleToken'
 import { removeStore } from './storage'
+const domains = {
+  qa: {
+    manager: 'http://116.62.236.67:5080',
+    user: 'http://116.62.236.67:5081'
+  },
+  local: {
+    manager: 'http://10.0.0.100:5080',
+    user: 'http://10.0.0.100:5081'
+  },
+  server: {
+    manager: 'https://api.xiaolian365.com/m',
+    user: 'https://api.xiaolian365.com/c'
+  }
+}
+const currentDomain = domains.qa
 
 const AjaxHandler = {
   showingError: false
@@ -244,11 +259,13 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options, errorCb) => {
   if (options && options.domain) {
     url = options.domain + resource
   } else {
-    url = 'http://116.62.236.67:5080' + resource
-    // url = 'http://10.0.0.4:5080' + resource
+    url = currentDomain.manager + resource
+    /* url = 'http://116.62.236.67:5080' + resource
+    // url = 'http://10.0.0.100:5080' + resource
     // url = 'https://api.xiaolian365.com/m' + resource
     // url = 'http://47.106.62.186/m' + resource // 预发环境
     // url = 'http://120.78.246.160:2080' + resource
+    */
   }
 
   const token = getToken()
@@ -270,11 +287,14 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options, errorCb) => {
 
 /* for client ajax request */
 AjaxHandler.ajaxClient = (resource, body, cb) => {
-  // const domain = 'http://116.62.236.67:5081'
-  const domain = 'http://10.0.0.4:5081'
+  const domain = currentDomain.user
+  /*
+  const domain = 'http://116.62.236.67:5081'
+  // const domain = 'http://10.0.0.100:5081'
   // const domain = 'https://api.xiaolian365.com/c'
   // const domain = 'http://47.106.62.186/c'
   // const domain = 'http://120.78.25.22:2080'
+  */
   AjaxHandler.ajax(resource, body, cb, null, { domain: domain })
 }
 
@@ -455,10 +475,13 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
   if (options && options.domain) {
     url = options.domain + resource
   } else {
+    url = currentDomain.manager + resource
+    /*
     url = 'http://116.62.236.67:5080' + resource
     // url = 'http://10.0.0.100:5080' + resource
     // url = 'https://api.xiaolian365.com/m' + resource
     // url = 'http://120.78.246.160:2080' + resource
+    */
   }
 
   const token = getToken()

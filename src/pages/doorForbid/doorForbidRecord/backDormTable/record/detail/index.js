@@ -437,7 +437,7 @@ class BackDormRecordDetail extends React.Component {
 
           <div className="queryPanel">
             <div className="queryLine">
-              <div className="block">
+              <div className="block recordDetailTimeRange">
                 <span>时间筛选:</span>
                 <CheckSelect
                   options={DOORFORBID_RECORD_TIME}

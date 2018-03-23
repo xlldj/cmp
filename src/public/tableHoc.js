@@ -5,11 +5,15 @@ import { Map, is } from 'immutable'
 function tableHoc(WrappedComponent, handleData) {
   class TableHoc extends React.Component {
     componentDidMount() {
-      this.props.hide(false)
+      if (this.props.hide) {
+        this.props.hide(false)
+      }
       handleData(this.props, null, this)
     }
     componentWillUnmount() {
-      this.props.hide(true)
+      if (this.props.hide) {
+        this.props.hide(true)
+      }
     }
 
     componentWillReceiveProps(nextProps) {

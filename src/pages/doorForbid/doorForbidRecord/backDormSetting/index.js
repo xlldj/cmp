@@ -66,7 +66,6 @@ class BackDormSettingInfo extends React.Component {
   }
 
   componentDidMount() {
-    this.props.hide(false)
     if (this.props.location.state) {
       var editItemMap = this.props.location.state.editItem
 
@@ -103,10 +102,6 @@ class BackDormSettingInfo extends React.Component {
         addButtonShow: hasSelectDayCount === 7 ? false : true
       })
     }
-  }
-
-  componentWillUnmount() {
-    this.props.hide(true)
   }
 
   componentWillReceiveProps(nextProps) {}
@@ -258,6 +253,7 @@ class BackDormSettingInfo extends React.Component {
 
   chooseTimeRange = (event, record) => {
     event.preventDefault()
+    event.stopPropagation()
     var willShowList = cloneDeep(this.timeRangeWeekData)
 
     let { allSelectedItems } = this.state

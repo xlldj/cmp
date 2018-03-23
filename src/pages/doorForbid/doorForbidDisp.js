@@ -19,6 +19,12 @@ const breadcrumbNameMap = {
 }
 
 class DoorForbidDisp extends React.Component {
+  componentDidMount() {
+    this.props.hide(false)
+  }
+  componentWillUnmount() {
+    this.props.hide(true)
+  }
   setStatusFordoorForbid = () => {
     this.clearStatus4doorForbidIIlist()
   }
@@ -43,9 +49,7 @@ class DoorForbidDisp extends React.Component {
           <Switch>
             <Route
               path="/doorForbid/record"
-              render={props => (
-                <DoorForbidRecordContainer hide={this.props.hide} {...props} />
-              )}
+              render={props => <DoorForbidRecordContainer {...props} />}
             />
             <Route
               exact

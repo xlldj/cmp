@@ -62,7 +62,6 @@ class BackDormTimeTable extends React.Component {
       }
     ]
   }
-
   showBackDormTimeString = itemsDic => {
     let items = itemsDic.items
     console.log(items)
