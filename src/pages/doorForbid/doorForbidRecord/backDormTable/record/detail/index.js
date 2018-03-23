@@ -287,6 +287,7 @@ class BackDormRecordDetail extends React.Component {
     const callBack = result => {
       if (result === true) {
         detail_recordInfo.bindStatus = 1
+        detail_recordInfo.mobile = ''
         this.props.changeDoorForbid(subModule, {
           detail_unbindCount: detail_unbindCount + 1,
           detail_recordInfo: detail_recordInfo
