@@ -9,7 +9,7 @@ import { mul } from '../../../util/numberHandle'
 const {
   DEVICE_TYPE_BLOWER,
   DEVICE_TYPE_WASHER,
-  DEVICE_TYPE_ENTRANCE,
+  BUSI_TYPE_ENTRANCE,
   WASHER_RATE_TYPES,
   REAL_SCHOOL,
   TEST_SCHOOL,
@@ -103,7 +103,7 @@ class InfoSet extends React.Component {
             */
             nextState.businesses = businesses
             businesses.forEach(busi => {
-              if (busi === DEVICE_TYPE_ENTRANCE) {
+              if (busi === BUSI_TYPE_ENTRANCE) {
                 return
               }
               let rateSet =
