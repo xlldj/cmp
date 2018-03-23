@@ -15,7 +15,7 @@ import { withRouter } from 'react-router-dom'
 import { changeSchool } from '../../../actions'
 const subModule = 'schoolList'
 
-const SIZE = CONSTANTS.PAGINATION
+const { PAGINATION: SIZE, SCHOOL_TYPES } = CONSTANTS
 const STATUSTEXT = {
   1: '是',
   2: '否'
@@ -79,6 +79,12 @@ class SchoolList extends React.Component {
             status={record.status ? STATUSICON[record.status] : 'error'}
           />
         )
+      },
+      {
+        title: '学校类型',
+        dataIndex: 'type',
+        width: '10%',
+        render: (text, record) => SCHOOL_TYPES[record.type] || '未知'
       },
       {
         title: <p className="lastCol">操作</p>,
