@@ -3,6 +3,7 @@ import { merge } from 'lodash'
 import { combineReducers } from 'redux'
 import { getLocal } from '../util/storage'
 import Time from '../util/time'
+import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
 if (recentSchools) {
@@ -462,6 +463,7 @@ const changeStat = (state = initialStatState, action) => {
 
 const rootReducer = combineReducers({
   changeSchool,
+  doorForbidModule,
   changeDevice,
   changeOrder,
   changeFund,
