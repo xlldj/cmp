@@ -3,6 +3,13 @@ import AjaxHandler from '../util/ajax'
 import { buildAuthenData } from '../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../util/storage'
 
+import {
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList,
+  fetchDetailRecordList
+} from '../pages/doorForbid/action'
+
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
   return {
@@ -264,4 +271,11 @@ export const changeStat = (subModule, keyValuePair) => {
     subModule,
     keyValuePair
   }
+}
+
+export {
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList,
+  fetchDetailRecordList
 }
