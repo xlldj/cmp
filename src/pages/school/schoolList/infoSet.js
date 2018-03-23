@@ -6,11 +6,25 @@ import AjaxHandler from '../../../util/ajax'
 import Format from '../../../util/format'
 import CONSTANTS from '../../../constants'
 import { mul } from '../../../util/numberHandle'
-const { DEVICE_TYPE_BLOWER, DEVICE_TYPE_WASHER, WASHER_RATE_TYPES } = CONSTANTS
+const {
+  DEVICE_TYPE_BLOWER,
+  DEVICE_TYPE_WASHER,
+  DEVICE_TYPE_ENTRANCE,
+  WASHER_RATE_TYPES,
+  REAL_SCHOOL,
+  TEST_SCHOOL,
+  SCHOOL_TYPES
+} = CONSTANTS
 
 const RadioGroup = Radio.Group
 const BUSINESS = CONSTANTS.BUSINESS
 
+/**
+ * use 'finished', 'status', 'onlineChanged' to determine status.
+ * 'finished' is fetched from server to determine if the info is all ready
+ * 'status' is used to indicate user select online or offline on page
+ * 'onlineChange' is set to true when user changed 'status'
+ */
 class InfoSet extends React.Component {
   constructor(props) {
     super(props)
@@ -21,8 +35,6 @@ class InfoSet extends React.Component {
       buildingNamesSet: false,
       businesses: [],
       businessSet: false,
-      online: false,
-      onlineError: false,
       prepayFunction: null,
       prepayFunctionSet: false,
       prepayOptions: [],
@@ -44,7 +56,9 @@ class InfoSet extends React.Component {
       rateDetails: [],
       rateDetailsSet: false,
       prepayNotMatchBusiness: false,
-      rateNotMatchBusiness: false
+      rateNotMatchBusiness: false,
+      type: '',
+      typeError: false
     }
   }
   fetchData = body => {
@@ -81,6 +95,10 @@ class InfoSet extends React.Component {
           }
           nextState.businessSet = businesses ? true : false
           if (businesses) {
+            /* 
+              1.  添加学校时，  洗衣机和门禁没有预付选项
+              2.  添加学校时，  门禁没有费率
+            */
             nextState.businesses = businesses
             businesses.forEach(busi => {
               if (busi === DEVICE_TYPE_WASHER) {
@@ -94,7 +112,13 @@ class InfoSet extends React.Component {
               }
               let rateSet =
                 rateDetails &&
-                rateDetails.some(rate => rate.deviceType === busi)
+                rateDetails.some(rate => {
+                  // if entrance, ignore it
+                  if (rate.deviceType === DEVICE_TYPE_ENTRANCE) {
+                    return true
+                  }
+                  return rate.deviceType === busi
+                })
               if (!rateSet) {
                 nextState.rateNotMatchBusiness = true
               }
@@ -157,15 +181,20 @@ class InfoSet extends React.Component {
     this.props.hide(true)
   }
   confirm = () => {
-    let { finished } = this.state
+    let { finished, type } = this.state
     if (!finished) {
       Noti.hintAndClick('请求出错', '当前学校还未设置完必选项，请全部添加后再')
       return
     }
+    if (!type) {
+      return this.setState({
+        typeError: true
+      })
+    }
     this.postChange()
   }
   postChange = () => {
-    let { status, finished } = this.state
+    let { status, finished, type } = this.state
     if (!finished) {
       return
     }
@@ -179,7 +208,8 @@ class InfoSet extends React.Component {
       resource = '/school/offline'
     }
     const body = {
-      id: parseInt(this.state.schoolId, 10)
+      id: parseInt(this.state.schoolId, 10),
+      type: parseInt(type, 10)
     }
     const cb = json => {
       if (json.error) {
@@ -268,6 +298,12 @@ class InfoSet extends React.Component {
   cancel = e => {
     // nothing
   }
+  changeType = e => {
+    this.setState({
+      type: e.target.value,
+      typeError: false
+    })
+  }
 
   render() {
     let {
@@ -294,7 +330,9 @@ class InfoSet extends React.Component {
       rateDetails,
       rateDetailsSet,
       prepayNotMatchBusiness,
-      rateNotMatchBusiness
+      rateNotMatchBusiness,
+      type,
+      typeError
     } = this.state
 
     let building =
@@ -574,6 +612,23 @@ class InfoSet extends React.Component {
               </Button>
             )}
           </li>
+          {/* show this when need to change online */}
+          {finished ? (
+            <li>
+              <p>{star}学校类型</p>
+              {status === 1 && !onlineChanged ? (
+                <span>{SCHOOL_TYPES[type] || '未知'}</span>
+              ) : (
+                <RadioGroup value={type} onChange={this.changeType}>
+                  <Radio value={REAL_SCHOOL}>真实学校</Radio>
+                  <Radio value={TEST_SCHOOL}>测试学校</Radio>
+                </RadioGroup>
+              )}
+              {typeError ? (
+                <span className="checkInvalid">请选择学校类型!</span>
+              ) : null}
+            </li>
+          ) : null}
           {finished ? (
             <li>
               <p>是否上线：</p>
