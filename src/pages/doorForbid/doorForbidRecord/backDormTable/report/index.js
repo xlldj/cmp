@@ -75,7 +75,8 @@ class BackDormReportTable extends React.Component {
       {
         title: '未归次数',
         dataIndex: 'notReturn',
-        width: '10%'
+        width: '10%',
+        sorter: true
       }
     ]
   }
@@ -85,7 +86,11 @@ class BackDormReportTable extends React.Component {
     let { order, field } = sorter
     let { report_order, report_orderBy } = this.props
     if (order) {
-      report_orderBy = field
+      if (field === 'notReturn') {
+        report_orderBy = 'not_return'
+      } else {
+        report_orderBy = field
+      }
       report_order = DOORFORBID_ORDER[order]
     } else {
       report_orderBy = ''
