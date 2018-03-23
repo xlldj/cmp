@@ -1,0 +1,142 @@
+@gray: #ddd;
+
+.disabled{
+  background-color: #eee;
+  border-radius: 5px;
+}
+
+// for new task module
+.selectedHintWraper{
+  position: relative;
+}
+.selectedImg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+}
+
+.checkSelect{
+  margin-right: 10px;
+}
+.doorForbidRecordTab .tableList{
+  td{
+    cursor: pointer;
+  }
+}
+.doorForbidTimeTab .tableList{
+  margin-top: 20px;
+  td{
+    cursor: default;
+  }
+  p{
+    cursor: default;
+  }
+}
+.doorForbidReportTab .tableList{
+  td{
+    cursor: default;
+  }
+}
+
+.hidden{
+  display: none;
+}
+.backDormDetailWrapper{
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 53%;
+  height: 100%;
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+  // transition: width 1s;
+  // animation: slide 1s;
+  .backDormDetail-header{
+    display: inline-flex;
+    padding: 0 30px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+  }
+  .backDormDetail-scrollContent{
+    .backDormDetail-content{
+      display: inline-block;
+      padding: 20px 30px;
+      border-bottom: 1px solid #ddd;
+      width: 100%;
+      h3{
+        font-size: 20px;
+      }
+      ul{
+        margin-top: 10px;
+        li{
+          margin-top: 5px;
+        }
+      }
+    }
+    .backDormDetail-tableList{
+      padding: 0px 20px;
+      margin: 0px;
+      // height: 30%;
+    }
+    .recordDetailTimeRange .datePicker{
+      width: 130px !important;
+    }
+  }
+}
+
+.backDormDetail-scrollContent{
+  position: absolute;
+  width: 100%;
+  height: calc(~ '100% - 50px');
+  top: 50px;
+  overflow-y: scroll;
+}
+// show the header even loading, or else it can't be closed
+.backDorm-loadWrapper{
+  position: absolute;
+  width: 100%;
+  height: calc(~ '100% - 50px');
+  top: 50px;
+  background-color: rgba(255 , 255, 255, 0.5);
+}
+
+.backDormWrapper{
+  position: relative;
+}
+
+.backDormDelBtn{
+  margin-left: 20px;
+}
+
+.doorForbidSearchBox{
+  .searchInput{
+    width: 130px;
+  }
+  text-align: right;
+}
+.cancelExceptionBtn
+{
+  margin-left: 20px;
+}
+.exceptionTipColor{
+  color: #f0091c;
+}
+
+.unbindButton{
+  margin-top: 20px;
+}
+
+.allChooseButton{
+  margin-right: 10px;
+}
+.doorForbidReportSpan{
+  margin-right: 20px;
+}
+.doorForbidQueryLine{
+  height: 10px !important;  
+}

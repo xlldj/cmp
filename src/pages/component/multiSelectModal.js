@@ -48,6 +48,16 @@ export default class MultiSelectModal extends React.Component {
     let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
     this.props.confirm(dataSource)
   }
+
+  allItemChoose = () => {
+    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    dataSource.forEach(d => {
+      d.selected = true
+    })
+    this.setState({
+      dataSource: dataSource
+    })
+  }
   cancel = () => {
     //clear all the data
     let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
@@ -69,7 +79,7 @@ export default class MultiSelectModal extends React.Component {
   }
   render() {
     const { dataSource } = this.state
-    const { show } = this.props
+    const { show, suportAllChoose } = this.props
 
     const selectedArr =
       dataSource && dataSource.filter((r, i) => r.selected === true)
@@ -93,13 +103,20 @@ export default class MultiSelectModal extends React.Component {
       >
         <div className="multiSelectModalHeader">
           <p className="hint">已选择:{selectedItems}</p>
-          <Button
-            className="rightConfirm"
-            type="primary"
-            onClick={this.confirm}
-          >
-            确定
-          </Button>
+          <div>
+            {suportAllChoose ? (
+              <Button className="allChooseButton" onClick={this.allItemChoose}>
+                全选
+              </Button>
+            ) : null}
+            <Button
+              className="rightConfirm"
+              type="primary"
+              onClick={this.confirm}
+            >
+              确定
+            </Button>
+          </div>
         </div>
         <div className="depositGiftTable">
           <Table

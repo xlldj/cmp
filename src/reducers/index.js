@@ -7,6 +7,7 @@ import Time from '../util/time'
 import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
 
+import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
 if (recentSchools) {
@@ -479,6 +480,7 @@ const rootReducer = combineReducers({
   employeeModule,
   notifyModule,
   versionModule,
+  doorForbidModule,
   setSchoolList,
   statModule,
   setAuthenData,
