@@ -354,7 +354,7 @@ class EmployeeInfo extends React.Component {
   }
   checkMobile = () => {
     let m = this.state.contactMobile
-    if (!/^1[3|4|5|7|8][0-9]{9}$/.test(m)) {
+    if (!/^1[0-9]{10}$/.test(m)) {
       return this.setState({
         mobileError: true,
         mobileErrorMessage: '手机号格式不正确！'
