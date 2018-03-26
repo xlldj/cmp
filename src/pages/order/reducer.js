@@ -20,9 +20,10 @@ const initialOrderState = {
     selectedDetailId: '',
     showDetail: false,
     // below is stat related state
-    stat_day: 1, // 1 for today, 'all' for '不限',
+    stat_day: 3, // 3 for today, 4 for 7 days, 5 for 30 days,  'all' for '不限', note need to change 'all' to 6 when sending to server
     stat_dt: 1, // for devicetype of stat.
-    stat_page: 1
+    stat_page: 1,
+    stat_orderBy: -1 // for order of the stat table, default is -1, for none selected
   },
   abnormal: {
     page: 1,

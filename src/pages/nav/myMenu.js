@@ -167,7 +167,7 @@ class MyMenu extends React.Component {
     } */
     var selectedSchool = 'all',
       defaultSchool = getLocal('defaultSchool')
-    if (recent.length > 0) {
+    if (recent.length > 0 && recent[0].id) {
       selectedSchool = recent[0].id.toString()
     } else if (defaultSchool) {
       selectedSchool = defaultSchool

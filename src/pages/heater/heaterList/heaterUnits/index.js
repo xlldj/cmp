@@ -377,7 +377,11 @@ class HeaterUnits extends React.PureComponent {
               <input value={editingName} onChange={this.changeEditingName} />
             </li>
           </ul>
-          <Button className="center" type="primary" onClick={this.confirmEdit}>
+          <Button
+            className="centerBlock"
+            type="primary"
+            onClick={this.confirmEdit}
+          >
             提交
           </Button>
         </Modal>

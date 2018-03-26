@@ -1,9 +1,21 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import {
+  BarChart,
+  Bar,
+  CartesianAxis,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  ReferenceArea,
+  ReferenceLine
+} from 'recharts'
 
 import { Table } from 'antd'
-import AjaxHandler from '../../../util/ajax'
-import Time from '../../../util/time'
+// import AjaxHandler from '../../../util/ajax'
+import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
 
 import CheckSelect from '../../component/checkSelect'
@@ -14,25 +26,25 @@ import { changeOrder } from '../../../actions'
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
 
-const { DEVICETYPE, ORDER_STAT_DAY_SELECT } = CONSTANTS
+const {
+  DEVICETYPE,
+  ORDER_STAT_DAY_SELECT,
+  ORDER_STAT_DAY_UNLIMITED,
+  X_AXIS_NAME
+} = CONSTANTS
 const SIZE = 1
 
-/* state explanation */
-/* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
-/* subStartTime: 传给字组件searchLine的截止时间 */
 class OrderStat extends React.Component {
   constructor(props) {
     super(props)
     let dataSource = []
     this.state = {
       dataSource,
+      BarChart: this.getBarData(),
+      listLoading: false,
+      histogramLoading: false,
       loading: false,
-      total: 0,
-      totalIncome: 0,
-      totalChargeback: 0,
-      searchingText: '',
-      subStartTime: this.props.startTime,
-      subEndTime: this.props.endTime
+      total: 0
     }
 
     this.columns = [
@@ -43,73 +55,52 @@ class OrderStat extends React.Component {
       {
         title: '设备类型',
         dataIndex: 'deviceType',
-        width: '7%',
+        width: '15%',
         render: (text, record, index) => DEVICETYPE[record.deviceType]
       },
       {
         title: '使用人数',
-        dataIndex: 'location',
-        width: '10%'
+        dataIndex: 'userCount',
+        width: '12%'
       },
       {
-        title: '开始时间',
-        dataIndex: 'createTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return Time.getTimeStr(record.createTime)
-        }
+        title: '人均消费(元)',
+        dataIndex: 'userAverage',
+        width: '15%'
       },
       {
-        title: '结束时间',
-        dataIndex: 'finishTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
-        }
+        title: '使用次数',
+        dataIndex: 'orderCount',
+        width: '15%'
       },
       {
-        title: '消费金额',
-        dataIndex: 'paymentType',
-        width: '8%',
-        className: 'shalowRed',
-        render: (text, record, index) => {
-          if (record.status !== 1) {
-            return `${record.consume}` || '暂无'
-          } else if (record.prepay) {
-            return `${record.prepay}`
-          }
-        }
+        title: '次均消费',
+        dataIndex: 'orderAverage',
+        width: '12%'
+      },
+      {
+        title: '总收益(元)',
+        dataIndex: 'totalIncome',
+        width: '15%'
       }
     ]
   }
-  fetchData = props => {
-    this.setState({
-      loading: true
-    })
+  fetchList = props => {
+    if (!this.state.loading) {
+      this.setState({
+        loading: true
+      })
+    }
     props = props || this.props
-    let { state } = props.history.location
 
-    let {
-      page,
-      schoolId,
-      deviceType,
-      status,
-      selectKey,
-      startTime,
-      endTime,
-      userType,
-      day
-    } = props
+    let { page, schoolId, deviceType, day } = props
     const body = {
       page: page,
-      size: SIZE
+      size: SIZE,
+      day
     }
-    if (startTime && endTime) {
-      body.startTime = startTime
-      body.timeQueryType = 1 // 选择create_time
-      body.endTime = endTime
-    } else {
-      body.day = parseInt(day, 10)
+    if (day === 'all') {
+      body.day = ORDER_STAT_DAY_UNLIMITED
     }
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
@@ -117,228 +108,118 @@ class OrderStat extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if (status !== 'all') {
-      body.status = parseInt(status, 10)
-    } else {
-      body.statusList = [1, 2, 4]
-    }
-    if (selectKey) {
-      body.selectKey = selectKey
-    }
-    if (userType && userType !== 'all') {
-      body.userType = parseInt(userType, 10)
-    }
-    if (state) {
-      if (state.path === 'fromDevice') {
-        body.residenceId = state.id
-        body.deviceType = state.deviceType
-      } else if (state.path === 'fromUser') {
-        body.userId = state.id
-      } else if (state.path === 'fromTask') {
-        if (state.userId) {
-          body.userId = state.userId
-        } else if (state.deviceType) {
-          body.residenceId = state.residenceId
-          body.deviceType = state.deviceType
-        }
-      }
-      delete body.schoolId
-    }
 
-    let resource = '/api/order/list'
+    let resource = '/api/order/statistic/list'
     const cb = json => {
-      let nextState = { loading: false }
-      if (json.error) {
-        this.setState(nextState)
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
-        /*--------redirect --------*/
-        if (json.data) {
-          json.data.orders &&
-            json.data.orders.forEach((r, i) => {
-              r.paymentType = r.paymentType && r.paymentType.toString()
-            })
-          nextState.dataSource = json.data.orders
-          nextState.total = json.data.total
-          nextState.totalIncome = json.data.totalIncome || 0
-          nextState.totalChargeback = json.data.totalChargeback || 0
-        }
+      let nextState = { listLoading: false }
+      if (!this.state.histogramLoading) {
+        nextState.loading = false
+      }
+      if (json.data) {
+        nextState.dataSource = json.data.list
+        nextState.total = json.data.total
       }
       this.setState(nextState)
     }
     AjaxHandler.ajax(resource, body, cb)
   }
+  fetchHistogram = props => {
+    if (!this.state.loading) {
+      this.setState({
+        loading: true
+      })
+    }
+    props = props || this.props
+
+    let { page, schoolId, deviceType, day } = props
+    const body = {
+      page: page,
+      size: SIZE,
+      day
+    }
+    if (day === 'all') {
+      body.day = ORDER_STAT_DAY_UNLIMITED
+    }
+    if (deviceType !== 'all') {
+      body.deviceType = parseInt(deviceType, 10)
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+
+    let resource = '/api/order/statistic/histogram'
+    const cb = json => {
+      let nextState = { histogramLoading: false }
+      if (!this.state.listLoading) {
+        nextState.loading = false
+      }
+      if (json.data) {
+        let barData = this.getBarData()
+        barData.forEach(d => {
+          let user = json.data.userPoints.find(u => u.x === d.key)
+          if (user) {
+            d.countUser = user.y
+          }
+          let order = json.data.orderPoints.find(o => o.x === d.key)
+          if (order) {
+            d.countOrder = order.y
+          }
+        })
+        nextState.barData = barData
+      }
+      this.setState(nextState)
+    }
+    AjaxHandler.ajax(resource, body, cb)
+  }
+  getBarData = () => {
+    let barData = []
+    for (let i = 0; i < 7; ) {
+      barData.push({
+        key: ++i,
+        x: X_AXIS_NAME[i],
+        countUser: 0,
+        countOrder: 0
+      })
+    }
+    return barData
+  }
 
   componentDidMount() {
-    this.fetchData()
-    // add click event
-    let root = document.getElementById('root')
-    this.root = root
-    root.addEventListener('click', this.closeDetail, false)
-  }
-  componentWillUnmount() {
-    this.root.removeEventListener('click', this.closeDetail)
+    this.fetchList()
+    this.fetchHistogram()
   }
   componentWillReceiveProps(nextProps) {
-    // handle close detail click event
-    if (!nextProps.showDetail && this.props.showDetail) {
-      // closed detail
-      this.root.removeEventListener('click', this.closeDetail)
-    } else if (!this.props.showDetail && nextProps.showDetail) {
-      this.root.addEventListener('click', this.closeDetail, false)
-    }
     if (
       checkObject(this.props, nextProps, [
         'day',
         'schoolId',
         'deviceType',
-        'status',
-        'selectKey',
-        'page',
-        'startTime',
-        'endTime',
-        'userType'
+        'page'
       ])
     ) {
       return
     }
-    let { startTime, endTime, selectKey } = nextProps
 
-    const nextState = {}
-    if (startTime !== this.state.startTime) {
-      nextState.startTime = startTime
-      nextState.endTime = endTime
-    }
-    if (selectKey !== this.state.searchingText) {
-      nextState.searchingText = selectKey
-    }
-    this.setState(nextState)
-    this.fetchData(nextProps)
-  }
-  closeDetail = e => {
-    if (!this.props.showDetail) {
-      return
-    }
-    let target = e.target
-    let detailWrapper = this.refs.detailWrapper
-    if (detailWrapper.contains(target)) {
-      console.log('contain')
-      return
-    }
-    if (this.props.showDetail) {
-      this.props.changeOrder(subModule, {
-        showDetail: false,
-        selectedRowIndex: -1,
-        selectedDetailId: -1
-      })
-    }
-  }
-  changeSchool = value => {
-    /*-----value is the school id, used to fetch the school data-----*/
-    /*-----does not reset other option other than searchText---------*/
-    let { schoolId } = this.props
-    if (value === schoolId) {
-      return
-    }
-    this.props.changeOrder(subModule, { schoolId: value, page: 1 })
+    this.fetchList(nextProps)
+    this.fetchHistogram(nextProps)
   }
   changeDevice = value => {
     let { deviceType } = this.props
     if (value === deviceType) {
       return
     }
-    this.props.changeOrder(subModule, { deviceType: value, page: 1 })
-  }
-  changeStatus = value => {
-    let { status } = this.props
-    if (value === status) {
-      return
-    }
-    this.props.changeOrder(subModule, { status: value, page: 1 })
-  }
-  changeSearch = e => {
-    this.setState({
-      searchingText: e.target.value
-    })
-  }
-  pressEnter = () => {
-    let { selectKey } = this.props
-    let searchingText = this.state.searchingText.trim()
-    if (selectKey !== searchingText) {
-      this.props.changeOrder(subModule, { selectKey: searchingText, page: 1 })
-    }
+    this.props.changeOrder(subModule, { stat_dt: value, page: 1 })
   }
   back = () => {
     this.props.history.goBack()
   }
   changePage = pageObj => {
     let page = pageObj.current
-    this.props.changeOrder(subModule, { page: page })
-  }
-  changeUserType = v => {
-    let { userType } = this.props
-    if (userType === v) {
-      return
-    }
-    this.props.changeOrder(subModule, { userType: v, page: 1 })
-  }
-  changeRange = key => {
-    this.props.changeOrder(subModule, {
-      startTime: '',
-      endTime: '',
-      day: +key
-    })
-  }
-  changeStartTime = time => {
-    this.setState({
-      startTime: time
-    })
-  }
-  changeEndTime = time => {
-    this.setState({
-      endTime: time
-    })
-  }
-  confirmTimeRange = () => {
-    let { startTime, endTime } = this.state
-    if (!startTime || !endTime) {
-      return
-    }
-    this.props.changeOrder(subModule, {
-      startTime: startTime,
-      endTime: endTime,
-      page: 1,
-      day: 0
-    })
-  }
-  selectRow = (record, index, event) => {
-    let { dataSource } = this.state
-    // let page = panel_page[main_phase]
-    let id = dataSource[index] && dataSource[index].id
-    this.props.changeOrder(subModule, {
-      selectedRowIndex: index,
-      showDetail: true,
-      selectedDetailId: id
-    })
-  }
-
-  setRowClass = (record, index) => {
-    let { selectedRowIndex } = this.props
-    if (index === selectedRowIndex) {
-      return 'selectedRow'
-    } else {
-      return ''
-    }
-  }
-  changePhase = v => {
-    let { tabIndex } = this.props
-    if (tabIndex !== v) {
-      this.props.changeOrder(subModule, { tabIndex: v })
-    }
+    this.props.changeOrder(subModule, { stat_page: page })
   }
   render() {
     const { page, deviceType, day } = this.props
-    const { dataSource, total, loading } = this.state
+    const { dataSource, total, loading, barData } = this.state
 
     return (
       <div className="">
@@ -369,22 +250,60 @@ class OrderStat extends React.Component {
           </div>
         </div>
 
-        <div className="tableList">
-          <Table
-            bordered
-            loading={loading}
-            pagination={{
-              pageSize: SIZE,
-              current: page,
-              total: total
-            }}
-            dataSource={dataSource}
-            rowKey={record => record.id}
-            columns={this.columns}
-            onChange={this.changePage}
-            onRowClick={this.selectRow}
-            rowClassName={this.setRowClass}
-          />
+        <div className="statWrapper">
+          <div className="tableList">
+            <Table
+              bordered
+              loading={loading}
+              pagination={{
+                pageSize: SIZE,
+                current: page,
+                total: total
+              }}
+              dataSource={dataSource}
+              rowKey={record => record.id}
+              columns={this.columns}
+              onChange={this.changePage}
+              onRowClick={this.selectRow}
+              rowClassName={this.setRowClass}
+            />
+          </div>
+
+          <div className="barChartWrapper">
+            <BarChart
+              width={CONSTANTS.CHARTWIDTH}
+              height={CONSTANTS.CHARTHEIGHT}
+              data={barData}
+              margin={{ top: 10, right: 20, bottom: 0, left: 0 }}
+            >
+              <XAxis
+                padding={{ left: 20 }}
+                axisLine={{ stroke: '#ddd' }}
+                name=""
+                dataKey="x"
+                tickLine={false}
+              />
+              <YAxis
+                axisLine={{ stroke: '#ddd' }}
+                domain={[0, dataMax => dataMax * 1.2]}
+                tickLine={false}
+              />
+              <Legend
+                align="center"
+                verticalAlign="top"
+                wrapperStyle={{ top: 30 }}
+              />
+              <Bar
+                dataKey="countUser"
+                name="人数"
+                isAnimationActive={true}
+                legendType="rect"
+                barSize={{ width: 10 }}
+                fill="#6bb2f2"
+              />
+              <Bar dataKey="countOrder" fill="#b1dc37" />
+            </BarChart>
+          </div>
         </div>
       </div>
     )
@@ -397,7 +316,8 @@ const mapStateToProps = (state, ownProps) => {
     schoolId: state.orderModule[subModule].schoolId,
     day: state.orderModule[subModule].stat_day,
     deviceType: state.orderModule[subModule].stat_dt,
-    page: state.orderModule[subModule].stat_page
+    page: state.orderModule[subModule].stat_page,
+    orderBy: state.orderModule[subModule].stat_orderBy
   }
 }
 

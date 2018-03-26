@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 
 import { Table, Badge, Button } from 'antd'
 import AjaxHandler from '../../../util/ajax'
@@ -200,15 +199,7 @@ class OrderTable extends React.Component {
       })
     }
   }
-  changeSchool = value => {
-    /*-----value is the school id, used to fetch the school data-----*/
-    /*-----does not reset other option other than searchText---------*/
-    let { schoolId } = this.props
-    if (value === schoolId) {
-      return
-    }
-    this.props.changeOrder(subModule, { schoolId: value, page: 1 })
-  }
+
   changeDevice = value => {
     let { deviceType } = this.props
     if (value === deviceType) {
@@ -297,12 +288,7 @@ class OrderTable extends React.Component {
       return ''
     }
   }
-  changePhase = v => {
-    let { tabIndex } = this.props
-    if (tabIndex !== v) {
-      this.props.changeOrder(subModule, { tabIndex: v })
-    }
-  }
+
   render() {
     const {
       page,

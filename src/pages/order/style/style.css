@@ -23,3 +23,9 @@ textarea {
 .orderInfo ul:last-of-type {
   border: none !important;
 }
+.statWrapper {
+  padding-top: 20px;
+}
+.barChartWrapper {
+  margin-bottom: 30px;
+}

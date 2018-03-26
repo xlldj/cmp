@@ -7,6 +7,10 @@ const domains = {
     user: 'http://116.62.236.67:5081'
   },
   local: {
+    manager: 'http://10.0.0.4:5080',
+    user: 'http://10.0.0.4:5081'
+  },
+  changdang: {
     manager: 'http://10.0.0.100:5080',
     user: 'http://10.0.0.100:5081'
   },
@@ -15,7 +19,7 @@ const domains = {
     user: 'https://api.xiaolian365.com/c'
   }
 }
-const currentDomain = domains.qa
+const currentDomain = domains.local
 
 const AjaxHandler = {
   showingError: false
