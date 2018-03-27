@@ -50,6 +50,13 @@ const ORDER = {
   USER_AVERAGE: 2,
   ORDER_COUNT: 3,
   ORDER_AVERAGE: 4,
-  TOTAL_CONSUME: 5
+  TOTAL_CONSUME: 5,
+  ORDER_STAT_ORDERBYS: {
+    userCount: 1,
+    userAverage: 2,
+    orderCount: 3,
+    orderAverage: 4,
+    totalIncome: 5
+  }
 }
 export default ORDER

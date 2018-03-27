@@ -30,7 +30,9 @@ const {
   DEVICETYPE,
   ORDER_STAT_DAY_SELECT,
   ORDER_STAT_DAY_UNLIMITED,
-  X_AXIS_NAME
+  X_AXIS_NAME,
+  ORDER_STAT_ORDERBYS,
+  ORDER
 } = CONSTANTS
 const SIZE = 1
 
@@ -61,27 +63,32 @@ class OrderStat extends React.Component {
       {
         title: '使用人数',
         dataIndex: 'userCount',
-        width: '12%'
+        width: '12%',
+        sorter: true
       },
       {
         title: '人均消费(元)',
         dataIndex: 'userAverage',
-        width: '15%'
+        width: '15%',
+        sorter: true
       },
       {
         title: '使用次数',
         dataIndex: 'orderCount',
-        width: '15%'
+        width: '15%',
+        sorter: true
       },
       {
         title: '次均消费',
         dataIndex: 'orderAverage',
-        width: '12%'
+        width: '12%',
+        sorter: true
       },
       {
         title: '总收益(元)',
         dataIndex: 'totalIncome',
-        width: '15%'
+        width: '15%',
+        sorter: true
       }
     ]
   }
@@ -121,6 +128,7 @@ class OrderStat extends React.Component {
       }
       this.setState(nextState)
     }
+    console.log(body)
     AjaxHandler.ajax(resource, body, cb)
   }
   fetchHistogram = props => {
@@ -194,7 +202,9 @@ class OrderStat extends React.Component {
         'day',
         'schoolId',
         'deviceType',
-        'page'
+        'page',
+        'order',
+        'orderBy'
       ])
     ) {
       return
@@ -202,6 +212,12 @@ class OrderStat extends React.Component {
 
     this.fetchList(nextProps)
     this.fetchHistogram(nextProps)
+  }
+  changeRange = key => {
+    console.log(key)
+    this.props.changeOrder(subModule, {
+      stat_day: key === 'all' ? 'all' : +key
+    })
   }
   changeDevice = value => {
     let { deviceType } = this.props
@@ -213,9 +229,28 @@ class OrderStat extends React.Component {
   back = () => {
     this.props.history.goBack()
   }
-  changePage = pageObj => {
+  changeTable = (pageObj, filter, sorter) => {
+    // page and sorter will not change at the same time
     let page = pageObj.current
-    this.props.changeOrder(subModule, { stat_page: page })
+    if (page !== this.props.page) {
+      return this.props.changeOrder(subModule, { stat_page: page })
+    }
+
+    console.log(sorter)
+    let { order, field } = sorter
+    if (!order) {
+      // change to not order, set all to -1
+      return this.props.changeOrder(subModule, {
+        stat_order: -1,
+        stat_orderBy: -1
+      })
+    }
+    // must not be empty
+    console.log(ORDER_STAT_ORDERBYS[field])
+    this.props.changeOrder(subModule, {
+      stat_order: ORDER[order],
+      stat_orderBy: ORDER_STAT_ORDERBYS[field]
+    })
   }
   render() {
     const { page, deviceType, day } = this.props
@@ -231,7 +266,7 @@ class OrderStat extends React.Component {
                 allOptTitle="不限"
                 allOptValue="all"
                 options={ORDER_STAT_DAY_SELECT}
-                value={+day}
+                value={day}
                 onClick={this.changeRange}
               />
             </div>
@@ -263,7 +298,7 @@ class OrderStat extends React.Component {
               dataSource={dataSource}
               rowKey={record => record.id}
               columns={this.columns}
-              onChange={this.changePage}
+              onChange={this.changeTable}
               onRowClick={this.selectRow}
               rowClassName={this.setRowClass}
             />
@@ -298,10 +333,14 @@ class OrderStat extends React.Component {
                 name="人数"
                 isAnimationActive={true}
                 legendType="rect"
-                barSize={{ width: 10 }}
                 fill="#6bb2f2"
               />
-              <Bar dataKey="countOrder" fill="#b1dc37" />
+              <Bar
+                dataKey="countOrder"
+                name="次数"
+                isAnimationActive={true}
+                fill="#b1dc37"
+              />
             </BarChart>
           </div>
         </div>
@@ -312,12 +351,12 @@ class OrderStat extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    tabIndex: state.orderModule[subModule].tabIndex,
     schoolId: state.orderModule[subModule].schoolId,
     day: state.orderModule[subModule].stat_day,
     deviceType: state.orderModule[subModule].stat_dt,
     page: state.orderModule[subModule].stat_page,
-    orderBy: state.orderModule[subModule].stat_orderBy
+    orderBy: state.orderModule[subModule].stat_orderBy,
+    order: state.orderModule[subModule].stat_order
   }
 }
 
