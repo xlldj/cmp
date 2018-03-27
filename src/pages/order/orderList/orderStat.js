@@ -1,17 +1,4 @@
 import React from 'react'
-import {
-  BarChart,
-  Bar,
-  CartesianAxis,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Legend,
-  ReferenceArea,
-  ReferenceLine
-} from 'recharts'
 
 import { Table } from 'antd'
 // import AjaxHandler from '../../../util/ajax'
@@ -19,6 +6,7 @@ import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
 
 import CheckSelect from '../../component/checkSelect'
+import OrderBarChart from './orderBarChart'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -100,7 +88,7 @@ class OrderStat extends React.Component {
     }
     props = props || this.props
 
-    let { page, schoolId, deviceType, day } = props
+    let { page, schoolId, deviceType, day, order, orderBy } = props
     const body = {
       page: page,
       size: SIZE,
@@ -114,6 +102,12 @@ class OrderStat extends React.Component {
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
+    }
+    if (order !== -1) {
+      body.order = parseInt(order, 10)
+    }
+    if (orderBy !== -1) {
+      body.orderBy = parseInt(orderBy, 10)
     }
 
     let resource = '/api/order/statistic/list'
@@ -246,7 +240,7 @@ class OrderStat extends React.Component {
       })
     }
     // must not be empty
-    console.log(ORDER_STAT_ORDERBYS[field])
+    console.log(ORDER_STAT_ORDERBYS[field], ORDER[order])
     this.props.changeOrder(subModule, {
       stat_order: ORDER[order],
       stat_orderBy: ORDER_STAT_ORDERBYS[field]
@@ -275,8 +269,6 @@ class OrderStat extends React.Component {
             <div className="block">
               <span>设备类型:</span>
               <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
                 options={DEVICETYPE}
                 value={deviceType}
                 onClick={this.changeDevice}
@@ -304,45 +296,7 @@ class OrderStat extends React.Component {
             />
           </div>
 
-          <div className="barChartWrapper">
-            <BarChart
-              width={CONSTANTS.CHARTWIDTH}
-              height={CONSTANTS.CHARTHEIGHT}
-              data={barData}
-              margin={{ top: 10, right: 20, bottom: 0, left: 0 }}
-            >
-              <XAxis
-                padding={{ left: 20 }}
-                axisLine={{ stroke: '#ddd' }}
-                name=""
-                dataKey="x"
-                tickLine={false}
-              />
-              <YAxis
-                axisLine={{ stroke: '#ddd' }}
-                domain={[0, dataMax => dataMax * 1.2]}
-                tickLine={false}
-              />
-              <Legend
-                align="center"
-                verticalAlign="top"
-                wrapperStyle={{ top: 30 }}
-              />
-              <Bar
-                dataKey="countUser"
-                name="人数"
-                isAnimationActive={true}
-                legendType="rect"
-                fill="#6bb2f2"
-              />
-              <Bar
-                dataKey="countOrder"
-                name="次数"
-                isAnimationActive={true}
-                fill="#b1dc37"
-              />
-            </BarChart>
-          </div>
+          <OrderBarChart data={barData} />
         </div>
       </div>
     )

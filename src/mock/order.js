@@ -19,13 +19,13 @@ const order_stat_histogram = {
     orderPoints: [
       {
         x: 1,
-        y: 10
+        y: 0
       }
     ],
     userPoints: [
       {
         x: 2,
-        y: 20
+        y: 0
       }
     ]
   }
