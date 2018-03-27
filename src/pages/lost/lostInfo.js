@@ -179,7 +179,7 @@ class LostInfo extends React.Component {
       data.images.map((s, i) => (
         <img
           alt=""
-          key={i}
+          key={s}
           src={CONSTANTS.FILEADDR + s}
           className="thumbnail"
           onClick={e => {
@@ -195,7 +195,7 @@ class LostInfo extends React.Component {
         return (
           <img
             alt=""
-            key={i}
+            key={r}
             src={CONSTANTS.FILEADDR + r}
             className="carouselImg"
           />
@@ -206,7 +206,7 @@ class LostInfo extends React.Component {
         dots={true}
         accessibility={true}
         className="carouselItem"
-        autoplay={true}
+        autoplay={data.images && data.images.length > 1 ? true : false}
         arrows={true}
         initialSlide={initialSlide}
       >
@@ -312,17 +312,19 @@ class LostInfo extends React.Component {
           <Button onClick={this.back}>返回</Button>
         </div>
 
-        <Modal
-          visible={showImgs}
-          title=""
-          closable={false}
-          onCancel={this.closeImgs}
-          className="carouselModal"
-          okText=""
-          footer={null}
-        >
-          <div className="carouselContainer">{carousel}</div>
-        </Modal>
+        {showImgs ? (
+          <Modal
+            visible={true}
+            title=""
+            closable={false}
+            onCancel={this.closeImgs}
+            className="carouselModal"
+            okText=""
+            footer={null}
+          >
+            <div className="carouselContainer">{carousel}</div>
+          </Modal>
+        ) : null}
       </div>
     )
   }
