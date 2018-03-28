@@ -466,7 +466,7 @@ button.grayBackColor:linked {
 .form li input {
   line-height: 28px;
 }
-.center {
+.centerBlock {
   margin-left: 50%;
   transform: translateX(-50%);
 }
