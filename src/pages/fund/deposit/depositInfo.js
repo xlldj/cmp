@@ -804,71 +804,77 @@ class GiftTable extends React.Component {
     }
   }
   componentWillReceiveProps(nextProps) {
+    let nextState = {}
     if (JSON.stringify(nextProps.gifts) !== JSON.stringify(this.props.gifts)) {
-      let data = JSON.parse(JSON.stringify(nextProps.gifts))
-      if (data.length > 0) {
-        data.forEach((r, i) => {
+      let dataSource = JSON.parse(JSON.stringify(nextProps.gifts)),
+        all = JSON.parse(JSON.stringify(nextProps.gifts))
+      if (all.length > 0) {
+        dataSource.forEach((r, i) => {
           if (!r.count) {
             r.count = 0
           }
         })
-        this.setState({
-          allTypeData: JSON.parse(JSON.stringify(data)),
-          dataSource: data,
-          total: data.amount ? data.amount : 0
-        })
+        all.forEach((r, i) => (r.count = 0))
+        nextState.allTypeData = all
+        nextState.dataSource = dataSource
       }
     }
-    if (nextProps.total !== this.props.total) {
-      this.setState({
-        total: nextProps.total
-      })
+    if (nextProps.total !== this.state.total) {
+      nextState.total = nextProps.total
     }
-  }
-  confirm = () => {
-    this.props.closeModal()
-    this.props.setGift(
-      JSON.parse(JSON.stringify(this.state.dataSource)),
-      this.state.total
-    )
+    this.setState(nextState)
   }
   changeDevice = v => {
     let data = JSON.parse(JSON.stringify(this.state.allTypeData))
     if (v === 'all') {
       return this.setState({
         dataSource: data,
-        selectedDevice: 'all'
+        selectedDevice: 'all',
+        total: 0
       })
     }
-    let newData = data.filter((r, i) => r.deviceType === v)
+    let newData = data.filter((r, i) => r.deviceType === parseInt(v, 10))
     this.setState({
       dataSource: newData,
-      selectedDevice: v
+      selectedDevice: v,
+      total: 0
     })
   }
-  add = (e, i) => {
+  add = (e, id) => {
     let gifts = JSON.parse(JSON.stringify(this.state.dataSource)),
       total = this.state.total,
-      all = JSON.parse(JSON.stringify(this.state.allTypeData)),
-      editingGift = all.filter((r, ind) => r.id === gifts[i].id)
-    editingGift[0].count++
-    gifts[i].count++
-    total++
-    this.setState({
-      allTypeData: all,
-      dataSource: gifts,
-      total: total
-    })
+      gift = gifts.find(r => r.id === id)
+    if (gift) {
+      gift.count++
+      total++
+      this.setState({
+        dataSource: gifts,
+        total: total
+      })
+    }
   }
-  minus = (e, i) => {
+  minus = (e, id) => {
     let gifts = JSON.parse(JSON.stringify(this.state.dataSource)),
-      total = this.state.total
-    gifts[i].count--
-    total--
+      total = this.state.total,
+      gift = gifts.find(r => r.id === id)
+    if (gift) {
+      gift.count--
+      total--
+      this.setState({
+        dataSource: gifts,
+        total: total
+      })
+    }
+  }
+  confirm = () => {
     this.setState({
-      dataSource: gifts,
-      total: total
+      total: 0
     })
+    this.props.closeModal()
+    this.props.setGift(
+      JSON.parse(JSON.stringify(this.state.dataSource)),
+      this.state.total
+    )
   }
   cancel = () => {
     //clear all the data
@@ -954,9 +960,9 @@ class GiftTable extends React.Component {
             className="editable-row-operations optInDeposit"
           >
             <div>
-              {dataSource[index].count > 0 ? (
+              {record.count > 0 ? (
                 <Button
-                  onClick={e => this.minus(e, index)}
+                  onClick={e => this.minus(e, record.id)}
                   type="primary"
                   size="small"
                 >
@@ -966,7 +972,7 @@ class GiftTable extends React.Component {
             </div>
             <div className="giftCount">{record.count}</div>
             <Button
-              onClick={e => this.add(e, index)}
+              onClick={e => this.add(e, record.id)}
               type="primary"
               size="small"
             >

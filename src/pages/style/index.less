@@ -75,6 +75,16 @@ input,textarea{
   outline: none;
   padding-left: 6px !important;
 }
+input.shortInput{
+  width: @liHeight;
+  text-align: center;
+}
+
+.horiInput.horiInput{
+    input {
+      margin-right: 10px;
+    }
+  }
 textarea{
   padding: 4px;
   resize: none;
@@ -179,6 +189,17 @@ button.grayBackColor:linked{
   text-align: left
 }
 
+/* for seperator */
+.seperator{
+  margin: 0 20px;
+}
+.leftSeperator{
+  margin-left: 10px;
+}
+.rightSeperator{
+  margin-right: 10px;
+}
+
 /* for time picker in gift/act and notify */
 .timePicker{
   width: 140px !important;
@@ -188,6 +209,15 @@ button.grayBackColor:linked{
     width: 150px;
   }
 }
+/* remove icon in antd timepicker */
+.ant-time-picker{
+  .ant-time-picker-input{
+    text-align: center;
+  }
+  .ant-time-picker-icon{
+    visibility: hidden
+  }
+} 
 /* for placeholder */
 .placeholder(@rules) {
     &::-webkit-input-placeholder {
@@ -451,21 +481,41 @@ button.grayBackColor:linked{
     margin-right: 12px;
   }
 }
+.btnArea{
+  .fi(@justifyContent: center);
+  width: 100%;
+  padding: 20px;
+  background-color: @blue;
+  &>button{
+    margin-right: 10px;
+  }
+  &>button:last-child{
+    margin-right: 0
+  }
+}
+
+/* form */
+.form{
+  margin-bottom: 10px;
+  li{
+    width: 100%;
+    height: 40px;
+    label{
+      display: inline-block;
+      width: 50px;
+    }
+    input{
+      line-height: 28px;
+    }
+  }
+}
+.centerBlock{
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
 /* -----info area----- */
 .infoBlockList{
   margin: 16px;
-  .btnArea{
-    .fi(@justifyContent: center);
-    width: 100%;
-    padding: 20px;
-    background-color: @blue;
-    &>button{
-      margin-right: 10px;
-    }
-    &>button:last-child{
-      margin-right: 0
-    }
-  }
 }
 .infoBlock{
   .flex(@alignItems: flex-start);
@@ -707,6 +757,47 @@ button.grayBackColor:linked{
   padding: 0px !important; 
   .info
 }
+/* for new info zone layout */
+.infoZone{
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  .header{
+    height: 50px;
+    line-height: 50px;
+    width: 100%;
+    font-size: 1.2em;
+    color: #333;
+  }
+  input{
+    line-height: 26px;
+  }
+  label{
+    display: inline-block;
+    width: 100px;
+    color: #333;
+  }
+  .row{
+    height: 50px;
+    line-height: 50px;
+    width: 100%;
+    color: #999;
+  }
+  .rows{
+    display: inline-flex;
+    width: 100%;
+    color: #999;
+    .horiInput{
+      padding-bottom: 10px;
+      .horiInputTitle{
+        padding-bottom: 5px;
+      }
+    }
+  }
+}
+.infoZone:last-child{
+  border-bottom: none;
+}
+
 .timepicker{
   input{
     width: 50px;
@@ -782,7 +873,6 @@ button.grayBackColor:linked{
   font-size: 40px;
   color: #108EE9;
 }
-
 .nonBdr{
   outline: none;
   width: 80px;
@@ -918,6 +1008,96 @@ button.grayBackColor:linked{
   }
 }
 
+// for new layout of content area
+.panelWrapper{
+  .tableList{
+    padding: 0 20px;
+    td, td *{
+      cursor: pointer;
+    }
+  }
+}
+
+// for new detail panel
+.detailPanelWrapper{
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+  // transition: width 1s;
+  // animation: slide 1s;
+  .detailPanel-header{
+    display: inline-flex;
+    padding: 0 30px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+  }
+  .detailPanel-content{
+    width: 100%;
+    height: calc(~ '100% - 50px');
+    padding: 20px 30px;
+    overflow-y: scroll;
+    .detailPanel-sidebar{
+      display: inline-block;
+      padding: 20px 30px;
+      // min-height: 100%;
+      height: auto;
+      border-right: 1px solid #ddd;
+    }
+    .detailPanel-content-title{
+      font-size: 20px;
+    }
+    .handleBtn{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      button{
+        margin-right: 10px;
+      }
+      .hint{
+        display: inline-block;
+        margin-right: 10px;
+        color: @gray;
+      }
+    }
+    .processLogs{
+      margin: 0px -30px;
+      padding: 15px 30px;
+      border-top: 1px solid #ddd;
+      ul{
+        margin-top: 15px;
+        border: 1px solid #ddd;
+      }
+    }
+    .detailList{
+      padding: 5px 0;
+    }
+  }
+}
+
+// for new panel module
+.selectedHintWraper{
+  position: relative;
+}
+.selectedImg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+}
+
+// for table rows
+.selectedRow{
+  background: @blue;
+}
 // for style like info in task/detail 
 .detailList{
   li{
@@ -928,11 +1108,11 @@ button.grayBackColor:linked{
       display: inline-block;
       margin-right: 10px;
     }
-    span{
+    &>span{
       display: inline-block;
       width: calc(~ '100% - 80px');
     }
-    span.inline{
+    &>span.inline{
       display: inline;
     }
     img{
@@ -1082,11 +1262,14 @@ button.grayBackColor:linked{
     height: 14px;
   }
 }
-
-// for table rows
-.selectedRow{
-  background: @blue;
+.task-loadWrapper{
+  position: absolute;
+  width: 100%;
+  height: calc(~ '100% - 50px');
+  top: 50px;
+  background-color: rgba(255 , 255, 255, 0.5);
 }
+
 /* for choose popup, both used in deposit-act/ gift-act/ maintainer-school-set/ multiselectmodal */
 .depositGiftTable{
   margin:10px 40px 40px 40px;
@@ -1260,18 +1443,12 @@ button.grayBackColor:linked{
             position: relative;
             max-width: 1920px;
             margin:0 auto;
+            .tableList{
+              padding: 0
+            }
             .navLink{
               width: 50%;
               position: absolute;
-            }
-            .tableList{
-              .firstCol{
-                padding-left: 20px;
-              }
-              .lastCol{
-                text-align: right;
-                padding-right: 20px;
-              }
             }
             .linkBtn{
               position: absolute;
@@ -1441,6 +1618,102 @@ button.grayBackColor:linked{
     height: 4px;
   }
 }
+.verticalRect{
+  position: relative;
+  overflow: hidden;
+  .verticalRect-innerDiv{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+}
+
+/* for phase tab */
+.queryPanel{
+  padding: 10px 20px;
+  .queryLine{
+    height: 40px;
+  }
+  &>li{
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    button{
+      margin-right: 15px;
+    }
+    span{
+      margin-right: 7px;
+    }
+  }
+  button{
+    height: 20px !important;
+    padding: 0px 5px;
+  }
+}
+.phaseLine{
+  height: 50px;
+  line-height: 40px;
+  border-bottom: 1px solid #ddd;
+  .navLink a{
+    display: inline-block;
+    line-height: 50px;
+    padding: 0 20px;
+  }
+  .navLink a:first-child{
+    margin-right: 0;
+  }
+ 
+}
+.phaseLine, .queryLine{
+  width: 100%;
+  display: inline-flex;
+  justify-content: space-between;
+  .block{
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    .select{
+      margin-left: 10px;
+      .select-item{
+        width: 105px;
+        margin-right: 5px;
+      }
+      .select-item:first-child{
+        margin-left: 10px
+      }
+    }
+    .rightBtn{
+      margin-right: 30px;
+    }
+  }
+}
+
+/* for hintBox */
+.hintBox{
+  border-width: 1px;
+  border-style: solid;
+  padding: 7px 15px;
+  width: fit-content;
+  li{
+    list-style: none;
+    label{
+      margin-right: 10px;
+    }
+  }
+}
+
+
+/* for table */
+.tableList{
+  .firstCol{
+    padding-left: 20px;
+  }
+  .lastCol{
+    text-align: right;
+    padding-right: 20px;
+  }
+}
+
 
 /* for phase tab */
 .queryPanel{

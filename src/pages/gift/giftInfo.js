@@ -37,7 +37,7 @@ class GiftInfo extends React.Component {
       nameErrorMsg: '',
       startTime: Time.getTodayStart(),
       originalST: '',
-      endTime: Time.getMonthEnd(new Date()),
+      endTime: Time.getMonthEndNot0(new Date()),
       originalET: '',
       rangeError: false
     }

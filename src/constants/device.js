@@ -5,6 +5,7 @@ const DEVICE = {
   DEVICE_TYPE_DRINGKER: 2,
   DEVICE_TYPE_BLOWER: 3,
   DEVICE_TYPE_WASHER: 4,
+  DEVICE_TYPE_ENTRANCE: 5,
   WATERTYPE: { 1: '热水', 2: '冷水', 3: '冰水' },
   WASHER_RATE_TYPES: {
     1: '单脱水',
