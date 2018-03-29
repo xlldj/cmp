@@ -4,7 +4,7 @@ import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'
 
 import OrderTable from './orderTable'
-import OrderStat from './orderStat'
+import OrderStatView from './orderStat'
 
 import PhaseLine from '../../component/phaseLine'
 
@@ -12,7 +12,22 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../../actions'
 const subModule = 'orderList'
+const mapStateToProps1 = (state, ownProps) => {
+  return {
+    schoolId: state.orderModule[subModule].schoolId,
+    day: state.orderModule[subModule].stat_day,
+    deviceType: state.orderModule[subModule].stat_dt,
+    page: state.orderModule[subModule].stat_page,
+    orderBy: state.orderModule[subModule].stat_orderBy,
+    order: state.orderModule[subModule].stat_order
+  }
+}
 
+let OrderStat = withRouter(
+  connect(mapStateToProps1, {
+    changeOrder
+  })(OrderStatView)
+)
 const { ORDER_LIST_TABLE, ORDER_LIST_PAGE_TABS } = CONSTANTS
 
 /* state explanation */

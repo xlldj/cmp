@@ -1,8 +1,8 @@
 import React from 'react'
 
 import { Table } from 'antd'
-// import AjaxHandler from '../../../util/ajax'
-import AjaxHandler from '../../../mock/ajax.js'
+import AjaxHandler from '../../../util/ajax'
+// import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
 
 import CheckSelect from '../../component/checkSelect'
@@ -122,7 +122,6 @@ class OrderStat extends React.Component {
       }
       this.setState(nextState)
     }
-    console.log(body)
     AjaxHandler.ajax(resource, body, cb)
   }
   fetchHistogram = props => {
@@ -158,11 +157,11 @@ class OrderStat extends React.Component {
       if (json.data) {
         let barData = this.getBarData()
         barData.forEach(d => {
-          let user = json.data.userPoints.find(u => u.x === d.key)
+          let user = json.data.userPoints.find(u => u.x === d.key.toString())
           if (user) {
             d.countUser = user.y
           }
-          let order = json.data.orderPoints.find(o => o.x === d.key)
+          let order = json.data.orderPoints.find(o => o.x === d.key.toString())
           if (order) {
             d.countOrder = order.y
           }
@@ -208,7 +207,6 @@ class OrderStat extends React.Component {
     this.fetchHistogram(nextProps)
   }
   changeRange = key => {
-    console.log(key)
     this.props.changeOrder(subModule, {
       stat_day: key === 'all' ? 'all' : +key
     })
@@ -230,7 +228,6 @@ class OrderStat extends React.Component {
       return this.props.changeOrder(subModule, { stat_page: page })
     }
 
-    console.log(sorter)
     let { order, field } = sorter
     if (!order) {
       // change to not order, set all to -1
@@ -240,7 +237,6 @@ class OrderStat extends React.Component {
       })
     }
     // must not be empty
-    console.log(ORDER_STAT_ORDERBYS[field], ORDER[order])
     this.props.changeOrder(subModule, {
       stat_order: ORDER[order],
       stat_orderBy: ORDER_STAT_ORDERBYS[field]
@@ -251,7 +247,7 @@ class OrderStat extends React.Component {
     const { dataSource, total, loading, barData } = this.state
 
     return (
-      <div className="">
+      <div className="orderStat">
         <div className="queryPanel">
           <div className="queryLine">
             <div className="block">
@@ -302,20 +298,4 @@ class OrderStat extends React.Component {
     )
   }
 }
-
-const mapStateToProps = (state, ownProps) => {
-  return {
-    schoolId: state.orderModule[subModule].schoolId,
-    day: state.orderModule[subModule].stat_day,
-    deviceType: state.orderModule[subModule].stat_dt,
-    page: state.orderModule[subModule].stat_page,
-    orderBy: state.orderModule[subModule].stat_orderBy,
-    order: state.orderModule[subModule].stat_order
-  }
-}
-
-export default withRouter(
-  connect(mapStateToProps, {
-    changeOrder
-  })(OrderStat)
-)
+export default OrderStat

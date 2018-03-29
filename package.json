@@ -88,6 +88,7 @@
     "dll": "webpack --config config/webpack.dll.config.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
+    "coverage": "node scripts/test.js --env=jsdom --coverage",
     "precommit": "lint-staged"
   },
   "prettier": {
@@ -98,7 +99,14 @@
     "*.{js,json,css,md}": ["prettier --write", "git add"]
   },
   "jest": {
-    "collectCoverageFrom": ["src/**/*.{js,jsx}"],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/constants/*.{js,jsx}",
+      "!src/store/*.{js,jsx}",
+      "!src/mock/*.{js,jsx}",
+      "!src/app.js",
+      "!src/index.js"
+    ],
     "setupFiles": [
       "<rootDir>/config/polyfills.js",
       "<rootDir>/config/shim.js",
