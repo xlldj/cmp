@@ -4,7 +4,7 @@ import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'
 
 import OrderTable from './orderTable'
-import OrderStatView from './orderStat'
+import OrderStatView from './orderStatView'
 
 import PhaseLine from '../../component/phaseLine'
 

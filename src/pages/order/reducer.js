@@ -1,7 +1,9 @@
 import { merge } from 'lodash'
+import CONSTANTS from '../../constants'
 import getDefaultSchool from '../../util/defaultSchool'
 import Time from '../../util/time'
 import * as ActionTypes from '../../actions'
+const { ORDER_USER_TYPE_STUDENT } = CONSTANTS
 let selectedSchool = getDefaultSchool()
 
 const initialOrderState = {
@@ -10,7 +12,7 @@ const initialOrderState = {
     page: 1,
     schoolId: selectedSchool,
     day: 1, // 1 for today, 2 for last 7 days , 3 for last 30 days, 0 for custom select
-    userType: 'all',
+    userType: ORDER_USER_TYPE_STUDENT, // 'all' for unlimited, 1 for student
     deviceType: 'all',
     status: 'all',
     selectKey: '',

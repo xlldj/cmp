@@ -2,6 +2,7 @@ const ORDER = {
   /* ORDER */
   ORDERSTATUS: { 1: '使用中', 2: '使用结束', 4: '已退单' },
   ORDERUSERTYPES: { 1: '学生', 2: '员工' },
+  ORDER_USER_TYPE_STUDENT: 1,
   ORDER_LIST_PAGE_TABS: [
     {
       value: 1,

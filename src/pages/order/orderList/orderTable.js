@@ -169,6 +169,7 @@ class OrderTable extends React.Component {
       return
     }
     let { startTime, endTime, selectKey } = nextProps
+    const { showClearBtn } = this.state
 
     const nextState = {}
     if (startTime !== this.state.startTime) {
@@ -176,6 +177,7 @@ class OrderTable extends React.Component {
       nextState.endTime = endTime
     }
     if (selectKey !== this.state.searchingText) {
+      console.log(selectKey, showClearBtn)
       nextState.searchingText = selectKey
     }
     this.setState(nextState)
@@ -215,9 +217,9 @@ class OrderTable extends React.Component {
     this.props.changeOrder(subModule, { status: value, page: 1 })
   }
   changeSearch = e => {
-    this.setState({
-      searchingText: e.target.value
-    })
+    const nextState = {}
+    nextState.searchingText = e.target.value
+    this.setState(nextState)
   }
   pressEnter = () => {
     let { selectKey } = this.props
@@ -225,6 +227,14 @@ class OrderTable extends React.Component {
     if (selectKey !== searchingText) {
       this.props.changeOrder(subModule, { selectKey: searchingText, page: 1 })
     }
+  }
+  clearMobile = () => {
+    this.setState(
+      {
+        searchingText: ''
+      },
+      this.pressEnter
+    )
   }
   back = () => {
     this.props.history.goBack()
@@ -307,8 +317,10 @@ class OrderTable extends React.Component {
       totalChargeback,
       loading,
       startTime,
-      endTime
+      endTime,
+      searchingText
     } = this.state
+    const showClearBtn = !!searchingText
     const { state } = this.props.location
 
     const columns = [
@@ -440,9 +452,18 @@ class OrderTable extends React.Component {
               />
             </div>
             <div className="block">
+              {showClearBtn ? (
+                <Button
+                  onClick={this.clearMobile}
+                  className="rightSeperator"
+                  type="primary"
+                >
+                  清空
+                </Button>
+              ) : null}
               <SearchInput
                 placeholder="宿舍/订单号/手机号"
-                searchingText={this.state.searchingText}
+                searchingText={searchingText}
                 pressEnter={this.pressEnter}
                 changeSearch={this.changeSearch}
               />

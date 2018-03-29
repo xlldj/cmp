@@ -30,11 +30,15 @@ const OrderBarChart = props => {
           name="人数"
           isAnimationActive={true}
           legendType="rect"
+          barSize={20}
+          label={<CustomLabel />}
           fill="#6bb2f2"
         />
         <Bar
           dataKey="countOrder"
           name="次数"
+          barSize={20}
+          label={<CustomLabel />}
           isAnimationActive={true}
           fill="#b1dc37"
         />
@@ -44,3 +48,17 @@ const OrderBarChart = props => {
 }
 
 export default OrderBarChart
+
+class CustomLabel extends React.Component {
+  render() {
+    const { x, y, value } = this.props
+    console.log(this.props)
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dx={12} dy={-10} textAnchor="end" fill="#999">
+          {value > 0 ? value : ''}
+        </text>
+      </g>
+    )
+  }
+}

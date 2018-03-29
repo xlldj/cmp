@@ -5,12 +5,10 @@ import AjaxHandler from '../../../util/ajax'
 // import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
 
+import QueryLine from '../../component/queryLine'
 import CheckSelect from '../../component/checkSelect'
 import OrderBarChart from './orderBarChart'
 
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeOrder } from '../../../actions'
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
 
@@ -20,11 +18,11 @@ const {
   ORDER_STAT_DAY_UNLIMITED,
   X_AXIS_NAME,
   ORDER_STAT_ORDERBYS,
-  ORDER
+  ORDER,
+  PAGINATION: SIZE
 } = CONSTANTS
-const SIZE = 1
 
-class OrderStat extends React.Component {
+class OrderStatView extends React.Component {
   constructor(props) {
     super(props)
     let dataSource = []
@@ -249,28 +247,22 @@ class OrderStat extends React.Component {
     return (
       <div className="orderStat">
         <div className="queryPanel">
-          <div className="queryLine">
-            <div className="block">
-              <span>时间筛选:</span>
-              <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
-                options={ORDER_STAT_DAY_SELECT}
-                value={day}
-                onClick={this.changeRange}
-              />
-            </div>
-          </div>
-          <div className="queryLine">
-            <div className="block">
-              <span>设备类型:</span>
-              <CheckSelect
-                options={DEVICETYPE}
-                value={deviceType}
-                onClick={this.changeDevice}
-              />
-            </div>
-          </div>
+          <QueryLine labelName="时间筛选">
+            <CheckSelect
+              allOptTitle="不限"
+              allOptValue="all"
+              options={ORDER_STAT_DAY_SELECT}
+              value={day}
+              onClick={this.changeRange}
+            />
+          </QueryLine>
+          <QueryLine labelName="设备类型">
+            <CheckSelect
+              options={DEVICETYPE}
+              value={deviceType}
+              onClick={this.changeDevice}
+            />
+          </QueryLine>
         </div>
 
         <div className="statWrapper">
@@ -284,7 +276,7 @@ class OrderStat extends React.Component {
                 total: total
               }}
               dataSource={dataSource}
-              rowKey={record => record.id}
+              rowKey={record => record.schoolName}
               columns={this.columns}
               onChange={this.changeTable}
               onRowClick={this.selectRow}
@@ -298,4 +290,4 @@ class OrderStat extends React.Component {
     )
   }
 }
-export default OrderStat
+export default OrderStatView

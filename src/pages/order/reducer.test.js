@@ -33,5 +33,23 @@ const initialOrderState = {
   }
 }
 test('initial state', () => {
-  expect(orderModule(initialOrderState, {})).toBe()
+  expect(orderModule(initialOrderState, {}).orderList.tabIndex).toBe(2)
+})
+test('change tabIndex', () => {
+  expect(
+    orderModule(initialOrderState, {
+      type: 'CHANGE_ORDER',
+      subModule: 'orderList',
+      keyValuePair: { tabIndex: 1 }
+    }).orderList.tabIndex
+  ).toBe(1)
+})
+test('change selectedSchool', () => {
+  expect(
+    orderModule(initialOrderState, {
+      type: 'CHANGE_ORDER',
+      subModule: 'orderList',
+      keyValuePair: { selectedSchool: 2 }
+    }).orderList.selectedSchool
+  ).toBe(2)
 })

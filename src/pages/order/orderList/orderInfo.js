@@ -9,7 +9,7 @@ import LoadingMask from '../../component/loadingMask'
 import closeBtn from '../../assets/close.png'
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
-const { ORDERSTATUS } = CONSTANTS
+const { ORDERSTATUS, NORMAL_DAY_7 } = CONSTANTS
 
 const { DEVICETYPE } = CONSTANTS
 const STATUSCLASS = {
@@ -41,7 +41,8 @@ class OrderInfo extends React.Component {
       data: data,
       modalClosable: true,
       modalVisible: false,
-      modalMessage: ''
+      modalMessage: '',
+      id: ''
     }
   }
   fetchData = props => {
@@ -108,9 +109,7 @@ class OrderInfo extends React.Component {
         Noti.hintSuccessWithoutSkip()
         nextState.modalVisible = false
         nextState.modalMessage = ''
-        this.fetchData({
-          id: this.state.id
-        })
+        this.fetchData()
       }
       this.setState(nextState)
     }
@@ -171,7 +170,7 @@ class OrderInfo extends React.Component {
     let mobile = this.state.data.mobile
     this.props.changeOrder(subModule, {
       page: 1,
-      day: 0,
+      day: NORMAL_DAY_7, // set to 7 days default
       status: 'all',
       selectKey: mobile,
       showDetail: false,
@@ -183,8 +182,6 @@ class OrderInfo extends React.Component {
     let { data, modalClosable, detailLoading } = this.state
     const { schoolName, deviceLocation, prepay, orderNo, deviceType } =
       data || {}
-    console.log(this.props)
-    console.log(ORDERSTATUS[data.status])
 
     const popTitle = (
       <p className="popTitle">
