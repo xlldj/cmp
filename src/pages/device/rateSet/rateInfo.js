@@ -169,7 +169,8 @@ class RateInfo extends React.Component {
                   r.rateGroups &&
                   r.rateGroups.map(rate => ({
                     price: rate.price ? mul(rate.price, 100) : '',
-                    pulse: rate.pulse ? rate.pulse : ''
+                    pulse: rate.pulse ? rate.pulse : '',
+                    unitPulse: rate.unitPulse || ''
                   }))
               }
             }
@@ -375,12 +376,14 @@ class RateInfo extends React.Component {
     }
     nextState.billError = false
 
+    // if 'checkRateGroup' is true, means need to not versionB; else need to check 'rateGroupsVersionB'
     let checkRateGroups = true,
       rateGroupsVersionB = JSON.parse(
         JSON.stringify(this.state.rateGroupsVersionB)
       )
 
     if (deviceType === DEVICE_TYPE_WASHER.toString()) {
+      // check washer, since it's different from other devices
       checkRateGroups = false
       if (!dryPrice) {
         return this.setState({
@@ -403,36 +406,74 @@ class RateInfo extends React.Component {
         })
       }
     } else {
+      // check device other than washer
       if (supplierId) {
+        // this will always be true. The judge is based on the former rate set, which allowed supplilerId not set.
         let supplier = supplierData.find(r => r.id === supplierId)
         if (supplier && supplier.agreement === 2) {
+          // this rate is set to versionB, need to check rateGroupsVersionB.
           checkRateGroups = false
           for (let i = 0; i < rateGroupsVersionB.length; i++) {
             let r = rateGroupsVersionB[i]
-            if (!r.price || !r.pulse) {
-              rateGroupsVersionB[i].error = true
+            if (!r.price || !r.pulse || !r.unitPulse) {
+              r.error = true
+              nextState.rateGroupsVersionB = rateGroupsVersionB
+              this.setState(nextState)
+              return false
+            }
+            // check if same to another rateset
+            let same = rateGroupsVersionB.find((another, ind) => {
+              // skip self
+              if (ind === i) {
+                return false
+              }
+              return (
+                another.price === r.price &&
+                another.pulse === r.pulse &&
+                another.unitPulse === r.unitPulse
+              )
+            })
+            if (same) {
+              r.same = true
               nextState.rateGroupsVersionB = rateGroupsVersionB
               this.setState(nextState)
               return false
             }
             delete rateGroupsVersionB[i].error
+            delete rateGroupsVersionB[i].same
           }
-          rateGroupsVersionB.forEach((r, i) => {})
         }
       }
       if (checkRateGroups) {
         let rates = JSON.parse(JSON.stringify(rateGroups))
         for (let i = 0; i < rates.length; i++) {
-          if (!rates[i].price || !rates[i].pulse) {
-            rates[i].error = true
+          let r = rates[i]
+          if (!r.price || !r.pulse) {
+            r.error = true
             nextState.rateGroups = rates
             this.setState(nextState)
             return false
           }
-          delete rates[i].error
+          // check if same to another rateset
+          let same = rates.find((another, ind) => {
+            // skip self
+            if (ind === i) {
+              return false
+            }
+            return another.price === r.price && another.pulse === r.pulse
+          })
+          if (same) {
+            r.same = true
+            nextState.rates = rates
+            this.setState(nextState)
+            return false
+          }
+          delete r.same
+          delete r.error
         }
       }
 
+      // check close tap setting.
       let taps = JSON.parse(JSON.stringify(closeTapGroups))
       for (let i = 0; i < taps.length; i++) {
         if (!taps[i].value) {
@@ -547,6 +588,7 @@ class RateInfo extends React.Component {
       rateGroupsVersionB.forEach(r => {
         if (r.price) {
           r.price = div(r.price, 100)
+          r.unitPulse = parseInt(r.unitPulse, 10)
         }
       })
       if (supplierId) {
@@ -681,6 +723,14 @@ class RateInfo extends React.Component {
       rateGroupsVersionB: o
     })
   }
+  changeUnitPulseB = (e, i) => {
+    let v = e.target.value
+    let o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
+    o[i].unitPulse = parseInt(v, 10)
+    this.setState({
+      rateGroupsVersionB: o
+    })
+  }
   addB = () => {
     const rateGroupsVersionB = JSON.parse(
       JSON.stringify(this.state.rateGroupsVersionB)
@@ -809,6 +859,7 @@ class RateInfo extends React.Component {
       rateGroups.map((r, i) => {
         return (
           <li className="rateSets" key={`rateA${i}`}>
+            <p>费率组{i + 1}:</p>
             <input
               type="number"
               className="shortInput"
@@ -849,8 +900,21 @@ class RateInfo extends React.Component {
       rateGroupsVersionB &&
       rateGroupsVersionB.map((r, i) => {
         return (
-          <li className="rateSets" key={`rateB${i}`}>
-            <span key={`spanVolume${i}`}>1升水/</span>
+          <li key={`rateB${i}`}>
+            <p>费率组{i + 1}:</p>
+            <span key={`spanVolume${i}`}>1升水 =</span>
+            <input
+              type="number"
+              className="shortInput"
+              onChange={e => {
+                this.changeUnitPulseB(e, i)
+              }}
+              key={`unitPulseB${i}`}
+              value={r.unitPulse || ''}
+            />
+            <span className="rightSeperatorBig" key={`spanUnitPulse${i}`}>
+              脉冲
+            </span>
             <input
               type="number"
               className="shortInput"
@@ -860,7 +924,7 @@ class RateInfo extends React.Component {
               key={`priceB${i}`}
               value={r.price ? r.price : ''}
             />
-            <span key={`spanPrice${i}`}>分钱/</span>
+            <span key={`spanPrice${i}`}>分钱 =</span>
             <input
               type="number"
               className="shortInput"
@@ -876,37 +940,42 @@ class RateInfo extends React.Component {
                 输入不完整
               </span>
             ) : null}
+            {r.same ? (
+              <span key={`same${i}`} className="checkInvalid">
+                请勿输入重复的费率设置
+              </span>
+            ) : null}
           </li>
         )
       })
     // if not washer: if blower, must be rateItems; else check if XINNA agreement
     const notWasherRates =
       currentAgreement === 2 && deviceType !== DEVICE_TYPE_BLOWER.toString() ? (
-        <li className="itemsWrapper">
-          <p>费率组:</p>
-          <div>
-            <ul>{rateItemsVersionB}</ul>
+        <Fragment>
+          {rateItemsVersionB}
+          <li>
+            <p />
             <AddPlusAbs
               count={rateGroupsVersionB.length}
               add={this.addB}
               min={deviceType === '2' ? 3 : 1}
               abstract={this.abstractB}
             />
-          </div>
-        </li>
+          </li>
+        </Fragment>
       ) : (
-        <li className="itemsWrapper">
-          <p>费率组:</p>
-          <div>
-            <ul>{rateItems}</ul>
+        <Fragment>
+          {rateItems}
+          <li>
+            <p />
             <AddPlusAbs
               count={rateGroups.length}
               add={this.add}
               min={deviceType === '2' ? 3 : 1}
               abstract={this.abstract}
             />
-          </div>
-        </li>
+          </li>
+        </Fragment>
       )
     const tapItems =
       closeTapGroups &&

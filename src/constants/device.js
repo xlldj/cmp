@@ -37,6 +37,7 @@ const DEVICE = {
   BLOWER_BILLING_OPTIONS: { 2: '时间计费' },
   WASHER_BILLING_OPTIONS: { 3: '固定计费' },
   BILLINGOPTIONS: { 1: '流量计费', 2: '时间计费', 3: '固定计费' },
-  DEVICEPROTOCOL: { 1: '协议A', 2: '协议B' }
+  DEVICEPROTOCOL: { 1: '协议A', 2: '协议B' },
+  DEVICE_AGREEMENT_B: 2
 }
 export default DEVICE

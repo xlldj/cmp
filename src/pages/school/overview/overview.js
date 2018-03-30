@@ -154,48 +154,50 @@ class Overview extends React.Component {
           if (record.devices) {
             deviceContent =
               record.devices &&
-              record.devices.map((r, i) => {
+              record.devices.map((device, i) => {
+                let isWasher = device.type === DEVICE_TYPE_WASHER
+
                 let supplierItems =
-                  r.suppliers &&
-                  r.suppliers.map((rec, ind) => {
+                  device.suppliers &&
+                  device.suppliers.map((supplier, ind) => {
+                    let rateItems =
+                      supplier.rate &&
+                      supplier.rate &&
+                      supplier.rate.rateGroups.map((rate, x) => {
+                        if (isWasher) {
+                          return (
+                            <div className="rateItem" key={x}>{`${
+                              WASHER_RATE_TYPES[rate.pulse]
+                            }/${rate.price ? rate.price : ''}元`}</div>
+                          )
+                        }
+                        let denomination =
+                          device.type === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
+
+                        return (
+                          <div className="rateItem" key={`rateItem-${x}`}>
+                            {mul(rate.price, 100)}分/{rate.pulse}
+                            {denomination}
+                          </div>
+                        )
+                      })
                     return (
                       <div key={`suppliers-${ind}`} className="supplierItem">
                         <div
                           key={`supplierName-${ind}`}
                           className="supplierName"
                         >
-                          {rec.name}
+                          {supplier.name}
                         </div>
+                        <div className="rateGroupsWrapper">{rateItems}</div>
                       </div>
                     )
                   })
-                let denomination =
-                  r.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
-
-                let rateGroups =
-                  r.rate &&
-                  r.rate.rateGroups &&
-                  r.rate.rateGroups.map((rate, x) => (
-                    <div className="rateItem" key={`rateItem-${x}`}>
-                      {mul(rate.price, 100)}分/{rate.pulse}
-                      {denomination}
-                    </div>
-                  ))
-
-                let washerRates =
-                  r.rate &&
-                  r.deviceType === DEVICE_TYPE_WASHER &&
-                  r.rateGroups &&
-                  r.rateGroups.map((r, i) => (
-                    <span key={i}>{`${WASHER_RATE_TYPES[r.pulse]}/${
-                      r.price ? r.price : ''
-                    }元`}</span>
-                  ))
 
                 let waterTimeItems =
-                  r.waterTimeRange &&
-                  r.waterTimeRange.items &&
-                  r.waterTimeRange.items.map((range, y) => (
+                  device.waterTimeRange &&
+                  device.waterTimeRange.items &&
+                  device.waterTimeRange.items.map((range, y) => (
                     <div key={`range-${y}`} className="waterTimeRange">
                       {Format.rangeToHour(range)}
                     </div>
@@ -210,15 +212,10 @@ class Overview extends React.Component {
                 return (
                   <div key={`device-${i}`} className="deviceItem">
                     <div key={`devicename-${i}`} className="deviceTypeWrapper">
-                      {CONSTANTS.DEVICETYPE[r.type]}
+                      {CONSTANTS.DEVICETYPE[device.type]}
                     </div>
                     <div key={`suppliersInfo-${i}`} className="supplierWrapper">
                       {supplierItems || backupSupplier}
-                    </div>
-                    <div key={`rateInfo-${i}`} className="rateGroupsWrapper">
-                      {r.deviceType === DEVICE_TYPE_WASHER
-                        ? washerRates
-                        : rateGroups || '暂无'}
                     </div>
                     <div key={`waterTime-${i}`} className="waterItemsWrapper">
                       {waterTimeItems || '暂无'}
