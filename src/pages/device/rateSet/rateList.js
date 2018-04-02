@@ -17,7 +17,12 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeDevice } from '../../../actions'
 const subModule = 'rateSet'
-const { DEVICE_TYPE_WASHER, DEVICE_TYPE_BLOWER, WASHER_RATE_TYPES } = CONSTANTS
+const {
+  DEVICE_TYPE_WASHER,
+  DEVICE_TYPE_BLOWER,
+  WASHER_RATE_TYPES,
+  DEVICE_AGREEMENT_B
+} = CONSTANTS
 
 const SIZE = CONSTANTS.PAGINATION
 
@@ -36,93 +41,6 @@ class RateList extends React.Component {
       total: 0,
       suppliers: {}
     }
-    this.columns = [
-      {
-        title: '学校',
-        dataIndex: 'schoolName',
-        className: 'firstCol',
-        width: '17%'
-      },
-      {
-        title: '设备类型',
-        dataIndex: 'deviceType',
-        width: '13%',
-        render: (text, r) => typeName[r.deviceType]
-      },
-      {
-        title: '供应商',
-        dataIndex: 'supplierId',
-        width: '13%',
-        render: (text, r) =>
-          r.supplierId && this.state.suppliers[r.supplierId]
-            ? this.state.suppliers[r.supplierId]
-            : ''
-      },
-      {
-        title: '费率',
-        dataIndex: 'rates',
-        width: '24%',
-        render: (text, record, index) => {
-          // washer's denomination is 'YUAN', doesn't need to mul by 100.
-          const washerItems =
-            record.deviceType === DEVICE_TYPE_WASHER
-              ? record.rateGroups &&
-                record.rateGroups.map((r, i) => (
-                  <li key={i}>
-                    <span key={i}>{`${WASHER_RATE_TYPES[r.pulse]}模式: ${
-                      r.price ? r.price : ''
-                    }元钱`}</span>
-                  </li>
-                ))
-              : null
-          const items = record.rateGroups.map((r, i) => (
-            <li key={i}>
-              <span key={i}>
-                扣费：{r.price ? mul(r.price, 100) : ''}分钱/{r.pulse
-                  ? r.pulse
-                  : ''}
-                {record.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'}
-              </span>
-            </li>
-          ))
-          return (
-            <ul>
-              {record.deviceType === DEVICE_TYPE_WASHER ? washerItems : items}
-            </ul>
-          )
-        }
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-        width: '17%',
-        render: (text, r, i) => {
-          return Time.getTimeStr(r.createTime)
-        }
-      },
-      {
-        title: <p className="lastCol">操作</p>,
-        dataIndex: 'operation',
-        render: (text, record, index) => (
-          <div className="editable-row-operations lastCol">
-            <span>
-              <Link to={`/device/rateSet/rateInfo/:${record.id}`}>编辑</Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除此么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
-            </span>
-          </div>
-        )
-      }
-    ]
   }
   componentDidMount() {
     this.props.hide(false)
@@ -152,7 +70,7 @@ class RateList extends React.Component {
             nextState = {}
           for (let i = 0; i < json.data.total; i++) {
             suppliers[json.data.supplierEntities[i].id] =
-              json.data.supplierEntities[i].name
+              json.data.supplierEntities[i]
           }
           nextState.suppliers = suppliers
           this.setState(nextState)
@@ -240,8 +158,103 @@ class RateList extends React.Component {
     this.props.changeDevice(subModule, { page: 1, schoolId: value })
   }
   render() {
-    let { dataSource, loading, total } = this.state
+    let { dataSource, loading, total, suppliers } = this.state
     let { page, schoolId } = this.props
+    const columns = [
+      {
+        title: '学校',
+        dataIndex: 'schoolName',
+        className: 'firstCol',
+        width: '17%'
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'deviceType',
+        width: '13%',
+        render: (text, r) => typeName[r.deviceType]
+      },
+      {
+        title: '供应商',
+        dataIndex: 'supplierId',
+        width: '13%',
+        render: (text, r) =>
+          r.supplierId && this.state.suppliers[r.supplierId]
+            ? this.state.suppliers[r.supplierId].name
+            : ''
+      },
+      {
+        title: '费率',
+        dataIndex: 'rates',
+        width: '24%',
+        render: (text, record, index) => {
+          // washer's denomination is 'YUAN', doesn't need to mul by 100.
+          const washerItems =
+            record.deviceType === DEVICE_TYPE_WASHER
+              ? record.rateGroups &&
+                record.rateGroups.map((r, i) => (
+                  <li key={i}>
+                    <span key={i}>{`${WASHER_RATE_TYPES[r.pulse]}模式: ${
+                      r.price ? r.price : ''
+                    }元钱`}</span>
+                  </li>
+                ))
+              : null
+          let agreementB =
+            suppliers[record.supplierId] &&
+            suppliers[record.supplierId].agreement === DEVICE_AGREEMENT_B
+          console.log(suppliers, record.supplierId, agreementB)
+          const items = record.rateGroups.map((r, i) => {
+            let denomination =
+              record.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
+            return (
+              <li key={i}>
+                <span key={i}>
+                  扣费：
+                  {agreementB ? `1升水/${r.unitPulse}${denomination}、` : ''}
+                  {r.price ? mul(r.price, 100) : ''}分钱/{r.pulse || ''}
+                  {denomination}
+                </span>
+              </li>
+            )
+          })
+          return (
+            <ul>
+              {record.deviceType === DEVICE_TYPE_WASHER ? washerItems : items}
+            </ul>
+          )
+        }
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'createTime',
+        width: '17%',
+        render: (text, r, i) => {
+          return Time.getTimeStr(r.createTime)
+        }
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <span>
+              <Link to={`/device/rateSet/rateInfo/:${record.id}`}>编辑</Link>
+              <span className="ant-divider" />
+              <Popconfirm
+                title="确定要删除此么?"
+                onConfirm={e => {
+                  this.delete(e, record.id)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        )
+      }
+    ]
     return (
       <div className="contentArea">
         <SearchLine
@@ -262,7 +275,7 @@ class RateList extends React.Component {
             pagination={{ pageSize: SIZE, current: page, total: total }}
             onChange={this.changePage}
             dataSource={dataSource}
-            columns={this.columns}
+            columns={columns}
           />
         </div>
         <div />

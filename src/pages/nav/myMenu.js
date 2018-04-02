@@ -21,6 +21,7 @@ import {
   changeNotify,
   changeVersion,
   changeStat,
+  changeHeater,
   setAuthenData
 } from '../../actions'
 import { withRouter } from 'react-router-dom'
@@ -166,7 +167,7 @@ class MyMenu extends React.Component {
     } */
     var selectedSchool = 'all',
       defaultSchool = getLocal('defaultSchool')
-    if (recent.length > 0) {
+    if (recent.length > 0 && recent[0].id) {
       selectedSchool = recent[0].id.toString()
     } else if (defaultSchool) {
       selectedSchool = defaultSchool
@@ -198,6 +199,9 @@ class MyMenu extends React.Component {
       this.props.changeStat('overview', { schoolId: selectedSchool })
       this.props.changeStat('charts', { schoolId: selectedSchool })
       this.props.changeStat('rank', { schoolId: selectedSchool })
+      this.props.changeHeater('heaterList', { schoolId: selectedSchool })
+      this.props.changeHeater('heaterUnits', { schoolId: selectedSchool })
+      this.props.changeHeater('heaterStatus', { schoolId: selectedSchool })
     }
   }
 
@@ -337,6 +341,9 @@ class MyMenu extends React.Component {
   setStatusForuser = () => {
     this.getDefaultSchool()
     this.props.changeUser('userList', { page: 1, selectKey: '' })
+  }
+  setStatusForheater = () => {
+    this.getDefaultSchool()
   }
 
   setStatusFortask = () => {
@@ -519,6 +526,7 @@ export default withRouter(
     changeNotify,
     changeVersion,
     changeStat,
+    changeHeater,
     setAuthenData
   })(MyMenu)
 )

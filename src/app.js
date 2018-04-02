@@ -8,6 +8,7 @@ import { withRouter } from 'react-router-dom'
 
 import Main from './pages/main'
 import Log from './pages/log/log'
+import ErrorBoundary from './public/errorBoundary'
 
 class App extends React.Component {
   state = {
@@ -70,14 +71,16 @@ class App extends React.Component {
     const component = logged ? main : log
 
     return (
-      <div className="home">
-        <div className="pageLoading hide" ref="loading">
-          加载中...
+      <ErrorBoundary>
+        <div className="home">
+          <div className="pageLoading hide" ref="loading">
+            加载中...
+          </div>
+          <Switch>
+            <Route render={() => component} />
+          </Switch>
         </div>
-        <Switch>
-          <Route render={() => component} />
-        </Switch>
-      </div>
+      </ErrorBoundary>
     )
   }
 }

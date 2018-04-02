@@ -14,3 +14,49 @@ textarea {
 .chargeBackModal span {
   margin-right: 10px;
 }
+.detailPanelWrapper {
+  width: 30%;
+}
+.detailList {
+  border-bottom: 1px solid #eee;
+}
+.orderInfo ul:last-of-type {
+  border: none !important;
+}
+.orderStat {
+  position: relative;
+}
+.orderStat .statWrapper {
+  position: absolute;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  top: 100px;
+  padding-top: 20px;
+  width: 100%;
+  height: calc(100vh - 100px - 120px);
+  border-top: 1px solid #eee;
+  background-color: #f9f9f9;
+}
+.orderStat .statWrapper .tableList {
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #eee;
+}
+.orderStat .statWrapper .tableList td {
+  background-color: white;
+}
+.orderStat .statWrapper::-webkit-scrollbar {
+  display: block !important;
+}
+.orderStat .statWrapper::-webkit-scrollbar-track-piece {
+  background-color: #fff;
+}
+.orderStat .statWrapper::-webkit-scrollbar {
+  width: 5px;
+}
+.orderStat .statWrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+.barChartWrapper {
+  margin-bottom: 30px;
+}

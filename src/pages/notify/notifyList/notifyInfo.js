@@ -357,7 +357,7 @@ class NotifyInfo extends React.Component {
     let mobiles = JSON.parse(JSON.stringify(this.state.mobiles))
     if (
       !mobiles[i].mobile ||
-      !/^1[3|4|5|7|8][0-9]{9}$/.test(parseInt(mobiles[i].mobile, 10))
+      !/^1[0-9]{10}$/.test(parseInt(mobiles[i].mobile, 10))
     ) {
       mobiles[i].error = true
       mobiles[i].errorMessage = '手机号格式不正确！'

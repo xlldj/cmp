@@ -9,6 +9,13 @@ import {
   changeHeater,
   fetchHeaterList
 } from '../pages/heater/action'
+import { CHANGE_ORDER, changeOrder } from '../pages/order/action'
+import {
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList,
+  fetchDetailRecordList
+} from '../pages/doorForbid/action'
 
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
@@ -175,15 +182,6 @@ export const changeSchool = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_ORDER = 'CHANGE_ORDER'
-export const changeOrder = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_ORDER,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_FUND = 'CHANGE_FUND'
 export const changeFund = (subModule, keyValuePair) => {
   return {
@@ -271,5 +269,11 @@ export {
   fetchDeviceList,
   CHANGE_HEATER,
   changeHeater,
-  fetchHeaterList
+  fetchHeaterList,
+  CHANGE_ORDER,
+  changeOrder,
+  CHANGE_DOORFORBID,
+  changeDoorForbid,
+  fetchDoorForbidList,
+  fetchDetailRecordList
 }

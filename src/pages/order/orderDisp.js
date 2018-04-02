@@ -12,11 +12,8 @@ import { changeOrder } from '../../actions'
 import Time from '../../util/time'
 import './style/style.css'
 
-const OrderTable = asyncComponent(() =>
-  import(/* webpackChunkName: "orderTable" */ './orderTable')
-)
-const OrderInfo = asyncComponent(() =>
-  import(/* webpackChunkName: "orderInfo" */ './orderInfo')
+const OrderList = asyncComponent(() =>
+  import(/* webpackChunkName: "orderTable" */ './orderList')
 )
 const AbnormalOrder = asyncComponent(() =>
   import(/* webpackChunkName: "abnormalOder" */ './abnormal/abnormalContainer')
@@ -95,11 +92,7 @@ class OrderDisp extends React.Component {
           <Route
             exact
             path="/order/list"
-            render={props => <OrderTable hide={this.props.hide} {...props} />}
-          />
-          <Route
-            path="/order/list/orderInfo/:id"
-            render={props => <OrderInfo hide={this.props.hide} {...props} />}
+            render={props => <OrderList hide={this.props.hide} {...props} />}
           />
           <Route
             path="/order/abnormal"

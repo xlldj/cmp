@@ -354,7 +354,7 @@ class EmployeeInfo extends React.Component {
   }
   checkMobile = () => {
     let m = this.state.contactMobile
-    if (!/^1[3|4|5|7|8][0-9]{9}$/.test(m)) {
+    if (!/^1[0-9]{10}$/.test(m)) {
       return this.setState({
         mobileError: true,
         mobileErrorMessage: '手机号格式不正确！'
@@ -614,7 +614,7 @@ class EmployeeInfo extends React.Component {
             </a>
             {schoolLimit ? selectedSchoolItems : <span>不限制学校</span>}
             {schoolError ? (
-              <span className="checkInvalid">请为选择最少一个学校！</span>
+              <span className="checkInvalid">请选择最少一个学校！</span>
             ) : null}
           </li>
           <li className="itemsWrapper">

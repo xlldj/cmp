@@ -17,3 +17,52 @@ export function obj2arr(o) {
 export function isNumber(n) {
   return n === +n
 }
+
+export function checkAllEmpty(o) {
+  for (let key in o) {
+    if (o.hasOwnProperty(key)) {
+      if (o[key]) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
+export function deleteEmptyKeyInObject(o) {
+  // only delete '' or NaN, not delete 0
+  for (let key in o) {
+    if (o.hasOwnProperty(key)) {
+      if (o[key] === 0 || o[key] === false) {
+        continue
+      }
+      if (!o[key]) {
+        delete o[key]
+      }
+    }
+  }
+}
+export function safeGet(o, keys) {
+  if (!o) {
+    return undefined
+  }
+  let keyArr = keys.split('.'),
+    result = o
+  for (let key of keyArr) {
+    if (hasOwn(result, key)) {
+      result = result[key]
+    } else {
+      return undefined
+    }
+  }
+  return result
+}
+
+function hasOwn(o, key) {
+  if (key in o) {
+    if (o.hasOwnProperty(key)) {
+      return true
+    }
+  }
+  return false
+}

@@ -1,8 +1,18 @@
+.tableList {
+  padding: 20px 20px;
+}
+.heaterUnitsWrapper .tableList {
+  padding-top: 0;
+}
 .liveMapWrapper img {
   height: 300px;
 }
 .liveStatusWrapper .liveMapWrapper {
   position: relative;
+  margin-top: 3rem;
+}
+.liveStatusWrapper .liveMapWrapper .tankImg {
+  cursor: pointer;
 }
 .liveStatusWrapper .liveMapWrapper .thermometer {
   position: absolute;
@@ -10,9 +20,96 @@
   top: 120px;
   left: 340px;
 }
-.liveStatusWrapper .liveMapWrapper .waterpipeHint {
+.liveStatusWrapper .liveMapWrapper .redThermo,
+.liveStatusWrapper .liveMapWrapper .blueThermo {
+  width: 6px;
+  height: 81px;
+  border-radius: 3px;
+  background-color: #eee;
+}
+.liveStatusWrapper .liveMapWrapper .redThermo {
   position: absolute;
+  top: 151px;
+  left: 372px;
+}
+.liveStatusWrapper .liveMapWrapper .blueThermo {
+  position: absolute;
+  top: 144px;
+  left: 386px;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHintWrapper {
+  position: absolute;
+  left: 480px;
+  bottom: 120px;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHintWrapper .hintBox {
+  margin-bottom: 10px;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHintWrapper .hintBox:last-child {
+  margin-bottom: 0;
+}
+.liveStatusWrapper .liveMapWrapper .waterpipeHint {
   left: 520px;
   bottom: 120px;
   width: fit-content;
+}
+.liveStatusWrapper .liveMapWrapper .tankHintWrapper {
+  position: absolute;
+  left: 250px;
+  top: 320px;
+}
+.liveStatusWrapper .liveMapWrapper .tankHintWrapper .hintBox {
+  display: inline-block;
+  margin-right: 10px;
+}
+.liveStatusWrapper .liveMapWrapper .tankHintWrapper .hintBox::last-child {
+  margin-right: 0;
+}
+.liveStatusWrapper .liveMapWrapper .warmerHintWrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 10px;
+  left: -120px;
+  height: 100%;
+  max-height: 100%;
+}
+.liveStatusWrapper .liveMapWrapper .commonHint {
+  position: absolute;
+  left: 40px;
+  top: 20px;
+  width: fit-content;
+}
+.heaterStatusConfig {
+  box-sizing: border-box;
+  border-top: 1px solid #eee;
+  height: calc(100vh - 110px - 70px);
+  overflow: hidden;
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+}
+.heaterStatusConfig .heaterStatusConfigSet {
+  width: 80%;
+  height: 100%;
+  padding: 10px 0px 30px 20px;
+  overflow-y: scroll;
+  border-right: 1px solid #eee;
+  background: #f9f9f9;
+}
+.heaterStatusConfig .heaterStatusConfigSet .btnArea {
+  width: calc(100% - 10px);
+  margin-top: 20px;
+}
+.heaterStatusConfig .heaterStatusConfigSet .noBdr {
+  border: none;
+}
+.heaterStatusConfig .heaterStatusAiSet {
+  width: 20%;
+}
+.heaterStatusConfig .heaterStatusAiSet button {
+  margin-top: 40px;
+  margin-left: 50%;
+  transform: translateX(-50%);
 }

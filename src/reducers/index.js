@@ -5,6 +5,9 @@ import { getLocal } from '../util/storage'
 import Time from '../util/time'
 
 import heaterModule from '../pages/heater/reducer'
+import orderModule from '../pages/order/reducer'
+
+import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
 if (recentSchools) {
@@ -204,38 +207,6 @@ const deviceModule = (state = initialDeviceState, action) => {
 
   if (type === ActionTypes.CHANGE_DEVICE) {
     const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
-const initialOrderState = {
-  orderList: {
-    page: 1,
-    schoolId: selectedSchool,
-    deviceType: 'all',
-    status: 'all',
-    selectKey: '',
-    startTime: Time.get7DaysAgoStart(),
-    endTime: Time.getTodayEnd(),
-    userType: 'all'
-  },
-  abnormal: {
-    page: 1,
-    schoolId: selectedSchool,
-    deviceType: 'all',
-    selectKey: '',
-    startTime: Time.get7DaysAgoStart(),
-    endTime: Time.getTodayEnd(),
-    userType: 'all'
-  }
-}
-const orderModule = (state = initialOrderState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_ORDER) {
-    const { subModule, keyValuePair } = action
-    // return { ...state, ...{ [subModule]: keyValuePair } }
     return merge({}, state, { [subModule]: keyValuePair })
   }
   return state
@@ -509,6 +480,7 @@ const rootReducer = combineReducers({
   employeeModule,
   notifyModule,
   versionModule,
+  doorForbidModule,
   setSchoolList,
   statModule,
   setAuthenData,

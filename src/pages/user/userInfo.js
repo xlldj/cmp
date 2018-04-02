@@ -246,8 +246,26 @@ class UserInfo extends React.Component {
                 <span>校ok迁移用户</span>
               </li>
               <li>
-                <p>校ok账户:</p>
-                <span>{data.originalAccount}</span>
+                <p>原校ok账号:</p>
+                <span>{data.originalAccount ? data.originalAccount : ''}</span>
+              </li>
+              <li>
+                <p>校ok迁移金额:</p>
+                <span>
+                  {data.originalBalance ? `¥${data.originalBalance}` : 0}
+                </span>
+              </li>
+              <li>
+                <p>校ok迁移红包:</p>
+                <span>
+                  {data.receivedUserTransferBonus
+                    ? data.receivedUserTransferBonus.join('、')
+                    : ''}
+                </span>
+              </li>
+              <li>
+                <p>已领取迁移红包:</p>
+                <span>{data.ifReceiveUserTransferBonus ? '是' : '否'}</span>
               </li>
             </Fragment>
           ) : null}

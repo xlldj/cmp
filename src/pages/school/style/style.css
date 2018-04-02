@@ -171,16 +171,18 @@
   display: inline-flex;
   align-items: center;
   position: absolute;
-  height: 100%;
   padding: 10px;
 }
 .schoolOverview .deviceWrapper .deviceContent .deviceItem .deviceTypeWrapper {
   width: 20%;
+  height: 100%;
   border-right: 1px solid #e9e9e9;
 }
 .schoolOverview .deviceWrapper .deviceContent .deviceItem .supplierWrapper {
+  flex-direction: column;
+  flex-wrap: wrap;
   left: 20%;
-  width: 20%;
+  width: 50%;
   height: 100%;
   padding: 0;
   border-right: 1px solid #e9e9e9;
@@ -191,12 +193,9 @@
   .deviceItem
   .supplierWrapper
   .supplierItem {
+  position: relative;
   width: 100%;
-  display: inline-flex;
-  flex: none;
-  flex-wrap: no-wrap;
-  align-items: center;
-  height: 100%;
+  flex-grow: 1;
 }
 .schoolOverview
   .deviceWrapper
@@ -205,20 +204,32 @@
   .supplierWrapper
   .supplierItem
   .supplierName {
-  width: 100%;
+  position: absolute;
+  width: calc(40% + 1px);
   height: 100%;
   padding: 10px;
+  border-bottom: 1px solid #e9e9e9;
   display: inline-flex;
   flex: none;
   flex-wrap: no-wrap;
   align-items: center;
+  border-right: 1px solid #e9e9e9;
+}
+.schoolOverview
+  .deviceWrapper
+  .deviceContent
+  .deviceItem
+  .supplierWrapper
+  .supplierItem
+  .supplierName:last-child {
+  border-bottom: none;
 }
 .schoolOverview .deviceWrapper .deviceContent .deviceItem .rateGroupsWrapper {
   left: 40%;
-  width: 30%;
+  width: 60%;
   height: 100%;
   padding: 10px;
-  border-right: 1px solid #e9e9e9;
+  border-bottom: 1px solid #e9e9e9;
   display: flex;
   flex: none;
   flex-wrap: wrap;
@@ -233,8 +244,7 @@
   left: 40%;
   width: 100%;
   height: 18px;
-  overflow: hidden;
-  white-space: nowrap;
+  white-space: wrap;
 }
 .schoolOverview .deviceWrapper .deviceContent .deviceItem .waterItemsWrapper {
   position: absolute;

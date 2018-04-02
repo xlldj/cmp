@@ -34,14 +34,17 @@
 .rateInfo .rateSets span {
   padding-right: 5px;
 }
+.rateInfo .rateSets .rightSeperatorBig {
+  padding-right: 40px;
+}
 .repair .waiting {
   color: #ff5555;
 }
 .repair .repairing {
-  color: #FFBF00;
+  color: #ffbf00;
 }
 .repair .finished {
-  color: #00A854;
+  color: #00a854;
 }
 .prepayInfo input {
   width: 50px;

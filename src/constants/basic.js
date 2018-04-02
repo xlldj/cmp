@@ -40,25 +40,15 @@ const BASIC = {
       ]
     },
     {
-      name: '热水机组',
-      path: 'heater',
-      key: 12,
-      icon: 'home',
+      name: '门禁管理',
+      path: 'doorForbid',
+      key: 13,
+      icon: 'appstore-o',
       children: [
         {
-          path: 'list',
-          name: '机组列表',
+          path: 'record',
+          name: '门禁记录',
           key: 0
-        },
-        {
-          path: 'status',
-          name: '工作状态',
-          key: 1
-        },
-        {
-          path: 'maintain',
-          name: '维护管理',
-          key: 2
         }
       ]
     },

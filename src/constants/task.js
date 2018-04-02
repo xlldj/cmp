@@ -101,6 +101,16 @@ const TASK = {
     repairRating: 16
   },
   // for heart beat check of online status
-  HEARTBEATTIMEOUT: 4 * 60 * 1000
+  HEARTBEATTIMEOUT: 4 * 60 * 1000,
+  // for day control
+  NORMAL_DAY_UNLIMITED: 0,
+  NORMAL_DAY_TODAY: 1,
+  NORMAL_DAY_3: 2,
+  NORMAL_DAY_7: 3,
+  NORMAL_DAY_14: 4,
+  NORMAL_DAY_30: 5,
+  NORMAL_DAY_BEYOND_1: 6,
+  NORMAL_DAY_BEYOND_2: 7,
+  NORMAL_DAY_BEYOND_5: 8
 }
 export default TASK

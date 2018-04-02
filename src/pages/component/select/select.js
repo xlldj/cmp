@@ -1,30 +1,30 @@
 import React from 'react'
 import arrow from '../../assets/selectArrow.png'
 
-class Select extends React.Component{
+class Select extends React.Component {
   state = {
     searching: false,
     inputLock: false,
     searchText: '',
     inputText: '',
-    open: false// show the dropdown or not
+    open: false // show the dropdown or not
   }
   componentWillMount() {
     this.getAllOption()
   }
-  componentDidUpdate () {
+  componentDidUpdate() {
     let searchInput = this.refs.searchInput
     if (searchInput) {
       searchInput.focus()
     }
   }
   getAllOption = () => {
-    const handleOption = (r) => {
+    const handleOption = r => {
       valueLabelPairs[r.props.value] = r.props.children
       values.push(r.props.value)
       return (
-        <li 
-          key={`option-${r.props.value}`} 
+        <li
+          key={`option-${r.props.value}`}
           className={value === r.props.value ? 'selected' : ''}
           data-value={r.props.value}
         >
@@ -35,15 +35,18 @@ class Select extends React.Component{
     const handleOptGroup = (r, i) => {
       let groupChildren = r.props.children
       let optItems = groupChildren.map((rec, ind) => {
-
         if (rec.props.value) {
           valueLabelPairs[rec.props.value] = rec.props.children
           values.push(rec.props.value)
         }
         return (
-          <li 
-            key={`optGroupOption-${rec.props.value}`} 
-            className={value === rec.props.value ? 'selected light-optOption' : 'light-optOption'}
+          <li
+            key={`optGroupOption-${rec.props.value}`}
+            className={
+              value === rec.props.value
+                ? 'selected light-optOption'
+                : 'light-optOption'
+            }
             data-value={rec.props.value}
           >
             {rec.props.children}
@@ -51,17 +54,18 @@ class Select extends React.Component{
         )
       })
       return (
-        <div key={`optGroupWrapper${i}`} className='light-optWrapper'>
-          <div key={`optGroupTitle${i}`} className='light-optTitle'>
+        <div key={`optGroupWrapper${i}`} className="light-optWrapper">
+          <div key={`optGroupTitle${i}`} className="light-optTitle">
             <span>{r.props.title}</span>
           </div>
-          <ul  key={`optGroupUl${i}`}>{optItems}</ul>
+          <ul key={`optGroupUl${i}`}>{optItems}</ul>
         </div>
       )
     }
-    let {value, all, children, allTitle} = this.props
+    let { value, all, children, allTitle } = this.props
     value = value.toString()
-    let valueLabelPairs = {}, values = []
+    let valueLabelPairs = {},
+      values = []
     let childItems = children.map((r, i) => {
       if (!r) {
         return null
@@ -78,7 +82,7 @@ class Select extends React.Component{
         } else {
           return null
         }
-      } 
+      }
     })
     // '全部选项'的键值对在这里添加到全局的键值对中用于匹配value，而all选项在render中添加
     if (all) {
@@ -87,11 +91,13 @@ class Select extends React.Component{
     }
     this.values = values
     this.valueLabelPairs = valueLabelPairs
-    if (values.length === 0) { // 没有选项时
-      childItems = <li 
-          key={`none`} 
-          data-value={'none'}
-        >无选项</li>
+    if (values.length === 0) {
+      // 没有选项时
+      childItems = (
+        <li key={`none`} data-value={'none'}>
+          无选项
+        </li>
+      )
     }
     // this.childItems = childItems
     return childItems
@@ -99,14 +105,14 @@ class Select extends React.Component{
   getSearchingOptions = () => {
     let valueLabelPairs = this.valueLabelPairs
     let value = this.props.value.toString()
-    let {searchText} = this.state
+    let { searchText } = this.state
     let keys = Object.keys(valueLabelPairs)
-    let searchResult = keys.filter((r)=>(valueLabelPairs[r].includes(searchText)))
+    let searchResult = keys.filter(r => valueLabelPairs[r].includes(searchText))
     this.searchResult = searchResult
     if (searchResult.length) {
       let childItems = searchResult.map((r, i) => (
-        <li 
-          key={`option-${i}`} 
+        <li
+          key={`option-${i}`}
           className={value === r ? 'selected' : ''}
           data-value={r}
         >
@@ -115,20 +121,18 @@ class Select extends React.Component{
       ))
       return childItems
     } else {
-      return (
-        <li className='noSearchResult'>无匹配结果</li>
-      )
+      return <li className="noSearchResult">无匹配结果</li>
     }
   }
-  toggleDropdown = (e) => {
+  toggleDropdown = e => {
     let disabled = this.props.disabled
     if (disabled) {
       return
     }
     let nextState = {}
-    let {search, value} = this.props
-    let {open} = this.state
-    if (open&&value) {
+    let { search, value } = this.props
+    let { open } = this.state
+    if (open && value) {
       nextState.open = false
       nextState.searching = false
       nextState.searchText = ''
@@ -143,7 +147,7 @@ class Select extends React.Component{
     this.setState(nextState)
 
     let selectWindow = this.refs.selectWindow
-    if (selectWindow&&!selectWindow.classList.contains('activeWindow')) {
+    if (selectWindow && !selectWindow.classList.contains('activeWindow')) {
       selectWindow.classList.add('activeWindow')
     }
   }
@@ -165,20 +169,21 @@ class Select extends React.Component{
       this.props.onBlur(value)
     }
   }
-  selectBlur = (e) => {
+  selectBlur = e => {
     // set a timer , if expires, close the select
     /* console.log(e.relatedTarget)
     console.log(e.currentTarget) */
     this.blurTi = setTimeout(this.checkFocus, 25)
   }
-  optionClicked = (e) => {
+  optionClicked = e => {
     if (this.blurTi) {
       clearTimeout(this.blurTi)
       this.blurTi = null
     }
     if (e.target.tagName.toLowerCase() === 'li') {
       let value = e.target.getAttribute('data-value')
-      if (value === 'none') { // 若选择的是'无选择'项，什么也不做
+      if (value === 'none') {
+        // 若选择的是'无选择'项，什么也不做
         return
       }
       this.setState({
@@ -193,7 +198,7 @@ class Select extends React.Component{
     }
   }
   getMixedStyle = () => {
-    let {style, width} = this.props
+    let { style, width } = this.props
     if (style && width) {
       style.width = width
       return style
@@ -207,8 +212,9 @@ class Select extends React.Component{
       return null
     }
   }
-  changeSearch = (e) => {
-    let {inputLock} = this.state, nextState = {}
+  changeSearch = e => {
+    let { inputLock } = this.state,
+      nextState = {}
     let v = e.target.value.trim()
     if (inputLock) {
       nextState.inputText = v
@@ -218,37 +224,39 @@ class Select extends React.Component{
     }
     this.setState(nextState)
   }
-  handleChineseStart = (e) => {
+  handleChineseStart = e => {
     if (this.state.inputLock) {
-      return 
+      return
     }
     this.setState({
       inputLock: true
     })
   }
-  handleChineseEnd = (e) => {
+  handleChineseEnd = e => {
     let v = e.target.value.trim()
-    this.setState({ //onCompositionEnd happens after onChange, so need to set value here.
+    this.setState({
+      //onCompositionEnd happens after onChange, so need to set value here.
       inputLock: false,
       inputText: v,
       searchText: v
     })
   }
-  pressEnter = (e) => {
+  pressEnter = e => {
     let key = e.key
     if (key.toLowerCase() === 'enter') {
       this.setSearchResult()
     }
   }
   setSearchResult = () => {
-    let searchResult = this.searchResult, nextState = {}
+    let searchResult = this.searchResult,
+      nextState = {}
 
-      nextState.searching = false
-      nextState.searchText = ''
-      nextState.inputText = ''
-      nextState.open = false
-    
-    if (searchResult&&searchResult.length) {
+    nextState.searching = false
+    nextState.searchText = ''
+    nextState.inputText = ''
+    nextState.open = false
+
+    if (searchResult && searchResult.length) {
       let value = searchResult[0]
       this.props.onChange(value)
     } else {
@@ -257,105 +265,122 @@ class Select extends React.Component{
     this.setState(nextState)
     this.refs.selectWrapper.focus()
   }
-  searchInputFocused = (e) => {
+  searchInputFocused = e => {
     if (this.blurTi) {
       clearTimeout(this.blurTi)
       this.blurTi = null
     }
   }
   focusInSelect = ({ relatedTarget, currentTarget }) => {
-    if (relatedTarget === null) return false;
-    
-    var node = relatedTarget, selectNode = this.refs.selectWrapper
-          
+    if (relatedTarget === null) return false
+
+    var node = relatedTarget,
+      selectNode = this.refs.selectWrapper
+
     while (node !== null) {
-      if (node === selectNode) return true;
-      node = node.parentNode;
+      if (node === selectNode) return true
+      node = node.parentNode
     }
 
-    return false;
+    return false
   }
-  searchInputBlur = (e) => {
+  searchInputBlur = e => {
     if (this.focusInSelect(e)) {
       e.stopPropagation()
     }
   }
-  handleScroll = (e) => {
-    let dropdown = this.refs.dropdown, down = e.deltaY > 0 ? true : false
-    let sh = dropdown.scrollHeight, ch = dropdown.clientHeight, st = dropdown.scrollTop
-    if (down && ch + st >= sh -2) {
+  handleScroll = e => {
+    let dropdown = this.refs.dropdown,
+      down = e.deltaY > 0 ? true : false
+    let sh = dropdown.scrollHeight,
+      ch = dropdown.clientHeight,
+      st = dropdown.scrollTop
+    if (down && ch + st >= sh - 2) {
       dropdown.scrollTop = sh - ch
       e.preventDefault()
-    } else if (!down && st <= 1){
+    } else if (!down && st <= 1) {
       dropdown.scrollTop = 0
       e.preventDefault()
     }
   }
-  render () {
-    let {value, all, allTitle, className, dropdownClassName, dropdownStyle, notFoundTitle} = this.props
+  render() {
+    let {
+      value,
+      all,
+      allTitle,
+      className,
+      dropdownClassName,
+      dropdownStyle,
+      notFoundTitle
+    } = this.props
     value = value.toString().trim()
-    let {searchText, open, searching, inputText} = this.state
+    let { searchText, open, searching, inputText } = this.state
     const style = this.getMixedStyle()
     const searchInput = (
-        <input 
-          id='searchInput'
-          ref='searchInput'
-          value={inputText}  
-          onChange={this.changeSearch} 
-          onCompositionStart={this.handleChineseStart}
-          onCompositionEnd={this.handleChineseEnd}
-          onFocus={this.searchInputFocused}
-          onBlur={this.searchInputBlur}
-          onKeyDown={this.pressEnter}
-          className='light-searchInput' 
-        />
+      <input
+        id="searchInput"
+        ref="searchInput"
+        value={inputText}
+        onChange={this.changeSearch}
+        onCompositionStart={this.handleChineseStart}
+        onCompositionEnd={this.handleChineseEnd}
+        onFocus={this.searchInputFocused}
+        onBlur={this.searchInputBlur}
+        onKeyDown={this.pressEnter}
+        className="light-searchInput"
+      />
     )
-    const childItems = searching&&searchText ? this.getSearchingOptions() : this.getAllOption()
+    const childItems =
+      searching && searchText ? this.getSearchingOptions() : this.getAllOption()
     // 需要确保一定能找到当前的value
     // get current label after get all options , bacause the value label pairs changed there
-    let currentLabel = this.valueLabelPairs[value] || (open ? '' : notFoundTitle) || ''
+    let currentLabel =
+      this.valueLabelPairs[value] || (open ? '' : notFoundTitle) || '无'
     const currentOption = (
-      <div 
-        className='light-currentOption'
-        onClick={this.toggleDropdown}
-      >
+      <div className="light-currentOption" onClick={this.toggleDropdown}>
         <span>{currentLabel}</span>
-        <img src={arrow} alt='' />
+        <img src={arrow} alt="" />
       </div>
     )
     const popUps = (
-      <ul 
-        className={dropdownClassName ? dropdownClassName + ' light-selectUl' : 'light-selectUl'}
+      <ul
+        className={
+          dropdownClassName
+            ? dropdownClassName + ' light-selectUl'
+            : 'light-selectUl'
+        }
         style={dropdownStyle}
         onClick={this.optionClicked}
         onWheel={this.handleScroll}
-        ref='dropdown'
+        ref="dropdown"
       >
-        {all&&!searchText ? 
-          <li 
-            key={'option-all'} 
+        {all && !searchText ? (
+          <li
+            key={'option-all'}
             className={value === 'all' ? 'selected' : ''}
             data-value={'all'}
           >
             {allTitle}
-          </li> 
-        : null}
+          </li>
+        ) : null}
         {childItems}
       </ul>
     )
 
     return (
-      <div 
+      <div
         style={style}
-        className={className ? 'light-styleWrapper ' + className : 'light-styleWrapper'}
+        className={
+          className ? 'light-styleWrapper ' + className : 'light-styleWrapper'
+        }
       >
-        <div 
-          className='light-selectWrapper'
+        <div
+          className="light-selectWrapper"
           onBlur={this.selectBlur}
           tabIndex={1}
-          ref='selectWrapper'
+          ref="selectWrapper"
         >
-          <div className='selectWindow' id='selectWindow' ref='selectWindow'>
+          <div className="selectWindow" id="selectWindow" ref="selectWindow">
             {searching ? searchInput : currentOption}
           </div>
 

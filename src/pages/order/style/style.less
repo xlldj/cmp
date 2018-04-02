@@ -14,3 +14,51 @@ textarea{
 		margin-right: 10px;
 	}
 }
+.detailPanelWrapper{
+	width: 30%;
+}
+.detailList{
+	border-bottom: 1px solid #eee;
+}
+.orderInfo{
+	ul:last-of-type{
+		border: none !important;
+	}
+}
+.orderStat{
+	position: relative;
+	.statWrapper{
+		position: absolute;
+		overflow-y: scroll;
+		overflow-x: hidden;
+		top: 100px;
+		padding-top: 20px;
+		width: 100%;
+		height: calc(~ '100vh - 100px - 120px');
+		border-top: 1px solid #eee;
+		background-color: #f9f9f9;
+		.tableList{
+			padding-bottom: 30px;
+			margin-bottom: 30px;
+			border-bottom: 1px solid #eee;
+			td{
+				background-color: white;
+			}
+		}
+	}
+	.statWrapper::-webkit-scrollbar{
+		display: block !important;
+	}
+	.statWrapper::-webkit-scrollbar-track-piece{
+		background-color:#fff;
+	}
+	.statWrapper::-webkit-scrollbar{
+		width:5px;
+	}
+	.statWrapper::-webkit-scrollbar-thumb{
+		background:#ccc;
+	} 	
+}
+.barChartWrapper{
+	margin-bottom: 30px;
+}
