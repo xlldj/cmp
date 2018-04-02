@@ -464,10 +464,6 @@ class Main extends React.Component {
                 render={props => <SchoolDisp hide={this.hide} {...props} />}
               />
               <Route
-                path="/heater"
-                render={props => <HeaterDisp hide={this.hide} {...props} />}
-              />
-              <Route
                 path="/doorForbid"
                 render={props => <DoorForbidDisp hide={this.hide} {...props} />}
               />
