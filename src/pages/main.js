@@ -49,13 +49,9 @@ const Welcome = asyncComponent(() =>
 const SchoolDisp = asyncComponent(() =>
   import(/* webpackChunkName: "school" */ './school/schoolDisp')
 )
-const HeaterDisp = asyncComponent(() =>
-  import(/* webpackChunkName: "heater" */ './heater/heaterDisp')
-)
 const DoorForbidDisp = asyncComponent(() =>
   import(/* webpackChunkName: "doorForbid" */ './doorForbid/doorForbidDisp')
 )
-
 const OrderDisp = asyncComponent(() =>
   import(/* webpackChunkName: "order" */ './order/orderDisp')
 )
@@ -411,7 +407,7 @@ class Main extends React.Component {
   }
   refresh = () => {
     let { pathname } = this.props.history.location
-    // window.location.assign(pathname)
+    window.location.assign(pathname)
   }
   changeWidth = hasChildren => {
     this.setState({

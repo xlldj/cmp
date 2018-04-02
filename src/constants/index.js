@@ -13,7 +13,6 @@ import USER from './user'
 import VERSION from './version'
 import HEATER from './heater'
 
-import DOORFORBID from './doorForbid'
 const CONSTANTS = {
   ...BASIC,
   ...SCHOOL,
@@ -28,8 +27,7 @@ const CONSTANTS = {
   ...STAT,
   ...TASK,
   ...USER,
-  ...VERSION,
-  ...DOORFORBID
+  ...VERSION
 }
 
 export default CONSTANTS

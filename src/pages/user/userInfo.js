@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { Button, Modal, Popconfirm } from 'antd'
 import Time from '../../util/time'
 import Noti from '../../util/noti'
@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
+const { Fragment } = React
 const SEX = {
   1: '男',
   2: '女'
@@ -54,7 +55,6 @@ class UserInfo extends React.Component {
         this.setState({
           data: json.data
         })
-        // 如果是迁移用户，fetch该学校的迁移红包
       }
     }
     AjaxHandler.ajax(resource, body, cb)
@@ -217,9 +217,6 @@ class UserInfo extends React.Component {
     let { data, cancelDefriending, reseting } = this.state
     const { forbiddenStatus } = this.props
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
-    const receivedUserTransferBonusItems =
-      data.receivedUserTransferBonus &&
-      data.receivedUserTransferBonus.join('、')
     return (
       <div className="infoList">
         <ul>
@@ -262,7 +259,7 @@ class UserInfo extends React.Component {
                 <p>校ok迁移红包:</p>
                 <span>
                   {data.receivedUserTransferBonus
-                    ? receivedUserTransferBonusItems
+                    ? data.receivedUserTransferBonus
                     : ''}
                 </span>
               </li>
