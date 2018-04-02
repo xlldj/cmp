@@ -259,7 +259,7 @@ class UserInfo extends React.Component {
                 <p>校ok迁移红包:</p>
                 <span>
                   {data.receivedUserTransferBonus
-                    ? data.receivedUserTransferBonus
+                    ? data.receivedUserTransferBonus.join('、')
                     : ''}
                 </span>
               </li>
