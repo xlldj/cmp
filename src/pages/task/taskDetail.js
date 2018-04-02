@@ -1929,7 +1929,7 @@ class TaskDetail extends React.Component {
             {/* only show when 'status' is not finished and has right to handle. */}
             {status !== CONSTANTS.TASK_FINISHED &&
             !forbiddenStatus.HANDLE_TASK ? (
-              <div className="btnArea">
+              <div>
                 {handleLimit !== true ? (
                   <Dropdown
                     overlay={
