@@ -30,7 +30,8 @@ const ORDER = {
   ORDER_STAT_DAY_UNLIMITED: 6,
   ORDER_LIST_TABLE: 1,
   X_AXIS_NAME: {
-    1: '0~0.5元',
+    0: '0元',
+    1: '<0.5元',
     2: '0.5~1元',
     3: '1~1.5元',
     4: '1.5~2元',

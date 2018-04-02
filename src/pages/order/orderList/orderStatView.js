@@ -174,8 +174,8 @@ class OrderStatView extends React.Component {
     let barData = []
     for (let i = 0; i < 7; ) {
       barData.push({
-        key: ++i,
-        x: X_AXIS_NAME[i],
+        key: i,
+        x: X_AXIS_NAME[i++],
         countUser: 0,
         countOrder: 0
       })
