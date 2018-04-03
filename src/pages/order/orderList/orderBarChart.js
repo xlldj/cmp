@@ -21,7 +21,7 @@ const OrderBarChart = props => {
         />
         <YAxis
           axisLine={{ stroke: '#ddd' }}
-          domain={[0, dataMax => dataMax * 1.2 + 10]}
+          domain={[0, dataMax => parseInt(dataMax * 1.2 + 10, 10)]}
           tickLine={false}
         />
         <Legend align="center" verticalAlign="top" wrapperStyle={{ top: 10 }} />
@@ -31,14 +31,14 @@ const OrderBarChart = props => {
           isAnimationActive={true}
           legendType="rect"
           barSize={20}
-          label={<CustomLabel />}
+          label={<CustomLabel textAnchor="end" dx={18} />}
           fill="#6bb2f2"
         />
         <Bar
           dataKey="countOrder"
           name="次数"
           barSize={20}
-          label={<CustomLabel />}
+          label={<CustomLabel textAnchor="start" dx={0} />}
           isAnimationActive={true}
           fill="#b1dc37"
         />
@@ -51,11 +51,11 @@ export default OrderBarChart
 
 class CustomLabel extends React.Component {
   render() {
-    const { x, y, value } = this.props
+    const { x, y, value, dx, textAnchor } = this.props
     console.log(this.props)
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dx={12} dy={-10} textAnchor="end" fill="#999">
+        <text x={0} y={0} dx={dx} dy={-10} textAnchor={textAnchor} fill="#999">
           {value > 0 ? value : ''}
         </text>
       </g>
