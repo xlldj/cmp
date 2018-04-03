@@ -12,7 +12,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../../actions'
 
-const { DEVICETYPE, TASKSTATUS, DEVICE_TYPE_BLOWER } = CONSTANTS
+const { DEVICETYPE, TASKSTATUS, DEVICE_TYPE_BLOWER, NORMAL_DAY_7 } = CONSTANTS
 const BACKTITLE = {
   fromRepair: '返回报修详情'
 }
@@ -99,13 +99,18 @@ class DeviceInfo extends React.Component {
   }
   toOrderOfDevice = () => {
     this.props.changeOrder('orderList', {
+      tabIndex: 1,
       page: 1,
       schoolId: 'all',
       deviceType: 'all',
       status: 'all',
       selectKey: '',
-      startTime: Time.get7DaysAgoStart(),
-      endTime: Time.getTodayEnd()
+      day: NORMAL_DAY_7, // last 7 days
+      startTime: '',
+      endTime: '',
+      showDetail: false,
+      selectedRowIndex: -1,
+      selectedDetailId: -1
     })
     let { data, deviceType } = this.state
     this.props.history.push({

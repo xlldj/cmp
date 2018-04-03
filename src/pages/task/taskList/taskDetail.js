@@ -40,7 +40,8 @@ const {
   DEVICE_TYPE_BLOWER,
   WASHER_RATE_TYPES,
   DEVICE_TYPE_WASHER,
-  TASK_HANDLE_BUILD
+  TASK_HANDLE_BUILD,
+  NORMAL_DAY_7
 } = CONSTANTS
 const subModule = 'taskList'
 
@@ -1145,11 +1146,19 @@ class TaskDetail extends React.Component {
       let currentTab = detail_tabIndex[main_phase]
       if (currentTab === 2) {
         this.props.changeOrder('orderList', {
+          tabIndex: 1,
           page: 1,
+          day: NORMAL_DAY_7, // last 7 days
+          userType: 'all',
+          startTime: '',
+          endTime: '',
           schoolId: 'all',
           deviceType: 'all',
           status: 'all',
-          selectKey: ''
+          selectKey: '',
+          selectedRowIndex: -1,
+          selectedDetailId: -1,
+          showDetail: false
         })
         this.props.history.push({
           pathname: '/order/list',
@@ -1168,11 +1177,19 @@ class TaskDetail extends React.Component {
         })
       } else if (currentTab === 5) {
         this.props.changeOrder('orderList', {
+          tabIndex: 1,
           page: 1,
+          day: NORMAL_DAY_7, // last 7 days
+          userType: 'all',
+          startTime: '',
+          endTime: '',
           schoolId: 'all',
-          deviceType: deviceType ? deviceType.toString() : 'all',
           status: 'all',
-          selectKey: ''
+          selectKey: '',
+          selectedRowIndex: -1,
+          selectedDetailId: -1,
+          showDetail: false,
+          deviceType: deviceType ? deviceType.toString() : 'all'
         })
         this.props.history.push({
           pathname: '/order/list',

@@ -27,6 +27,8 @@ import {
 import { withRouter } from 'react-router-dom'
 import { checkObject } from '../../util/checkSame'
 
+const { ORDER_USER_TYPE_STUDENT } = CONSTANTS
+
 // const this.rootBlock = CONSTANTS.this.rootBlock
 
 class MyMenu extends React.Component {
@@ -265,13 +267,18 @@ class MyMenu extends React.Component {
   clearStatus4orderIIlist = () => {
     this.getDefaultSchool()
     this.props.changeOrder('orderList', {
+      tabIndex: 1,
       page: 1,
       deviceType: 'all',
       status: 'all',
+      day: 1, // 1 for today
       selectKey: '',
-      startTime: Time.get7DaysAgoStart(),
-      endTime: Time.getTodayEnd(),
-      userType: 'all'
+      startTime: '',
+      endTime: '',
+      selectedRowIndex: '',
+      selectedDetailId: '',
+      showDetail: false,
+      userType: ORDER_USER_TYPE_STUDENT
     })
   }
   clearStatus4orderIIabnormal = () => {
