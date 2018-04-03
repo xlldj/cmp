@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
+const { NORMAL_DAY_7 } = CONSTANTS
 const { Fragment } = React
 const SEX = {
   1: '男',
@@ -187,7 +188,7 @@ class UserInfo extends React.Component {
       page: 1,
       schoolId: 'all',
       deviceType: 'all',
-      day: 2, // last 7 days
+      day: NORMAL_DAY_7, // last 7 days
       status: 'all',
       selectKey: '',
       showDetail: false,

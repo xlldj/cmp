@@ -40,7 +40,8 @@ const {
   DEVICE_TYPE_BLOWER,
   WASHER_RATE_TYPES,
   DEVICE_TYPE_WASHER,
-  TASK_HANDLE_BUILD
+  TASK_HANDLE_BUILD,
+  NORMAL_DAY_7
 } = CONSTANTS
 const subModule = 'taskList'
 
@@ -1147,7 +1148,7 @@ class TaskDetail extends React.Component {
         this.props.changeOrder('orderList', {
           tabIndex: 1,
           page: 1,
-          day: 2, // 2 for today
+          day: NORMAL_DAY_7, // last 7 days
           userType: 'all',
           startTime: '',
           endTime: '',
@@ -1178,7 +1179,7 @@ class TaskDetail extends React.Component {
         this.props.changeOrder('orderList', {
           tabIndex: 1,
           page: 1,
-          day: 2, // 2 for today
+          day: NORMAL_DAY_7, // last 7 days
           userType: 'all',
           startTime: '',
           endTime: '',
