@@ -99,13 +99,18 @@ class DeviceInfo extends React.Component {
   }
   toOrderOfDevice = () => {
     this.props.changeOrder('orderList', {
+      tabIndex: 1,
       page: 1,
       schoolId: 'all',
       deviceType: 'all',
       status: 'all',
       selectKey: '',
-      startTime: Time.get7DaysAgoStart(),
-      endTime: Time.getTodayEnd()
+      day: 2, // last 7 days
+      startTime: '',
+      endTime: '',
+      showDetail: false,
+      selectedRowIndex: -1,
+      selectedDetailId: -1
     })
     let { data, deviceType } = this.state
     this.props.history.push({

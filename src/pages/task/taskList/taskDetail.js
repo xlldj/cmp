@@ -1145,11 +1145,19 @@ class TaskDetail extends React.Component {
       let currentTab = detail_tabIndex[main_phase]
       if (currentTab === 2) {
         this.props.changeOrder('orderList', {
+          tabIndex: 1,
           page: 1,
+          day: 2, // 2 for today
+          userType: 'all',
+          startTime: '',
+          endTime: '',
           schoolId: 'all',
           deviceType: 'all',
           status: 'all',
-          selectKey: ''
+          selectKey: '',
+          selectedRowIndex: -1,
+          selectedDetailId: -1,
+          showDetail: false
         })
         this.props.history.push({
           pathname: '/order/list',
@@ -1168,11 +1176,19 @@ class TaskDetail extends React.Component {
         })
       } else if (currentTab === 5) {
         this.props.changeOrder('orderList', {
+          tabIndex: 1,
           page: 1,
+          day: 2, // 2 for today
+          userType: 'all',
+          startTime: '',
+          endTime: '',
           schoolId: 'all',
-          deviceType: deviceType ? deviceType.toString() : 'all',
           status: 'all',
-          selectKey: ''
+          selectKey: '',
+          selectedRowIndex: -1,
+          selectedDetailId: -1,
+          showDetail: false,
+          deviceType: deviceType ? deviceType.toString() : 'all'
         })
         this.props.history.push({
           pathname: '/order/list',
