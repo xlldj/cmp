@@ -44,13 +44,20 @@ class OrderList extends React.Component {
   changeSchool = value => {
     /*-----value is the school id, used to fetch the school data-----*/
     /*-----does not reset other option other than searchText---------*/
-    let { schoolId } = this.props
+    let { schoolId, tabIndex } = this.props
     if (value === schoolId) {
       return
     }
-    this.props.changeOrder(subModule, { schoolId: value, page: 1 })
+    let nextProps = { schoolId: value }
+    if (tabIndex === 1) {
+      nextProps.page = 1
+    } else {
+      nextProps.stat_page = 1
+    }
+    this.props.changeOrder(subModule, nextProps)
   }
   changePhase = v => {
+    console.log(v)
     let { tabIndex } = this.props
     if (tabIndex !== v) {
       this.props.changeOrder(subModule, { tabIndex: v })

@@ -202,6 +202,10 @@ class OrderStatView extends React.Component {
     }
 
     this.fetchList(nextProps)
+    // if these options are same, doesn't need to refetch histogram.
+    if (checkObject(this.props, nextProps, ['day', 'schoolId', 'deviceType'])) {
+      return
+    }
     this.fetchHistogram(nextProps)
   }
   changeRange = key => {
@@ -230,12 +234,14 @@ class OrderStatView extends React.Component {
     if (!order) {
       // change to not order, set all to -1
       return this.props.changeOrder(subModule, {
+        stat_page: 1,
         stat_order: -1,
         stat_orderBy: -1
       })
     }
     // must not be empty
     this.props.changeOrder(subModule, {
+      stat_page: 1,
       stat_order: ORDER[order],
       stat_orderBy: ORDER_STAT_ORDERBYS[field]
     })

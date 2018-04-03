@@ -5,13 +5,14 @@ import { asyncComponent } from '../component/asyncComponent'
 //import OrderTable from './orderTable'
 import Bread from '../component/bread'
 import { getLocal } from '../../util/storage'
+import CONSTANTS from '../../constants'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder } from '../../actions'
 import Time from '../../util/time'
 import './style/style.css'
-
+const { ORDER_USER_TYPE_STUDENT } = CONSTANTS
 const OrderList = asyncComponent(() =>
   import(/* webpackChunkName: "orderTable" */ './orderList')
 )
@@ -33,13 +34,18 @@ class OrderDisp extends React.Component {
   clearStatus4orderIIlist = () => {
     this.getDefaultSchool()
     this.props.changeOrder('orderList', {
+      tabIndex: 1,
       page: 1,
       deviceType: 'all',
       status: 'all',
+      day: 1, // 1 for today
       selectKey: '',
-      startTime: Time.get7DaysAgoStart(),
-      endTime: Time.getTodayEnd(),
-      userType: 'all'
+      startTime: '',
+      endTime: '',
+      selectedRowIndex: '',
+      selectedDetailId: '',
+      showDetail: false,
+      userType: ORDER_USER_TYPE_STUDENT
     })
   }
   clearStatus4orderIIabnormal = () => {
