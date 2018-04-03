@@ -517,7 +517,7 @@ class OrderTable extends React.Component {
           </div>
         ) : null}
         {state ? (
-          <div className="btnRight">
+          <div className="btnRight marginBottom">
             <Button onClick={this.back}>{BACKTITLE[state.path]}</Button>
           </div>
         ) : null}
