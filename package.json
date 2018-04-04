@@ -133,14 +133,7 @@
     "presets": ["react-app"],
     "plugins": [
       "babel-plugin-transform-decorators-legacy",
-      "react-hot-loader/babel",
-      [
-        "import",
-        {
-          "libraryName": "antd",
-          "style": true
-        }
-      ]
+      "react-hot-loader/babel"
     ]
   },
   "eslintConfig": {

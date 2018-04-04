@@ -10,7 +10,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
 const { NORMAL_DAY_7 } = CONSTANTS
-const { Fragment } = React
 const SEX = {
   1: '男',
   2: '女'

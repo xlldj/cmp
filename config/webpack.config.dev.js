@@ -38,8 +38,10 @@ module.exports = {
       require.resolve('./polyfills'),
       require.resolve('react-error-overlay'),
       paths.appIndexJs
-    ],
-    vendor: ['react', 'antd', 'react-router']
+    ]
+  },
+  externals: {
+    antd: 'antd'
   },
   output: {
     path: paths.appBuild,
@@ -128,8 +130,7 @@ module.exports = {
           {
             loader: require.resolve('babel-loader'),
             query: {
-              presets: ['es2015', 'stage-0', 'react'],
-              plugins: [['import', { libraryName: 'antd' }]]
+              presets: ['es2015', 'stage-0', 'react']
             }
           }
         ]
@@ -197,10 +198,6 @@ module.exports = {
     }),
     // Add module names to factory functions so they appear in browser profiler.
     new webpack.NamedModulesPlugin(),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.bundle.js'
-    }),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
     new webpack.DefinePlugin(env.stringified),

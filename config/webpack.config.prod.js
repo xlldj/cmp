@@ -59,6 +59,9 @@ module.exports = {
   entry: {
     index: [require.resolve('./polyfills'), paths.appSrc + '/index.js']
   },
+  externals: {
+    antd: 'antd'
+  },
   output: {
     path: paths.appBuild,
     pathinfo: true,
@@ -162,8 +165,7 @@ module.exports = {
           {
             loader: require.resolve('babel-loader'),
             query: {
-              presets: ['es2015', 'stage-0', 'react'],
-              plugins: [['import', { libraryName: 'antd' }]]
+              presets: ['es2015', 'stage-0', 'react']
             }
           }
         ]
