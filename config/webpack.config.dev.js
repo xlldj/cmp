@@ -11,6 +11,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter')
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
 const getClientEnvironment = require('./env')
 const paths = require('./paths')
+const happypack = require('happypack')
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -91,14 +92,7 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         enforce: 'pre',
-        use: [
-          {
-            options: {
-              formatter: eslintFormatter
-            },
-            loader: require.resolve('eslint-loader')
-          }
-        ],
+        use: 'happypack/loader?id=eslint',
         include: paths.appSrc,
         exclude: paths.appNodeModules
       },
@@ -129,24 +123,13 @@ module.exports = {
       // Process JS with Babel.
       {
         test: /\.(js|jsx)$/,
+        use: 'happypack/loader?id=babel',
         include: paths.appSrc,
-        exclude: paths.appNodeModules,
-        use: [
-          {
-            loader: require.resolve('babel-loader'),
-            query: {
-              presets: ['es2015', 'stage-0', 'react']
-            }
-          }
-        ]
+        exclude: paths.appNodeModules
       },
       {
         test: /\.less$/,
-        use: [
-          { loader: 'style-loader' },
-          { loader: 'css-loader' },
-          { loader: 'less-loader' }
-        ]
+        use: 'happypack/loader?id=less'
       },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -190,6 +173,33 @@ module.exports = {
     ]
   },
   plugins: [
+    new happypack({
+      id: 'less',
+      loaders: ['style-loader', 'css-loader', 'less-loader']
+    }),
+    new happypack({
+      id: 'eslint',
+      loaders: [
+        {
+          loader: require.resolve('eslint-loader'),
+          options: {
+            formatter: eslintFormatter
+          }
+        }
+      ]
+    }),
+    new happypack({
+      id: 'babel',
+      loaders: [
+        {
+          // loader: require.resolve('babel-loader'),
+          loader: require.resolve('babel-loader'),
+          query: {
+            presets: ['es2015', 'stage-0', 'react']
+          }
+        }
+      ]
+    }),
     new webpack.optimize.CommonsChunkPlugin({
       names: ['recharts', 'antd', 'react', 'draftjs', 'vendor'],
       filename: '[name].bundle.js',
