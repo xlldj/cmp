@@ -1,8 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import Table from 'antd/lib/table'
-import Popconfirm from 'antd/lib/popconfirm'
+import { Table, Popconfirm } from 'antd'
 
 import Noti from '../../util/noti'
 import Time from '../../util/time'

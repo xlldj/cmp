@@ -38,10 +38,14 @@ module.exports = {
       require.resolve('./polyfills'),
       require.resolve('react-error-overlay'),
       paths.appIndexJs
-    ]
-  },
-  externals: {
-    antd: 'antd'
+    ],
+    lodash: ['lodash'],
+    moment: ['moment'],
+    immutable: ['immutable'],
+    'react-dom': ['react-dom'],
+    'react-lib': ['react', 'react-router', 'react-redux', 'react-router-dom'],
+    'draft-js': ['draft-js'],
+    antd: ['antd']
   },
   output: {
     path: paths.appBuild,
@@ -50,7 +54,8 @@ module.exports = {
     chunkFilename: 'static/js/[name].chunk.js',
     publicPath: publicPath,
     devtoolModuleFilenameTemplate: info =>
-      path.resolve(info.absoluteResourcePath)
+      path.resolve(info.absoluteResourcePath),
+    libraryTarget: 'umd'
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -96,7 +101,8 @@ module.exports = {
             loader: require.resolve('eslint-loader')
           }
         ],
-        include: paths.appSrc
+        include: paths.appSrc,
+        exclude: paths.appNodeModules
       },
       {
         exclude: [
@@ -126,6 +132,7 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         include: paths.appSrc,
+        exclude: paths.appNodeModules,
         use: [
           {
             loader: require.resolve('babel-loader'),
@@ -185,6 +192,21 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      names: [
+        'antd',
+        'draft-js',
+        'react-lib',
+        'react-dom',
+        'immutable',
+        'moment',
+        'lodash'
+      ],
+      filename: '[name].bundle.js',
+      children: false,
+      deepChildren: false,
+      minChunks: 2
+    }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Icon } from 'antd'
+// import { Icon } from 'antd'
 import './style/index.css'
 import CONSTANTS from '../../constants'
 import { setLocal, getLocal } from '../../util/storage'
@@ -27,6 +27,8 @@ import {
 import { withRouter } from 'react-router-dom'
 import { checkObject } from '../../util/checkSame'
 
+const antd = require('antd')
+const { Icon } = antd
 const { ORDER_USER_TYPE_STUDENT } = CONSTANTS
 
 // const this.rootBlock = CONSTANTS.this.rootBlock

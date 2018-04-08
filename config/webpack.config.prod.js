@@ -57,7 +57,14 @@ module.exports = {
   devtool: 'source-map',
   // In production, we only want to load the polyfills and the app code.
   entry: {
-    index: [require.resolve('./polyfills'), paths.appSrc + '/index.js']
+    index: [require.resolve('./polyfills'), paths.appSrc + '/index.js'],
+    lodash: ['lodash'],
+    moment: ['moment'],
+    immutable: ['immutable'],
+    'react-dom': ['react-dom'],
+    'react-lib': ['react', 'react-router', 'react-redux', 'react-router-dom'],
+    'draft-js': ['draft-js'],
+    antd: ['antd']
   },
   externals: {
     antd: 'antd'
@@ -69,7 +76,8 @@ module.exports = {
     chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
     publicPath: publicPath,
     devtoolModuleFilenameTemplate: info =>
-      path.resolve(info.absoluteResourcePath)
+      path.resolve(info.absoluteResourcePath),
+    libraryTarget: 'umd'
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -229,6 +237,22 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      names: [
+        'antd',
+        'draft-js',
+        'react-lib',
+        'react-dom',
+        'immutable',
+        'moment',
+        'lodash'
+      ],
+      filename: '[name].bundle.js',
+      children: false,
+      deepChildren: false,
+      minChunks: 2
+    }),
+    new webpack.HashedModuleIdsPlugin(),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
@@ -259,25 +283,6 @@ module.exports = {
     // It is absolutely essential that NODE_ENV was set to production here.
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env.stringified),
-    // Minify the code.
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-        drop_console: true,
-        pure_funcs: ['console.log'],
-        // Disabled because of an issue with Uglify breaking seemingly valid code:
-        // https://github.com/facebookincubator/create-react-app/issues/2376
-        // Pending further investigation:
-        // https://github.com/mishoo/UglifyJS2/issues/2011
-        comparisons: false
-      },
-      output: {
-        comments: false,
-        // Turned on because emoji and regex is not minified properly using default
-        // https://github.com/facebookincubator/create-react-app/issues/2488
-        ascii_only: true
-      }
-    }),
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin({
       filename: cssFilename
@@ -317,6 +322,24 @@ module.exports = {
       navigateFallbackWhitelist: [/^(?!\/__).*/],
       // Don't precache sourcemaps (they're large) and build asset manifest:
       staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/]
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+        drop_console: true,
+        pure_funcs: ['console.log'],
+        // Disabled because of an issue with Uglify breaking seemingly valid code:
+        // https://github.com/facebookincubator/create-react-app/issues/2376
+        // Pending further investigation:
+        // https://github.com/mishoo/UglifyJS2/issues/2011
+        comparisons: false
+      },
+      output: {
+        comments: false,
+        // Turned on because emoji and regex is not minified properly using default
+        // https://github.com/facebookincubator/create-react-app/issues/2488
+        ascii_only: true
+      }
     }),
     // Moment.js is an extremely popular library that bundles large locale files
     // by default due to how Webpack interprets its code. This is a practical

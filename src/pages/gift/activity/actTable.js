@@ -1,9 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import Table from 'antd/lib/table'
-import Badge from 'antd/lib/badge'
-import Popconfirm from 'antd/lib/popconfirm'
+import { Table, Badge, Popconfirm } from 'antd'
 
 import Noti from '../../../util/noti'
 import AjaxHandler from '../../../util/ajax'

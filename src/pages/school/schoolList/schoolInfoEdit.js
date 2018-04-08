@@ -5,9 +5,7 @@ import { Map, Marker } from 'react-amap'
 import Noti from '../../../util/noti'
 import PicturesWall from '../../component/picturesWall'
 
-import Cascader from 'antd/lib/cascader'
-import Button from 'antd/lib/button'
-import Radio from 'antd/lib/radio'
+import { Cascader, Button, Radio } from 'antd'
 import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'

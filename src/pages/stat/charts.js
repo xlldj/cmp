@@ -11,8 +11,7 @@ import {
   Area
 } from 'recharts'
 import SchoolSelector from '../component/schoolSelector'
-import Switch from 'antd/lib/switch'
-import DatePicker from 'antd/lib/date-picker'
+import { DatePicker, Switch } from 'antd'
 import AjaxHandler from '../../util/ajax'
 import Format from '../../util/format'
 import CONSTANTS from '../../constants'
