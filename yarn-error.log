@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/Cellar/node/7.10.0/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js build
+  /usr/local/Cellar/node/7.10.0/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js start
 
 PATH: 
   /Users/mg20/.rvm/gems/ruby-2.5.0/bin:/Users/mg20/.rvm/gems/ruby-2.5.0@global/bin:/Users/mg20/.rvm/rubies/ruby-2.5.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/mg20/Library/Android/sdk/tools:/Users/mg20/Library/Android/sdk/platform-tools:/Users/mg20/.rvm/bin
@@ -113,10 +113,7 @@ npm manifest:
       "semi": false
     },
     "lint-staged": {
-      "*.{js,json,css,md}": [
-        "prettier --write",
-        "git add"
-      ]
+      "*.{js,json,css,md}": ["prettier --write", "git add"]
     },
     "jest": {
       "collectCoverageFrom": [
@@ -143,24 +140,14 @@ npm manifest:
         "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
         "^(?!.*\\.(js|jsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
       },
-      "transformIgnorePatterns": [
-        "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
-      ],
+      "transformIgnorePatterns": ["[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"],
       "moduleNameMapper": {
         "^react-native$": "react-native-web"
       },
-      "moduleFileExtensions": [
-        "web.js",
-        "js",
-        "json",
-        "web.jsx",
-        "jsx"
-      ]
+      "moduleFileExtensions": ["web.js", "js", "json", "web.jsx", "jsx"]
     },
     "babel": {
-      "presets": [
-        "react-app"
-      ],
+      "presets": ["react-app"],
       "plugins": [
         "babel-plugin-transform-decorators-legacy",
         "react-hot-loader/babel",
@@ -9354,7 +9341,7 @@ Trace:
   Error: Command failed.
   Exit code: 1
   Command: sh
-  Arguments: -c node scripts/build.js
+  Arguments: -c node scripts/start.js
   Directory: /Users/mg20/git/icmp
   Output:
   

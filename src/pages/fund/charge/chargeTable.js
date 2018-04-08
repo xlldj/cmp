@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import Table from 'antd/lib/table'
+import { Table } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../../constants'

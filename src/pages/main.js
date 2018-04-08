@@ -6,9 +6,9 @@
 */
 
 import React from 'react'
-import { Route, Redirect, Link } from 'react-router-dom'
+import { Route, Redirect, Link, withRouter } from 'react-router-dom'
 import { asyncComponent } from './component/asyncComponent'
-// import { Layout, Dropdown, Menu, Badge } from 'antd'
+import { Layout, Dropdown, Menu, Badge } from 'antd'
 import MyMenu from './nav/myMenu'
 import userImg from './assets/user.png'
 import logo from './assets/logo.png'
@@ -19,7 +19,6 @@ import { removeStore } from './../util/storage'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import {
   changeSchool,
   changeDevice,
@@ -43,13 +42,47 @@ import {
 import { heartBeat, stopBeat } from '../tasks/heartBeat'
 
 import DeviceDisp from './device/deviceDisp'
-const antd = require('antd')
-const { Layout, Dropdown, Menu, Badge } = antd
 const Welcome = asyncComponent(() =>
   import(/* webpackChunkName: "welcome" */ './welcome/welcome')
 )
 const SchoolDisp = asyncComponent(() =>
   import(/* webpackChunkName: "school" */ './school/schoolDisp')
+)
+const DoorForbidDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "doorForbid" */ './doorForbid/doorForbidDisp')
+)
+const OrderDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "order" */ './order/orderDisp')
+)
+const FundDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "fund" */ './fund/fundDisp')
+)
+const GiftDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "gift" */ './gift/giftDisp')
+)
+const LostDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "lost" */ './lost/lostDisp')
+)
+const EmployeeDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "employee" */ './employee/employeeDisp')
+)
+const TaskDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "task" */ './task/taskDisp')
+)
+const StatDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "stat" */ './stat/statDisp')
+)
+const UserDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "user" */ './user/userDisp')
+)
+const NotifyDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "notify" */ './notify/notifyDisp')
+)
+const AccountInfo = asyncComponent(() =>
+  import(/* webpackChunkName: "account" */ './account/accountInfo')
+)
+const VersionDisp = asyncComponent(() =>
+  import(/* webpackChunkName: "version" */ './version/versionDisp')
 )
 
 const { Content } = Layout
@@ -373,7 +406,7 @@ class Main extends React.Component {
   }
   refresh = () => {
     let { pathname } = this.props.history.location
-    // window.location.assign(pathname)
+    window.location.assign(pathname)
   }
   changeWidth = hasChildren => {
     this.setState({
@@ -424,6 +457,65 @@ class Main extends React.Component {
               <Route
                 path="/school"
                 render={props => <SchoolDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/doorForbid"
+                render={props => <DoorForbidDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/device"
+                render={props => <DeviceDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/order"
+                render={props => <OrderDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/fund"
+                render={props => <FundDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/gift"
+                render={props => <GiftDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/lost"
+                render={props => <LostDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/employee"
+                render={props => <EmployeeDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/task"
+                render={props => <TaskDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/stat"
+                render={props => <StatDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/user"
+                render={props => <UserDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/notify"
+                render={props => <NotifyDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/version"
+                render={props => <VersionDisp hide={this.hide} {...props} />}
+              />
+              <Route
+                path="/account"
+                render={props => (
+                  <AccountInfo
+                    hide={this.hide}
+                    user={this.props.user}
+                    logout={this.logout}
+                    {...props}
+                  />
+                )}
               />
               <Route exact path="/" render={() => <Redirect to="/welcome" />} />
             </div>

@@ -58,16 +58,11 @@ module.exports = {
   // In production, we only want to load the polyfills and the app code.
   entry: {
     index: [require.resolve('./polyfills'), paths.appSrc + '/index.js'],
-    lodash: ['lodash'],
-    moment: ['moment'],
-    immutable: ['immutable'],
-    'react-dom': ['react-dom'],
-    'react-lib': ['react', 'react-router', 'react-redux', 'react-router-dom'],
-    'draft-js': ['draft-js'],
-    antd: ['antd']
-  },
-  externals: {
-    antd: 'antd'
+    vendor: ['lodash', 'moment'],
+    draftjs: ['draft-js'],
+    react: ['react', 'react-dom', 'react-router-dom'],
+    antd: ['antd'],
+    recharts: ['recharts']
   },
   output: {
     path: paths.appBuild,
@@ -238,18 +233,8 @@ module.exports = {
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin({
-      names: [
-        'antd',
-        'draft-js',
-        'react-lib',
-        'react-dom',
-        'immutable',
-        'moment',
-        'lodash'
-      ],
+      names: ['recharts', 'antd', 'react', 'draftjs', 'vendor'],
       filename: '[name].bundle.js',
-      children: false,
-      deepChildren: false,
       minChunks: 2
     }),
     new webpack.HashedModuleIdsPlugin(),
