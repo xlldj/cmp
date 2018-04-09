@@ -1,6 +1,5 @@
 import React from 'react'
-import notification from 'antd/lib/notification'
-import Button from 'antd/lib/button'
+import { notification, Button } from 'antd'
 import CONSTANTS from '../constants'
 
 const Noti = {}

@@ -1,5 +1,5 @@
 import React from 'react'
-import Table from 'antd/lib/table'
+import { Table } from 'antd'
 import { Link } from 'react-router-dom'
 import AjaxHandler from '../../util/ajax'
 import Time from '../../util/time'

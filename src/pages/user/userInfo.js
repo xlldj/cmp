@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Button, Modal, Popconfirm } from 'antd'
 import Time from '../../util/time'
 import Noti from '../../util/noti'
@@ -10,7 +10,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeOrder, changeFund } from '../../actions'
 const { NORMAL_DAY_7 } = CONSTANTS
-const { Fragment } = React
 const SEX = {
   1: '男',
   2: '女'

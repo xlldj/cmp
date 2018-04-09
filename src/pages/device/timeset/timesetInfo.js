@@ -1,10 +1,8 @@
 /* this is a version with different timeset for different building of same school */
 import React from 'react'
 import moment from 'moment'
-import TimePicker from 'rc-time-picker'
-import 'rc-time-picker/assets/index.css'
 
-import { Button } from 'antd'
+import { Button, TimePicker } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'

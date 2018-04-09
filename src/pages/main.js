@@ -6,7 +6,7 @@
 */
 
 import React from 'react'
-import { Route, Redirect, Link } from 'react-router-dom'
+import { Route, Redirect, Link, withRouter } from 'react-router-dom'
 import { asyncComponent } from './component/asyncComponent'
 import { Layout, Dropdown, Menu, Badge } from 'antd'
 import MyMenu from './nav/myMenu'
@@ -19,7 +19,6 @@ import { removeStore } from './../util/storage'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import {
   changeSchool,
   changeDevice,

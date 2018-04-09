@@ -146,10 +146,9 @@ class SchoolList extends React.Component {
     AjaxHandler.ajax(url, body, cb)
   }
   componentDidMount() {
+    console.log('school list did mount')
     /*-----------fetch data-----------*/
     let { page, schoolId } = this.props
-    console.log(this.props)
-    console.log(page)
     const body = {
       page: page,
       size: SIZE
