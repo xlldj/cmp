@@ -200,12 +200,12 @@ class UserInfo extends React.Component {
       state: { path: 'fromUser', id: id }
     })
   }
-  toFundOfUser = () => {
+  toRechargeOfUser = () => {
     let { mobile } = this.state.data
     this.props.changeFund('fundList', {
       page: 1,
-      selectKey: mobile.toString(),
-      type: 'all',
+      selectKey: mobile ? mobile.toString() : '',
+      // type: 'all', // deprecated @2018/4/10
       status: 'all',
       schoolId: 'all',
       startTime: Time.get7DaysAgoStart(),
@@ -213,6 +213,22 @@ class UserInfo extends React.Component {
     })
     this.props.history.push({
       pathname: '/fund/list',
+      state: { path: 'fromUser', mobile: mobile }
+    })
+  }
+  toWithdrawOfUser = () => {
+    let { mobile } = this.state.data
+    this.props.changeFund('withdrawList', {
+      page: 1,
+      selectKey: mobile ? mobile.toString() : '',
+      // type: 'all', // deprecated @2018/4/10
+      status: 'all',
+      schoolId: 'all',
+      startTime: Time.get7DaysAgoStart(),
+      endTime: Time.getTodayEnd()
+    })
+    this.props.history.push({
+      pathname: '/fund/withdrawList',
       state: { path: 'fromUser', mobile: mobile }
     })
   }
@@ -315,8 +331,12 @@ class UserInfo extends React.Component {
             <a onClick={this.toOrderOfUser}>查看详情</a>
           </li>
           <li>
-            <p>充值提现记录:</p>
-            <a onClick={this.toFundOfUser}>查看详情</a>
+            <p>充值记录:</p>
+            <a onClick={this.toRechargeOfUser}>查看详情</a>
+          </li>
+          <li>
+            <p>提现记录:</p>
+            <a onClick={this.toWithdrawOfUser}>查看详情</a>
           </li>
           {forbiddenStatus.RESET_USER_PWD ? null : (
             <li>

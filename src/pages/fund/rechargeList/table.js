@@ -1,3 +1,6 @@
+/**
+ * this will only display recharge list. @2018/4/10
+ */
 import React from 'react'
 import { Link } from 'react-router-dom'
 
@@ -6,21 +9,14 @@ import { Table, Badge, Button } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../../constants'
 import Time from '../../../util/time'
-import OperationSelector from '../../component/operationSelector'
 import BasicSelector from '../../component/basicSelector'
 import SearchLine from '../../component/searchLine'
 import SchoolSelector from '../../component/schoolSelector'
+import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeFund } from '../../../actions'
-import { checkObject } from '../../../util/checkSame'
 const subModule = 'fundList'
-
-const typeName = CONSTANTS.FUNDTYPE
-const STATUS = CONSTANTS.WITHDRAWSTATUS
-const SIZE = CONSTANTS.PAGINATION
+const { FUNDTYPE, WITHDRAWSTATUS, PAGINATION: SIZE, CASHTYPE } = CONSTANTS
 
 /* status枚举：
 {1: '等待审核', 2: '审核失败（拒绝）', 3: '等待第三方确认支付情况', 4: '提现充值成功', 5: '提现充值失败'}
@@ -30,10 +26,9 @@ const SIZE = CONSTANTS.PAGINATION
 /* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
 /* subStartTime: 传给字组件searchLine的截止时间 */
 
-class FundTable extends React.Component {
+class TableUi extends React.Component {
   static propTypes = {
     schoolId: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
     selectKey: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired,
@@ -50,6 +45,7 @@ class FundTable extends React.Component {
       searchingText,
       loading: false,
       total: 0,
+      totalRecharge: 0,
       subStartTime: this.props.startTime,
       subEndTime: this.props.endTime
     }
@@ -86,9 +82,9 @@ class FundTable extends React.Component {
         width: '10%',
         render: (text, record) => {
           if (record.instead) {
-            return typeName[record.operationType] + '(代充值)'
+            return FUNDTYPE[record.operationType] + '(代充值)'
           } else {
-            return typeName[record.operationType]
+            return FUNDTYPE[record.operationType]
           }
         }
       },
@@ -99,15 +95,23 @@ class FundTable extends React.Component {
         render: (text, record, index) => {
           switch (record.status) {
             case 1:
-              return <Badge status="error" text={STATUS[record.status]} />
+              return (
+                <Badge status="error" text={WITHDRAWSTATUS[record.status]} />
+              )
             case 2:
             case 5:
             case 6:
-              return <Badge status="default" text={STATUS[record.status]} />
+              return (
+                <Badge status="default" text={WITHDRAWSTATUS[record.status]} />
+              )
             case 3:
-              return <Badge status="warning" text={STATUS[record.status]} />
+              return (
+                <Badge status="warning" text={WITHDRAWSTATUS[record.status]} />
+              )
             case 4:
-              return <Badge status="success" text={STATUS[record.status]} />
+              return (
+                <Badge status="success" text={WITHDRAWSTATUS[record.status]} />
+              )
             default:
               return <Badge status="warning" text="未知" />
           }
@@ -127,7 +131,7 @@ class FundTable extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/fund/list/fundInfo/:${record.id}`}>详情</Link>
+              <Link to={`/fund/list/info/:${record.id}`}>详情</Link>
             </span>
           </div>
         )
@@ -152,9 +156,6 @@ class FundTable extends React.Component {
           nextState.totalRecharge = json.data.totalRecharge
             ? json.data.totalRecharge
             : 0
-          nextState.totalWithdraw = json.data.totalWithdraw
-            ? json.data.totalWithdraw
-            : 0
         } else {
           this.setState(nextState)
         }
@@ -170,11 +171,10 @@ class FundTable extends React.Component {
   }
 
   componentDidMount() {
-    this.props.hide(false)
     let {
       page,
       schoolId,
-      type,
+      // type,
       status,
       selectKey,
       startTime,
@@ -183,7 +183,8 @@ class FundTable extends React.Component {
     } = this.props
     const body = {
       page: page,
-      size: SIZE
+      size: SIZE,
+      type: CASHTYPE.RECHARGE
     }
 
     if (startTime) {
@@ -194,9 +195,11 @@ class FundTable extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
+    /* deprecated @2018/4/10
     if (type !== 'all') {
       body.type = type
     }
+    */
     if (status !== 'all') {
       body.status = [parseInt(status, 10)]
     }
@@ -210,9 +213,6 @@ class FundTable extends React.Component {
     this.setState({
       searchingText: selectKey
     })
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   componentWillReceiveProps(nextProps) {
     if (
@@ -232,7 +232,6 @@ class FundTable extends React.Component {
     let {
       page,
       schoolId,
-      type,
       status,
       selectKey,
       startTime,
@@ -241,7 +240,8 @@ class FundTable extends React.Component {
     } = nextProps
     const body = {
       page: page,
-      size: SIZE
+      size: SIZE,
+      type: CASHTYPE.RECHARGE
     }
 
     if (startTime) {
@@ -252,9 +252,11 @@ class FundTable extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
+    /* deprecated @2018/4/10
     if (type !== 'all') {
       body.type = type
     }
+    */
     if (status !== 'all') {
       body.status = [parseInt(status, 10)]
     }
@@ -364,10 +366,9 @@ class FundTable extends React.Component {
       loading,
       subStartTime,
       subEndTime,
-      totalWithdraw,
       totalRecharge
     } = this.state
-    let { page, schoolId, type, status, userType } = this.props
+    let { page, schoolId, status, userType } = this.props
 
     return (
       <div className="contentArea">
@@ -397,25 +398,16 @@ class FundTable extends React.Component {
             />
           }
           selector3={
-            <OperationSelector
-              selectedOpration={type}
-              changeOpration={this.changeOpration}
-            />
-          }
-          selector4={
             <BasicSelector
               allTitle="全部状态"
-              staticOpts={STATUS}
+              staticOpts={WITHDRAWSTATUS}
               selectedOpt={status}
               changeOpt={this.changeStatus}
             />
           }
         />
 
-        <p className="profitBanner">
-          充值总额: {totalRecharge}元
-          <span className="mgl10">提现总额: {totalWithdraw}</span>元
-        </p>
+        <p className="profitBanner">充值总额: {totalRecharge}元</p>
 
         <div className="tableList">
           <Table
@@ -438,19 +430,4 @@ class FundTable extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.fundModule[subModule].schoolId,
-  type: state.fundModule[subModule].type,
-  status: state.fundModule[subModule].status,
-  selectKey: state.fundModule[subModule].selectKey,
-  page: state.fundModule[subModule].page,
-  startTime: state.fundModule[subModule].startTime,
-  endTime: state.fundModule[subModule].endTime,
-  userType: state.fundModule[subModule].userType
-})
-
-export default withRouter(
-  connect(mapStateToProps, {
-    changeFund
-  })(FundTable)
-)
+export default TableUi

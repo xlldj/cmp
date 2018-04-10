@@ -224,6 +224,15 @@ const initialFundState = {
     endTime: Time.getTodayEnd(),
     userType: 'all'
   },
+  withdrawList: {
+    page: 1,
+    schoolId: selectedSchool,
+    status: 'all',
+    selectKey: '',
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
+    userType: 'all'
+  },
   cashtime: {
     page: 1,
     schoolId: selectedSchool

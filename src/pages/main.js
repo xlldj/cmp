@@ -42,6 +42,8 @@ import {
 import { heartBeat, stopBeat } from '../tasks/heartBeat'
 
 import DeviceDisp from './device/deviceDisp'
+
+const REFRESHTIMEOUT = 100
 const Welcome = asyncComponent(() =>
   import(/* webpackChunkName: "welcome" */ './welcome/welcome')
 )
@@ -390,7 +392,7 @@ class Main extends React.Component {
       loading && loading.classList.remove('hide')
       let nextState = {}
       // if wait for more than 5s, refresh the web
-      nextState.ti = setTimeout(this.refresh, 5000)
+      nextState.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
       this.setState(nextState)
     } else {
       // add 'hide' to not display loading

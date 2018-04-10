@@ -71,15 +71,11 @@ class FundInfo extends React.Component {
   }
 
   componentDidMount() {
-    this.props.hide(false)
     let id = this.props.match.params.id.slice(1)
     const body = {
       id: id
     }
     this.fetchData(body)
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   back = () => {
     this.props.history.goBack()

@@ -1218,7 +1218,7 @@ class TaskDetail extends React.Component {
         this.props.changeFund('fundList', {
           page: 1,
           selectKey: userMobile ? userMobile.toString() : '',
-          type: 'all',
+          // type: 'all', // deprecated @2018/4/10
           status: 'all',
           schoolId: 'all',
           startTime: Time.get7DaysAgoStart(),

@@ -98,7 +98,6 @@ class ChargeTable extends React.Component {
     })
   }
   componentDidMount() {
-    this.props.hide(false)
     let { page, schoolId } = this.props
     const body = {
       page: page,
@@ -108,9 +107,6 @@ class ChargeTable extends React.Component {
       body.schoolId = parseInt(schoolId, 10)
     }
     this.fetchData(body)
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {

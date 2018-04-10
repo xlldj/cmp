@@ -1,6 +1,7 @@
 const FUND = {
   /* FUND */
   FUNDTYPE: { 2: '提现', 1: '充值' },
+  CASHTYPE: { WITHDRAW: 2, RECHARGE: 1 },
   WITHDRAWSTATUS: {
     1: '待审核',
     2: '审核未通过',

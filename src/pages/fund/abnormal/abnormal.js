@@ -180,7 +180,6 @@ class AbnormalOrder extends React.Component {
     })
   }
   componentDidMount() {
-    this.props.hide(false)
     let { page, selectKey, schoolId } = this.props
     const body = {
       page: page,
@@ -196,9 +195,6 @@ class AbnormalOrder extends React.Component {
     this.setState({
       searchingText: selectKey
     })
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['schoolId', 'selectKey', 'page'])) {
