@@ -1546,19 +1546,23 @@ class TaskDetail extends React.Component {
             message = '创建工单'
             break
           case CONSTANTS.TASK_HANDLE_REASSIGN:
-            message = '转接工单' + (assignName ? `给${assignName}` : '')
+            message =
+              '转接工单' +
+              (assignName ? `给${assignName}` : '') +
+              (content ? ` 备注信息: ${content}` : '')
             break
           case CONSTANTS.TASK_HANDLE_ACCEPT:
             message = (assignName ? assignName : '') + '接受工单'
             break
           case CONSTANTS.TASK_HANDLE_REFUSE:
-            message = '拒绝工单'
+            message = '拒绝工单' + (content ? ` 拒绝原因: ${content}` : '')
             break
           case CONSTANTS.TASK_HANDLE_SENDMESSAGE:
-            message = '发送客服消息给用户: ' + (content ? content : '')
+            message =
+              '发送客服消息给用户: ' + (content ? ` 客服消息: ${content}` : '')
             break
           case CONSTANTS.TASK_HANDLE_FINISH:
-            message = '完结工单'
+            message = '完结工单' + (content ? ` 备注信息: ${content}` : '')
             break
           default:
             message = ''
