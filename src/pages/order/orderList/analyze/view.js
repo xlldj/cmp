@@ -21,14 +21,6 @@ const {
   ORDERSTATUS
 } = CONSTANTS
 
-const BACKTITLE = {
-  fromUser: '返回用户详情',
-  fromDevice: '返回设备详情',
-  fromTask: '返回工单'
-}
-/* state explanation */
-/* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
-/* subStartTime: 传给字组件searchLine的截止时间 */
 class OrderAnalyzeView extends React.Component {
   constructor(props) {
     super(props)
@@ -299,9 +291,12 @@ class OrderAnalyzeView extends React.Component {
     const {
       page,
       deviceType,
-      status,
-      userType,
+      buildindId,
       day,
+      roomType,
+      threshold,
+      thresholdType,
+      page,
       selectedRowIndex
     } = this.props
     const {
@@ -315,7 +310,6 @@ class OrderAnalyzeView extends React.Component {
       searchingText
     } = this.state
     const showClearBtn = !!searchingText
-    const { state } = this.props.location
 
     const columns = [
       {
@@ -422,18 +416,7 @@ class OrderAnalyzeView extends React.Component {
             </div>
           </div>
 
-          <div className="queryLine">
-            <div className="block">
-              <span>用户类型:</span>
-              <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
-                options={ORDERUSERTYPES}
-                value={userType}
-                onClick={this.changeUserType}
-              />
-            </div>
-          </div>
+          <div className="queryLine" />
           <div className="queryLine">
             <div className="block">
               <span>设备类型:</span>
@@ -470,7 +453,6 @@ class OrderAnalyzeView extends React.Component {
                 allOptTitle="不限"
                 allOptValue="all"
                 options={ORDERSTATUS}
-                value={status}
                 onClick={this.changeStatus}
               />
             </div>
@@ -500,12 +482,6 @@ class OrderAnalyzeView extends React.Component {
             rowClassName={this.setRowClass}
           />
         </div>
-
-        {state ? (
-          <div className="btnRight marginBottom">
-            <Button onClick={this.back}>{BACKTITLE[state.path]}</Button>
-          </div>
-        ) : null}
       </div>
     )
   }

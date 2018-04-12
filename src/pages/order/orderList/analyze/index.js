@@ -7,11 +7,15 @@ const subModule = 'orderList'
 const mapStateToProps = (state, ownProps) => {
   return {
     schoolId: state.orderModule[subModule].schoolId,
-    day: state.orderModule[subModule].stat_day,
-    deviceType: state.orderModule[subModule].stat_dt,
-    page: state.orderModule[subModule].stat_page,
-    orderBy: state.orderModule[subModule].stat_orderBy,
-    order: state.orderModule[subModule].stat_order
+    day: state.orderModule[subModule].analyze_day,
+    deviceType: state.orderModule[subModule].analyze_deviceType,
+    buildingId: state.orderModule[subModule].analyze_buildingId,
+    roomType: state.orderModule[subModule].analyze_roomType,
+    startTime: state.orderModule[subModule].analyze_startTime,
+    endTime: state.orderModule[subModule].analyze_endTime,
+    threshold: state.orderModule[subModule].analyze_threshold,
+    thresholdType: state.orderModule[subModule].analyze_thresholdType,
+    page: state.orderModule[subModule].analyze_page
   }
 }
 

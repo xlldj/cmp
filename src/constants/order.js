@@ -11,6 +11,10 @@ const ORDER = {
     {
       value: 2,
       text: '消费统计'
+    },
+    {
+      value: 3,
+      text: '设备消费分析'
     }
   ],
   ORDER_WARN_PAGE_TABS: [

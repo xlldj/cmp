@@ -26,7 +26,17 @@ const initialOrderState = {
     stat_dt: 1, // for devicetype of stat.
     stat_page: 1,
     stat_orderBy: -1, // for order of the stat table, default is -1, for none selected
-    stat_order: -1 //  ORDER: { descend: 1, ascend: 2 }, -1 is for none selected.
+    stat_order: -1, //  ORDER: { descend: 1, ascend: 2 }, -1 is for none selected.
+    // below is state for order analyze
+    analyze_day: 1,
+    analyze_deviceType: 1,
+    analyze_buildingId: 'all',
+    analyze_roomType: 1,
+    analyze_startTime: '',
+    analyze_endTime: '',
+    analyze_threshold: 0,
+    analyze_thresholdType: 1, // 1 means minimun, 2 means maximum
+    analyze_page: 1
   },
   orderWarn: {
     tabIndex: 2, // 1 for warn table, 2 for warn setting
