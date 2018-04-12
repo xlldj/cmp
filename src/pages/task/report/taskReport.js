@@ -1216,8 +1216,8 @@ class TaskReport extends React.Component {
           ) : null}
         </div>
 
-        <div className="queryPanel">
-          <div className="queryLine">
+        <div className="task-queryPanel">
+          <div className="task-queryLine">
             <div className="block">
               <span>{TIMELABEL[mainCate]}:</span>
               <CheckSelect
@@ -1309,7 +1309,7 @@ class TaskReport extends React.Component {
 // export default TaskList
 
 const mapStateToProps = (state, ownProps) => ({
-  report: state.taskModule[subModule],
+  report: state.changeTask[subModule],
   user: state.setUserInfo,
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   tagInfo: state.setTagList
