@@ -64,3 +64,11 @@ textarea {
   margin-bottom: 20px;
   margin-right: 20px;
 }
+.orderWarnWrapper .tableList {
+  margin-top: 20px;
+}
+.orderWarnSet .buildRuleBtn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}

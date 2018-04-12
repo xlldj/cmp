@@ -43,7 +43,7 @@ import { heartBeat, stopBeat } from '../tasks/heartBeat'
 
 import DeviceDisp from './device/deviceDisp'
 
-const REFRESHTIMEOUT = 100
+const REFRESHTIMEOUT = 1000
 const Welcome = asyncComponent(() =>
   import(/* webpackChunkName: "welcome" */ './welcome/welcome')
 )
@@ -177,6 +177,7 @@ class Main extends React.Component {
     // clear online status when window is closed.
     // can't clear, it will offline when user refresh.
     // window.onbeforeunload = this.clearOnline;
+    this.ti = null
 
     // set school list globally
     this.props.setSchoolList({
@@ -385,25 +386,25 @@ class Main extends React.Component {
     this.props.logout()
   }
   hide = v => {
+    // debugger
     // hide means if to hide the main content or not
+    /**
+     * @2018/4/10
+     * no longer set ti in state, to keep it immediately change other than set it as a batch.
+     */
     let loading = this.refs.contentLoading
     if (v) {
       // loading , need to show the loading div
       loading && loading.classList.remove('hide')
-      let nextState = {}
       // if wait for more than 5s, refresh the web
-      nextState.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
-      this.setState(nextState)
+      this.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
     } else {
       // add 'hide' to not display loading
       loading && loading.classList.add('hide')
-      let { ti } = this.state
-      if (ti) {
-        clearTimeout(ti)
-        this.setState({
-          ti: null
-        })
+      if (this.ti) {
+        clearTimeout(this.ti)
       }
+      this.ti = null
     }
   }
   refresh = () => {

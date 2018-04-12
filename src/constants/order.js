@@ -13,6 +13,16 @@ const ORDER = {
       text: '消费统计'
     }
   ],
+  ORDER_WARN_PAGE_TABS: [
+    {
+      value: 1,
+      text: '预警列表'
+    },
+    {
+      value: 2,
+      text: '预警设置'
+    }
+  ],
   // 'ORDER_DAY_SELECT' is same to normal day enums, like in task.
   ORDER_DAY_SELECT: {
     // for order table
@@ -28,6 +38,10 @@ const ORDER = {
     5: '近30日'
   },
   ORDER_STAT_DAY_UNLIMITED: 6,
+  ORDER_WARN_TABS: {
+    WARNTABLE: 1,
+    WARNSET: 2
+  },
   ORDER_LIST_TABLE: 1,
   X_AXIS_NAME: {
     0: '0元',

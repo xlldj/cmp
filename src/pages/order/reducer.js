@@ -28,6 +28,12 @@ const initialOrderState = {
     stat_orderBy: -1, // for order of the stat table, default is -1, for none selected
     stat_order: -1 //  ORDER: { descend: 1, ascend: 2 }, -1 is for none selected.
   },
+  orderWarn: {
+    tabIndex: 2, // 1 for warn table, 2 for warn setting
+    page: 1, // page of warntable
+    schoolId: selectedSchool,
+    warnset_page: 1
+  },
   abnormal: {
     page: 1,
     schoolId: selectedSchool,
