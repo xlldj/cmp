@@ -43,6 +43,8 @@ const ORDER = {
     WARNSET: 2
   },
   ORDER_LIST_TABLE: 1,
+  ORDER_LIST_STAT: 2,
+  ORDER_LIST_ANALYZE: 3,
   X_AXIS_NAME: {
     0: '0元',
     1: '<0.5元',

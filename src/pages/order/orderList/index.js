@@ -5,6 +5,7 @@ import SchoolSelector from '../../component/schoolSelector'
 
 import OrderTable from './orderTable'
 import OrderStatView from './orderStatView'
+import OrderAnalyze from './analyze'
 
 import PhaseLine from '../../component/phaseLine'
 
@@ -28,7 +29,12 @@ let OrderStat = withRouter(
     changeOrder
   })(OrderStatView)
 )
-const { ORDER_LIST_TABLE, ORDER_LIST_PAGE_TABS } = CONSTANTS
+const {
+  ORDER_LIST_TABLE,
+  ORDER_LIST_STAT,
+  ORDER_LIST_ANALYZE,
+  ORDER_LIST_PAGE_TABS
+} = CONSTANTS
 
 /* state explanation */
 /* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
@@ -63,6 +69,18 @@ class OrderList extends React.Component {
       this.props.changeOrder(subModule, { tabIndex: v })
     }
   }
+  getContent = tabIndex => {
+    switch (tabIndex) {
+      case ORDER_LIST_TABLE:
+        return <OrderTable />
+      case ORDER_LIST_STAT:
+        return <OrderStat />
+      case ORDER_LIST_ANALYZE:
+        return <OrderAnalyze />
+      default:
+        return <OrderTable />
+    }
+  }
   render() {
     const { tabIndex, schoolId } = this.props
     const selector1 = (
@@ -72,6 +90,7 @@ class OrderList extends React.Component {
         changeSchool={this.changeSchool}
       />
     )
+    const tabContent = this.getContent(tabIndex)
 
     return (
       <div className="panelWrapper" ref="wrapper">
@@ -82,7 +101,7 @@ class OrderList extends React.Component {
           changePhase={this.changePhase}
         />
 
-        {tabIndex === ORDER_LIST_TABLE ? <OrderTable /> : <OrderStat />}
+        {tabContent}
       </div>
     )
   }

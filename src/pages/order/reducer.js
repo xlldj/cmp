@@ -8,7 +8,7 @@ let selectedSchool = getDefaultSchool()
 
 const initialOrderState = {
   orderList: {
-    tabIndex: 1, // 1 for table, 2 for statistics
+    tabIndex: 1, // 1 for table, 2 for statistics, 3 for analyze
     page: 1,
     schoolId: selectedSchool,
     day: 1, // 1 for today, 2 for last 7 days , 3 for last 30 days, 0 for custom select
