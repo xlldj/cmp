@@ -823,11 +823,12 @@ class TaskReport extends React.Component {
       thisObj: this
     })
   }
-  editTag = (e, index) => {
+  editTag = (e, id) => {
     e.preventDefault()
-    let { id, description } = this.state.dataSource[index]
+    let data = this.state.dataSource.find(d => d.id === +id)
+    let { description } = data
     this.setState({
-      tagId: id,
+      tagId: +id,
       note: description,
       originalTag: description,
       showBuildTag: true
@@ -1056,7 +1057,7 @@ class TaskReport extends React.Component {
         className: 'ope',
         render: (text, record, index) => (
           <div className="editable-row-operations">
-            <a href="" onClick={e => this.editTag(e, index)}>
+            <a href="" onClick={e => this.editTag(e, record.id)}>
               编辑
             </a>
             <span className="ant-divider" />
@@ -1215,8 +1216,8 @@ class TaskReport extends React.Component {
           ) : null}
         </div>
 
-        <div className="task-queryPanel">
-          <div className="task-queryLine">
+        <div className="queryPanel">
+          <div className="queryLine">
             <div className="block">
               <span>{TIMELABEL[mainCate]}:</span>
               <CheckSelect
@@ -1225,7 +1226,7 @@ class TaskReport extends React.Component {
                 onClick={this.changeRange}
               />
               <RangeSelect
-                className="task-rangeSelect"
+                className="rangeSelect"
                 startTime={startTime}
                 endTime={endTime}
                 changeStartTime={this.changeStartTime}
@@ -1236,7 +1237,7 @@ class TaskReport extends React.Component {
           </div>
 
           {mainCate === REPORT_CATE_ASSESS - 1 ? (
-            <div className="task-queryLine">
+            <div className="queryLine">
               <div className="block">
                 <span>考核维度:</span>
                 <CheckSelect
@@ -1308,7 +1309,7 @@ class TaskReport extends React.Component {
 // export default TaskList
 
 const mapStateToProps = (state, ownProps) => ({
-  report: state.changeTask[subModule],
+  report: state.taskModule[subModule],
   user: state.setUserInfo,
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   tagInfo: state.setTagList
