@@ -1,20 +1,17 @@
 import React from 'react'
 
 import { Table, Badge, Button } from 'antd'
-import AjaxHandler from '../../../util/ajax'
-import Time from '../../../util/time'
-import CONSTANTS from '../../../constants'
-import selectedImg from '../../assets/selected.png'
+import AjaxHandler from '../../../../util/ajax'
+import Time from '../../../../util/time'
+import CONSTANTS from '../../../../constants'
+import selectedImg from '../../../assets/selected.png'
 
-import RangeSelect from '../../component/rangeSelect'
-import SearchInput from '../../component/searchInput'
-import CheckSelect from '../../component/checkSelect'
+import RangeSelect from '../../../component/rangeSelect'
+import SearchInput from '../../../component/searchInput'
+import CheckSelect from '../../../component/checkSelect'
 import OrderDetail from './orderInfo'
 
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeOrder } from '../../../actions'
-import { checkObject } from '../../../util/checkSame'
+import { checkObject } from '../../../../util/checkSame'
 const subModule = 'orderList'
 
 const {
@@ -33,7 +30,7 @@ const BACKTITLE = {
 /* state explanation */
 /* subStartTime: 传给字组件searchLine的起始时间，因为要区分propTypes.startTime和组件弹窗中的起始时间 */
 /* subStartTime: 传给字组件searchLine的截止时间 */
-class OrderTable extends React.Component {
+class OrderTableView extends React.Component {
   constructor(props) {
     super(props)
     let dataSource = []
@@ -141,6 +138,7 @@ class OrderTable extends React.Component {
     let root = document.getElementById('root')
     this.root = root
     root.addEventListener('click', this.closeDetail, false)
+    this.syncStateWithProps()
   }
   componentWillUnmount() {
     this.root.removeEventListener('click', this.closeDetail)
@@ -168,20 +166,20 @@ class OrderTable extends React.Component {
     ) {
       return
     }
-    let { startTime, endTime, selectKey } = nextProps
-    const { showClearBtn } = this.state
-
+    this.syncStateWithProps(nextProps)
+    this.fetchData(nextProps)
+  }
+  syncStateWithProps = props => {
+    let { startTime, endTime, selectKey } = props || this.props
     const nextState = {}
     if (startTime !== this.state.startTime) {
       nextState.startTime = startTime
       nextState.endTime = endTime
     }
     if (selectKey !== this.state.searchingText) {
-      console.log(selectKey, showClearBtn)
       nextState.searchingText = selectKey
     }
     this.setState(nextState)
-    this.fetchData(nextProps)
   }
   closeDetail = e => {
     if (!this.props.showDetail) {
@@ -492,11 +490,13 @@ class OrderTable extends React.Component {
         <div className="tableList">
           <Table
             bordered
+            showQuickJumper
             loading={loading}
             pagination={{
               pageSize: SIZE,
               current: page,
-              total: total
+              total: total,
+              showQuickJumper: true
             }}
             dataSource={dataSource}
             rowKey={record => record.id}
@@ -526,26 +526,4 @@ class OrderTable extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    tabIndex: state.orderModule[subModule].tabIndex,
-    schoolId: state.orderModule[subModule].schoolId,
-    day: state.orderModule[subModule].day,
-    deviceType: state.orderModule[subModule].deviceType,
-    status: state.orderModule[subModule].status,
-    userType: state.orderModule[subModule].userType,
-    selectKey: state.orderModule[subModule].selectKey,
-    page: state.orderModule[subModule].page,
-    startTime: state.orderModule[subModule].startTime,
-    endTime: state.orderModule[subModule].endTime,
-    selectedRowIndex: state.orderModule[subModule].selectedRowIndex,
-    selectedDetailId: state.orderModule[subModule].selectedDetailId,
-    showDetail: state.orderModule[subModule].showDetail
-  }
-}
-
-export default withRouter(
-  connect(mapStateToProps, {
-    changeOrder
-  })(OrderTable)
-)
+export default OrderTableView

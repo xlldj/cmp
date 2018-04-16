@@ -170,21 +170,21 @@
   margin-top: 15px;
   border: 1px solid #ddd;
 }
-.taskDetailWrapper .taskDetail-content .detailList {
+.taskDetailWrapper .taskDetail-content .task-detailList {
   margin: 10px 0;
 }
 .taskDetailWrapper .taskDetail-sidebar {
   position: absolute;
   width: 30%;
 }
-.taskDetailWrapper .taskDetail-sidebar .detailList {
+.taskDetailWrapper .taskDetail-sidebar .task-detailList {
   margin: 15px 0;
 }
 .taskDetail-panelWrapper {
   padding: 10px 0px;
   min-height: 180px;
 }
-.taskDetail-panelWrapper .detailList {
+.taskDetail-panelWrapper .task-detailList {
   padding: 15px 20px;
   background-color: #f5f5f5;
 }

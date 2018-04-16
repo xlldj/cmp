@@ -39,7 +39,7 @@ const TASK = {
   TASK_FINISHED: 5,
   TASK_CANCELED: 6,
 
-  TASKTYPE: { 1: '报修', 2: '账单投诉', 3: '意见反馈' },
+  TASKTYPE: { 1: '报修', 2: '账单投诉', 3: '意见反馈', 4: '消费预警' },
   TASK_TYPE_REPAIR: 1, // type value of 'repair' in task
   TASK_TYPE_COMPLAINT: 2,
   TASK_TYPE_FEEDBACK: 3,

@@ -41,6 +41,13 @@ const ORDER = {
     4: '近7日',
     5: '近30日'
   },
+  ORDER_ANALYZE_DAY_SELECT: {
+    // for order stat
+    3: '今日',
+    9: '昨天',
+    4: '近7日',
+    5: '近30日'
+  },
   ORDER_STAT_DAY_UNLIMITED: 6,
   ORDER_WARN_TABS: {
     WARNTABLE: 1,
@@ -79,6 +86,21 @@ const ORDER = {
     orderCount: 3,
     orderAverage: 4,
     totalIncome: 5
-  }
+  },
+
+  // for order analyze
+  DEVICE_WARN_TASK_STATUS_ENUM: {
+    1: '没有工单',
+    2: '已存在工单'
+  },
+  ROOMTYPES: {
+    1: '正常房间',
+    2: '空房间'
+  },
+  THRESHOLD_TYPE_ENUMS: {
+    1: '以上',
+    2: '以下'
+  },
+  DEVICE_WARN_TASK_HANDLING: 2 // 当前设备有订单预警工单处理中
 }
 export default ORDER

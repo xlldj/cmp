@@ -8,7 +8,7 @@ let selectedSchool = getDefaultSchool()
 
 const initialOrderState = {
   orderList: {
-    tabIndex: 1, // 1 for table, 2 for statistics, 3 for analyze
+    tabIndex: 3, // 1 for table, 2 for statistics, 3 for analyze
     page: 1,
     schoolId: selectedSchool,
     day: 1, // 1 for today, 2 for last 7 days , 3 for last 30 days, 0 for custom select
@@ -28,15 +28,17 @@ const initialOrderState = {
     stat_orderBy: -1, // for order of the stat table, default is -1, for none selected
     stat_order: -1, //  ORDER: { descend: 1, ascend: 2 }, -1 is for none selected.
     // below is state for order analyze
-    analyze_day: 1,
+    analyze_day: 3, // 3 for 'today', default setting.
     analyze_deviceType: 1,
-    analyze_buildingId: 'all',
-    analyze_roomType: 1,
+    analyze_buildingIds: 'all',
+    analyze_roomType: 'all',
     analyze_startTime: '',
     analyze_endTime: '',
-    analyze_threshold: 0,
+    analyze_threshold: 0.00001,
     analyze_thresholdType: 1, // 1 means minimun, 2 means maximum
-    analyze_page: 1
+    analyze_page: 1,
+    analyze_order: '',
+    analyze_warnTaskStatus: 'all' // if device has task of order warning type. 'all' for all devices
   },
   orderWarn: {
     tabIndex: 2, // 1 for warn table, 2 for warn setting
@@ -56,7 +58,6 @@ const initialOrderState = {
 }
 const orderModule = (state = initialOrderState, action) => {
   const { type } = action
-
   if (type === ActionTypes.CHANGE_ORDER) {
     const { subModule, keyValuePair } = action
     // return { ...state, ...{ [subModule]: keyValuePair } }

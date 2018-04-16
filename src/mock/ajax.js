@@ -1,6 +1,7 @@
 import heaterHandler from './heater'
 import creditsHandler from './credits'
-import orderHandler from './order.js'
+import orderStatHandler from './order.js'
+import orderConsumptionHandler from './orderConsumption'
 
 const AjaxHandler = {
   showingError: false
@@ -18,7 +19,7 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options, errorCb) => {
   } else if (resource.indexOf('credits') !== -1) {
     return creditsHandler(resource, body, cb)
   } else if (resource.indexOf('order/statistic') !== -1) {
-    return orderHandler(resource, body, cb)
+    return orderStatHandler(resource, body, cb)
   }
 }
 AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
@@ -32,6 +33,8 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return heaterHandler(resource, body)
   } else if (resource.indexOf('credits') !== -1) {
     return creditsHandler(resource, body)
+  } else if (resource.indexOf('order/consumption/device')) {
+    return orderConsumptionHandler(resource, body)
   }
 }
 

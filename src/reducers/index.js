@@ -6,6 +6,7 @@ import Time from '../util/time'
 
 import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
+import buildingsSet from './building'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -107,6 +108,7 @@ const setSchoolList = (state = initialSchools, action) => {
       selectedSchool = action.value.schools[0].id.toString()
     }
     const value = action.value
+    console.log(value, { ...state, ...value })
     // console.log({...state, ...value})
     return { ...state, ...value }
   }
@@ -496,7 +498,8 @@ const rootReducer = combineReducers({
   setRoleList,
   setTagList,
   setUserInfo,
-  setGifts
+  setGifts,
+  buildingsSet
 })
 
 export default rootReducer

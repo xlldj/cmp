@@ -6,7 +6,6 @@ import { asyncComponent } from '../component/asyncComponent'
 import Bread from '../component/bread'
 import { getLocal } from '../../util/storage'
 import CONSTANTS from '../../constants'
-import OrderWarn from './orderWarn'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -101,10 +100,6 @@ class OrderDisp extends React.Component {
             exact
             path="/order/list"
             render={props => <OrderList hide={this.props.hide} {...props} />}
-          />
-          <Route
-            path="/order/warning"
-            render={props => <OrderWarn hide={this.props.hide} {...props} />}
           />
           <Route
             path="/order/abnormal"

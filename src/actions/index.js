@@ -3,6 +3,8 @@ import AjaxHandler from '../util/ajax'
 import { buildAuthenData } from '../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../util/storage'
 
+import { SET_BUILDING_LIST, fetchBuildings } from './building'
+
 import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
 import {
   CHANGE_HEATER,
@@ -275,5 +277,7 @@ export {
   CHANGE_DOORFORBID,
   changeDoorForbid,
   fetchDoorForbidList,
-  fetchDetailRecordList
+  fetchDetailRecordList,
+  SET_BUILDING_LIST,
+  fetchBuildings
 }

@@ -1,14 +1,18 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
-import { Table, Badge, Button } from 'antd'
+import { Table, Button, Checkbox } from 'antd'
 import AjaxHandler from '../../../../util/ajax'
+// import AjaxHandler from '../../../../mock/ajax'
 import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
-import selectedImg from '../../../assets/selected.png'
+import Noti from '../../../../util/noti'
 
 import RangeSelect from '../../../component/rangeSelect'
-import SearchInput from '../../../component/searchInput'
 import CheckSelect from '../../../component/checkSelect'
+import ThresholdSelector from '../../../component/thresholdSelector'
+import SetRuleHint from './setRuleHint.js'
+import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
+import RepairmanTable from '../../../component/repairmanChooseClean.js'
 
 import { checkObject } from '../../../../util/checkSame'
 const subModule = 'orderList'
@@ -16,9 +20,10 @@ const subModule = 'orderList'
 const {
   PAGINATION: SIZE,
   DEVICETYPE,
-  ORDER_DAY_SELECT,
-  ORDERUSERTYPES,
-  ORDERSTATUS
+  ORDER_ANALYZE_DAY_SELECT,
+  ROOMTYPES,
+  DEVICE_WARN_TASK_STATUS_ENUM,
+  NORMAL_DAY_7
 } = CONSTANTS
 
 class OrderAnalyzeView extends React.Component {
@@ -29,11 +34,15 @@ class OrderAnalyzeView extends React.Component {
       dataSource,
       loading: false,
       total: 0,
-      totalIncome: 0,
-      totalChargeback: 0,
-      searchingText: '',
-      subStartTime: this.props.startTime,
-      subEndTime: this.props.endTime
+      totalDeviceCount: 0,
+      startTime: this.props.startTime,
+      endTime: this.props.endTime,
+      threshold: this.props.threshold,
+      thresholdType: this.props.thresholdType,
+      showSetRuleHint: !this.checkRulesReady(this.props),
+      selectedRowKeys: [],
+      buildingDataSet: {},
+      showBuildingSelect: false
     }
   }
   fetchData = props => {
@@ -41,26 +50,32 @@ class OrderAnalyzeView extends React.Component {
       loading: true
     })
     props = props || this.props
-    let { state } = props.history.location
 
     let {
       page,
+      day,
       schoolId,
+      buildingIds,
+      roomType,
+      warnTaskStatus,
+      threshold,
+      thresholdType,
       deviceType,
-      status,
-      selectKey,
       startTime,
-      endTime,
-      userType,
-      day
+      endTime
     } = props
     const body = {
       page: page,
-      size: SIZE
+      size: SIZE,
+      schoolId: +schoolId, // schoolId should not be 'all', thus could be parse to int directly
+      threshold,
+      thresholdType
+    }
+    if (buildingIds !== 'all') {
+      body.buildingIds = buildingIds
     }
     if (startTime && endTime) {
       body.startTime = startTime
-      body.timeQueryType = 1 // 选择create_time
       body.endTime = endTime
     } else {
       body.day = parseInt(day, 10)
@@ -68,181 +83,117 @@ class OrderAnalyzeView extends React.Component {
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
     }
-    if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10)
+    if (roomType !== 'all') {
+      body.status = parseInt(roomType, 10)
     }
-    if (status !== 'all') {
-      body.status = parseInt(status, 10)
-    } else {
-      body.statusList = [1, 2, 4]
-    }
-    if (selectKey) {
-      body.selectKey = selectKey
-    }
-    if (userType && userType !== 'all') {
-      body.userType = parseInt(userType, 10)
-    }
-    if (state) {
-      if (state.path === 'fromDevice') {
-        body.residenceId = state.id
-        body.deviceType = state.deviceType
-      } else if (state.path === 'fromUser') {
-        body.userId = state.id
-      } else if (state.path === 'fromTask') {
-        if (state.userId) {
-          body.userId = state.userId
-        } else if (state.deviceType) {
-          body.residenceId = state.residenceId
-          body.deviceType = state.deviceType
-        }
-      }
-      delete body.schoolId
+    if (warnTaskStatus !== 'all') {
+      body.warnTaskStatus = parseInt(warnTaskStatus, 10)
     }
 
-    let resource = '/api/order/list'
-    const cb = json => {
+    let resource = '/api/order/consumption/device/list'
+    AjaxHandler.fetch(resource, body).then(json => {
       let nextState = { loading: false }
-      if (json.error) {
-        this.setState(nextState)
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
-        /*--------redirect --------*/
-        if (json.data) {
-          json.data.orders &&
-            json.data.orders.forEach((r, i) => {
-              r.paymentType = r.paymentType && r.paymentType.toString()
-            })
-          nextState.dataSource = json.data.orders
-          nextState.total = json.data.total
-          nextState.totalIncome = json.data.totalIncome || 0
-          nextState.totalChargeback = json.data.totalChargeback || 0
-        }
+      if (json && json.data) {
+        // select no rows default
+        nextState.dataSource = json.data.list.map(l => {
+          l.selected = false
+          return l
+        })
+        nextState.total = json.data.total
+        nextState.totalDeviceCount = json.data.totalDeviceCount
       }
       this.setState(nextState)
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    })
   }
-
   componentDidMount() {
-    this.fetchData()
-    // add click event
-    let root = document.getElementById('root')
-    this.root = root
-    root.addEventListener('click', this.closeDetail, false)
-  }
-  componentWillUnmount() {
-    this.root.removeEventListener('click', this.closeDetail)
+    let { schoolId, schools, buildingsOfSchoolId } = this.props
+    // change schoolId if is 'all' now
+    if (schoolId === 'all') {
+      schoolId = (schools && schools[0] && schools[0].id) || 1
+      this.props.changeOrder(subModule, { schoolId })
+    }
+    // fetch buildings if not set
+    // here guarantees schoolId is always set and buildings are always fetched when mounted.
+    // thus only need to fetch buildings when schoolId is changed through user click.
+    if (!buildingsOfSchoolId[schoolId]) {
+      this.props.fetchBuildings(+schoolId)
+    }
+    this.syncStateWithProps()
   }
   componentWillReceiveProps(nextProps) {
-    // handle close detail click event
-    if (!nextProps.showDetail && this.props.showDetail) {
-      // closed detail
-      this.root.removeEventListener('click', this.closeDetail)
-    } else if (!this.props.showDetail && nextProps.showDetail) {
-      this.root.addEventListener('click', this.closeDetail, false)
-    }
     if (
       checkObject(this.props, nextProps, [
         'day',
         'schoolId',
         'deviceType',
-        'status',
-        'selectKey',
         'page',
         'startTime',
         'endTime',
-        'userType'
+        'buildingIds',
+        'roomType',
+        'threshold',
+        'thresholdType',
+        'warnTaskStatus',
+        'order'
       ])
     ) {
       return
     }
-    let { startTime, endTime, selectKey } = nextProps
-    const { showClearBtn } = this.state
+    // if 'schoolId' is changed ,fetch buildings again if needed
+    if (this.props.schoolId !== nextProps.schoolId) {
+      this.props.fetchBuildings(+nextProps.schoolId)
+    }
+
+    this.syncStateWithProps(nextProps)
+  }
+  syncStateWithProps = props => {
+    let { startTime, endTime, threshold, thresholdType } = props || this.props
 
     const nextState = {}
     if (startTime !== this.state.startTime) {
       nextState.startTime = startTime
       nextState.endTime = endTime
     }
-    if (selectKey !== this.state.searchingText) {
-      console.log(selectKey, showClearBtn)
-      nextState.searchingText = selectKey
+    if (threshold !== this.state.threshold) {
+      nextState.threshold = threshold
     }
-    this.setState(nextState)
-    this.fetchData(nextProps)
-  }
-  closeDetail = e => {
-    if (!this.props.showDetail) {
-      return
+    if (thresholdType !== this.state.thresholdType) {
+      nextState.thresholdType = thresholdType
     }
-    let target = e.target
-    let detailWrapper = this.refs.detailWrapper
-    if (detailWrapper.contains(target)) {
-      console.log('contain')
-      return
-    }
-    if (this.props.showDetail) {
-      this.props.changeOrder(subModule, {
-        showDetail: false,
-        selectedRowIndex: -1,
-        selectedDetailId: -1
-      })
-    }
-  }
 
-  changeDevice = value => {
-    let { deviceType } = this.props
-    if (value === deviceType) {
-      return
+    // check if rules are set ready
+    if (this.checkRulesReady(props)) {
+      nextState.showSetRuleHint = false
+      this.fetchData(props)
+    } else {
+      nextState.showSetRuleHint = true
     }
-    this.props.changeOrder(subModule, { deviceType: value, page: 1 })
-  }
-  changeStatus = value => {
-    let { status } = this.props
-    if (value === status) {
-      return
-    }
-    this.props.changeOrder(subModule, { status: value, page: 1 })
-  }
-  changeSearch = e => {
-    const nextState = {}
-    nextState.searchingText = e.target.value
     this.setState(nextState)
   }
-  pressEnter = () => {
-    let { selectKey } = this.props
-    let searchingText = this.state.searchingText.trim()
-    if (selectKey !== searchingText) {
-      this.props.changeOrder(subModule, { selectKey: searchingText, page: 1 })
+  isThresholdReady = value => {
+    // set rules here for threshold
+    let v = +value
+    if (!v || v < 0) {
+      return false
     }
+    return true
   }
-  clearMobile = () => {
-    this.setState(
-      {
-        searchingText: ''
-      },
-      this.pressEnter
-    )
-  }
-  back = () => {
-    this.props.history.goBack()
-  }
-  changePage = pageObj => {
-    let page = pageObj.current
-    this.props.changeOrder(subModule, { page: page })
-  }
-  changeUserType = v => {
-    let { userType } = this.props
-    if (userType === v) {
-      return
+  checkRulesReady = props => {
+    let { schoolId, threshold, thresholdType } = props || this.props
+    if (
+      schoolId === 'all' ||
+      !this.isThresholdReady(threshold) ||
+      !thresholdType
+    ) {
+      return false
     }
-    this.props.changeOrder(subModule, { userType: v, page: 1 })
+    return true
   }
   changeRange = key => {
     this.props.changeOrder(subModule, {
-      startTime: '',
-      endTime: '',
-      day: +key
+      analyze_startTime: '',
+      analyze_endTime: '',
+      analyze_day: +key
     })
   }
   changeStartTime = time => {
@@ -261,85 +212,167 @@ class OrderAnalyzeView extends React.Component {
       return
     }
     this.props.changeOrder(subModule, {
-      startTime: startTime,
-      endTime: endTime,
-      page: 1,
-      day: 0
+      analyze_startTime: startTime,
+      analyze_endTime: endTime,
+      analyze_page: 1,
+      analyze_day: 0
     })
   }
-  selectRow = (record, index, event) => {
-    let { dataSource } = this.state
-    // let page = panel_page[main_phase]
-    let id = dataSource[index] && dataSource[index].id
-    this.props.changeOrder(subModule, {
-      selectedRowIndex: index,
-      showDetail: true,
-      selectedDetailId: id
-    })
-  }
-
-  setRowClass = (record, index) => {
-    let { selectedRowIndex } = this.props
-    if (index === selectedRowIndex) {
-      return 'selectedRow'
-    } else {
-      return ''
+  changeDevice = value => {
+    let { deviceType } = this.props
+    if (value === deviceType) {
+      return
     }
+    this.props.changeOrder(subModule, { analyze_deviceType: value, page: 1 })
+  }
+  showBuildingSelect = () => {
+    this.setState({
+      showBuildingSelect: true
+    })
   }
 
-  render() {
-    const {
-      page,
-      deviceType,
-      buildindId,
-      day,
-      roomType,
-      threshold,
-      thresholdType,
-      page,
-      selectedRowIndex
-    } = this.props
-    const {
-      dataSource,
-      total,
-      totalIncome,
-      totalChargeback,
-      loading,
-      startTime,
-      endTime,
-      searchingText
-    } = this.state
-    const showClearBtn = !!searchingText
+  changeRoomType = value => {
+    let { roomType } = this.props
+    if (value === roomType) {
+      return
+    }
+    this.props.changeOrder(subModule, { analyze_roomType: value, page: 1 })
+  }
+  changeThreshold = e => {
+    this.setState({
+      threshold: +e.target.value
+    })
+  }
+  changeThresholdType = v => {
+    console.log(v)
+    this.setState({
+      thresholdType: v
+    })
+  }
+  confirmThreshold = () => {
+    let { threshold, thresholdType } = this.state
+    this.props.changeOrder(subModule, {
+      analyze_thresholdType: thresholdType,
+      analyze_threshold: threshold,
+      page: 1
+    })
+  }
+  changeWarnTaskStatus = value => {
+    let { warnTaskStatus } = this.props
+    if (value === warnTaskStatus) {
+      return
+    }
+    this.props.changeOrder(subModule, {
+      analyze_warnTaskStatus: value,
+      page: 1
+    })
+  }
+
+  back = () => {
+    this.props.history.goBack()
+  }
+
+  changeTable = (pageObj, filters, sorter) => {
+    let { order } = sorter
+    let data = {}
+    if (order !== this.props.order) {
+      data.analyze_order = order
+    }
+    let page = pageObj.current
+    if (page !== this.props.page) {
+      data.analyze_page = page
+    }
+    this.props.changeOrder(subModule, data)
+  }
+
+  selectRow = (record, index, event) => {
+    const { dataSource } = this.state
+    this.toggleOrderRowSelectStatus(null, dataSource[index].deviceId)
+  }
+  onSelectInvert = () => {
+    console.log('onSelectInvert')
+  }
+  selectAllItemsOfOrderTable = () => {
+    console.log('selectAllItemsOfOrderTable')
+  }
+  toOrderRecord = (e, deviceType, location) => {
+    e.preventDefault()
+    // must stop it unless will cause a click on order/list item to show detail
+    e.stopPropagation()
+    // just go to order list tab
+    console.log(location)
+    this.props.changeOrder(subModule, {
+      tabIndex: 1, // goto order list tab
+      page: 1,
+      day: NORMAL_DAY_7, // set to 7 days default
+      deviceType: deviceType || 'all',
+      status: 'all',
+      userType: 'all',
+      selectKey: location,
+      showDetail: false,
+      selectedRowIndex: -1,
+      selectedDetailId: -1
+    })
+  }
+  toggleAllRowsOfOrderTable = () => {
+    this.setState({
+      allRowsOfOrderTableSelected: !this.state.allRowsOfOrderTableSelected
+    })
+  }
+  toggleOrderRowSelectStatus = (e, deviceId) => {
+    const dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    let data = dataSource.find(d => d.deviceId === deviceId)
+    if (data) {
+      // if has task handling, can't select it
+      if (data.warningTaskHandling) {
+        return
+      }
+      data.selected = !data.selected
+    }
+    this.setState({
+      dataSource
+    })
+  }
+  getColumns = () => {
+    let { day } = this.props
+    let { startTime, endTime, allRowsOfOrderTableSelected } = this.state
+    const dayStr = day
+      ? ORDER_ANALYZE_DAY_SELECT[day]
+      : `${Time.format(startTime, 'yyyy-MM-DD')}至${Time.format(
+          endTime,
+          'yyyy-MM-DD'
+        )}`
 
     const columns = [
       {
-        title: '订单号',
-        dataIndex: 'orderNo',
-        width: '20%',
-        className: 'firstCol selectedHintWraper',
-        render: (text, record, index) => (
-          <span className="">
-            {index === selectedRowIndex ? (
-              <img src={selectedImg} alt="" className="selectedImg" />
-            ) : null}
-            {text}
-          </span>
+        title: (
+          <Checkbox
+            style={{ textAlign: 'center' }}
+            checked={allRowsOfOrderTableSelected}
+            onChange={this.toggleAllRowsOfOrderTable}
+          />
+        ),
+        width: '4%',
+        dataIndex: 'selected',
+        className: 'center',
+        render: (text, record) => (
+          <Checkbox
+            checked={record.selected}
+            onChange={e => {
+              this.toggleOrderRowSelectStatus(e, record.deviceId)
+            }}
+          />
         )
       },
       {
-        title: '用户',
-        dataIndex: 'username',
-        width: '10%'
+        title: '学校',
+        dataIndex: 'schoolName'
       },
       {
-        title: '使用设备',
+        title: '设备',
         dataIndex: 'deviceType',
         width: '7%',
         render: (text, record, index) => DEVICETYPE[record.deviceType]
-      },
-      {
-        title: '所在学校',
-        dataIndex: 'schoolName'
       },
       {
         title: '设备地址',
@@ -347,61 +380,190 @@ class OrderAnalyzeView extends React.Component {
         width: '10%'
       },
       {
-        title: '开始时间',
-        dataIndex: 'createTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return Time.getTimeStr(record.createTime)
-        }
-      },
-      {
-        title: '结束时间',
-        dataIndex: 'finishTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
-        }
-      },
-      {
-        title: '使用状态',
-        dataIndex: 'status',
-        width: '10%',
-        render: (text, record, index) => {
-          switch (record.status) {
-            case 1:
-              return <Badge status="warning" text="使用中" />
-            case 2:
-              return <Badge status="success" text="使用结束" />
-            case 4:
-              return <Badge status="default" text="已退单" />
-            case 3:
-              return <Badge status="warning" text="异常" />
-            default:
-              return <Badge status="warning" text="异常" />
-          }
-        }
-      },
-      {
-        title: '消费金额',
+        title: `${dayStr}消费总额`,
         dataIndex: 'paymentType',
         className: 'shalowRed',
-        render: (text, record, index) => {
-          if (record.status !== 1) {
-            return `${record.consume}` || '暂无'
-          } else if (record.prepay) {
-            return `${record.prepay}`
-          }
-        }
+        render: (text, record, index) =>
+          record.consumption ? `¥${record.consumption}` : 0,
+        sorter: true
+      },
+      {
+        title: '是否存在预警工单',
+        dataIndex: 'warningTaskHandling',
+        render: (text, record, index) =>
+          record.warningTaskHandling ? '是' : '否'
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <a
+              href=""
+              onClick={e =>
+                this.toOrderRecord(e, record.deviceType, record.location)
+              }
+            >
+              查看订单记录
+            </a>
+          </div>
+        )
       }
     ]
+    return columns
+  }
+  getSchoolName = () => {
+    let { schoolId, schools } = this.props
+    if (schoolId === 'all') {
+      return
+    }
+    let school = schools && schools.find(s => s.id === +schoolId)
+    return school ? school.name : ''
+  }
+
+  confirmBuildings = ({ all, dataSource }) => {
+    this.setState({
+      showBuildingSelect: false
+    })
+    let buildingIds = all
+      ? 'all'
+      : dataSource.filter(d => d.selected === true).map(d => d.id)
+    this.props.changeOrder(subModule, {
+      analyze_buildingIds: buildingIds
+    })
+  }
+  closeBuildingSelect = () => {
+    this.setState({
+      showBuildingSelect: false
+    })
+  }
+  showRepairmanSelect = () => {
+    this.setState({
+      showRepairmanSelect: true
+    })
+  }
+  confirmChooseRepairman = (assignId, level, content) => {
+    // first post then close the modal. And notice to forbid double click when posting
+    const { allRowsOfOrderTableSelected, dataSource } = this.state
+    const {
+      schoolId,
+      deviceType,
+      buildingIds,
+      threshold,
+      thresholdType,
+      day,
+      startTime,
+      endTime,
+      roomType
+    } = this.props
+    const resource = '/api/work/order/create/batch'
+    const body = {
+      schoolId: +schoolId,
+      assignId,
+      level,
+      content
+    }
+
+    let deviceIds = dataSource.filter(d => d.selected === true)
+    if (allRowsOfOrderTableSelected) {
+      // if post 'all', set all the needing options
+      body.all = true
+      if (deviceType !== 'all') {
+        body.deviceType = +deviceType
+      }
+      if (buildingIds !== 'all') {
+        body.buildingIds = buildingIds
+      }
+      if (roomType !== 'all') {
+        body.roomType = +roomType
+      }
+      body.threshold = threshold
+      body.thresholdType = thresholdType
+    } else {
+      body.deviceIds = deviceIds.map(d => d.deviceId)
+    }
+    // always posting time setting
+    if (day) {
+      // day is not 0, which is a valid value
+      body.day = +day
+    } else {
+      body.startTime = startTime
+      body.endTime = endTime
+    }
+    this.setState({
+      postingTask: true
+    })
+    AjaxHandler.fetch(resource, body).then(json => {
+      const nextState = {
+        postingTask: false
+      }
+      if (json && json.data) {
+        // close modal and clear selectedRowKeys
+        nextState.showRepairmanSelect = false
+        nextState.selectedRowKeys = []
+        Noti.hintOk('生成成功', '工单已提交')
+        // refetch data, since these items' warningTaskHandling is changed
+        this.fetchData()
+      }
+      this.setState(nextState)
+    })
+  }
+  cancelChooseRepairman = () => {
+    this.setState({
+      showRepairmanSelect: false
+    })
+  }
+  render() {
+    const {
+      page,
+      deviceType,
+      buildingIds,
+      day,
+      roomType,
+      warnTaskStatus,
+      schoolId,
+      buildingsOfSchoolId
+    } = this.props
+    const {
+      threshold,
+      thresholdType,
+      dataSource,
+      total,
+      totalDeviceCount,
+      loading,
+      startTime,
+      endTime,
+      showSetRuleHint,
+      showBuildingSelect,
+      showRepairmanSelect,
+      allRowsOfOrderTableSelected
+    } = this.state
+    const selectedRowLengthsOfOrderTable = dataSource.filter(
+      d => d.selected === true
+    ).length
+    const schoolName = this.getSchoolName()
+    const buildingNames =
+      buildingIds === 'all'
+        ? '全部楼栋'
+        : buildingIds
+            .map(
+              b =>
+                buildingsOfSchoolId[+schoolId] &&
+                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
+                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
+            )
+            .join('、')
+
+    const showBuildTaskBtn =
+      selectedRowLengthsOfOrderTable > 0 || allRowsOfOrderTableSelected
     return (
-      <div className="">
+      <div className="orderWarnListWrapper">
         <div className="queryPanel">
           <div className="queryLine">
             <div className="block">
               <span>时间筛选:</span>
               <CheckSelect
-                options={ORDER_DAY_SELECT}
+                options={ORDER_ANALYZE_DAY_SELECT}
                 value={+day}
                 onClick={this.changeRange}
               />
@@ -416,7 +578,6 @@ class OrderAnalyzeView extends React.Component {
             </div>
           </div>
 
-          <div className="queryLine" />
           <div className="queryLine">
             <div className="block">
               <span>设备类型:</span>
@@ -428,60 +589,135 @@ class OrderAnalyzeView extends React.Component {
                 onClick={this.changeDevice}
               />
             </div>
-            <div className="block">
-              {showClearBtn ? (
-                <Button
-                  onClick={this.clearMobile}
-                  className="rightSeperator"
-                  type="primary"
-                >
-                  清空
-                </Button>
-              ) : null}
-              <SearchInput
-                placeholder="宿舍/订单号/手机号"
-                searchingText={searchingText}
-                pressEnter={this.pressEnter}
-                changeSearch={this.changeSearch}
-              />
-            </div>
           </div>
+
           <div className="queryLine">
             <div className="block">
-              <span>使用状态:</span>
+              <span>楼栋筛选:</span>
+              <span className="customized_select_option">{buildingNames}</span>
+              <Button type="primary" onClick={this.showBuildingSelect}>
+                点击选择
+              </Button>
+            </div>
+          </div>
+
+          <div className="queryLine">
+            <div className="block">
+              <span>宿舍类型:</span>
               <CheckSelect
                 allOptTitle="不限"
                 allOptValue="all"
-                options={ORDERSTATUS}
-                onClick={this.changeStatus}
+                options={ROOMTYPES}
+                value={roomType}
+                onClick={this.changeRoomType}
               />
             </div>
+
+            <div className="block orderWarnThresholdWrapper">
+              <span className="shortSeperator">消费区间筛选(元):</span>
+              <input
+                type="number"
+                className="shortInput"
+                value={threshold}
+                onChange={this.changeThreshold}
+              />
+              <ThresholdSelector
+                value={+thresholdType}
+                changeThreshold={this.changeThresholdType}
+              />
+              <Button
+                type="primary"
+                className="shortSeperator"
+                onClick={this.confirmThreshold}
+              >
+                确认
+              </Button>
+            </div>
+          </div>
+
+          <div className="queryLine">
+            <div className="block">
+              <span>工单状态:</span>
+              <CheckSelect
+                allOptTitle="不限"
+                allOptValue="all"
+                options={DEVICE_WARN_TASK_STATUS_ENUM}
+                value={warnTaskStatus}
+                onClick={this.changeWarnTaskStatus}
+              />
+            </div>
+
             <div className="block">
               <span className="seperator">
-                总收益(使用结束): {totalIncome}元
+                {schoolName} {buildingNames} 共{totalDeviceCount}个设备，当前筛选{
+                  total
+                }个设备
               </span>
-              <span>已退单: {totalChargeback}元</span>
             </div>
           </div>
         </div>
 
         <div className="tableList">
-          <Table
-            bordered
-            loading={loading}
-            pagination={{
-              pageSize: SIZE,
-              current: page,
-              total: total
-            }}
-            dataSource={dataSource}
-            rowKey={record => record.id}
-            columns={columns}
-            onChange={this.changePage}
-            onRowClick={this.selectRow}
-            rowClassName={this.setRowClass}
-          />
+          {showSetRuleHint ? (
+            <SetRuleHint />
+          ) : (
+            <Fragment>
+              <Table
+                bordered
+                loading={loading}
+                pagination={{
+                  pageSize: SIZE,
+                  current: page,
+                  total: total,
+                  showQuickJumper: true
+                }}
+                dataSource={dataSource}
+                rowKey={record => record.deviceId}
+                columns={this.getColumns()}
+                onChange={this.changeTable}
+                onRowClick={this.selectRow}
+              />
+              {showBuildTaskBtn ? (
+                <div className="buildTaskWrapper">
+                  <Button type="primary" onClick={this.showRepairmanSelect}>
+                    批量生成工单
+                  </Button>
+                  <span>
+                    {allRowsOfOrderTableSelected
+                      ? '全部订单'
+                      : `当前选中${selectedRowLengthsOfOrderTable}条`}
+                  </span>
+                </div>
+              ) : null}
+            </Fragment>
+          )}
         </div>
+
+        {showBuildingSelect ? (
+          <BuildingMultiSelectModal
+            all={buildingIds === 'all'}
+            selectedItems={buildingIds !== 'all' ? buildingIds : []}
+            schoolId={schoolId}
+            closeModal={this.closeBuildingSelect}
+            confirmBuildings={this.confirmBuildings}
+          />
+        ) : null}
+
+        {/* for repairm choose */}
+        {showRepairmanSelect ? (
+          <RepairmanTable
+            showModal={showRepairmanSelect}
+            confirm={this.confirmChooseRepairman}
+            cancel={this.cancelChooseRepairman}
+            schoolId={schoolId}
+            schoolName={schoolName}
+            taskCount={
+              allRowsOfOrderTableSelected
+                ? 'all'
+                : selectedRowLengthsOfOrderTable
+            }
+          />
+        ) : null}
       </div>
     )
   }

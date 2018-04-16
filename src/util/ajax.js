@@ -235,7 +235,7 @@ const abortablePromise = (
   /* reject timeout promise after 5s */
   setTimeout(() => {
     timeoutAction()
-  }, 10000)
+  }, 5000)
 
   return abortable_promise
 }

@@ -43,7 +43,6 @@ module.exports = {
     vendor: ['lodash', 'moment'],
     draftjs: ['draft-js'],
     react: ['react', 'react-dom', 'react-router-dom'],
-    antd: ['antd'],
     recharts: ['recharts']
   },
   output: {

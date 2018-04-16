@@ -112,11 +112,6 @@ const BASIC = {
           key: 0
         },
         {
-          name: '消费预警',
-          path: 'warning',
-          key: 2
-        },
-        {
           name: '异常订单',
           path: 'abnormal',
           key: 1

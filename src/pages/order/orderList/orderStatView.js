@@ -279,7 +279,8 @@ class OrderStatView extends React.Component {
               pagination={{
                 pageSize: SIZE,
                 current: page,
-                total: total
+                total: total,
+                showQuickJumper: true
               }}
               dataSource={dataSource}
               rowKey={record => record.schoolName}
