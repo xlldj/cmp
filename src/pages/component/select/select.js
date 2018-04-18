@@ -18,6 +18,7 @@ class Select extends React.Component {
       searchInput.focus()
     }
   }
+  componentWillReceiveProps(nextProps) {}
   getAllOption = () => {
     const handleOption = r => {
       valueLabelPairs[r.props.value] = r.props.children

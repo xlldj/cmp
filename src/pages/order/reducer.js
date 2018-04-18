@@ -8,7 +8,7 @@ let selectedSchool = getDefaultSchool()
 
 const initialOrderState = {
   orderList: {
-    tabIndex: 3, // 1 for table, 2 for statistics, 3 for analyze
+    tabIndex: 1, // 1 for table, 2 for statistics, 3 for analyze
     page: 1,
     schoolId: selectedSchool,
     day: 1, // 1 for today, 2 for last 7 days , 3 for last 30 days, 0 for custom select
@@ -28,7 +28,7 @@ const initialOrderState = {
     stat_orderBy: -1, // for order of the stat table, default is -1, for none selected
     stat_order: -1, //  ORDER: { descend: 1, ascend: 2 }, -1 is for none selected.
     // below is state for order analyze
-    analyze_day: 3, // 3 for 'today', default setting.
+    analyze_day: 1, // 1 for 'today', default setting.
     analyze_deviceType: 1,
     analyze_buildingIds: 'all',
     analyze_roomType: 'all',

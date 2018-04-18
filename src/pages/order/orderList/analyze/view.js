@@ -23,7 +23,8 @@ const {
   ORDER_ANALYZE_DAY_SELECT,
   ROOMTYPES,
   DEVICE_WARN_TASK_STATUS_ENUM,
-  NORMAL_DAY_7
+  NORMAL_DAY_7,
+  ORDER_ANALYZE_DAY_SELECT_ARR
 } = CONSTANTS
 
 class OrderAnalyzeView extends React.Component {
@@ -87,7 +88,8 @@ class OrderAnalyzeView extends React.Component {
       body.status = parseInt(roomType, 10)
     }
     if (warnTaskStatus !== 'all') {
-      body.warnTaskStatus = parseInt(warnTaskStatus, 10)
+      // body.warnTaskStatus = parseInt(warnTaskStatus, 10)
+      body.warnTaskStatus = warnTaskStatus.toString() === '1' ? false : true
     }
 
     let resource = '/api/order/consumption/device/list'
@@ -563,7 +565,7 @@ class OrderAnalyzeView extends React.Component {
             <div className="block">
               <span>时间筛选:</span>
               <CheckSelect
-                options={ORDER_ANALYZE_DAY_SELECT}
+                options={ORDER_ANALYZE_DAY_SELECT_ARR}
                 value={+day}
                 onClick={this.changeRange}
               />

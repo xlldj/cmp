@@ -23,14 +23,14 @@ class CheckSelector extends React.Component {
   }
   render() {
     let { options, value, noOptionTitle, allOptValue, allOptTitle } = this.props
-    let optionArr = obj2arr(options)
+    let optionArr = Array.isArray(options) ? options : obj2arr(options)
     const optionItems =
       optionArr &&
       optionArr.map((o, i) => (
         <li
-          key={i}
+          key={o.key}
           data-key={o.key}
-          className={value.toString() === o.key ? 'active' : ''}
+          className={value.toString() === o.key.toString() ? 'active' : ''}
         >
           {o.value}
         </li>

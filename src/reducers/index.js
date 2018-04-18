@@ -1,7 +1,7 @@
 import * as ActionTypes from '../actions'
 import { merge } from 'lodash'
 import { combineReducers } from 'redux'
-import { getLocal } from '../util/storage'
+import { getLocal, getStore } from '../util/storage'
 import Time from '../util/time'
 
 import heaterModule from '../pages/heater/reducer'
@@ -42,7 +42,8 @@ const initialAuthenData = {
   forbiddenStatus: {},
   authenSet: false,
   mainNavs: [],
-  subNavs: {}
+  subNavs: {},
+  schoolLimit: getStore('schoolLimit') ? true : false // if employee has rights to check all schools, this is true; or else is false
 }
 const setAuthenData = (state = initialAuthenData, action) => {
   const { type } = action
@@ -209,7 +210,10 @@ const deviceModule = (state = initialDeviceState, action) => {
 
   if (type === ActionTypes.CHANGE_DEVICE) {
     const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
+    const newSubState = {}
+    newSubState[subModule] = { ...state[subModule], ...keyValuePair }
+    return { ...state, ...newSubState }
+    // return merge({}, state, { [subModule]: keyValuePair })
   }
   return state
 }

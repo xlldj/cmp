@@ -38,6 +38,7 @@ class App extends React.Component {
   }
   logout = () => {
     removeStore('logged')
+    removeStore('schoolLimit')
     this.setState({
       logged: false
     })

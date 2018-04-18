@@ -45,11 +45,28 @@ class OrderTableView extends React.Component {
       subEndTime: this.props.endTime
     }
   }
-  fetchData = props => {
+  fetchList = props => {
     this.setState({
       loading: true
     })
     props = props || this.props
+    const body = this.getPostBody(props)
+
+    let resource = '/api/order/list'
+    AjaxHandler.fetch(resource, body).then(json => {
+      const nextState = { loading: false }
+      if (json && json.data) {
+        json.data.orders &&
+          json.data.orders.forEach((r, i) => {
+            r.paymentType = r.paymentType && r.paymentType.toString()
+          })
+        nextState.dataSource = json.data.orders
+        nextState.total = json.data.total
+      }
+      this.setState(nextState)
+    })
+  }
+  getPostBody = props => {
     let { state } = props.history.location
 
     let {
@@ -107,33 +124,48 @@ class OrderTableView extends React.Component {
       }
       delete body.schoolId
     }
-
-    let resource = '/api/order/list'
-    const cb = json => {
-      let nextState = { loading: false }
-      if (json.error) {
-        this.setState(nextState)
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
-        /*--------redirect --------*/
-        if (json.data) {
-          json.data.orders &&
-            json.data.orders.forEach((r, i) => {
-              r.paymentType = r.paymentType && r.paymentType.toString()
-            })
-          nextState.dataSource = json.data.orders
-          nextState.total = json.data.total
-          nextState.totalIncome = json.data.totalIncome || 0
-          nextState.totalChargeback = json.data.totalChargeback || 0
-        }
+    return body
+  }
+  fetchSum = props => {
+    props = props || this.props
+    const body = this.getPostBody(props)
+    const resource = '/api/order/finish/sum'
+    this.setState({
+      sumLoading: true
+    })
+    AjaxHandler.fetch(resource, body).then(json => {
+      let nextState = { sumLoading: false }
+      if (json && json.data) {
+        nextState.totalIncome = json.data || 0
       }
       this.setState(nextState)
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    })
   }
-
+  fetchChargeBackSum = props => {
+    props = props || this.props
+    const body = this.getPostBody(props)
+    const resource = '/api/order/chargeback/sum'
+    this.setState({
+      chargebackSumLoading: true
+    })
+    AjaxHandler.fetch(resource, body).then(json => {
+      let nextState = { chargebackSumLoading: false }
+      if (json && json.data) {
+        nextState.totalChargeback = json.data || 0
+      }
+      this.setState(nextState)
+    })
+  }
+  fetchAllData = props => {
+    // fetch list
+    this.fetchList(props)
+    // fetch sum
+    this.fetchSum(props)
+    // fetch chargeback sum
+    this.fetchChargeBackSum(props)
+  }
   componentDidMount() {
-    this.fetchData()
+    this.fetchAllData()
     // add click event
     let root = document.getElementById('root')
     this.root = root
@@ -167,7 +199,28 @@ class OrderTableView extends React.Component {
       return
     }
     this.syncStateWithProps(nextProps)
-    this.fetchData(nextProps)
+    if (this.onlyPageChanged(this.props, nextProps)) {
+      this.fetchList(nextProps)
+    } else {
+      this.fetchAllData(nextProps)
+    }
+  }
+  onlyPageChanged = (prev, cur) => {
+    if (
+      checkObject(prev, cur, [
+        'day',
+        'schoolId',
+        'deviceType',
+        'status',
+        'selectKey',
+        'startTime',
+        'endTime',
+        'userType'
+      ])
+    ) {
+      return true
+    }
+    return false
   }
   syncStateWithProps = props => {
     let { startTime, endTime, selectKey } = props || this.props

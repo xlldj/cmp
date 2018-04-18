@@ -24,6 +24,7 @@ class DevicesTable extends React.Component {
       reset
     }
   }
+
   changeSchool = value => {
     let { schoolId } = this.props
     if (schoolId === value) {

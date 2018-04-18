@@ -41,13 +41,20 @@ const ORDER = {
     4: '近7日',
     5: '近30日'
   },
+  // this day select is from normal day setting, different from upper 'ORDER_STAT_DAY_SELECT'
   ORDER_ANALYZE_DAY_SELECT: {
     // for order stat
-    3: '今日',
+    1: '今日',
     9: '昨天',
-    4: '近7日',
+    3: '近7日',
     5: '近30日'
   },
+  ORDER_ANALYZE_DAY_SELECT_ARR: [
+    { key: 1, value: '今日' },
+    { key: 9, value: '昨天' },
+    { key: 3, value: '近7日' },
+    { key: 5, value: '近30日' }
+  ],
   ORDER_STAT_DAY_UNLIMITED: 6,
   ORDER_WARN_TABS: {
     WARNTABLE: 1,

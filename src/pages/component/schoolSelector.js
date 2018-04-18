@@ -2,7 +2,7 @@ import React from 'react'
 import { Map, is } from 'immutable'
 
 import AjaxHandler from '../../util/ajax'
-import { getStore, getLocal, setLocal } from '../../util/storage'
+import { getLocal, setLocal } from '../../util/storage'
 import CONSTANTS from '../../constants'
 import Select from './select'
 
@@ -12,8 +12,6 @@ import { withRouter } from 'react-router-dom'
 import { setSchoolList } from '../../actions'
 
 const { Option, OptGroup } = Select
-
-// const forbidden = getStore('forbidden')
 
 class SchoolSelector extends React.Component {
   static propTypes = {
@@ -28,6 +26,7 @@ class SchoolSelector extends React.Component {
       this.fetchSchools()
     }
   }
+
   shouldComponentUpdate(nextProps) {
     let nextPropsMap = Map(nextProps),
       thisPropsMap = Map(this.props)
@@ -126,7 +125,7 @@ class SchoolSelector extends React.Component {
     }
   }
   render() {
-    const { schools, recent } = this.props
+    const { schools, recent, selectedSchool, schoolLimit } = this.props
 
     const schNameOptions = schools.map((s, i) => (
       <Option value={s.id.toString()} key={s.id}>
@@ -135,14 +134,13 @@ class SchoolSelector extends React.Component {
     ))
 
     const recentItems = this.setRecentSchools()
-    let forbidden = getStore('forbidden')
     return (
       <Select
         disabled={this.props.disabled ? this.props.disabled : false}
-        all={forbidden ? false : true}
+        all={schoolLimit ? false : true}
         allTitle="全部学校"
         search
-        value={this.props.selectedSchool}
+        value={selectedSchool || ''}
         className={this.props.className ? this.props.className : 'customSelect'}
         width={this.props.width ? this.props.width : ''}
         onChange={this.changeSchool}
@@ -161,7 +159,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     schools: state.setSchoolList.schools,
     schoolSet: state.setSchoolList.schoolSet,
-    recent: state.setSchoolList.recent
+    recent: state.setSchoolList.recent,
+    schoolLimit: state.setAuthenData.schoolLimit
   }
 }
 
