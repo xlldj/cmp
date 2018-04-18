@@ -217,7 +217,7 @@ class RepairmanTable extends React.Component {
         <div className="schName">
           <span>学校:{schoolName}</span>
           <span className="seperator">
-            {taskCount === 'all' ? '生成所有工单' : `生成工单数:{taskCount}`}
+            {taskCount === 'all' ? '生成所有工单' : `生成工单数:${taskCount}`}
           </span>
           {hintNoRepairmanSelected ? (
             <span className="checkInvalid">请选择至少一名维修员</span>
