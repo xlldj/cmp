@@ -34,7 +34,7 @@ const initialOrderState = {
     analyze_roomType: 'all',
     analyze_startTime: '',
     analyze_endTime: '',
-    analyze_threshold: 0.00001,
+    analyze_threshold: 0,
     analyze_thresholdType: 1, // 1 means minimun, 2 means maximum
     analyze_page: 1,
     analyze_order: '',

@@ -77,6 +77,7 @@ class OrderDisp extends React.Component {
     }
   }
   render() {
+    debugger
     return (
       <div>
         <div className="breadc">
