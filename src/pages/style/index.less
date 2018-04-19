@@ -658,6 +658,7 @@ shortSeperator{
       width: 100%;
 
       &>p{
+        flex-shrink: 0;
         width: @labelWidth;
         text-align: right;
         color: #222;
@@ -724,6 +725,19 @@ shortSeperator{
         line-height: 22px;
         min-height: 110px;
       }
+    }
+    li.longInput{
+      align-items: flex-start;
+      height: auto;
+      min-height: @liHeight;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      line-height: 22px;
+      .detailContent{
+        display: inline-block;
+        max-width: 180px;
+        line-height: 22px;
+      } 
     }
   }
   .btnArea{

@@ -607,15 +607,20 @@ class EmployeeInfo extends React.Component {
               <span className="checkInvalid">请选择最少一个身份！</span>
             ) : null}
           </li>
-          <li>
+          <li className="longInput">
             <p>指定学校:</p>
-            <a className="mgr10" onClick={this.showSchools} href="">
-              点击选择
-            </a>
-            {schoolLimit ? selectedSchoolItems : <span>不限制学校</span>}
-            {schoolError ? (
-              <span className="checkInvalid">请选择最少一个学校！</span>
-            ) : null}
+            <div>
+              <a className="mgr10" onClick={this.showSchools} href="">
+                点击选择
+              </a>
+              <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+              <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+              <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
+              {schoolLimit ? selectedSchoolItems : <span>不限制学校</span>}
+              {schoolError ? (
+                <span className="checkInvalid">请选择最少一个学校！</span>
+              ) : null}
+            </div>
           </li>
           <li className="itemsWrapper">
             <AuthenDataTable clickable={false} authenStatus={authenStatus} />
