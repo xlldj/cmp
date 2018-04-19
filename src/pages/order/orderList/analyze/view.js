@@ -241,9 +241,16 @@ class OrderAnalyzeView extends React.Component {
     this.props.changeOrder(subModule, { analyze_roomType: value, page: 1 })
   }
   changeThreshold = e => {
-    this.setState({
-      threshold: +e.target.value
-    })
+    let value = e.target.value
+    // no negative, could be fractional
+    let v = parseInt(value, 10)
+    if (v >= 0) {
+      this.setState({
+        threshold: value
+      })
+    } else {
+      this.setState({ threshold: '' })
+    }
   }
   changeThresholdType = v => {
     console.log(v)
@@ -254,8 +261,8 @@ class OrderAnalyzeView extends React.Component {
   confirmThreshold = () => {
     let { threshold, thresholdType } = this.state
     this.props.changeOrder(subModule, {
-      analyze_thresholdType: thresholdType,
-      analyze_threshold: threshold,
+      analyze_thresholdType: thresholdType || 0,
+      analyze_threshold: parseFloat(threshold, 10) || 0,
       page: 1
     })
   }
@@ -618,7 +625,6 @@ class OrderAnalyzeView extends React.Component {
             <div className="block orderWarnThresholdWrapper">
               <span className="shortSeperator">消费区间筛选(元):</span>
               <input
-                type="number"
                 className="shortInput"
                 value={threshold}
                 onChange={this.changeThreshold}
