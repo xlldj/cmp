@@ -43,7 +43,8 @@ class OrderAnalyzeView extends React.Component {
       showSetRuleHint: !this.checkRulesReady(this.props),
       selectedRowKeys: [],
       buildingDataSet: {},
-      showBuildingSelect: false
+      showBuildingSelect: false,
+      notHandlingCount: ''
     }
   }
   fetchData = props => {
@@ -103,6 +104,7 @@ class OrderAnalyzeView extends React.Component {
         })
         nextState.total = json.data.total
         nextState.totalDeviceCount = json.data.totalDeviceCount
+        nextState.notHandlingCount = json.data.notHandlingCount
       }
       this.setState(nextState)
     })
@@ -324,11 +326,23 @@ class OrderAnalyzeView extends React.Component {
     })
   }
   toggleAllRowsOfOrderTable = () => {
+    const { allRowsOfOrderTableSelected } = this.state
+
+    const dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    if (allRowsOfOrderTableSelected) {
+      // previous all selected, not deselect
+      dataSource.forEach(d => (d.selected = false))
+    } else {
+      dataSource.forEach(d => (d.selected = true))
+    }
     this.setState({
-      allRowsOfOrderTableSelected: !this.state.allRowsOfOrderTableSelected
+      allRowsOfOrderTableSelected: !this.state.allRowsOfOrderTableSelected,
+      dataSource
     })
   }
   toggleOrderRowSelectStatus = (e, deviceId) => {
+    let { allRowsOfOrderTableSelected } = this.state
+
     const dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
     let data = dataSource.find(d => d.deviceId === deviceId)
     if (data) {
@@ -338,8 +352,19 @@ class OrderAnalyzeView extends React.Component {
       }
       data.selected = !data.selected
     }
+    // if 'allRowsOfOrderTableSelected' is true, which means selected all items across pages, need to
+    // toggle it when deselect some item in this page
+    if (allRowsOfOrderTableSelected) {
+      let allRowsInCurrentPageSelected = dataSource
+        .filter(d => d.warningTaskHandling === false)
+        .every(d => d.selected === true)
+      if (!allRowsInCurrentPageSelected) {
+        allRowsOfOrderTableSelected = false
+      }
+    }
     this.setState({
-      dataSource
+      dataSource,
+      allRowsOfOrderTableSelected
     })
   }
   getColumns = () => {
@@ -364,14 +389,20 @@ class OrderAnalyzeView extends React.Component {
         width: '4%',
         dataIndex: 'selected',
         className: 'center',
-        render: (text, record) => (
-          <Checkbox
-            checked={record.selected}
-            onChange={e => {
-              this.toggleOrderRowSelectStatus(e, record.deviceId)
-            }}
-          />
-        )
+        render: (text, record) => {
+          if (record.warningTaskHandling) {
+            return ''
+          } else {
+            return (
+              <Checkbox
+                checked={record.selected}
+                onChange={e => {
+                  this.toggleOrderRowSelectStatus(e, record.deviceId)
+                }}
+              />
+            )
+          }
+        }
       },
       {
         title: '学校',
@@ -545,10 +576,11 @@ class OrderAnalyzeView extends React.Component {
       showSetRuleHint,
       showBuildingSelect,
       showRepairmanSelect,
-      allRowsOfOrderTableSelected
+      allRowsOfOrderTableSelected,
+      notHandlingCount
     } = this.state
     const selectedRowLengthsOfOrderTable = dataSource.filter(
-      d => d.selected === true
+      d => d.selected === true && d.warningTaskHandling === false
     ).length
     const schoolName = this.getSchoolName()
     const buildingNames =
@@ -692,7 +724,7 @@ class OrderAnalyzeView extends React.Component {
                   </Button>
                   <span>
                     {allRowsOfOrderTableSelected
-                      ? '全部订单'
+                      ? `当前选中全部订单${notHandlingCount}条`
                       : `当前选中${selectedRowLengthsOfOrderTable}条`}
                   </span>
                 </div>
@@ -721,7 +753,7 @@ class OrderAnalyzeView extends React.Component {
             schoolName={schoolName}
             taskCount={
               allRowsOfOrderTableSelected
-                ? 'all'
+                ? notHandlingCount
                 : selectedRowLengthsOfOrderTable
             }
           />
