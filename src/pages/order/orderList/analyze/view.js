@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 
 import { Table, Button, Checkbox } from 'antd'
+import moment from 'moment'
 import AjaxHandler from '../../../../util/ajax'
 // import AjaxHandler from '../../../../mock/ajax'
 import Time from '../../../../util/time'
@@ -177,10 +178,10 @@ class OrderAnalyzeView extends React.Component {
   isThresholdReady = value => {
     // set rules here for threshold
     let v = +value
-    if (!v || v < 0) {
-      return false
+    if (v >= 0) {
+      return true
     }
-    return true
+    return false
   }
   checkRulesReady = props => {
     let { schoolId, threshold, thresholdType } = props || this.props
@@ -204,6 +205,12 @@ class OrderAnalyzeView extends React.Component {
     this.setState({
       startTime: time
     })
+  }
+  disableRule = (startTime, endTime) => {
+    if (startTime) {
+      const monthlater = moment(startTime).add(1, 'M')
+      return endTime < monthlater.millisecond()
+    }
   }
   changeEndTime = time => {
     this.setState({
@@ -615,6 +622,7 @@ class OrderAnalyzeView extends React.Component {
                 changeStartTime={this.changeStartTime}
                 changeEndTime={this.changeEndTime}
                 confirm={this.confirmTimeRange}
+                disableRule={this.disableRule}
               />
             </div>
           </div>
@@ -687,13 +695,15 @@ class OrderAnalyzeView extends React.Component {
               />
             </div>
 
-            <div className="block">
-              <span className="seperator">
-                {schoolName} {buildingNames} 共{totalDeviceCount}个设备，当前筛选{
-                  total
-                }个设备
-              </span>
-            </div>
+            {showSetRuleHint ? null : (
+              <div className="block">
+                <span className="seperator">
+                  {schoolName} {buildingNames} 共{totalDeviceCount}个设备，当前筛选{
+                    total
+                  }个设备
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
