@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import AjaxHandler from '../../../util/ajax'
 import { Map, Marker } from 'react-amap'
@@ -265,7 +265,22 @@ class SchoolInfoEdit extends React.Component {
       clientResponsed: false,
       clientReloaded: false,
 
-      initialAccount: false // when edit a school info, show the account info has not been changed
+      initialAccount: false, // when edit a school info, show the account info has not been changed
+
+      hasWxAccount: true,
+      wxpayAccountEditing: true,
+      wxpayAccountName: '',
+      wxpayAccountNameError: false,
+      wxpayAccountNameErrorMsg: '',
+      wxpayAppId: '',
+      wxpayAppidError: false,
+      wxpayAppidErrorMsg: '',
+      wxpayMchId: '',
+      wxpayMchIdError: false,
+      wxpayMchIdErrorMsg: '',
+      apikey: '',
+      apikeyError: false,
+      apiKeyErrorMsg: ''
     }
   }
   fetchData = body => {
@@ -1054,8 +1069,204 @@ class SchoolInfoEdit extends React.Component {
       accountEditing,
       validateSuccess,
       validateFailure,
-      initialAccount
+      initialAccount,
+      hasWxAccount,
+      wxpayAccountEditing,
+      wxpayAccountName,
+      wxpayAccountNameError,
+      wxpayAccountNameErrorMsg,
+      wxpayAppId,
+      wxpayAppidError,
+      wxpayAppidErrorMsg,
+      wxpayMchId,
+      wxpayMchIdError,
+      wxpayMchIdErrorMsg,
+      apikey,
+      apikeyError,
+      apiKeyErrorMsg
     } = this.state
+
+    const alipayAccount = (
+      <Fragment>
+        <li>
+          <p className="schoolinfo_blockTitle">支付宝信息</p>
+        </li>
+        <li>
+          <p>app_id:</p>
+          <input
+            disabled={accountEditing ? false : true}
+            onChange={this.changeAppId}
+            onBlur={this.checkAppId}
+            value={appId}
+            className={accountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {appIdError ? (
+            <span className="checkInvalid">{appIdErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>pid:</p>
+          <input
+            onChange={this.changePid}
+            onBlur={this.checkPid}
+            value={pid}
+            disabled={accountEditing ? false : true}
+            className={accountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {pidError ? (
+            <span className="checkInvalid">{pidErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>app_private_key:</p>
+          <input
+            onChange={this.changePrivateKey}
+            onBlur={this.checkPrivateKey}
+            value={appPrivateKey}
+            disabled={accountEditing ? false : true}
+            className={accountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {appPrivateKeyError ? (
+            <span className="checkInvalid">{appPrivateKeyErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>app_public_key:</p>
+          <input
+            onChange={this.changePublicKey}
+            onBlur={this.checkPublicKey}
+            value={appPublicKey}
+            disabled={accountEditing ? false : true}
+            className={accountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {appPublicKeyError ? (
+            <span className="checkInvalid">{appPublicKeyErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>alipay_public_key:</p>
+          <input
+            onChange={this.changeAlipayPublicKey}
+            onBlur={this.checkAlipayPublicKey}
+            value={alipayPublicKey}
+            disabled={accountEditing ? false : true}
+            className={accountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {alipayPublicKeyError ? (
+            <span className="checkInvalid">{alipayPublicKeyErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p />
+          <Button
+            type="primary"
+            className={accountComplete && accountEditing ? '' : 'disabled'}
+            onClick={this.validateAccount}
+          >
+            验证支付宝账号
+          </Button>
+          <Button
+            type="primary"
+            className={validateSuccess ? '' : 'disabled'}
+            onClick={this.editAccount}
+          >
+            编辑支付宝账号
+          </Button>
+          {validateSuccess && !initialAccount ? (
+            <span className="checkInvalid">验证通过，该支付宝账号可用</span>
+          ) : null}
+          {validateFailure ? (
+            <span className="checkInvalid">验证失败，该支付宝账号不可用</span>
+          ) : null}
+        </li>
+      </Fragment>
+    )
+
+    const wxAccount = (
+      <Fragment>
+        <li>
+          <p className="schoolinfo_blockTitle">微信支付信息</p>
+        </li>
+        <li>
+          <p>收款账号:</p>
+          <input
+            onChange={this.changeWxpayAccountName}
+            onBlur={this.checkWxpayAccountName}
+            value={wxpayAccountName}
+            disabled={wxpayAccountEditing ? false : true}
+            className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {wxpayAccountNameError ? (
+            <span className="checkInvalid">{wxpayAccountNameErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>appid:</p>
+          <input
+            onChange={this.changeWxpayAppid}
+            onBlur={this.checkWxpayAppid}
+            value={wxpayAppId}
+            disabled={wxpayAccountEditing ? false : true}
+            className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {wxpayAppidError ? (
+            <span className="checkInvalid">{wxpayAppidErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>mchid:</p>
+          <input
+            onChange={this.changeWxpayMchId}
+            onBlur={this.checkWxpayMchId}
+            value={wxpayMchId}
+            disabled={wxpayAccountEditing ? false : true}
+            className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {wxpayMchIdError ? (
+            <span className="checkInvalid">{wxpayMchIdErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>apikey:</p>
+          <input
+            onChange={this.changeApikey}
+            onBlur={this.checkApikey}
+            value={apikey}
+            disabled={wxpayAccountEditing ? false : true}
+            className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
+          />
+          {apikeyError ? (
+            <span className="checkInvalid">{apiKeyErrorMsg}</span>
+          ) : null}
+        </li>
+        <li>
+          <p>apicert:</p>
+        </li>
+        <li>
+          <p />
+          <Button
+            type="primary"
+            className={accountComplete && accountEditing ? '' : 'disabled'}
+            onClick={this.validateAccount}
+          >
+            验证微信账号
+          </Button>
+          <Button
+            type="primary"
+            className={validateSuccess ? '' : 'disabled'}
+            onClick={this.editAccount}
+          >
+            编辑微信账号
+          </Button>
+          {validateSuccess && !initialAccount ? (
+            <span className="checkInvalid">验证通过，该微信账号可用</span>
+          ) : null}
+          {validateFailure ? (
+            <span className="checkInvalid">验证失败，该微信账号不可用</span>
+          ) : null}
+        </li>
+      </Fragment>
+    )
 
     return (
       <div className="infoList schoolInfoEdit">
@@ -1152,103 +1363,10 @@ class SchoolInfoEdit extends React.Component {
             ) : null}
           </li>
 
-          {accountType === 1 ? (
-            <li>
-              <p>app_id:</p>
-              <input
-                disabled={accountEditing ? false : true}
-                onChange={this.changeAppId}
-                onBlur={this.checkAppId}
-                value={appId}
-                className={accountEditing ? 'longInput' : 'longInput disabled'}
-              />
-              {appIdError ? (
-                <span className="checkInvalid">{appIdErrorMsg}</span>
-              ) : null}
-            </li>
-          ) : null}
-          {accountType === 1 ? (
-            <li>
-              <p>pid:</p>
-              <input
-                onChange={this.changePid}
-                onBlur={this.checkPid}
-                value={pid}
-                disabled={accountEditing ? false : true}
-                className={accountEditing ? 'longInput' : 'longInput disabled'}
-              />
-              {pidError ? (
-                <span className="checkInvalid">{pidErrorMsg}</span>
-              ) : null}
-            </li>
-          ) : null}
-          {accountType === 1 ? (
-            <li>
-              <p>app_private_key:</p>
-              <input
-                onChange={this.changePrivateKey}
-                onBlur={this.checkPrivateKey}
-                value={appPrivateKey}
-                disabled={accountEditing ? false : true}
-                className={accountEditing ? 'longInput' : 'longInput disabled'}
-              />
-              {appPrivateKeyError ? (
-                <span className="checkInvalid">{appPrivateKeyErrorMsg}</span>
-              ) : null}
-            </li>
-          ) : null}
-          {accountType === 1 ? (
-            <li>
-              <p>app_public_key:</p>
-              <input
-                onChange={this.changePublicKey}
-                onBlur={this.checkPublicKey}
-                value={appPublicKey}
-                disabled={accountEditing ? false : true}
-                className={accountEditing ? 'longInput' : 'longInput disabled'}
-              />
-              {appPublicKeyError ? (
-                <span className="checkInvalid">{appPublicKeyErrorMsg}</span>
-              ) : null}
-            </li>
-          ) : null}
-          {accountType === 1 ? (
-            <li>
-              <p>alipay_public_key:</p>
-              <input
-                onChange={this.changeAlipayPublicKey}
-                onBlur={this.checkAlipayPublicKey}
-                value={alipayPublicKey}
-                disabled={accountEditing ? false : true}
-                className={accountEditing ? 'longInput' : 'longInput disabled'}
-              />
-              {alipayPublicKeyError ? (
-                <span className="checkInvalid">{alipayPublicKeyErrorMsg}</span>
-              ) : null}
-            </li>
-          ) : null}
+          {alipayAccount}
+          {hasWxAccount ? wxAccount : null}
           <li>
-            <p />
-            <Button
-              type="primary"
-              className={accountComplete && accountEditing ? '' : 'disabled'}
-              onClick={this.validateAccount}
-            >
-              验证支付宝账号
-            </Button>
-            <Button
-              type="primary"
-              className={validateSuccess ? '' : 'disabled'}
-              onClick={this.editAccount}
-            >
-              编辑支付宝账号
-            </Button>
-            {validateSuccess && !initialAccount ? (
-              <span className="checkInvalid">验证通过，该支付宝账号可用</span>
-            ) : null}
-            {validateFailure ? (
-              <span className="checkInvalid">验证失败，该支付宝账号不可用</span>
-            ) : null}
+            <span>*支付宝必须验证通过，微信支付选填</span>
           </li>
         </ul>
 
