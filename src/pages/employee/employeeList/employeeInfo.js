@@ -613,9 +613,6 @@ class EmployeeInfo extends React.Component {
               <a className="mgr10" onClick={this.showSchools} href="">
                 点击选择
               </a>
-              <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
-              <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
-              <span>xxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
               {schoolLimit ? selectedSchoolItems : <span>不限制学校</span>}
               {schoolError ? (
                 <span className="checkInvalid">请选择最少一个学校！</span>
