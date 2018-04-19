@@ -223,7 +223,8 @@ class TaskList extends React.Component {
       panel_type,
       panel_selectKey,
       panel_page,
-      panel_dataSource
+      panel_dataSource,
+      user
     } = this.props.taskList
     let page = panel_page[main_phase]
     let startTime = panel_startTime[main_phase],
@@ -240,11 +241,15 @@ class TaskList extends React.Component {
     let root = document.getElementById('root')
     root.addEventListener('click', this.closeDetail, false)
 
-    if (!this.props.user.csOnline) {
+    const { isCs, csOnline } = user || {}
+    if (isCs && !csOnline) {
       return
     }
 
-    if (panel_dataSource[main_phase]) {
+    if (
+      panel_dataSource[main_phase] &&
+      panel_dataSource[main_phase].length > 0
+    ) {
       // dataSource has the data
       if (this.state.loading) {
         this.setState({

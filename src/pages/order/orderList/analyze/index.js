@@ -2,7 +2,12 @@ import OrderAnalyzeView from './view.js'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeOrder, setSchoolList, fetchBuildings } from '../../../../actions'
+import {
+  changeOrder,
+  setSchoolList,
+  fetchBuildings,
+  changeTask
+} from '../../../../actions'
 const subModule = 'orderList'
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -27,7 +32,8 @@ let OrderAnalyze = withRouter(
   connect(mapStateToProps, {
     changeOrder,
     setSchoolList,
-    fetchBuildings
+    fetchBuildings,
+    changeTask
   })(OrderAnalyzeView)
 )
 

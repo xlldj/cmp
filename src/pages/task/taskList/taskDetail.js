@@ -563,11 +563,17 @@ class TaskDetail extends React.Component {
     // this.props.hide(false)
     // if showing, get id.
     try {
+      console.log(this.props.location)
       let { details, selectedDetailId } = this.props.taskList
       let id = selectedDetailId,
         nextState = { id }
       if (details && details.creatorId) {
         nextState.creatorId = details.creatorId
+      } else {
+        const body = {
+          id: selectedDetailId
+        }
+        this.fetchTaskDetail(body)
       }
       this.setState(nextState)
     } catch (e) {
@@ -1356,6 +1362,9 @@ class TaskDetail extends React.Component {
       })
     }
   }
+  back = () => {
+    this.props.history.go(-1)
+  }
   render() {
     const {
       showDetailImgs,
@@ -1583,6 +1592,10 @@ class TaskDetail extends React.Component {
       })
 
     const statusClass = status === CONSTANTS.TASK_FINISHED ? '' : 'shalowRed'
+
+    const { state } = this.props.location
+    const { id: queryId } = state || {}
+    console.log(queryId, selectedDetailId)
 
     return (
       <div
@@ -2064,6 +2077,15 @@ class TaskDetail extends React.Component {
                 {status ? CONSTANTS.TASKSTATUS[status] : ''}
               </span>
             </li>
+            {queryId && +queryId === selectedDetailId ? (
+              <Button
+                style={{ marginTop: '20px' }}
+                type="primary"
+                onClick={this.back}
+              >
+                返回
+              </Button>
+            ) : null}
           </ul>
 
           {/* if not 'repair' type, not finished, has right to send message, show send message block. */}

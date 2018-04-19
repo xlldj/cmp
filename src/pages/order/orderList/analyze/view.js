@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react'
+import { Link } from 'react-router-dom'
 
 import { Table, Button, Checkbox } from 'antd'
 import moment from 'moment'
@@ -97,12 +98,22 @@ class OrderAnalyzeView extends React.Component {
     let resource = '/api/order/consumption/device/list'
     AjaxHandler.fetch(resource, body).then(json => {
       let nextState = { loading: false }
+
       if (json && json.data) {
         // select no rows default
-        nextState.dataSource = json.data.list.map(l => {
+        let dataSource = json.data.list.map(l => {
           l.selected = false
           return l
         })
+        const { allRowsOfOrderTableSelected } = this.state
+        if (allRowsOfOrderTableSelected) {
+          dataSource.forEach(d => {
+            if (!d.warningTaskHandling) {
+              d.selected = true
+            }
+          })
+        }
+        nextState.dataSource = dataSource
         nextState.total = json.data.total
         nextState.totalDeviceCount = json.data.totalDeviceCount
         nextState.notHandlingCount = json.data.notHandlingCount
@@ -438,7 +449,16 @@ class OrderAnalyzeView extends React.Component {
         title: '是否存在预警工单',
         dataIndex: 'warningTaskHandling',
         render: (text, record, index) =>
-          record.warningTaskHandling ? '是' : '否'
+          record.warningTaskHandling ? (
+            <span>
+              是 |{' '}
+              <a onClick={e => this.toTaskDetail(e, record.workOrderId)}>
+                查看工单
+              </a>
+            </span>
+          ) : (
+            '否'
+          )
       },
       {
         title: <p className="lastCol">操作</p>,
@@ -458,6 +478,25 @@ class OrderAnalyzeView extends React.Component {
       }
     ]
     return columns
+  }
+  toTaskDetail = (e, id) => {
+    e.preventDefault()
+    this.props.changeTask('taskList', {
+      main_phase: 1, // '处理中'
+      showDetail: true,
+      selectedRowIndex: 0,
+      selectedDetailId: id,
+      details: {},
+      panel_rangeIndex: [0, 0, 0],
+      main_schoolId: 'all',
+      main_mine: 2,
+      panel_type: [1, 1, 1],
+      panel_selectKey: ['', id, '']
+    })
+    this.props.history.push({
+      pathname: '/task/list',
+      state: { path: 'fromOrder', id: id }
+    })
   }
   getSchoolName = () => {
     let { schoolId, schools } = this.props
