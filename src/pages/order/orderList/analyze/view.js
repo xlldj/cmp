@@ -1,16 +1,18 @@
 import React, { Fragment } from 'react'
+import { Link } from 'react-router-dom'
 
 import { Table, Button, Checkbox } from 'antd'
+import moment from 'moment'
 import AjaxHandler from '../../../../util/ajax'
 // import AjaxHandler from '../../../../mock/ajax'
 import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import Noti from '../../../../util/noti'
 
-import RangeSelect from '../../../component/rangeSelect'
 import CheckSelect from '../../../component/checkSelect'
 import ThresholdSelector from '../../../component/thresholdSelector'
 import SetRuleHint from './setRuleHint.js'
+import RangeSelect from './rangeSelectDisableMonth.js'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
 import RepairmanTable from '../../../component/repairmanChooseClean.js'
 
@@ -43,7 +45,8 @@ class OrderAnalyzeView extends React.Component {
       showSetRuleHint: !this.checkRulesReady(this.props),
       selectedRowKeys: [],
       buildingDataSet: {},
-      showBuildingSelect: false
+      showBuildingSelect: false,
+      notHandlingCount: ''
     }
   }
   fetchData = props => {
@@ -95,14 +98,25 @@ class OrderAnalyzeView extends React.Component {
     let resource = '/api/order/consumption/device/list'
     AjaxHandler.fetch(resource, body).then(json => {
       let nextState = { loading: false }
+
       if (json && json.data) {
         // select no rows default
-        nextState.dataSource = json.data.list.map(l => {
+        let dataSource = json.data.list.map(l => {
           l.selected = false
           return l
         })
+        const { allRowsOfOrderTableSelected } = this.state
+        if (allRowsOfOrderTableSelected) {
+          dataSource.forEach(d => {
+            if (!d.warningTaskHandling) {
+              d.selected = true
+            }
+          })
+        }
+        nextState.dataSource = dataSource
         nextState.total = json.data.total
         nextState.totalDeviceCount = json.data.totalDeviceCount
+        nextState.notHandlingCount = json.data.notHandlingCount
       }
       this.setState(nextState)
     })
@@ -175,10 +189,10 @@ class OrderAnalyzeView extends React.Component {
   isThresholdReady = value => {
     // set rules here for threshold
     let v = +value
-    if (!v || v < 0) {
-      return false
+    if (v >= 0) {
+      return true
     }
-    return true
+    return false
   }
   checkRulesReady = props => {
     let { schoolId, threshold, thresholdType } = props || this.props
@@ -202,6 +216,12 @@ class OrderAnalyzeView extends React.Component {
     this.setState({
       startTime: time
     })
+  }
+  disableRule = (startTime, endTime) => {
+    return (
+      startTime < moment(endTime).subtract(1, 'M') &&
+      startTime > moment(endTime)
+    )
   }
   changeEndTime = time => {
     this.setState({
@@ -241,9 +261,16 @@ class OrderAnalyzeView extends React.Component {
     this.props.changeOrder(subModule, { analyze_roomType: value, page: 1 })
   }
   changeThreshold = e => {
-    this.setState({
-      threshold: +e.target.value
-    })
+    let value = e.target.value
+    // no negative, could be fractional
+    let v = parseInt(value, 10)
+    if (v >= 0) {
+      this.setState({
+        threshold: value
+      })
+    } else {
+      this.setState({ threshold: '' })
+    }
   }
   changeThresholdType = v => {
     console.log(v)
@@ -254,8 +281,8 @@ class OrderAnalyzeView extends React.Component {
   confirmThreshold = () => {
     let { threshold, thresholdType } = this.state
     this.props.changeOrder(subModule, {
-      analyze_thresholdType: thresholdType,
-      analyze_threshold: threshold,
+      analyze_thresholdType: thresholdType || 0,
+      analyze_threshold: parseFloat(threshold, 10) || 0,
       page: 1
     })
   }
@@ -317,11 +344,23 @@ class OrderAnalyzeView extends React.Component {
     })
   }
   toggleAllRowsOfOrderTable = () => {
+    const { allRowsOfOrderTableSelected } = this.state
+
+    const dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    if (allRowsOfOrderTableSelected) {
+      // previous all selected, not deselect
+      dataSource.forEach(d => (d.selected = false))
+    } else {
+      dataSource.forEach(d => (d.selected = true))
+    }
     this.setState({
-      allRowsOfOrderTableSelected: !this.state.allRowsOfOrderTableSelected
+      allRowsOfOrderTableSelected: !this.state.allRowsOfOrderTableSelected,
+      dataSource
     })
   }
   toggleOrderRowSelectStatus = (e, deviceId) => {
+    let { allRowsOfOrderTableSelected } = this.state
+
     const dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
     let data = dataSource.find(d => d.deviceId === deviceId)
     if (data) {
@@ -331,8 +370,19 @@ class OrderAnalyzeView extends React.Component {
       }
       data.selected = !data.selected
     }
+    // if 'allRowsOfOrderTableSelected' is true, which means selected all items across pages, need to
+    // toggle it when deselect some item in this page
+    if (allRowsOfOrderTableSelected) {
+      let allRowsInCurrentPageSelected = dataSource
+        .filter(d => d.warningTaskHandling === false)
+        .every(d => d.selected === true)
+      if (!allRowsInCurrentPageSelected) {
+        allRowsOfOrderTableSelected = false
+      }
+    }
     this.setState({
-      dataSource
+      dataSource,
+      allRowsOfOrderTableSelected
     })
   }
   getColumns = () => {
@@ -357,14 +407,20 @@ class OrderAnalyzeView extends React.Component {
         width: '4%',
         dataIndex: 'selected',
         className: 'center',
-        render: (text, record) => (
-          <Checkbox
-            checked={record.selected}
-            onChange={e => {
-              this.toggleOrderRowSelectStatus(e, record.deviceId)
-            }}
-          />
-        )
+        render: (text, record) => {
+          if (record.warningTaskHandling) {
+            return ''
+          } else {
+            return (
+              <Checkbox
+                checked={record.selected}
+                onChange={e => {
+                  this.toggleOrderRowSelectStatus(e, record.deviceId)
+                }}
+              />
+            )
+          }
+        }
       },
       {
         title: '学校',
@@ -393,7 +449,16 @@ class OrderAnalyzeView extends React.Component {
         title: '是否存在预警工单',
         dataIndex: 'warningTaskHandling',
         render: (text, record, index) =>
-          record.warningTaskHandling ? '是' : '否'
+          record.warningTaskHandling ? (
+            <span>
+              是 |{' '}
+              <a onClick={e => this.toTaskDetail(e, record.workOrderId)}>
+                查看工单
+              </a>
+            </span>
+          ) : (
+            '否'
+          )
       },
       {
         title: <p className="lastCol">操作</p>,
@@ -413,6 +478,25 @@ class OrderAnalyzeView extends React.Component {
       }
     ]
     return columns
+  }
+  toTaskDetail = (e, id) => {
+    e.preventDefault()
+    this.props.changeTask('taskList', {
+      main_phase: 1, // '处理中'
+      showDetail: true,
+      selectedRowIndex: 0,
+      selectedDetailId: id,
+      details: {},
+      panel_rangeIndex: [0, 0, 0],
+      main_schoolId: 'all',
+      main_mine: 2,
+      panel_type: [1, 1, 1],
+      panel_selectKey: ['', id, '']
+    })
+    this.props.history.push({
+      pathname: '/task/list',
+      state: { path: 'fromOrder', id: id }
+    })
   }
   getSchoolName = () => {
     let { schoolId, schools } = this.props
@@ -538,10 +622,11 @@ class OrderAnalyzeView extends React.Component {
       showSetRuleHint,
       showBuildingSelect,
       showRepairmanSelect,
-      allRowsOfOrderTableSelected
+      allRowsOfOrderTableSelected,
+      notHandlingCount
     } = this.state
     const selectedRowLengthsOfOrderTable = dataSource.filter(
-      d => d.selected === true
+      d => d.selected === true && d.warningTaskHandling === false
     ).length
     const schoolName = this.getSchoolName()
     const buildingNames =
@@ -576,6 +661,7 @@ class OrderAnalyzeView extends React.Component {
                 changeStartTime={this.changeStartTime}
                 changeEndTime={this.changeEndTime}
                 confirm={this.confirmTimeRange}
+                disableRule={this.disableRule}
               />
             </div>
           </div>
@@ -618,7 +704,6 @@ class OrderAnalyzeView extends React.Component {
             <div className="block orderWarnThresholdWrapper">
               <span className="shortSeperator">消费区间筛选(元):</span>
               <input
-                type="number"
                 className="shortInput"
                 value={threshold}
                 onChange={this.changeThreshold}
@@ -649,13 +734,15 @@ class OrderAnalyzeView extends React.Component {
               />
             </div>
 
-            <div className="block">
-              <span className="seperator">
-                {schoolName} {buildingNames} 共{totalDeviceCount}个设备，当前筛选{
-                  total
-                }个设备
-              </span>
-            </div>
+            {showSetRuleHint ? null : (
+              <div className="block">
+                <span className="seperator">
+                  {schoolName} {buildingNames} 共{totalDeviceCount}个设备，当前筛选{
+                    total
+                  }个设备
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -686,7 +773,7 @@ class OrderAnalyzeView extends React.Component {
                   </Button>
                   <span>
                     {allRowsOfOrderTableSelected
-                      ? '全部订单'
+                      ? `当前选中全部订单${notHandlingCount}条`
                       : `当前选中${selectedRowLengthsOfOrderTable}条`}
                   </span>
                 </div>
@@ -715,7 +802,7 @@ class OrderAnalyzeView extends React.Component {
             schoolName={schoolName}
             taskCount={
               allRowsOfOrderTableSelected
-                ? 'all'
+                ? notHandlingCount
                 : selectedRowLengthsOfOrderTable
             }
           />
