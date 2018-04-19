@@ -8,10 +8,10 @@ import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import Noti from '../../../../util/noti'
 
-import RangeSelect from '../../../component/rangeSelect'
 import CheckSelect from '../../../component/checkSelect'
 import ThresholdSelector from '../../../component/thresholdSelector'
 import SetRuleHint from './setRuleHint.js'
+import RangeSelect from './rangeSelectDisableMonth.js'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
 import RepairmanTable from '../../../component/repairmanChooseClean.js'
 
@@ -207,10 +207,10 @@ class OrderAnalyzeView extends React.Component {
     })
   }
   disableRule = (startTime, endTime) => {
-    if (startTime) {
-      const monthlater = moment(startTime).add(1, 'M')
-      return endTime < monthlater.millisecond()
-    }
+    return (
+      startTime < moment(endTime).subtract(1, 'M') &&
+      startTime > moment(endTime)
+    )
   }
   changeEndTime = time => {
     this.setState({

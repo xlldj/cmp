@@ -60,8 +60,9 @@ const orderModule = (state = initialOrderState, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_ORDER) {
     const { subModule, keyValuePair } = action
-    // return { ...state, ...{ [subModule]: keyValuePair } }
-    return merge({}, state, { [subModule]: keyValuePair })
+    const newSubState = {}
+    newSubState[subModule] = { ...state[subModule], ...keyValuePair }
+    return { ...state, ...newSubState }
   }
   return state
 }

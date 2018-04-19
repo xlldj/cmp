@@ -20,9 +20,13 @@ class BuildingMultiSelectModal extends React.Component {
         r.selected = true
       })
     } else if (selectedItems) {
-      selectedItems.forEach(r => {
-        let building = dataSource.find(rec => rec.id === parseInt(r.id, 10))
-        building.selected = true
+      dataSource.forEach(r => {
+        let item = selectedItems.find(s => s === parseInt(r.id, 10))
+        if (item) {
+          r.selected = true
+        } else {
+          r.selected = false
+        }
       })
     }
 
