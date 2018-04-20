@@ -1718,7 +1718,7 @@ class TaskDetail extends React.Component {
                   <span>{ROOMTYPES[roomType]}</span>
                 </li>
               ) : null}
-              {timeRange && consume ? (
+              {timeRange && consume !== undefined ? (
                 <li>
                   <label>{timeRange}消费总额:</label>
                   <span className="red">{`¥${consume}`}</span>
