@@ -560,6 +560,7 @@ class TimesetInfo extends React.Component {
               onChange={e => {
                 this.handleStartTime(e, i)
               }}
+              style={{ width: '60px' }}
             />
             至
             <TimePicker
