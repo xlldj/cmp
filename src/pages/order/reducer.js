@@ -30,7 +30,7 @@ const initialOrderState = {
     analyze_day: 1, // 1 for 'today', default setting.
     analyze_deviceType: 1,
     analyze_buildingIds: 'all',
-    analyze_roomType: 'all',
+    analyze_roomType: 2, // 2 for 'empty room'
     analyze_startTime: '',
     analyze_endTime: '',
     analyze_threshold: 50,
