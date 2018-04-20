@@ -224,7 +224,7 @@ class TaskList extends React.Component {
       panel_selectKey,
       panel_page,
       panel_dataSource,
-      user
+      showDetail
     } = this.props.taskList
     let page = panel_page[main_phase]
     let startTime = panel_startTime[main_phase],
@@ -241,8 +241,15 @@ class TaskList extends React.Component {
     let root = document.getElementById('root')
     root.addEventListener('click', this.closeDetail, false)
 
+    const { user } = this.props
     const { isCs, csOnline } = user || {}
     if (isCs && !csOnline) {
+      // if jumped from order/warn, and customer is offline, hide detail.
+      if (showDetail) {
+        this.props.changeTask(subModule, {
+          showDetail: false
+        })
+      }
       return
     }
 
