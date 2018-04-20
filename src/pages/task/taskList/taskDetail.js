@@ -564,12 +564,12 @@ class TaskDetail extends React.Component {
     // if showing, get id.
     try {
       console.log(this.props.location)
-      let { details, selectedDetailId } = this.props.taskList
+      let { details, selectedDetailId, showDetail } = this.props.taskList
       let id = selectedDetailId,
         nextState = { id }
       if (details && details.creatorId) {
         nextState.creatorId = details.creatorId
-      } else {
+      } else if (showDetail && selectedDetailId !== -1) {
         const body = {
           id: selectedDetailId
         }
