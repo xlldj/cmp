@@ -7,13 +7,23 @@ class RangeSelector extends React.Component {
     super()
   }
   changeStartTime = data => {
-    let st = parseInt(moment(data).valueOf(), 10)
+    let st = parseInt(
+      moment(data)
+        .startOf('day')
+        .valueOf(),
+      10
+    )
     if (this.props.changeStartTime) {
       this.props.changeStartTime(st)
     }
   }
   changeEndTime = data => {
-    let et = parseInt(moment(data).valueOf(), 10)
+    let et = parseInt(
+      moment(data)
+        .endOf('day')
+        .valueOf(),
+      10
+    )
     if (this.props.changeEndTime) {
       this.props.changeEndTime(et)
     }

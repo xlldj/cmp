@@ -7,13 +7,25 @@ class RangeSelector extends React.Component {
     super()
   }
   changeStartTime = data => {
-    let st = parseInt(moment(data).valueOf(), 10)
+    // startime alway begins with 0:00
+    let st = parseInt(
+      moment(data)
+        .startOf('day')
+        .valueOf(),
+      10
+    )
     if (this.props.changeStartTime) {
       this.props.changeStartTime(st)
     }
   }
   changeEndTime = data => {
-    let et = parseInt(moment(data).valueOf(), 10)
+    // endTime always end with 23:59
+    let et = parseInt(
+      moment(data)
+        .endOf('day')
+        .valueOf(),
+      10
+    )
     if (this.props.changeEndTime) {
       this.props.changeEndTime(et)
     }
