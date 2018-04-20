@@ -193,6 +193,9 @@ button.grayBackColor:linked{
 .seperator{
   margin: 0 20px;
 }
+shortSeperator{
+  margin: 0 8px;
+}
 .leftSeperator{
   margin-left: 10px;
 }
@@ -354,7 +357,7 @@ button.grayBackColor:linked{
   clear:both;
 }
 .center{
-  text-align: center;
+  text-align: center !important;
 }
 .rightAlign{
   text-align: right;
@@ -655,6 +658,7 @@ button.grayBackColor:linked{
       width: 100%;
 
       &>p{
+        flex-shrink: 0;
         width: @labelWidth;
         text-align: right;
         color: #222;
@@ -721,6 +725,19 @@ button.grayBackColor:linked{
         line-height: 22px;
         min-height: 110px;
       }
+    }
+    li.longInput{
+      align-items: flex-start;
+      height: auto;
+      min-height: @liHeight;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      line-height: 22px;
+      .detailContent{
+        display: inline-block;
+        max-width: 180px;
+        line-height: 22px;
+      } 
     }
   }
   .btnArea{
@@ -1714,6 +1731,17 @@ button.grayBackColor:linked{
   }
 }
 
+.thresholdSelector{
+  width: 80px;
+}
+
+// multi select modal
+.multiSelect_header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 40px;
+}
 
 @media screen and (min-width: 1440px) {
   body {

@@ -1,5 +1,5 @@
 import React from 'react'
-import Breadcrumb from 'antd/lib/breadcrumb'
+import { Breadcrumb } from 'antd'
 import { withRouter, Link } from 'react-router-dom'
 
 const Bread = withRouter(props => {

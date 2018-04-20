@@ -63,7 +63,8 @@ const TASKTYPES = {
   1: '不限',
   2: '报修',
   3: '账单投诉',
-  4: '意见反馈'
+  4: '意见反馈',
+  5: '消费预警'
 }
 const TARGETS = {
   1: '我的任务',
@@ -222,7 +223,8 @@ class TaskList extends React.Component {
       panel_type,
       panel_selectKey,
       panel_page,
-      panel_dataSource
+      panel_dataSource,
+      showDetail
     } = this.props.taskList
     let page = panel_page[main_phase]
     let startTime = panel_startTime[main_phase],
@@ -239,11 +241,22 @@ class TaskList extends React.Component {
     let root = document.getElementById('root')
     root.addEventListener('click', this.closeDetail, false)
 
-    if (!this.props.user.csOnline) {
+    const { user } = this.props
+    const { isCs, csOnline } = user || {}
+    if (isCs && !csOnline) {
+      // if jumped from order/warn, and customer is offline, hide detail.
+      if (showDetail) {
+        this.props.changeTask(subModule, {
+          showDetail: false
+        })
+      }
       return
     }
 
-    if (panel_dataSource[main_phase]) {
+    if (
+      panel_dataSource[main_phase] &&
+      panel_dataSource[main_phase].length > 0
+    ) {
       // dataSource has the data
       if (this.state.loading) {
         this.setState({

@@ -171,7 +171,19 @@ class Log extends React.Component {
           this.handleLogError(json.error)
         } else {
           let { nickName, id, pictureUrl } = json.data.user
-          let { fullPrivileges, privileges, isCs } = json.data
+          // handle schoolLimit, set to redux store and sessionStorage
+          let { fullPrivileges, privileges, isCs, schoolLimit } = json.data
+          if (schoolLimit) {
+            this.props.setAuthenData({
+              schoolLimit: true
+            })
+            setStore('schoolLimit', 1)
+          } else {
+            this.props.setAuthenData({
+              schoolLimit: false
+            })
+            removeStore('schoolLimit')
+          }
           // set global pribileges info
           if (fullPrivileges && privileges) {
             // set full privileges data

@@ -1,5 +1,5 @@
 {
-  "plugins": ["transform-class-properties", ["import", { "libraryName": "antd"}]],
+  "plugins": ["transform-class-properties", "syntax-dynamic-import"],
   "env": {
     "test": {
       "plugins": ["transform-es2015-modules-commonjs"]

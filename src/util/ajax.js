@@ -19,7 +19,7 @@ const domains = {
     user: 'https://api.xiaolian365.com/c'
   }
 }
-const currentDomain = domains.server
+const currentDomain = domains.qa
 
 const AjaxHandler = {
   showingError: false
@@ -235,7 +235,7 @@ const abortablePromise = (
   /* reject timeout promise after 5s */
   setTimeout(() => {
     timeoutAction()
-  }, 10000)
+  }, 5000)
 
   return abortable_promise
 }

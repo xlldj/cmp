@@ -11,6 +11,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter')
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin')
 const getClientEnvironment = require('./env')
 const paths = require('./paths')
+const happypack = require('happypack')
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -38,7 +39,12 @@ module.exports = {
       require.resolve('./polyfills'),
       require.resolve('react-error-overlay'),
       paths.appIndexJs
-    ]
+    ],
+    vendor: ['lodash', 'moment'],
+    draftjs: ['draft-js'],
+    react: ['react', 'react-dom', 'react-router-dom'],
+    antd: ['antd'],
+    recharts: ['recharts']
   },
   output: {
     path: paths.appBuild,
@@ -47,7 +53,8 @@ module.exports = {
     chunkFilename: 'static/js/[name].chunk.js',
     publicPath: publicPath,
     devtoolModuleFilenameTemplate: info =>
-      path.resolve(info.absoluteResourcePath)
+      path.resolve(info.absoluteResourcePath),
+    libraryTarget: 'umd'
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -85,15 +92,9 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         enforce: 'pre',
-        use: [
-          {
-            options: {
-              formatter: eslintFormatter
-            },
-            loader: require.resolve('eslint-loader')
-          }
-        ],
-        include: paths.appSrc
+        use: 'happypack/loader?id=eslint',
+        include: paths.appSrc,
+        exclude: paths.appNodeModules
       },
       {
         exclude: [
@@ -122,24 +123,13 @@ module.exports = {
       // Process JS with Babel.
       {
         test: /\.(js|jsx)$/,
+        use: 'happypack/loader?id=babel',
         include: paths.appSrc,
-        use: [
-          {
-            loader: require.resolve('babel-loader'),
-            query: {
-              presets: ['es2015', 'stage-0', 'react'],
-              plugins: [['import', { libraryName: 'antd' }]]
-            }
-          }
-        ]
+        exclude: paths.appNodeModules
       },
       {
         test: /\.less$/,
-        use: [
-          { loader: 'style-loader' },
-          { loader: 'css-loader' },
-          { loader: 'less-loader' }
-        ]
+        use: 'happypack/loader?id=less'
       },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -183,6 +173,38 @@ module.exports = {
     ]
   },
   plugins: [
+    new happypack({
+      id: 'less',
+      loaders: ['style-loader', 'css-loader', 'less-loader']
+    }),
+    new happypack({
+      id: 'eslint',
+      loaders: [
+        {
+          loader: require.resolve('eslint-loader'),
+          options: {
+            formatter: eslintFormatter
+          }
+        }
+      ]
+    }),
+    new happypack({
+      id: 'babel',
+      loaders: [
+        {
+          // loader: require.resolve('babel-loader'),
+          loader: require.resolve('babel-loader'),
+          query: {
+            presets: ['es2015', 'stage-0', 'react']
+          }
+        }
+      ]
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      names: ['recharts', 'antd', 'react', 'draftjs', 'vendor'],
+      filename: '[name].bundle.js',
+      minChunks: 2
+    }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">

@@ -125,9 +125,14 @@ const BASIC = {
       icon: 'pay-circle-o',
       children: [
         {
-          name: '资金列表',
+          name: '充值列表',
           path: 'list',
           key: 0
+        },
+        {
+          name: '提现列表',
+          path: 'withdrawList',
+          key: 5
         },
         {
           name: '提现时间',

@@ -6,7 +6,7 @@
 */
 
 import React from 'react'
-import { Route, Redirect, Link } from 'react-router-dom'
+import { Route, Redirect, Link, withRouter } from 'react-router-dom'
 import { asyncComponent } from './component/asyncComponent'
 import { Layout, Dropdown, Menu, Badge } from 'antd'
 import MyMenu from './nav/myMenu'
@@ -19,7 +19,6 @@ import { removeStore } from './../util/storage'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import {
   changeSchool,
   changeDevice,
@@ -43,6 +42,8 @@ import {
 import { heartBeat, stopBeat } from '../tasks/heartBeat'
 
 import DeviceDisp from './device/deviceDisp'
+
+const REFRESHTIMEOUT = 5000
 const Welcome = asyncComponent(() =>
   import(/* webpackChunkName: "welcome" */ './welcome/welcome')
 )
@@ -176,6 +177,7 @@ class Main extends React.Component {
     // clear online status when window is closed.
     // can't clear, it will offline when user refresh.
     // window.onbeforeunload = this.clearOnline;
+    this.ti = null
 
     // set school list globally
     this.props.setSchoolList({
@@ -223,6 +225,7 @@ class Main extends React.Component {
   hintRelog = () => {
     const logout = () => {
       removeStore('logged')
+      removeStore('schoolLimit')
       window.location.assign('/')
     }
     Noti.hintAndClick(
@@ -384,25 +387,25 @@ class Main extends React.Component {
     this.props.logout()
   }
   hide = v => {
+    // debugger
     // hide means if to hide the main content or not
+    /**
+     * @2018/4/10
+     * no longer set ti in state, to keep it immediately change other than set it as a batch.
+     */
     let loading = this.refs.contentLoading
     if (v) {
       // loading , need to show the loading div
       loading && loading.classList.remove('hide')
-      let nextState = {}
       // if wait for more than 5s, refresh the web
-      nextState.ti = setTimeout(this.refresh, 5000)
-      this.setState(nextState)
+      this.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
     } else {
       // add 'hide' to not display loading
       loading && loading.classList.add('hide')
-      let { ti } = this.state
-      if (ti) {
-        clearTimeout(ti)
-        this.setState({
-          ti: null
-        })
+      if (this.ti) {
+        clearTimeout(this.ti)
       }
+      this.ti = null
     }
   }
   refresh = () => {

@@ -1,11 +1,12 @@
 import * as ActionTypes from '../actions'
 import { merge } from 'lodash'
 import { combineReducers } from 'redux'
-import { getLocal } from '../util/storage'
+import { getLocal, getStore } from '../util/storage'
 import Time from '../util/time'
 
 import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
+import buildingsSet from './building'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -41,7 +42,8 @@ const initialAuthenData = {
   forbiddenStatus: {},
   authenSet: false,
   mainNavs: [],
-  subNavs: {}
+  subNavs: {},
+  schoolLimit: getStore('schoolLimit') ? true : false // if employee has rights to check all schools, this is true; or else is false
 }
 const setAuthenData = (state = initialAuthenData, action) => {
   const { type } = action
@@ -107,6 +109,7 @@ const setSchoolList = (state = initialSchools, action) => {
       selectedSchool = action.value.schools[0].id.toString()
     }
     const value = action.value
+    console.log(value, { ...state, ...value })
     // console.log({...state, ...value})
     return { ...state, ...value }
   }
@@ -207,7 +210,10 @@ const deviceModule = (state = initialDeviceState, action) => {
 
   if (type === ActionTypes.CHANGE_DEVICE) {
     const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
+    const newSubState = {}
+    newSubState[subModule] = { ...state[subModule], ...keyValuePair }
+    return { ...state, ...newSubState }
+    // return merge({}, state, { [subModule]: keyValuePair })
   }
   return state
 }
@@ -218,6 +224,15 @@ const initialFundState = {
     page: 1,
     schoolId: selectedSchool,
     type: 'all',
+    status: 'all',
+    selectKey: '',
+    startTime: Time.get7DaysAgoStart(),
+    endTime: Time.getTodayEnd(),
+    userType: 'all'
+  },
+  withdrawList: {
+    page: 1,
+    schoolId: selectedSchool,
     status: 'all',
     selectKey: '',
     startTime: Time.get7DaysAgoStart(),
@@ -487,7 +502,8 @@ const rootReducer = combineReducers({
   setRoleList,
   setTagList,
   setUserInfo,
-  setGifts
+  setGifts,
+  buildingsSet
 })
 
 export default rootReducer

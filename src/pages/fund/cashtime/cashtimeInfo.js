@@ -77,16 +77,12 @@ class CashtimeInfo extends React.Component {
   }
 
   componentDidMount() {
-    this.props.hide(false)
     if (this.props.match.params.id) {
       const body = {
         id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
     }
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   completeEdit = () => {
     if (!this.state.schoolId) {

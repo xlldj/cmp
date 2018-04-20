@@ -15,8 +15,11 @@ import { changeFund } from '../../actions'
 const ChargeContainer = asyncComponent(() =>
   import(/* webpackChunkName: "chargeContainer" */ './charge/chargeContainer')
 )
-const FundContainer = asyncComponent(() =>
-  import(/* webpackChunkName: "fundContainer" */ './fundList/fundContainer')
+const RechargeContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "rechargeContainer" */ './rechargeList/container')
+)
+const WithdrawContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "withdrawContainer" */ './withdrawList/container')
 )
 const DepositContainer = asyncComponent(() =>
   import(/* webpackChunkName: "chargeList" */ './deposit/depositContainer')
@@ -29,8 +32,10 @@ const AbnormalContainer = asyncComponent(() =>
 )
 
 const breadcrumbNameMap = {
-  '/list': '资金列表',
-  '/list/fundInfo': '资金详情',
+  '/list': '充值列表',
+  '/list/info': '充值详情',
+  '/withdrawList': '提现列表',
+  '/withdrawList/info': '提现详情',
   '/charge': '充值面额',
   '/charge/addCharge': '添加充值面额',
   '/charge/editCharge': '编辑充值面额',
@@ -44,6 +49,12 @@ const breadcrumbNameMap = {
 }
 
 class FundDisp extends React.Component {
+  componentDidMount() {
+    this.props.hide(false)
+  }
+  componentWillUnmount() {
+    this.props.hide(true)
+  }
   setStatusForfund = () => {
     this.clearStatus4fundIIlist()
   }
@@ -138,7 +149,13 @@ class FundDisp extends React.Component {
             <Route
               path="/fund/list"
               render={props => (
-                <FundContainer hide={this.props.hide} {...props} />
+                <RechargeContainer hide={this.props.hide} {...props} />
+              )}
+            />
+            <Route
+              path="/fund/withdrawList"
+              render={props => (
+                <WithdrawContainer hide={this.props.hide} {...props} />
               )}
             />
             <Route

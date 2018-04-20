@@ -64,3 +64,53 @@ textarea {
   margin-bottom: 20px;
   margin-right: 20px;
 }
+.orderWarnWrapper .tableList {
+  margin-top: 20px;
+}
+.orderWarnSet .buildRuleBtn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+.customized_select_option {
+  margin: 0 8px;
+}
+.orderWarnThresholdWrapper > input {
+  height: 30px;
+  margin: 0 8px;
+}
+.orderWarnThresholdWrapper > button {
+  margin-left: 8px;
+}
+.setRuleHintWrapper {
+  width: 100%;
+  border: 1px solid #eee;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.setRuleHintWrapper .setRuleHintWrapper_header {
+  height: 45px;
+  background-color: #f7f7f7;
+}
+.setRuleHintWrapper .setRuleHintWrapper_content {
+  height: 60px;
+}
+.setRuleHintWrapper .setRuleHintWrapper_content p {
+  text-align: center;
+  line-height: 60px;
+  color: #ccc;
+}
+.orderWarnListWrapper .orderWarnThresholdWrapper > input {
+  text-align: left;
+}
+.orderWarnListWrapper .tableList {
+  position: relative;
+}
+.orderWarnListWrapper .tableList .buildTaskWrapper {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+}
+.orderWarnListWrapper .tableList .buildTaskWrapper button {
+  margin-right: 10px;
+}

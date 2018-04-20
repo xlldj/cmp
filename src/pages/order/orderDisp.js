@@ -24,7 +24,8 @@ const breadcrumbNameMap = {
   '/list': '订单列表',
   '/list/orderInfo': '详情',
   '/abnormal': '异常订单',
-  '/abnormal/detail': '详情'
+  '/abnormal/detail': '详情',
+  '/warning': '消费预警'
 }
 
 class OrderDisp extends React.Component {

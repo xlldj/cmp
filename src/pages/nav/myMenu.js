@@ -101,13 +101,7 @@ class MyMenu extends React.Component {
     }
     */
     this.rootBlock = rootBlock
-    /*
-    if (rootBlock.length > 0) {
-      this.rootBlock = rootBlock
-    } else {
-      this.rootBlock = CONSTANTS.rootBlock
-    }
-    */
+    // this.rootBlock = CONSTANTS.rootBlock
     this.changeMenu()
   }
   componentDidUpdate() {
@@ -223,7 +217,7 @@ class MyMenu extends React.Component {
     this.clearStatus4deviceIIlist()
   }
   clearStatus4deviceIIlist = () => {
-    this.getDefaultSchool()
+    // this.getDefaultSchool()
     this.props.changeDevice('deviceList', {
       page: 1,
       deviceType: 'all',

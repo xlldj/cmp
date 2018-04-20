@@ -202,12 +202,8 @@ class DepositInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   componentDidMount() {
-    this.props.hide(false)
     // this.fetchSchools()
     this.fetchGifts()
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
 
   handleBack = () => {

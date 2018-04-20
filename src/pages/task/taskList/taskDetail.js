@@ -41,7 +41,9 @@ const {
   WASHER_RATE_TYPES,
   DEVICE_TYPE_WASHER,
   TASK_HANDLE_BUILD,
-  NORMAL_DAY_7
+  NORMAL_DAY_7,
+  TASKTYPE,
+  ROOMTYPES
 } = CONSTANTS
 const subModule = 'taskList'
 
@@ -85,12 +87,6 @@ const TAB2HINT = {
   7: '用户近五次充值提现',
   8: '用户近五次投诉',
   9: '用户近五次反馈'
-}
-
-const TASKTYPE = {
-  1: '报修工单',
-  2: '投诉工单',
-  3: '意见反馈'
 }
 
 const roleModalName = {
@@ -567,11 +563,17 @@ class TaskDetail extends React.Component {
     // this.props.hide(false)
     // if showing, get id.
     try {
-      let { details, selectedDetailId } = this.props.taskList
+      console.log(this.props.location)
+      let { details, selectedDetailId, showDetail } = this.props.taskList
       let id = selectedDetailId,
         nextState = { id }
       if (details && details.creatorId) {
         nextState.creatorId = details.creatorId
+      } else if (showDetail && selectedDetailId !== -1) {
+        const body = {
+          id: selectedDetailId
+        }
+        this.fetchTaskDetail(body)
       }
       this.setState(nextState)
     } catch (e) {
@@ -1218,7 +1220,7 @@ class TaskDetail extends React.Component {
         this.props.changeFund('fundList', {
           page: 1,
           selectKey: userMobile ? userMobile.toString() : '',
-          type: 'all',
+          // type: 'all', // deprecated @2018/4/10
           status: 'all',
           schoolId: 'all',
           startTime: Time.get7DaysAgoStart(),
@@ -1360,6 +1362,9 @@ class TaskDetail extends React.Component {
       })
     }
   }
+  back = () => {
+    this.props.history.go(-1)
+  }
   render() {
     const {
       showDetailImgs,
@@ -1428,8 +1433,12 @@ class TaskDetail extends React.Component {
       type,
       exist,
       handleLimit,
-      level
+      level,
+      deviceConsumeWarn
     } = detail
+
+    // detail of warn type
+    const { roomType, timeRange, consume } = deviceConsumeWarn || {}
 
     let denomination =
       parseInt(deviceType, 10) === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
@@ -1546,19 +1555,23 @@ class TaskDetail extends React.Component {
             message = '创建工单'
             break
           case CONSTANTS.TASK_HANDLE_REASSIGN:
-            message = '转接工单' + (assignName ? `给${assignName}` : '')
+            message =
+              '转接工单' +
+              (assignName ? `给${assignName}` : '') +
+              (content ? ` 备注信息: ${content}` : '')
             break
           case CONSTANTS.TASK_HANDLE_ACCEPT:
             message = (assignName ? assignName : '') + '接受工单'
             break
           case CONSTANTS.TASK_HANDLE_REFUSE:
-            message = '拒绝工单'
+            message = '拒绝工单' + (content ? ` 拒绝原因: ${content}` : '')
             break
           case CONSTANTS.TASK_HANDLE_SENDMESSAGE:
-            message = '发送客服消息给用户: ' + (content ? content : '')
+            message =
+              '发送客服消息给用户: ' + (content ? ` 客服消息: ${content}` : '')
             break
           case CONSTANTS.TASK_HANDLE_FINISH:
-            message = '完结工单'
+            message = '完结工单' + (content ? ` 备注信息: ${content}` : '')
             break
           default:
             message = ''
@@ -1579,6 +1592,10 @@ class TaskDetail extends React.Component {
       })
 
     const statusClass = status === CONSTANTS.TASK_FINISHED ? '' : 'shalowRed'
+
+    const { state } = this.props.location
+    const { id: queryId } = state || {}
+    console.log(queryId, selectedDetailId)
 
     return (
       <div
@@ -1606,7 +1623,7 @@ class TaskDetail extends React.Component {
             {type ? TASKTYPE[type] : ''} {schoolName ? schoolName : ''}
           </h3>
           {type === 1 ? (
-            <ul className="detailList">
+            <ul className="task-detailList">
               <li>
                 <label>设备类型:</label>
                 <span>{CONSTANTS.DEVICETYPE[deviceType]}</span>
@@ -1638,7 +1655,7 @@ class TaskDetail extends React.Component {
             </ul>
           ) : null}
           {type === 2 ? (
-            <ul className="detailList">
+            <ul className="task-detailList">
               <li>
                 <label>投诉类型:</label>
                 <span>{CONSTANTS.COMPLAINTTYPES[orderType]}</span>
@@ -1664,7 +1681,7 @@ class TaskDetail extends React.Component {
             </ul>
           ) : null}
           {type === 3 ? (
-            <ul className="detailList">
+            <ul className="task-detailList">
               <li>
                 <label>反馈类型:</label>
                 <span>{CONSTANTS.FEEDBACKTYPES[opt]}</span>
@@ -1683,6 +1700,30 @@ class TaskDetail extends React.Component {
                 <label>反馈用户:</label>
                 <span>{userMobile}</span>
               </li>
+            </ul>
+          ) : null}
+          {type === 4 ? (
+            <ul className="task-detailList">
+              <li>
+                <label>设备类型:</label>
+                <span>{CONSTANTS.DEVICETYPE[deviceType]}</span>
+              </li>
+              <li>
+                <label>设备位置:</label>
+                <span>{location}</span>
+              </li>
+              {roomType ? (
+                <li>
+                  <label>宿舍类型:</label>
+                  <span>{ROOMTYPES[roomType]}</span>
+                </li>
+              ) : null}
+              {timeRange && consume !== undefined ? (
+                <li>
+                  <label>{timeRange}消费总额:</label>
+                  <span className="red">{`¥${consume}`}</span>
+                </li>
+              ) : null}
             </ul>
           ) : null}
 
@@ -1787,7 +1828,7 @@ class TaskDetail extends React.Component {
           {env === 1 ? (
             <div className="taskDetail-panelWrapper">
               {currentTab === 1 ? (
-                <ul className="detailList">
+                <ul className="task-detailList">
                   <li>
                     <label>手机型号:</label>
                     <span>
@@ -1848,7 +1889,7 @@ class TaskDetail extends React.Component {
               ) : null}
               {currentTab === 4 ? (
                 exist ? (
-                  <ul className="detailList">
+                  <ul className="task-detailList">
                     <li>
                       <label>绑定时间:</label>
                       <span>
@@ -1879,7 +1920,7 @@ class TaskDetail extends React.Component {
                     ) : null}
                   </ul>
                 ) : (
-                  <ul className="detailList">
+                  <ul className="task-detailList">
                     <li>
                       <label>绑定时间:</label>
                       <span>该设备已解绑</span>
@@ -2005,7 +2046,7 @@ class TaskDetail extends React.Component {
 
         <div className="taskDetail-sidebar">
           <h3>工单信息</h3>
-          <ul className="detailList">
+          <ul className="task-detailList">
             <li>
               <label>工单编号:</label>
               <span>{id}</span>
@@ -2036,6 +2077,15 @@ class TaskDetail extends React.Component {
                 {status ? CONSTANTS.TASKSTATUS[status] : ''}
               </span>
             </li>
+            {queryId && +queryId === selectedDetailId ? (
+              <Button
+                style={{ marginTop: '20px' }}
+                type="primary"
+                onClick={this.back}
+              >
+                返回
+              </Button>
+            ) : null}
           </ul>
 
           {/* if not 'repair' type, not finished, has right to send message, show send message block. */}
