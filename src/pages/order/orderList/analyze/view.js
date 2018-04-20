@@ -87,7 +87,7 @@ class OrderAnalyzeView extends React.Component {
       body.deviceType = parseInt(deviceType, 10)
     }
     if (roomType !== 'all') {
-      body.status = parseInt(roomType, 10)
+      body.roomType = parseInt(roomType, 10)
     }
     if (warnTaskStatus !== 'all') {
       // body.warnTaskStatus = parseInt(warnTaskStatus, 10)

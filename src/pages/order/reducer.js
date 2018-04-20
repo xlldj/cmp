@@ -1,4 +1,3 @@
-import { merge } from 'lodash'
 import CONSTANTS from '../../constants'
 import getDefaultSchool from '../../util/defaultSchool'
 import Time from '../../util/time'
@@ -34,8 +33,8 @@ const initialOrderState = {
     analyze_roomType: 'all',
     analyze_startTime: '',
     analyze_endTime: '',
-    analyze_threshold: 0,
-    analyze_thresholdType: 1, // 1 means minimun, 2 means maximum
+    analyze_threshold: 50,
+    analyze_thresholdType: 2, // 1 means minimun, 2 means maximum
     analyze_page: 1,
     analyze_order: '',
     analyze_warnTaskStatus: 'all' // if device has task of order warning type. 'all' for all devices
