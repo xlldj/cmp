@@ -5,7 +5,7 @@ import { Map, Marker } from 'react-amap'
 import Noti from '../../../util/noti'
 import PicturesWall from '../../component/picturesWall'
 
-import { Cascader, Button, Radio } from 'antd'
+import { Cascader, Button, Radio, Upload, Icon } from 'antd'
 import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'
@@ -268,7 +268,7 @@ class SchoolInfoEdit extends React.Component {
       initialAccount: false, // when edit a school info, show the account info has not been changed
 
       hasWxAccount: true,
-      wxpayAccountEditing: true,
+
       wxpayAccountName: '',
       wxpayAccountNameError: false,
       wxpayAccountNameErrorMsg: '',
@@ -278,9 +278,19 @@ class SchoolInfoEdit extends React.Component {
       wxpayMchId: '',
       wxpayMchIdError: false,
       wxpayMchIdErrorMsg: '',
-      apikey: '',
-      apikeyError: false,
-      apiKeyErrorMsg: ''
+      wxpayApiKey: '',
+      wxpayApiKeyError: false,
+      wxpayApiKeyErrorMsg: '',
+      wxpayCertId: '',
+      wxpayCertIdError: false,
+      wxpayCertIdErrorMsg: '',
+      wxpayCertFile: [],
+
+      wxAccountComplete: false,
+      wxpayAccountEditing: true,
+      initialWxpayAccount: false,
+      wxValidateSuccess: false,
+      wxValidateFailure: false
     }
   }
   fetchData = body => {
@@ -761,6 +771,30 @@ class SchoolInfoEdit extends React.Component {
       return false
     }
   }
+
+  checkWxAccountComplete = state => {
+    let {
+      wxpayAccountName,
+      wxpayAppId,
+      wxpayMchId,
+      wxpayApiKey,
+      wxpayCertId
+    } = {
+      ...this.state,
+      ...state
+    }
+    if (
+      wxpayAccountName &&
+      wxpayAppId &&
+      wxpayMchId &&
+      wxpayApiKey &&
+      wxpayCertId
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
   changeAppId = e => {
     this.setState({
       appId: e.target.value
@@ -781,6 +815,86 @@ class SchoolInfoEdit extends React.Component {
       this.setState({
         validateFailure: false
       })
+    }
+  }
+
+  changeWxpayAccountName = e => {
+    this.setState({
+      wxpayAccountName: e.target.value
+    })
+    let state = {
+      wxpayAccountName: e.target.value
+    }
+    if (this.checkWxAccountComplete(state)) {
+      this.setState({
+        wxAccountComplete: true
+      })
+    } else if (this.state.wxAccountComplete) {
+      this.setState({
+        wxAccountComplete: false
+      })
+    }
+    if (this.state.wxValidateFailure) {
+      this.setState({
+        wxValidateFailure: false
+      })
+    }
+  }
+  checkWxpayAccountName = e => {
+    let v = e.target.value
+    if (!v) {
+      return this.setState({
+        wxpayAccountNameError: true,
+        wxpayAccountName: v,
+        wxpayAccountNameErrorMsg: 'appId不能为空'
+      })
+    }
+    let { wxpayAccountNameError } = this.state
+    const nextState = {
+      appId: v,
+      appIdErrorMsg: ''
+    }
+    if (wxpayAccountNameError) {
+      nextState.appIdError = false
+    }
+    this.setState(nextState)
+  }
+
+  changeWxInputWrapper = keyName => {
+    return e => {
+      const nextState = {}
+      nextState[keyName] = e.target.value
+      let state = {
+        [keyName]: e.target.value
+      }
+      if (this.checkWxAccountComplete(state)) {
+        nextState.wxAccountComplete = true
+      } else if (this.state.wxAccountComplete) {
+        nextState.wxAccountComplete = false
+      }
+      if (this.state.wxValidateFailure) {
+        nextState.wxValidateFailure = false
+      }
+      this.setState(nextState)
+    }
+  }
+  checkInputWrapper = (keyName, keyErrorFlag, keyErrorMsg) => {
+    return e => {
+      let v = e.target.value
+      if (!v) {
+        const nextState = {}
+        nextState[keyName] = v
+        nextState[keyErrorFlag] = true
+        nextState[keyErrorMsg] = `${keyName}不能为空`
+        return this.setState(nextState)
+      }
+      const nextState = {}
+      nextState[keyName] = v
+      nextState[keyErrorMsg] = ''
+      if (this.state[keyErrorFlag]) {
+        nextState[keyErrorFlag] = false
+      }
+      this.setState(nextState)
     }
   }
   checkAppId = e => {
@@ -966,6 +1080,66 @@ class SchoolInfoEdit extends React.Component {
     }
     this.setState(nextState)
   }
+  validateWxAccount = () => {
+    let {
+      wxpayAccountEditing,
+      wxAccountComplete,
+      wxpayAccountName,
+      wxpayApiKey,
+      wxpayMchId,
+      wxpayAppId,
+      wxpayCertId,
+      wxChecking
+    } = this.state
+    if (!wxAccountComplete || !wxpayAccountEditing || wxChecking) {
+      return
+    }
+    this.setState({
+      wxChecking: true
+    })
+
+    let resource = '/alipay/trade/verification'
+    const body = {
+      wxpayAccountName,
+      wxpayApiKey,
+      wxpayAppId,
+      wxpayMchId,
+      wxpayCertId
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      const nextState = {
+        checking: false
+      }
+      if (json && json.data) {
+        if (json.data.result) {
+          nextState.wxValidateSuccess = true
+          nextState.wxpayAccountEditing = false
+        } else {
+          nextState.wxValidateFailure = true
+        }
+      }
+      this.setState(nextState)
+    })
+  }
+
+  editWxAccount = () => {
+    /* 置位validateSuccess, validateFailure, accountComplete, accountEditing, 以及账户相关信息 */
+    const nextState = {
+      wxpayAccountEditing: true,
+      wxValidateSuccess: false,
+      wxValidateFailure: false,
+      wxAccountComplete: false,
+      wxpayAccountName: '',
+      wxpayAppId: '',
+      wxpayApiKey: '',
+      wxpayMchId: '',
+      wxpayCertId: ''
+    }
+    if (this.state.initialAccount) {
+      nextState.initialAccount = false
+    }
+    this.setState(nextState)
+  }
 
   validateAccount = () => {
     let {
@@ -1081,9 +1255,16 @@ class SchoolInfoEdit extends React.Component {
       wxpayMchId,
       wxpayMchIdError,
       wxpayMchIdErrorMsg,
-      apikey,
-      apikeyError,
-      apiKeyErrorMsg
+      wxpayApiKey,
+      wxpayApiKeyError,
+      wxpayApiKeyErrorMsg,
+
+      wxAccountComplete,
+      wxValidateSuccess,
+      wxValidateFailure,
+      initialWxpayAccount,
+
+      wxpayCertFile
     } = this.state
 
     const alipayAccount = (
@@ -1181,7 +1362,11 @@ class SchoolInfoEdit extends React.Component {
         </li>
       </Fragment>
     )
-
+    const uploadButton = (
+      <div className="uploadButton">
+        <Icon type="plus" />
+      </div>
+    )
     const wxAccount = (
       <Fragment>
         <li>
@@ -1190,8 +1375,12 @@ class SchoolInfoEdit extends React.Component {
         <li>
           <p>收款账号:</p>
           <input
-            onChange={this.changeWxpayAccountName}
-            onBlur={this.checkWxpayAccountName}
+            onChange={this.changeWxInputWrapper('wxpayAccountName')}
+            onBlur={this.checkInputWrapper(
+              'wxpayAccountName',
+              'wxpayAccountNameError',
+              'wxpayAccountNameErrorMsg'
+            )}
             value={wxpayAccountName}
             disabled={wxpayAccountEditing ? false : true}
             className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
@@ -1203,8 +1392,12 @@ class SchoolInfoEdit extends React.Component {
         <li>
           <p>appid:</p>
           <input
-            onChange={this.changeWxpayAppid}
-            onBlur={this.checkWxpayAppid}
+            onChange={this.changeWxInputWrapper('wxpayAppId')}
+            onBlur={this.checkInputWrapper(
+              'wxpayAppId',
+              'wxpayAppidError',
+              'wxpayAppidErrorMsg'
+            )}
             value={wxpayAppId}
             disabled={wxpayAccountEditing ? false : true}
             className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
@@ -1216,8 +1409,12 @@ class SchoolInfoEdit extends React.Component {
         <li>
           <p>mchid:</p>
           <input
-            onChange={this.changeWxpayMchId}
-            onBlur={this.checkWxpayMchId}
+            onChange={this.changeWxInputWrapper('wxpayMchId')}
+            onBlur={this.checkInputWrapper(
+              'wxpayMchId',
+              'wxpayMchIdError',
+              'wxpayMchIdErrorMsg'
+            )}
             value={wxpayMchId}
             disabled={wxpayAccountEditing ? false : true}
             className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
@@ -1229,39 +1426,58 @@ class SchoolInfoEdit extends React.Component {
         <li>
           <p>apikey:</p>
           <input
-            onChange={this.changeApikey}
-            onBlur={this.checkApikey}
-            value={apikey}
+            onChange={this.changeWxInputWrapper('wxpayApiKey')}
+            onBlur={this.checkInputWrapper(
+              'wxpayApiKey',
+              'wxpayApiKeyError',
+              'wxpayApiKeyErrorMsg'
+            )}
+            value={wxpayApiKey}
             disabled={wxpayAccountEditing ? false : true}
             className={wxpayAccountEditing ? 'longInput' : 'longInput disabled'}
           />
-          {apikeyError ? (
-            <span className="checkInvalid">{apiKeyErrorMsg}</span>
+          {wxpayApiKeyError ? (
+            <span className="checkInvalid">{wxpayApiKeyErrorMsg}</span>
           ) : null}
         </li>
-        <li>
+        <li className="imgWrapper">
           <p>apicert:</p>
+          <div>
+            <Upload
+              accept={this.props.accept ? this.props.accept : 'image/*'}
+              action={CONSTANTS.FILESERVER}
+              listType="picture-card"
+              fileList={wxpayCertFile}
+              onChange={this.handleChange}
+              onRemove={this.remove}
+              customRequest={this.request}
+            >
+              {wxpayCertFile.length >= 1 ? null : uploadButton}
+            </Upload>
+          </div>
         </li>
         <li>
           <p />
           <Button
             type="primary"
-            className={accountComplete && accountEditing ? '' : 'disabled'}
-            onClick={this.validateAccount}
+            className={
+              wxAccountComplete && wxpayAccountEditing ? '' : 'disabled'
+            }
+            onClick={this.validateWxAccount}
           >
             验证微信账号
           </Button>
           <Button
             type="primary"
-            className={validateSuccess ? '' : 'disabled'}
-            onClick={this.editAccount}
+            className={wxValidateSuccess ? '' : 'disabled'}
+            onClick={this.editWxAccount}
           >
             编辑微信账号
           </Button>
-          {validateSuccess && !initialAccount ? (
+          {wxValidateSuccess && !initialWxpayAccount ? (
             <span className="checkInvalid">验证通过，该微信账号可用</span>
           ) : null}
-          {validateFailure ? (
+          {wxValidateFailure ? (
             <span className="checkInvalid">验证失败，该微信账号不可用</span>
           ) : null}
         </li>
@@ -1366,6 +1582,7 @@ class SchoolInfoEdit extends React.Component {
           {alipayAccount}
           {hasWxAccount ? wxAccount : null}
           <li>
+            <p />
             <span>*支付宝必须验证通过，微信支付选填</span>
           </li>
         </ul>
