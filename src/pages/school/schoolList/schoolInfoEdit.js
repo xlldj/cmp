@@ -1207,6 +1207,10 @@ class SchoolInfoEdit extends React.Component {
     }
     this.setState(nextState)
   }
+
+  handleChange = ({ wxpayCertFile }) => {
+    this.setState({ wxpayCertFile })
+  }
   render() {
     const {
       id,
@@ -1444,8 +1448,7 @@ class SchoolInfoEdit extends React.Component {
           <p>apicert:</p>
           <div>
             <Upload
-              accept={this.props.accept ? this.props.accept : 'image/*'}
-              action={CONSTANTS.FILESERVER}
+              action={CONSTANTS.WXPAYSERVER}
               listType="picture-card"
               fileList={wxpayCertFile}
               onChange={this.handleChange}

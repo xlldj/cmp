@@ -11,15 +11,15 @@ const domains = {
     user: 'http://10.0.0.4:5081'
   },
   changdang: {
-    manager: 'http://10.0.0.100:5080',
-    user: 'http://10.0.0.100:5081'
+    manager: 'http://10.0.0.14:5080',
+    user: 'http://10.0.0.14:5081'
   },
   server: {
     manager: 'https://api.xiaolian365.com/m',
     user: 'https://api.xiaolian365.com/c'
   }
 }
-const currentDomain = domains.qa
+const currentDomain = domains.changdang
 
 const AjaxHandler = {
   showingError: false

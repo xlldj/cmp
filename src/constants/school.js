@@ -8,7 +8,8 @@ const SCHOOL = {
   SCHOOL_TYPES: {
     1: '真实学校',
     2: '测试学校'
-  }
+  },
+  WXPAYSERVER: 'http://10.0.0.14:5080/wxpay/trade/cert/upload'
 }
 
 export default SCHOOL
