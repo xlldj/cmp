@@ -9,7 +9,7 @@ const SCHOOL = {
     1: '真实学校',
     2: '测试学校'
   },
-  WXPAYSERVER: 'http://10.0.0.14:5080/wxpay/trade/cert/upload'
+  WXCERTSIZE: 65534 // cert file should not exceed 64k bytes.
 }
 
 export default SCHOOL

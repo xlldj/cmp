@@ -11,15 +11,15 @@ const domains = {
     user: 'http://10.0.0.4:5081'
   },
   changdang: {
-    manager: 'http://10.0.0.14:5080',
-    user: 'http://10.0.0.14:5081'
+    manager: 'http://10.195.90.130:5080',
+    user: 'http://10.195.90.130:5081'
   },
   server: {
     manager: 'https://api.xiaolian365.com/m',
     user: 'https://api.xiaolian365.com/c'
   }
 }
-const currentDomain = domains.changdang
+const currentDomain = domains.qa
 
 const AjaxHandler = {
   showingError: false
@@ -488,6 +488,43 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     options,
     errorCb
   )
+}
+
+AjaxHandler.postFile = (file, resource) => {
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest()
+
+    //监听文件上传进度
+    xhr.upload.onprogress = function(evt) {
+      //lengthComputabel: 文件长度是否可计算
+      if (evt.lengthComputable) {
+        //evt.loaded: 已下载的字节数
+        //evt.total: 文件总字节数
+        var percent = Math.round(evt.loaded * 100 / evt.total)
+        console.log(percent)
+      }
+    }
+
+    //监听传输结束事件: 不管成功或者失败都会触发
+    xhr.onreadystatechange = function(evt) {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        const res = xhr.response
+        resolve(JSON.parse(res))
+      }
+    }
+
+    //*发起ajax请求数据
+    if (resource.includes('/api')) {
+      resource = resource.replace('/api', '')
+    }
+    xhr.open('POST', currentDomain.manager + resource, true)
+
+    const token = getToken()
+    xhr.setRequestHeader('token', token)
+    const formData = new FormData()
+    formData.append('file', file)
+    xhr.send(formData)
+  })
 }
 
 export default AjaxHandler
