@@ -307,7 +307,6 @@ class SchoolInfoEdit extends React.Component {
           lat,
           logo,
           accountName,
-          accountType,
           wxpayAccountName
         } = json.data
         let nextState = {
@@ -315,14 +314,7 @@ class SchoolInfoEdit extends React.Component {
           city: city.split('-'),
           location: location,
           lnglat: { longitude: lon, latitude: lat },
-          initialName: name,
-          accountName: accountName || 1,
-          accountType: accountType || 1,
-          appId: '********',
-          pid: '********',
-          appPrivateKey: '********',
-          appPublicKey: '********',
-          alipayPublicKey: '********'
+          initialName: name
         }
         if (logo) {
           nextState.fileList = [
@@ -333,9 +325,22 @@ class SchoolInfoEdit extends React.Component {
             }
           ]
         }
-        nextState.accountEditing = false
-        nextState.validateSuccess = true
-        nextState.initialAccount = true
+        if (accountName) {
+          nextState = {
+            ...nextState,
+            ...{
+              accountName: accountName,
+              appId: '********',
+              pid: '********',
+              appPrivateKey: '********',
+              appPublicKey: '********',
+              alipayPublicKey: '********'
+            }
+          }
+          nextState.accountEditing = false
+          nextState.validateSuccess = true
+          nextState.initialAccount = true
+        }
         if (wxpayAccountName) {
           nextState = {
             ...nextState,
@@ -380,7 +385,7 @@ class SchoolInfoEdit extends React.Component {
       lnglat,
       location,
       accountName,
-      accountType,
+      validateSuccess,
       posting,
       appId,
       pid,
@@ -407,11 +412,10 @@ class SchoolInfoEdit extends React.Component {
       city: city.join('-'),
       lat: lnglat.latitude,
       lon: lnglat.longitude,
-      location: location,
-      accountName: accountName,
-      accountType: accountType
+      location: location
     }
-    if (appId !== '********') {
+    if (validateSuccess && appId !== '********') {
+      body.accountName = accountName
       body.appId = appId
       body.pid = pid
       body.appPrivateKey = appPrivateKey
@@ -579,13 +583,8 @@ class SchoolInfoEdit extends React.Component {
         initialName,
         city,
         location,
-        accountName,
-        appId,
-        pid,
-        appPrivateKey,
-        appPublicKey,
-        alipayPublicKey,
-        validateSuccess
+        validateSuccess,
+        wxValidateSuccess
       } = this.state,
       nextState = {}
     if (!name) {
@@ -601,38 +600,8 @@ class SchoolInfoEdit extends React.Component {
       nextState.locationError = true
       return this.setState(nextState)
     }
-    if (!accountName) {
-      nextState.accountNameError = true
-      nextState.accountNameErrorMsg = '学校账号不能为空'
-      return this.setState(nextState)
-    }
-    if (!appId) {
-      nextState.appIdError = true
-      nextState.appIdErrorMsg = 'app_id不能为空！'
-      return this.setState(nextState)
-    }
-    if (!pid) {
-      nextState.pidError = true
-      nextState.pidErrorMsg = 'pid不能为空！'
-      return this.setState(nextState)
-    }
-    if (!appPrivateKey) {
-      nextState.appPrivateKeyError = true
-      nextState.appPrivateKeyErrorMsg = 'app_private_key不能为空！'
-      return this.setState(nextState)
-    }
-    if (!appPublicKey) {
-      nextState.appPublicKeyError = true
-      nextState.appPublicKeyErrorMsg = 'app_public_key不能为空！'
-      return this.setState(nextState)
-    }
-    if (!alipayPublicKey) {
-      nextState.alipayPublicKeyError = true
-      nextState.alipayPublicKeyErrorMsg = 'alipay_public_key不能为空！'
-      return this.setState(nextState)
-    }
-    /* 验证未通过，不予处理 */
-    if (!validateSuccess) {
+    // if both alipay and wx are not validated, and this is creating new school, return
+    if (!validateSuccess && !wxValidateSuccess && id) {
       return Noti.hintWarning('', '请先验证收款账号再提交！')
     }
 
@@ -871,35 +840,6 @@ class SchoolInfoEdit extends React.Component {
     }
   }
 
-  changeWxpayAccountName = e => {
-    const nextState = {
-      wxpayAccountName: e.target.value
-    }
-    if (this.state.wxValidateFailure) {
-      nextState.wxValidateFailure = false
-    }
-    this.setState(nextState, this.checkAccountComplete)
-  }
-  checkWxpayAccountName = e => {
-    let v = e.target.value
-    if (!v) {
-      return this.setState({
-        wxpayAccountNameError: true,
-        wxpayAccountName: v,
-        wxpayAccountNameErrorMsg: 'appId不能为空'
-      })
-    }
-    let { wxpayAccountNameError } = this.state
-    const nextState = {
-      appId: v,
-      appIdErrorMsg: ''
-    }
-    if (wxpayAccountNameError) {
-      nextState.appIdError = false
-    }
-    this.setState(nextState)
-  }
-
   changeWxInputWrapper = keyName => {
     return e => {
       const nextState = {}
@@ -917,7 +857,7 @@ class SchoolInfoEdit extends React.Component {
         const nextState = {}
         nextState[keyName] = v
         nextState[keyErrorFlag] = true
-        nextState[keyErrorMsg] = `${keyName}不能为空`
+        nextState[keyErrorMsg] = `选项不能为空`
         return this.setState(nextState)
       }
       const nextState = {}
@@ -1654,7 +1594,9 @@ class SchoolInfoEdit extends React.Component {
           {hasWxAccount ? wxAccount : null}
           <li>
             <p />
-            <span>*支付宝必须验证通过，微信支付选填</span>
+            <span className="hintText">
+              *支付宝和微信支付至少验证通过一个，未验证或验证未通过的用户端不显示
+            </span>
           </li>
         </ul>
 
