@@ -5,7 +5,7 @@ import { Map, Marker } from 'react-amap'
 import Noti from '../../../util/noti'
 import PicturesWall from '../../component/picturesWall'
 
-import { Cascader, Button, Upload, Icon } from 'antd'
+import { Cascader, Button, Upload, Icon, Popconfirm } from 'antd'
 import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'
@@ -290,7 +290,10 @@ class SchoolInfoEdit extends React.Component {
       wxpayAccountEditing: true,
       initialWxpayAccount: false,
       wxValidateSuccess: false,
-      wxValidateFailure: false
+      wxValidateFailure: false,
+
+      has2Accounts: false, // editing, and has both accounts, this will be true
+      deletedOneAccountInTow: false // when editing, and original has both alipay and wx, and deleted one of them, this will be true.
     }
   }
   fetchData = body => {
@@ -345,7 +348,7 @@ class SchoolInfoEdit extends React.Component {
           nextState = {
             ...nextState,
             ...{
-              wxpayAccountName: '********',
+              wxpayAccountName,
               wxpayApiKey: '********',
               wxpayAppId: '********',
               wxpayMchId: '********'
@@ -354,6 +357,9 @@ class SchoolInfoEdit extends React.Component {
           nextState.wxpayAccountEditing = false
           nextState.wxValidateSuccess = true
           nextState.initialWxpayAccount = true
+        }
+        if (accountName && wxpayAccountName) {
+          nextState.has2Accounts = true
         }
         this.setState(nextState)
       }
@@ -414,30 +420,35 @@ class SchoolInfoEdit extends React.Component {
       lon: lnglat.longitude,
       location: location
     }
-    if (validateSuccess && appId !== '********') {
+    if (validateSuccess && accountName) {
       body.accountName = accountName
-      body.appId = appId
-      body.pid = pid
-      body.appPrivateKey = appPrivateKey
-      body.appPublicKey = appPublicKey
-      body.alipayPublicKey = alipayPublicKey
+      if (appId !== '********') {
+        body.appId = appId
+        body.pid = pid
+        body.appPrivateKey = appPrivateKey
+        body.appPublicKey = appPublicKey
+        body.alipayPublicKey = alipayPublicKey
+      }
     }
 
     // if has wxaccount, and validate success, post it. Or else just ignore it.
-    if (wxpayAppId && wxpayAppId !== '********' && wxValidateSuccess) {
-      // has wx account, and changed
-      body.hasWxAccount = true
-      body = {
-        ...body,
-        ...{
-          wxpayAccountName,
-          wxpayAppId,
-          wxpayApiKey,
-          wxpayMchId,
-          wxpayCertId
+    if (wxValidateSuccess && wxpayAccountName) {
+      body.wxpayAccountName = wxpayAccountName
+      if (wxpayAppId !== '********') {
+        // has wx account, and changed
+        body.hasWxAccount = true
+        body = {
+          ...body,
+          ...{
+            wxpayAppId,
+            wxpayApiKey,
+            wxpayMchId,
+            wxpayCertId
+          }
         }
       }
     }
+
     if (this.state.fileList.length > 0 && this.state.fileList[0].url) {
       body.logo = this.state.fileList[0].url.replace(FILEADDR, '')
     }
@@ -452,23 +463,8 @@ class SchoolInfoEdit extends React.Component {
           name: name
         }
         this.addSchoolToReducer(school)
-        // appId must not be empty, since alipay is a 'must' option
-        // if alipay changed, check wx after alipay reloaded.
-        // if alipay not changed, wx changed, only check wx.
-        // if both not changed, hint success
-        if (validateSuccess && appId && appId !== '********') {
-          this.reloadAlipay()
-        } else if (
-          wxpayAppId &&
-          wxpayAppId !== '********' &&
-          wxValidateSuccess
-        ) {
-          // wxpay is a option, may be empty. If has and validate success, reload it
-          this.reloadWxAccount()
-        } else {
-          // no wxaccount ,and alipay not changed, toast success
-          this.hintSuccess()
-        }
+        // always reload when confirm
+        this.reloadAlipay()
       }
       this.setState(nextState)
     })
@@ -1093,6 +1089,7 @@ class SchoolInfoEdit extends React.Component {
   }
 
   editWxAccount = () => {
+    const { has2Accounts, initialWxpayAccount } = this.state
     /* 置位validateSuccess, validateFailure, accountComplete, accountEditing, 以及账户相关信息 */
     const nextState = {
       wxpayAccountEditing: true,
@@ -1105,8 +1102,12 @@ class SchoolInfoEdit extends React.Component {
       wxpayMchId: '',
       wxpayCertId: ''
     }
-    if (this.state.initialWxpayAccount) {
+    if (initialWxpayAccount) {
       nextState.initialWxpayAccount = false
+    }
+    // if has both and now editing, set 'deletedOneAccountInTow' to hint
+    if (has2Accounts) {
+      nextState.deletedOneAccountInTow = true
     }
     this.setState(nextState)
   }
@@ -1159,6 +1160,7 @@ class SchoolInfoEdit extends React.Component {
     })
   }
   editAccount = () => {
+    const { initialAccount, has2Accounts } = this.state
     /* 置位validateSuccess, validateFailure, accountComplete, accountEditing, 以及账户相关信息 */
     const nextState = {
       accountEditing: true,
@@ -1172,8 +1174,11 @@ class SchoolInfoEdit extends React.Component {
       appPublicKey: '',
       alipayPublicKey: ''
     }
-    if (this.state.initialAccount) {
+    if (initialAccount) {
       nextState.initialAccount = false
+    }
+    if (has2Accounts) {
+      nextState.deletedOneAccountInTow = true
     }
     this.setState(nextState)
   }
@@ -1263,7 +1268,8 @@ class SchoolInfoEdit extends React.Component {
       initialWxpayAccount,
 
       wxpayCertFile,
-      wxpayCertId
+      wxpayCertId,
+      deletedOneAccountInTow
     } = this.state
 
     const alipayAccount = (
@@ -1601,9 +1607,21 @@ class SchoolInfoEdit extends React.Component {
         </ul>
 
         <div className="btnArea">
-          <Button type="primary" onClick={this.handleSubmit}>
-            确认
-          </Button>
+          {deletedOneAccountInTow ? (
+            <Popconfirm
+              title="确认后会更新/删除对应账户，确定要进行此操作么?"
+              onConfirm={this.handleSubmit}
+              onCancel={this.cancelDelete}
+              okText="确认"
+              cancelText="取消"
+            >
+              <Button type="primary">确认</Button>
+            </Popconfirm>
+          ) : (
+            <Button type="primary" onClick={this.handleSubmit}>
+              确认
+            </Button>
+          )}
           <Button onClick={this.handleBack}>返回</Button>
         </div>
       </div>
