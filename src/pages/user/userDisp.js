@@ -1,23 +1,45 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
 import Bread from '../component/bread'
-import { asyncComponent } from '../component/asyncComponent'
 import './style/style.css'
 import { getLocal } from '../../util/storage'
+import UserTableView from './userTable'
+import UserInfoView from './userInfo'
+import UserFoxconn from './foxconn'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeUser } from '../../actions'
+import { changeUser, changeOrder, changeFund } from '../../actions'
 
-const UserTable = asyncComponent(() =>
-  import(/* webpackChunkName: "userTable" */ './userTable')
+const subModule = 'userList'
+
+const mapStateToInfoProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
+
+const UserInfo = withRouter(
+  connect(mapStateToInfoProps, {
+    changeOrder,
+    changeFund
+  })(UserInfoView)
 )
-const UserInfo = asyncComponent(() =>
-  import(/* webpackChunkName: "userInfo" */ './userInfo')
+
+const mapStateToTableProps = (state, ownProps) => ({
+  schoolId: state.userModule[subModule].schoolId,
+  selectKey: state.userModule[subModule].selectKey,
+  page: state.userModule[subModule].page,
+  userTransfer: state.userModule[subModule].userTransfer
+})
+
+const UserTable = withRouter(
+  connect(mapStateToTableProps, {
+    changeUser
+  })(UserTableView)
 )
 
 const breadcrumbNameMap = {
-  '/userInfo': '详情'
+  '/userInfo': '详情',
+  '/foxconn': '导入富士康员工'
 }
 
 class UserDisp extends React.Component {
@@ -58,6 +80,10 @@ class UserDisp extends React.Component {
           <Route
             path="/user/userInfo/:id"
             render={props => <UserInfo hide={this.props.hide} {...props} />}
+          />
+          <Route
+            path="/user/foxconn"
+            render={props => <UserFoxconn hide={this.props.hide} {...props} />}
           />
           <Route
             exact
