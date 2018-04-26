@@ -13,7 +13,16 @@ const FUND = {
   WITHDRAWTIME: { 1: '固定时段', 2: '具体时段' },
   // DEPOSITACTTYPE: { 1: '充值优惠', 2: '赠送红包' },
   DEPOSITACTTYPE: { 2: '赠送红包' },
-  PAYMENTTYPE: { 1: '余额支付', 2: '红包支付' }
+  PAYMENTTYPE: { 1: '余额支付', 2: '红包支付' },
+  FREEGIVING_PERIOD: { 1: '每月', 2: '每日' },
+  FREEGIVING_PERIOD_DAY: 2,
+  FREEGIVING_PERIOD_MONTH: 1,
+  FREEGIVING_STATUS: {
+    1: '是',
+    2: '否'
+  },
+  FREEGIVING_ONLINE: 1,
+  FREEGIVING_OFFLINE: 2
 }
 
 export default FUND

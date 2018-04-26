@@ -17,9 +17,13 @@ const domains = {
   server: {
     manager: 'https://api.xiaolian365.com/m',
     user: 'https://api.xiaolian365.com/c'
+  },
+  wq: {
+    manager: 'http://10.195.90.172:5080',
+    user: 'http://10.195.90.172:5081'
   }
 }
-const currentDomain = domains.qa
+const currentDomain = domains.wq
 
 const AjaxHandler = {
   showingError: false

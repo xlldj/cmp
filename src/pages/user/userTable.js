@@ -10,15 +10,12 @@ import CONSTANTS from '../../constants'
 import { checkObject } from '../../util/checkSame'
 
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeUser } from '../../actions'
 const subModule = 'userList'
 
 const { USERORIGIN } = CONSTANTS
 const SIZE = CONSTANTS.PAGINATION
 
-class UserTable extends React.Component {
+class UserTableView extends React.Component {
   static propTypes = {
     schoolId: PropTypes.string.isRequired,
     selectKey: PropTypes.string.isRequired,
@@ -209,6 +206,8 @@ class UserTable extends React.Component {
         <SearchLine
           leftDespTitle1={`当前用户数量：${total ? total : 0}`}
           searchInputText="手机号/手机型号"
+          rightAddTitle="导入富士康员工"
+          rightAddLink="/user/foxconn"
           selector1={
             <BasicSelector
               allTitle="所有用户"
@@ -244,15 +243,4 @@ class UserTable extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.userModule[subModule].schoolId,
-  selectKey: state.userModule[subModule].selectKey,
-  page: state.userModule[subModule].page,
-  userTransfer: state.userModule[subModule].userTransfer
-})
-
-export default withRouter(
-  connect(mapStateToProps, {
-    changeUser
-  })(UserTable)
-)
+export default UserTableView

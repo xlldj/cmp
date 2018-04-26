@@ -30,6 +30,9 @@ const CashtimeContainer = asyncComponent(() =>
 const AbnormalContainer = asyncComponent(() =>
   import(/* webpackChunkName: "abnormalFund" */ './abnormal/abnormal')
 )
+const FreeGiving = asyncComponent(() =>
+  import(/* webpackChunkName: "freeGiving" */ './freeGiving/container.js')
+)
 
 const breadcrumbNameMap = {
   '/list': '充值列表',
@@ -45,7 +48,10 @@ const breadcrumbNameMap = {
   '/deposit': '充值活动',
   '/deposit/depositInfo': '编辑充值活动',
   '/deposit/addDeposit': '创建充值活动',
-  '/abnormal': '异常资金'
+  '/abnormal': '异常资金',
+  '/freeGiving': '赠送金额',
+  '/freeGiving/add': '新建赠送规则',
+  '/freeGiving/info': '详情'
 }
 
 class FundDisp extends React.Component {
@@ -163,6 +169,11 @@ class FundDisp extends React.Component {
               render={props => (
                 <AbnormalContainer hide={this.props.hide} {...props} />
               )}
+            />
+
+            <Route
+              path="/fund/freeGiving"
+              render={props => <FreeGiving hide={this.props.hide} {...props} />}
             />
             <Route
               exact

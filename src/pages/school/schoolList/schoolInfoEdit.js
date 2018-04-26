@@ -1238,9 +1238,6 @@ class SchoolInfoEdit extends React.Component {
     this.setState(nextState)
   }
 
-  handleChange = ({ fileList }) => {
-    this.setState({ wxpayCertFile: fileList })
-  }
   deleteCertAndReupload = () => {
     this.setState({
       wxpayCertId: ''
@@ -1533,7 +1530,6 @@ class SchoolInfoEdit extends React.Component {
                   <Upload
                     listType="picture-card"
                     fileList={wxpayCertFile}
-                    onRemove={this.remove}
                     customRequest={this.uploadCertFile}
                   >
                     {wxpayCertFile.length >= 1 ? null : uploadButton}
