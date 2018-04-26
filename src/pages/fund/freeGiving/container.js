@@ -2,7 +2,19 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import FreeGivingList from './list.js'
-import FreeGivingInfo from './info.js'
+import FreeGivingInfoView from './info.js'
+
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+
+const mapStateToProps = (state, ownProps) => ({
+  schools: state.setSchoolList.schools,
+  schoolSet: state.setSchoolList.schoolSet
+})
+
+const FreeGivingInfo = withRouter(
+  connect(mapStateToProps, null)(FreeGivingInfoView)
+)
 
 class Container extends React.Component {
   render() {
