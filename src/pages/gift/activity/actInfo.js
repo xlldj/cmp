@@ -359,6 +359,7 @@ class ActInfo extends React.Component {
         })
       }
     }
+    // if online already, just route back when clicked '确认'
     if (released && online) {
       return this.props.history.push('/gift/act')
     }

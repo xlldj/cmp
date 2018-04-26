@@ -19,12 +19,6 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { setAuthenData, setUserInfo } from '../../actions'
 
-//const Form = asyncComponent(() => import(/* webpackChunkName: "form" */ "antd/lib/form"))
-//const Button = asyncComponent(() => import(/* webpackChunkName: "button" */ "antd/lib/button"))
-//const Input = asyncComponent(() => import(/* webpackChunkName: "input" */ "antd/lib/input"))
-//const Icon = asyncComponent(() => import(/* webpackChunkName: "icon" */ "antd/lib/icon"))
-//const Checkbox = asyncComponent(() => import(/* webpackChunkName: "checkbox" */ "antd/lib/checkbox"))
-
 class Log extends React.Component {
   state = {
     remember: true,

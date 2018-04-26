@@ -100,8 +100,8 @@ class MyMenu extends React.Component {
       this.rootBlock = rootBlock
     }
     */
-    this.rootBlock = rootBlock
-    // this.rootBlock = CONSTANTS.rootBlock
+    // this.rootBlock = rootBlock
+    this.rootBlock = CONSTANTS.rootBlock
     this.changeMenu()
   }
   componentDidUpdate() {

@@ -152,6 +152,9 @@ button.grayBackColor:linked {
 .gray {
   color: #f5f5f5;
 }
+.hintText {
+  color: #999;
+}
 .blueBgcolor {
   background-color: steelblue;
 }

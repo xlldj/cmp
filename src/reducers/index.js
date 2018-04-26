@@ -256,6 +256,10 @@ const initialFundState = {
     page: 1,
     selectKey: '',
     userType: 'all'
+  },
+  freeGiving: {
+    schoolId: selectedSchool,
+    page: 1
   }
 }
 const fundModule = (state = initialFundState, action) => {

@@ -6,9 +6,7 @@ import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
 
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeOrder, changeFund } from '../../actions'
+
 const { NORMAL_DAY_7 } = CONSTANTS
 const SEX = {
   1: '男',
@@ -22,7 +20,7 @@ const backTitle = {
   fromFeedback: '返回意见反馈',
   fromComplaint: '返回账单投诉'
 }
-class UserInfo extends React.Component {
+class UserInfoView extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
   }
@@ -410,13 +408,5 @@ class UserInfo extends React.Component {
     )
   }
 }
-const mapStateToProps = (state, ownProps) => ({
-  forbiddenStatus: state.setAuthenData.forbiddenStatus
-})
 
-export default withRouter(
-  connect(mapStateToProps, {
-    changeOrder,
-    changeFund
-  })(UserInfo)
-)
+export default UserInfoView
