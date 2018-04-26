@@ -5,10 +5,10 @@ import { Button, TimePicker, Radio } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
-import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import CONSTANTS from '../../../constants'
 import { generateMonthDayEnums } from '../../../util/dayHandle.js'
+import { checkObject } from '../../../util/checkSame'
 const {
   FREEGIVING_PERIOD,
   FREEGIVING_PERIOD_MONTH,
@@ -51,7 +51,12 @@ class FreeGivingInfo extends React.Component {
       initialSchool,
       id,
       posting: false,
-      released: false
+      released: false,
+
+      schoolOpts: {}
+    }
+    if (this.props.schoolSet) {
+      this.setSchoolOpts(this.props)
     }
   }
   fetchData = body => {
@@ -103,6 +108,22 @@ class FreeGivingInfo extends React.Component {
         id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    if (!checkObject(this.props.schools, nextProps.schools, ['schoolSet'])) {
+      this.setSchoolOpts(nextProps)
+    }
+  }
+  setSchoolOpts = props => {
+    const fox_index = props.schools.findIndex(s => s.name === '富士康')
+    if (fox_index !== -1) {
+      const school = props.schools[fox_index]
+      const schoolOpts = {}
+      schoolOpts[school.id] = school.name
+      this.setState({
+        schoolOpts
+      })
     }
   }
   checkComplete = () => {
@@ -376,7 +397,8 @@ class FreeGivingInfo extends React.Component {
       endTime,
       status,
       released,
-      initialSchool
+      initialSchool,
+      schoolOpts
     } = this.state
     const startDaySelect = (
       <BasicSelectorWithoutAll
@@ -402,13 +424,14 @@ class FreeGivingInfo extends React.Component {
         <ul>
           <li>
             <p>选择学校:</p>
-            <SchoolSelectWithoutAll
+            <BasicSelectorWithoutAll
               width={'140px'}
               disabled={initialSchool}
               className={initialSchool ? 'disabled' : ''}
-              selectedSchool={schoolId.toString()}
-              changeSchool={this.changeSchool}
-              checkSchool={this.checkSchool}
+              staticOpts={schoolOpts}
+              selectedOpt={schoolId}
+              changeOpt={this.changeSchool}
+              checkOpt={this.checkSchool}
             />
             {schoolError ? (
               <span className="checkInvalid">学校不能为空！</span>
