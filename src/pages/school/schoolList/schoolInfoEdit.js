@@ -456,7 +456,7 @@ class SchoolInfoEdit extends React.Component {
         // if alipay changed, check wx after alipay reloaded.
         // if alipay not changed, wx changed, only check wx.
         // if both not changed, hint success
-        if (appId !== '********') {
+        if (validateSuccess && appId && appId !== '********') {
           this.reloadAlipay()
         } else if (
           wxpayAppId &&
@@ -847,7 +847,7 @@ class SchoolInfoEdit extends React.Component {
       if (this.state.wxValidateFailure) {
         nextState.wxValidateFailure = false
       }
-      this.setState(nextState, this.checkAccountComplete)
+      this.setState(nextState, this.checkWxAccountComplete)
     }
   }
   checkInputWrapper = (keyName, keyErrorFlag, keyErrorMsg) => {
