@@ -199,15 +199,15 @@ class UserTableView extends React.Component {
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page, schoolId, userTransfer } = this.props
+    const { page, schoolId, userTransfer, forbiddenStatus } = this.props
 
     return (
       <div className="contentArea">
         <SearchLine
           leftDespTitle1={`当前用户数量：${total ? total : 0}`}
           searchInputText="手机号/手机型号"
-          rightAddTitle="导入富士康员工"
-          rightAddLink="/user/foxconn"
+          rightAddTitle={forbiddenStatus.IMPORT_USERS ? '' : '导入富士康员工'}
+          rightAddLink={forbiddenStatus.IMPORT_USERS ? '' : '/user/foxconn'}
           selector1={
             <BasicSelector
               allTitle="所有用户"
