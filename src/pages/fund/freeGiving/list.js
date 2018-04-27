@@ -58,7 +58,7 @@ class FreeGivingTable extends React.Component {
         dataIndex: 'createTime',
         width: '15%',
         render: (text, record, index) => {
-          return Time.getTimeStr(record.createTime)
+          return record.createTime ? Time.getTimeStr(record.createTime) : ''
         }
       },
       {
@@ -67,7 +67,7 @@ class FreeGivingTable extends React.Component {
         width: '10%',
         render: (text, record, index) => (
           <Badge
-            status={HINTSTATUS[record.online]}
+            status={HINTSTATUS[record.status]}
             text={FREEGIVING_STATUS[record.status]}
           />
         )
@@ -78,7 +78,7 @@ class FreeGivingTable extends React.Component {
         className: 'lastCol',
         render: (text, record, index) => (
           <div className="editable-row-operations">
-            <Link to={`/fund/deposit/depositInfo/:${record.id}`}>编辑</Link>
+            <Link to={`/fund/freeGiving/info/:${record.id}`}>编辑</Link>
             <span className="ant-divider" />
             <Popconfirm
               title="确定要删除此活动么?"
@@ -101,10 +101,10 @@ class FreeGivingTable extends React.Component {
       loading: true
     })
     let resource = '/api/givingRule/activity/list'
-    AjaxHandler.ajax(resource, body).then(json => {
+    AjaxHandler.fetch(resource, body).then(json => {
       let nextState = { loading: false }
       if (json && json.data) {
-        nextState.dataSource = json.data.depositActivities
+        nextState.dataSource = json.data.givingRules
         nextState.total = json.data.total
       }
       this.setState(nextState)
@@ -145,7 +145,7 @@ class FreeGivingTable extends React.Component {
 
   delete = (e, id) => {
     e.preventDefault()
-    let url = '/api/freeGiving/activity/delete'
+    let url = '/api/givingRule/activity/delete'
     const body = {
       id: id
     }

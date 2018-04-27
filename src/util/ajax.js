@@ -23,8 +23,7 @@ const domains = {
     user: 'http://10.195.90.172:5081'
   }
 }
-const currentDomain = domains.qa
-
+const currentDomain = domains.wq
 const AjaxHandler = {
   showingError: false
 }
@@ -494,7 +493,7 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
   )
 }
 
-AjaxHandler.postFile = (file, resource) => {
+AjaxHandler.postFile = (file, resource, options) => {
   return new Promise((resolve, reject) => {
     var xhr = new XMLHttpRequest()
 
@@ -516,6 +515,9 @@ AjaxHandler.postFile = (file, resource) => {
         resolve(JSON.parse(res))
       }
     }
+    xhr.onerror = function(e) {
+      reject(e)
+    }
 
     //*发起ajax请求数据
     if (resource.includes('/api')) {
@@ -527,6 +529,11 @@ AjaxHandler.postFile = (file, resource) => {
     xhr.setRequestHeader('token', token)
     const formData = new FormData()
     formData.append('file', file)
+    if (options && options.keys) {
+      options.keys.forEach(k => {
+        formData.append(k.key, k.value)
+      })
+    }
     xhr.send(formData)
   })
 }
