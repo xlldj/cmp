@@ -38,7 +38,7 @@ class UserTableView extends React.Component {
         className: 'firstCol'
       },
       {
-        title: '用户手机号',
+        title: '登录账号',
         dataIndex: 'mobile'
       },
       {
