@@ -169,19 +169,15 @@ class UserInfoView extends React.Component {
       fileUploading: true
     })
     const { schoolId, userFile } = this.state
+    const file = userFile[0].originFileObj
     const resource = '/api/user/add/import'
-    const formData = new FormData()
-    formData.append('file', userFile.file)
-    const body = {
-      schoolId,
-      file: userFile.file
-    }
-    AjaxHandler.fetch(resource, body).then(json => {
-      console.log(json)
+    AjaxHandler.postFile(file, resource, {
+      keys: [{ key: 'schoolId', value: schoolId }]
+    }).then(json => {
       if (json && json.data) {
         this.setState(
           {
-            uploadTaskId: json.data.taskId
+            taskId: json.data.taskId
           },
           this.checkProgress
         )
@@ -255,7 +251,7 @@ class UserInfoView extends React.Component {
       users
     }
     AjaxHandler.fetch(resource, body).then(json => {
-      if (json && json.data) {
+      if (json && json.result) {
         Noti.hintSuccess(this.props.history, '/user')
       }
     })
