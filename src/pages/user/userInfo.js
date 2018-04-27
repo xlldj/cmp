@@ -287,7 +287,7 @@ class UserInfoView extends React.Component {
             </Fragment>
           ) : null}
           <li>
-            <p>手机号:</p>
+            <p>登录账号:</p>
             {data.mobile}
           </li>
           <li>
@@ -317,7 +317,7 @@ class UserInfoView extends React.Component {
           {data.givingBalance ? (
             <li>
               <p>赠送金额:</p>
-              {data.givingBalance}
+              {`¥${data.givingBalance}`}
             </li>
           ) : null}
           {data.credits !== undefined ? (
