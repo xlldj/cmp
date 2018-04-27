@@ -38,7 +38,8 @@ class UserInfoView extends React.Component {
       loadingRatio: '',
       fileUploadFailure: false,
       fileUploadSuccess: false,
-      fileUploading: false
+      fileUploading: false,
+      stopFetchPercent: false
     }
   }
   componentDidMount() {
@@ -139,7 +140,8 @@ class UserInfoView extends React.Component {
       fileUploading: false,
       fileUploadSuccess: false,
       fileUploadFailure: false,
-      userFile: []
+      userFile: [],
+      stopFetchPercent: true // always stop fetching percent
     })
   }
   uploadFile = () => {
@@ -155,7 +157,8 @@ class UserInfoView extends React.Component {
       if (json && json.data) {
         this.setState(
           {
-            taskId: json.data.taskId
+            taskId: json.data.taskId,
+            stopFetchPercent: false
           },
           this.checkProgress
         )
@@ -163,6 +166,7 @@ class UserInfoView extends React.Component {
         this.setState({
           fileUploading: false
         })
+        Noti.hintNetworkError()
       }
     })
   }
@@ -179,14 +183,18 @@ class UserInfoView extends React.Component {
       if (json && json.data) {
         const { taskPercent, successTaskSize, failTaskSize } = json.data
         this.setState({ taskPercent, successTaskSize, failTaskSize }, () => {
-          if (taskPercent < 1) {
+          if (taskPercent < 1 && !this.state.stopFetchPercent) {
             setTimeout(this.checkProgress, 0)
-          } else {
+          } else if (this.state.fileUploading) {
             this.setState({
               fileUploading: false,
               fileUploadSuccess: true
             })
           }
+        })
+      } else {
+        this.setState({
+          fileUploading: false
         })
       }
     })
@@ -220,7 +228,8 @@ class UserInfoView extends React.Component {
         ) !== -1
       if (duplicateLocal) {
         users[i].errorMsg = '已存在相同的用户账号'
-        return this.setState({ users })
+        this.setState({ users })
+        return false
       }
 
       delete users[i].errorMsg
@@ -367,6 +376,55 @@ class UserInfoView extends React.Component {
           100
         )}%。写入成功${successTaskSize || 0}条，失败${failTaskSize || 0}条。`
       : ''
+    const batchImportFragment = (
+      <Fragment>
+        <li>
+          <p>导入文件模版:</p>
+          <a
+            href="http://xiaolian-image-prod.oss-cn-shenzhen.aliyuncs.com/foxconn/foxconn_empoyee.xlsx"
+            download="foxconn_template.xlsx"
+          >
+            点击下载
+          </a>
+        </li>
+        <li className="imgWrapper">
+          <p>上传导入文件:</p>
+          <div>
+            {userFile && userFile.length > 0 ? (
+              <Fragment>
+                <span>{userFile[0].originFileObj.name}</span>
+                {fileUploading ? (
+                  loadingInfo
+                ) : (
+                  <Button type="primary" onClick={this.uploadFile}>
+                    开始上传
+                  </Button>
+                )}
+                <Button type="primary" onClick={this.deleteCertAndReupload}>
+                  {fileUploadSuccess ? '继续选择文件' : '重新选择文件'}
+                </Button>
+              </Fragment>
+            ) : (
+              <Fragment>
+                <Upload
+                  listType="picture-card"
+                  fileList={userFile}
+                  onChange={this.cacheFile}
+                  customRequest={this.request}
+                >
+                  {userFile.length >= 1 ? null : (
+                    <div className="uploadButton">
+                      <Icon type="plus" />
+                    </div>
+                  )}
+                </Upload>
+                {fileTypeError ? '请上传.xlsx格式的文件' : null}
+              </Fragment>
+            )}
+          </div>
+        </li>
+      </Fragment>
+    )
     return (
       <div className="infoList">
         <ul>
@@ -391,7 +449,7 @@ class UserInfoView extends React.Component {
               changeOpt={this.changeImportMethod}
             />
           </li>
-          {importMethod === Import_Method_Manual ? (
+          {schoolId && importMethod === Import_Method_Manual ? (
             <Fragment>
               {userInfos}
               <li>
@@ -403,58 +461,9 @@ class UserInfoView extends React.Component {
                 />
               </li>
             </Fragment>
-          ) : (
-            <Fragment>
-              <li>
-                <p>导入文件模版:</p>
-                <a
-                  href="http://xiaolian-image-prod.oss-cn-shenzhen.aliyuncs.com/foxconn/foxconn_empoyee.xlsx"
-                  download="foxconn_template.xlsx"
-                >
-                  点击下载
-                </a>
-              </li>
-              <li className="imgWrapper">
-                <p>上传导入文件:</p>
-                <div>
-                  {userFile && userFile.length > 0 ? (
-                    <Fragment>
-                      <span>{userFile[0].originFileObj.name}</span>
-                      {fileUploading ? (
-                        loadingInfo
-                      ) : (
-                        <Button type="primary" onClick={this.uploadFile}>
-                          开始上传
-                        </Button>
-                      )}
-                      <Button
-                        type="primary"
-                        onClick={this.deleteCertAndReupload}
-                      >
-                        {fileUploadSuccess ? '继续选择文件' : '重新选择文件'}
-                      </Button>
-                    </Fragment>
-                  ) : (
-                    <Fragment>
-                      <Upload
-                        listType="picture-card"
-                        fileList={userFile}
-                        onChange={this.cacheFile}
-                        customRequest={this.request}
-                      >
-                        {userFile.length >= 1 ? null : (
-                          <div className="uploadButton">
-                            <Icon type="plus" />
-                          </div>
-                        )}
-                      </Upload>
-                      {fileTypeError ? '请上传.xlsx格式的文件' : null}
-                    </Fragment>
-                  )}
-                </div>
-              </li>
-            </Fragment>
-          )}
+          ) : schoolId ? (
+            batchImportFragment
+          ) : null}
         </ul>
         <div className="btnArea">
           {importMethod === Import_Method_Manual ? (
