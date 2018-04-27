@@ -496,6 +496,7 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
 AjaxHandler.postFile = (file, resource, options) => {
   return new Promise((resolve, reject) => {
     var xhr = new XMLHttpRequest()
+    xhr.timeout = 4000
 
     //监听文件上传进度
     xhr.upload.onprogress = function(evt) {
@@ -515,9 +516,11 @@ AjaxHandler.postFile = (file, resource, options) => {
         resolve(JSON.parse(res))
       }
     }
-    xhr.onerror = function(e) {
+    const errorHandler = e => {
       reject(e)
     }
+    xhr.onerror = errorHandler
+    xhr.ontimeout = errorHandler
 
     //*发起ajax请求数据
     if (resource.includes('/api')) {
