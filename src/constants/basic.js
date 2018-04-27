@@ -460,6 +460,7 @@ const BASIC = {
     屏蔽失物招领: 'SHIELD_LOST_INFO',
     拉黑用户: 'DEACTIVE_USER',
     重置用户密码: 'RESET_USER_PWD',
+    用户导入: 'IMPORT_USERS', // 用户列表中'导入富士康员工'的按钮，以及相关接口的权限控制
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
     删除员工: 'DELETE_EMPLOYEE',

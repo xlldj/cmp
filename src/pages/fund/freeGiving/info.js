@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from '../../../util/myMoment'
 
-import { Button, TimePicker, Radio } from 'antd'
+import { Button, TimePicker, Radio, Popconfirm } from 'antd'
 
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
@@ -30,22 +30,22 @@ class FreeGivingInfo extends React.Component {
       schoolError,
       amount: '',
       amountError: false,
-      startDay: '',
+      startDay: 1,
       startDayError: false,
-      endDay: '',
+      endDay: -1,
       endDayError: false,
       period: 1,
       periodError: false,
       status: '',
       statusError: false,
 
-      endTime: {
-        time: { hour: 0, minute: 0 },
-        weekday: '1'
-      },
       startTime: {
-        time: { hour: 0, minute: 0 },
-        weekday: '1'
+        hour: 0,
+        minute: 0
+      },
+      endTime: {
+        hour: 23,
+        minute: 59
       },
 
       initialSchool,
@@ -53,7 +53,8 @@ class FreeGivingInfo extends React.Component {
       posting: false,
       released: false,
 
-      schoolOpts: {}
+      schoolOpts: {},
+      validateMonth: ''
     }
   }
   fetchData = body => {
@@ -126,12 +127,21 @@ class FreeGivingInfo extends React.Component {
       const schoolOpts = {}
       schoolOpts[school.id] = school.name
       this.setState({
-        schoolOpts
+        schoolOpts,
+        schoolId: school.id
       })
     }
   }
   checkComplete = () => {
-    const { schoolId, amount, period, startDay, endDay, status } = this.state
+    const {
+      schoolId,
+      amount,
+      period,
+      startDay,
+      endDay,
+      status,
+      validateMonth
+    } = this.state
     if (!schoolId) {
       this.setState({
         schoolError: true
@@ -163,6 +173,16 @@ class FreeGivingInfo extends React.Component {
       })
       return false
     }
+    if (!validateMonth) {
+      this.setState({
+        validateMonthError: true
+      })
+      return false
+    } else if (this.state.validateMonthError) {
+      this.setState({
+        validateMonthError: false
+      })
+    }
     if (!status) {
       this.setState({
         statusError: true
@@ -182,7 +202,8 @@ class FreeGivingInfo extends React.Component {
       endTime,
       status,
       released,
-      posting
+      posting,
+      validateMonth
     } = this.state
     if (!this.checkComplete()) {
       return
@@ -195,7 +216,8 @@ class FreeGivingInfo extends React.Component {
       startMinute: moment(startTime).minute(),
       endHour: moment(endTime).hour(),
       endMinute: moment(endTime).minute(),
-      status: +status
+      status: +status,
+      validateMonth: +validateMonth
     }
     if (period === FREEGIVING_PERIOD_MONTH) {
       body.startDay = +startDay
@@ -302,7 +324,8 @@ class FreeGivingInfo extends React.Component {
       startTime,
       endDay,
       endTime,
-      status
+      status,
+      validateMonth
     } = this.state
 
     // still the same school, no need to check.
@@ -327,7 +350,8 @@ class FreeGivingInfo extends React.Component {
       startMinute: moment(startTime).minute(),
       endHour: moment(endTime).hour(),
       endMinute: moment(endTime).minute(),
-      status: +status
+      status: +status,
+      validateMonth: +validateMonth
     }
     if (period === FREEGIVING_PERIOD_MONTH) {
       body.startDay = +startDay
@@ -387,11 +411,26 @@ class FreeGivingInfo extends React.Component {
     let endTime = v.valueOf()
     this.setState({ endTime })
   }
-  changeOnline = v => {
+  changeOnline = e => {
+    const v = e.target.value
+    if (v === FREEGIVING_ONLINE) {
+      return
+    }
     let nextState = {
-      status: v.target.value
+      status: e.target.value
     }
     this.setState(nextState)
+  }
+  setOnline = () => {
+    this.setState({
+      status: 1
+    })
+  }
+  changeValidateMonth = e => {
+    const v = e.target.value
+    this.setState({
+      validateMonth: v
+    })
   }
   render() {
     let {
@@ -412,7 +451,10 @@ class FreeGivingInfo extends React.Component {
       status,
       released,
       initialSchool,
-      schoolOpts
+      schoolOpts,
+
+      validateMonth,
+      validateMonthError
     } = this.state
     const startDaySelect = (
       <BasicSelectorWithoutAll
@@ -525,9 +567,30 @@ class FreeGivingInfo extends React.Component {
             </span>
           </li>
           <li>
+            <p>生效时间：</p>
+            <RadioGroup
+              disabled={released}
+              onChange={this.changeValidateMonth}
+              value={validateMonth}
+            >
+              <Radio value={1}>当月</Radio>
+              <Radio value={2}>下月</Radio>
+            </RadioGroup>
+            {validateMonthError ? (
+              <span className="checkInvalid">请选择生效时间！</span>
+            ) : null}
+          </li>
+          <li>
             <p>是否上线：</p>
             <RadioGroup onChange={this.changeOnline} value={status}>
-              <Radio value={1}>是</Radio>
+              <Popconfirm
+                title="确定要上线么?"
+                onConfirm={this.setOnline}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Radio value={1}>是</Radio>
+              </Popconfirm>
               <Radio value={2}>否</Radio>
             </RadioGroup>
             {released ? (
@@ -545,9 +608,20 @@ class FreeGivingInfo extends React.Component {
         </ul>
 
         <div className="btnArea">
-          <Button type="primary" onClick={this.confirm}>
-            确认
-          </Button>
+          {status === FREEGIVING_ONLINE ? (
+            <Popconfirm
+              title="确定要上线么?"
+              onConfirm={this.confirm}
+              okText="确认"
+              cancelText="取消"
+            >
+              <Button type="primary">确认</Button>
+            </Popconfirm>
+          ) : (
+            <Button type="primary" onClick={this.confirm}>
+              确认
+            </Button>
+          )}
           <Button onClick={this.back}>返回</Button>
         </div>
       </div>
