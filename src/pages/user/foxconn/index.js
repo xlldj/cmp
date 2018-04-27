@@ -16,8 +16,7 @@ import { changeOrder, changeFund } from '../../../actions'
 const userInfo = {
   userNo: '',
   userName: '',
-  numError: false,
-  nameError: false
+  errorMsg: ''
 }
 
 const {
@@ -51,43 +50,6 @@ class UserInfoView extends React.Component {
   back = () => {
     this.props.history.goBack()
   }
-  postMessage = () => {
-    if (!this.state.addingName) {
-      return this.setState({
-        empty: true
-      })
-    }
-    if (this.state.messagePosting) {
-      return
-    }
-    this.setState({
-      messagePosting: true
-    })
-    let resource = '/api/notify/add',
-      mobile = this.state.data.mobile
-    const body = {
-      content: this.state.addingName,
-      type: 3,
-      mobiles: [mobile]
-    }
-    const cb = json => {
-      const nextState = {
-        messagePosting: false
-      }
-      if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage)
-      } else {
-        if (json.data.id) {
-          Noti.hintSuccessWithoutSkip('发送成功')
-          nextState.visible = false
-        } else {
-          Noti.hintWarning('数据出错')
-        }
-      }
-      this.setState(nextState)
-    }
-    AjaxHandler.ajax(resource, body, cb)
-  }
   changeAccount = (e, i) => {
     const users = deepCopy(this.state.users)
     users[i].userNo = e.target.value
@@ -97,16 +59,32 @@ class UserInfoView extends React.Component {
   }
   checkAccount = (e, i) => {
     const users = deepCopy(this.state.users)
+    // trim
     users[i].userNo = users[i].userNo.trim()
-    if (users[i].account === '') {
-      users[i].numError = true
-    } else if (users[i].numError) {
-      users[i].numError = false
+    // check if empty
+    const userNo = users[i].userNo
+    if (userNo === '') {
+      users[i].errorMsg = '账号不能为空'
+      return this.setState({ users })
     }
-    this.setState({
-      users
-    })
+    // check if same to editing items
+    const duplicateLocal =
+      users.findIndex((u, ind) => i !== ind && u.userNo === userNo) !== -1
+    if (duplicateLocal) {
+      users[i].errorMsg = '已存在相同的用户账号'
+      return this.setState({ users })
+    }
+    if (users[i].errorMsg) {
+      users[i].errorMsg = ''
+    }
+    this.setState(
+      {
+        users
+      },
+      () => this.checkUserNo(userNo)
+    )
   }
+
   changeName = (e, i) => {
     const users = deepCopy(this.state.users)
     users[i].userName = e.target.value
@@ -225,7 +203,7 @@ class UserInfoView extends React.Component {
     for (let i = 0, l = users.length; i < l; i++) {
       const u = users[i]
       if (!u.userNo) {
-        users[i].numError = true
+        users[i].errorMsg = '账号不能为空'
         this.setState(users)
         return false
       }
@@ -234,15 +212,86 @@ class UserInfoView extends React.Component {
         this.setState(users)
         return false
       }
-      delete users[i].numError
+
+      // check if same to editing items
+      const duplicateLocal =
+        users.findIndex(
+          (user, ind) => i !== ind && user.userNo === u.userNo
+        ) !== -1
+      if (duplicateLocal) {
+        users[i].errorMsg = '已存在相同的用户账号'
+        return this.setState({ users })
+      }
+
+      delete users[i].errorMsg
       delete users[i].nameError
     }
     return true
+  }
+  /**
+   * check if the userNo or userNos exist in database
+   * if 'userNo' is empty, check all the users
+   * @param {? int}   i   the index of the userNo
+   * @returns {Promise}
+   */
+  checkUserNo = userNo => {
+    const resource = '/api/user/import/check'
+    const body = {}
+    if (userNo) {
+      body.userNos = [userNo]
+    } else {
+      body.userNos = this.state.users.map(u => u.userNo)
+    }
+    if (this.state.checking) {
+      return new Promise((resolve, reject) => {
+        reject()
+      })
+    }
+    this.setState({
+      checking: true
+    })
+    return AjaxHandler.fetch(resource, body).then(json => {
+      const users = deepCopy(this.state.users)
+      const nextState = { checking: false }
+      if (json && json.data) {
+        const { result, duplicates } = json.data
+        if (result) {
+          // already exist
+          duplicates.forEach(d => {
+            const index = users.findIndex(u => u.userNo === d)
+            if (index !== -1) {
+              users[index].errorMsg = '此账号已注册，请重新输入'
+            }
+          })
+        } else {
+          if (userNo) {
+            const index = users.findIndex(u => u.userNo === userNo)
+            if (index !== -1) {
+              users[index].errorMsg = ''
+            }
+          } else {
+            users.forEach(u => (u.errorMsg = ''))
+          }
+        }
+      }
+      nextState.users = users
+      this.setState(nextState)
+    })
   }
   submitManual = () => {
     if (!this.checkInfo()) {
       return
     }
+    this.checkUserNo().then(json => {
+      // users.errorMsg will be cleard in checking, if not , means error exist
+      const users = deepCopy(this.state.users)
+      const hasError = users.some(u => !!u.errorMsg)
+      if (!hasError) {
+        this.postInfo()
+      }
+    })
+  }
+  postInfo = () => {
     const { schoolId, users, importMethod } = this.state
     const resource = '/api/user/add/handwork'
     const body = {
@@ -295,11 +344,10 @@ class UserInfoView extends React.Component {
             onChange={e => this.changeAccount(e, i)}
             onBlur={e => this.checkAccount(e, i)}
           />
-          {u.numError ? (
-            <span className="checkInvalid">请输入登录账号！</span>
+          {u.errorMsg ? (
+            <span className="checkInvalid">{u.errorMsg}</span>
           ) : null}
         </li>
-
         <li>
           <p>姓名:</p>
           <input
@@ -308,7 +356,7 @@ class UserInfoView extends React.Component {
             onBlur={e => this.checkName(e, i)}
           />
           {u.nameError ? (
-            <span className="checkInvalid">请输入名字！</span>
+            <span className="checkInvalid">名称不能为空</span>
           ) : null}
         </li>
       </Fragment>

@@ -28,7 +28,8 @@ const mapStateToTableProps = (state, ownProps) => ({
   schoolId: state.userModule[subModule].schoolId,
   selectKey: state.userModule[subModule].selectKey,
   page: state.userModule[subModule].page,
-  userTransfer: state.userModule[subModule].userTransfer
+  userTransfer: state.userModule[subModule].userTransfer,
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
 const UserTable = withRouter(
