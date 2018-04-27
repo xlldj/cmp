@@ -434,9 +434,9 @@ class SchoolInfoEdit extends React.Component {
     // if has wxaccount, and validate success, post it. Or else just ignore it.
     if (wxValidateSuccess && wxpayAccountName) {
       body.wxpayAccountName = wxpayAccountName
+      body.hasWxAccount = true
       if (wxpayAppId !== '********') {
         // has wx account, and changed
-        body.hasWxAccount = true
         body = {
           ...body,
           ...{
@@ -1246,7 +1246,6 @@ class SchoolInfoEdit extends React.Component {
       validateSuccess,
       validateFailure,
       initialAccount,
-      hasWxAccount,
       wxpayAccountEditing,
       wxpayAccountName,
       wxpayAccountNameError,
@@ -1597,7 +1596,7 @@ class SchoolInfoEdit extends React.Component {
           </li>
 
           {alipayAccount}
-          {hasWxAccount ? wxAccount : null}
+          {wxAccount}
           <li>
             <p />
             <span className="hintText">
