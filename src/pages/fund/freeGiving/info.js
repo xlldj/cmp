@@ -55,12 +55,9 @@ class FreeGivingInfo extends React.Component {
 
       schoolOpts: {}
     }
-    if (this.props.schoolSet) {
-      this.setSchoolOpts(this.props)
-    }
   }
   fetchData = body => {
-    let resource = '/api/givingRul/activity/one'
+    let resource = '/api/givingRule/activity/one'
     AjaxHandler.fetch(resource, body).then(json => {
       if (json && json.data) {
         const {
@@ -79,8 +76,6 @@ class FreeGivingInfo extends React.Component {
         const nextState = {
           schoolId,
           id,
-          startDay,
-          endDay,
           period,
           amount,
           status
@@ -94,8 +89,14 @@ class FreeGivingInfo extends React.Component {
           hour: endHour,
           minute: endMinute
         }
+        if (period === FREEGIVING_PERIOD_MONTH) {
+          nextState.startDay = startDay
+          nextState.endDay = endDay
+        }
         if (status === FREEGIVING_ONLINE) {
           nextState.released = true
+        } else {
+          nextState.released = false
         }
         this.setState(nextState)
       }
@@ -108,6 +109,9 @@ class FreeGivingInfo extends React.Component {
         id: parseInt(this.props.match.params.id.slice(1), 10)
       }
       this.fetchData(body)
+    }
+    if (this.props.schoolSet) {
+      this.setSchoolOpts(this.props)
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -127,16 +131,7 @@ class FreeGivingInfo extends React.Component {
     }
   }
   checkComplete = () => {
-    const {
-      schoolId,
-      amount,
-      period,
-      startDay,
-      endDay,
-      startTime,
-      endTime,
-      status
-    } = this.state
+    const { schoolId, amount, period, startDay, endDay, status } = this.state
     if (!schoolId) {
       this.setState({
         schoolError: true
@@ -178,7 +173,6 @@ class FreeGivingInfo extends React.Component {
   }
   postInfo = () => {
     let {
-      id,
       schoolId,
       amount,
       period,
@@ -199,11 +193,13 @@ class FreeGivingInfo extends React.Component {
       period,
       startHour: moment(startTime).hour(),
       startMinute: moment(startTime).minute(),
+      endHour: moment(endTime).hour(),
+      endMinute: moment(endTime).minute(),
       status: +status
     }
     if (period === FREEGIVING_PERIOD_MONTH) {
-      body.startDay = startDay
-      body.endDay = endDay
+      body.startDay = +startDay
+      body.endDay = +endDay
     }
     const resource = '/api/givingRule/activity/save'
     if (this.props.match.params.id) {
@@ -215,7 +211,6 @@ class FreeGivingInfo extends React.Component {
     this.setState({
       posting: true
     })
-    debugger
     AjaxHandler.fetch(resource, body).then(json => {
       const nextState = {
         posting: false
@@ -229,6 +224,7 @@ class FreeGivingInfo extends React.Component {
           Noti.hintSuccess(this.props.history, '/fund/freeGiving')
         }
       }
+      this.setState(nextState)
     })
   }
   back = () => {
@@ -244,7 +240,7 @@ class FreeGivingInfo extends React.Component {
     if (this.state.schoolError) {
       nextState.schoolError = false
     }
-    this.setState(nextState, this.checkExist)
+    this.setState(nextState)
   }
   checkSchool = v => {
     if (!parseInt(this.state.schoolId, 10)) {
@@ -295,7 +291,19 @@ class FreeGivingInfo extends React.Component {
     this.checkExist(this.postInfo)
   }
   checkExist = callback => {
-    let { schoolId, id, initialSchool, checking } = this.state
+    let {
+      schoolId,
+      id,
+      initialSchool,
+      checking,
+      amount,
+      period,
+      startDay,
+      startTime,
+      endDay,
+      endTime,
+      status
+    } = this.state
 
     // still the same school, no need to check.
     if (id && parseInt(schoolId, 10) === initialSchool) {
@@ -312,25 +320,31 @@ class FreeGivingInfo extends React.Component {
     })
     let resource = '/api/givingRule/activity/check'
     const body = {
-      schoolId: parseInt(schoolId, 10)
+      schoolId: parseInt(schoolId, 10),
+      amount: +amount,
+      period,
+      startHour: moment(startTime).hour(),
+      startMinute: moment(startTime).minute(),
+      endHour: moment(endTime).hour(),
+      endMinute: moment(endTime).minute(),
+      status: +status
     }
-    const cb = json => {
+    if (period === FREEGIVING_PERIOD_MONTH) {
+      body.startDay = +startDay
+      body.endDay = +endDay
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
       this.setState({
         checking: false
       })
-      if (json.error) {
-        Noti.hintServiceError(json.error.displayMessage)
+      if (json && json.data && json.data.result) {
+        Noti.hintLock('操作出错', '当前学校已有赠送金额设置，请勿重复添加')
       } else {
-        if (json.data.result) {
-          Noti.hintLock('操作出错', '当前学校已有赠送金额设置，请勿重复添加')
-        } else {
-          if (callback) {
-            callback()
-          }
+        if (callback) {
+          callback()
         }
       }
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    })
   }
 
   changeStartDay = v => {
@@ -402,7 +416,9 @@ class FreeGivingInfo extends React.Component {
     } = this.state
     const startDaySelect = (
       <BasicSelectorWithoutAll
-        style={{ marginRight: '8px' }}
+        disabled={released}
+        className={released ? 'disabled' : ''}
+        style={{ marginRight: '8px', width: '100px' }}
         staticOpts={MONTH_DAY_ENUMS}
         selectedOpt={startDay}
         changeOpt={this.changeStartDay}
@@ -411,7 +427,9 @@ class FreeGivingInfo extends React.Component {
     )
     const endDaySelect = (
       <BasicSelectorWithoutAll
-        style={{ marginRight: '8px' }}
+        disabled={released}
+        className={released ? 'disabled' : ''}
+        style={{ marginRight: '8px', width: '100px' }}
         staticOpts={MONTH_DAY_ENUMS}
         selectedOpt={endDay}
         changeOpt={this.changeEndDay}
@@ -440,6 +458,8 @@ class FreeGivingInfo extends React.Component {
           <li>
             <p>赠送金额:</p>
             <input
+              disabled={released}
+              className={released ? 'disabled' : ''}
               type="number"
               value={amount}
               onChange={this.changeAmount}
@@ -452,6 +472,9 @@ class FreeGivingInfo extends React.Component {
           <li>
             <p>赠送周期:</p>
             <BasicSelectorWithoutAll
+              disabled={released}
+              style={{ width: '80px' }}
+              className={released ? 'disabled' : ''}
               staticOpts={FREEGIVING_PERIOD}
               selectedOpt={period}
               changeOpt={this.changePeriod}
@@ -466,8 +489,9 @@ class FreeGivingInfo extends React.Component {
             <span>
               {period === FREEGIVING_PERIOD_MONTH ? startDaySelect : null}
               <TimePicker
-                style={{ width: 'auto' }}
-                className="timepicker"
+                disabled={released}
+                style={{ width: 'auto', backgroundColor: 'auto' }}
+                className={released ? 'timepicker disabled' : 'timepicker'}
                 allowEmpty={false}
                 showSecond={false}
                 value={moment(startTime)}
@@ -485,8 +509,9 @@ class FreeGivingInfo extends React.Component {
             <span>
               {period === FREEGIVING_PERIOD_MONTH ? endDaySelect : null}
               <TimePicker
+                disabled={released}
+                className={released ? 'timepicker disabled' : 'timepicker'}
                 style={{ width: 'auto' }}
-                className="timepicker"
                 allowEmpty={false}
                 showSecond={false}
                 value={moment(endTime)}

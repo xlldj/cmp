@@ -314,6 +314,12 @@ class UserInfoView extends React.Component {
             <p>账户余额:</p>
             {data.balance ? '¥' + data.balance : '暂无'}
           </li>
+          {data.givingBalance ? (
+            <li>
+              <p>赠送金额:</p>
+              {data.givingBalance}
+            </li>
+          ) : null}
           {data.credits !== undefined ? (
             <li>
               <p>用户积分:</p>
