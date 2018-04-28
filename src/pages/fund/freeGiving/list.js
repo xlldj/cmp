@@ -97,6 +97,9 @@ class FreeGivingTable extends React.Component {
     ]
   }
   fetchData = body => {
+    if (this.state.loading) {
+      return
+    }
     this.setState({
       loading: true
     })
