@@ -3,11 +3,12 @@ import { Button, Upload, Icon } from 'antd'
 import Noti from '../../../util/noti'
 import CONSTANTS from '../../../constants'
 import AjaxHandler from '../../../util/ajax'
-import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
+import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import AddPlusAbs from '../../component/addPlusAbs'
 import { deepCopy } from '../../../util/copy'
 import { mul } from '../../../util/numberHandle'
+import { checkObject } from '../../../util/checkSame'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -24,7 +25,8 @@ const {
   Import_Method_Manual,
   FILE_TYPE_XLSX
 } = CONSTANTS
-class UserInfoView extends React.Component {
+
+class FoxImportView extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
   }
@@ -32,21 +34,42 @@ class UserInfoView extends React.Component {
     super(props)
     this.state = {
       schoolId: '',
-      importMethod: 1, // 1 for batch import, 2 for single import
+      importMethod: 1, // 1 for batch import, 2 for manual import
       users: [deepCopy(userInfo)],
       userFile: [],
       loadingRatio: '',
       fileUploadFailure: false,
       fileUploadSuccess: false,
       fileUploading: false,
-      stopFetchPercent: false
+      stopFetchPercent: false,
+      schoolOpts: {}
     }
   }
   componentDidMount() {
     this.props.hide(false)
+    if (this.props.schoolSet) {
+      this.setSchoolOpts(this.props)
+    }
   }
   componentWillUnmount() {
     this.props.hide(true)
+  }
+  componentWillReceiveProps(nextProps) {
+    if (!checkObject(this.props.schools, nextProps.schools, ['schoolSet'])) {
+      this.setSchoolOpts(nextProps)
+    }
+  }
+  setSchoolOpts = props => {
+    const fox_index = props.schools.findIndex(s => s.name === '富士康')
+    if (fox_index !== -1) {
+      const school = props.schools[fox_index]
+      const schoolOpts = {}
+      schoolOpts[school.id] = school.name
+      this.setState({
+        schoolOpts,
+        schoolId: school.id
+      })
+    }
   }
   back = () => {
     this.props.history.goBack()
@@ -199,6 +222,11 @@ class UserInfoView extends React.Component {
       }
     })
   }
+  /**
+   * check if needed inputs are ready. This only happens with 'importMethod' === 'manual'.
+   * If no ready, this will setState of corresponding state.
+   * @return {bool} :true if inputs are ready.
+   */
   checkInfo = () => {
     const { schoolId, users } = this.state
     if (!schoolId) {
@@ -240,8 +268,8 @@ class UserInfoView extends React.Component {
   /**
    * check if the userNo or userNos exist in database
    * if 'userNo' is empty, check all the users
-   * @param {? int}   i   the index of the userNo
-   * @returns {Promise}
+   * @param {? int}   userNo   :the userNo to be checked
+   * @return {Promise}
    */
   checkUserNo = userNo => {
     const resource = '/api/user/import/check'
@@ -287,12 +315,12 @@ class UserInfoView extends React.Component {
       this.setState(nextState)
     })
   }
-  submitManual = () => {
+  confirmManual = () => {
     if (!this.checkInfo()) {
       return
     }
     this.checkUserNo().then(json => {
-      // users.errorMsg will be cleard in checking, if not , means error exist
+      // users.errorMsg will be cleard in checking, if not, means error exist
       const users = deepCopy(this.state.users)
       const hasError = users.some(u => !!u.errorMsg)
       if (!hasError) {
@@ -342,7 +370,8 @@ class UserInfoView extends React.Component {
       fileTypeError,
       taskPercent,
       successTaskSize,
-      failTaskSize
+      failTaskSize,
+      schoolOpts
     } = this.state
     const userInfos = users.map((u, i) => (
       <Fragment>
@@ -430,14 +459,16 @@ class UserInfoView extends React.Component {
         <ul>
           <li>
             <p>学校:</p>
-            <SchoolSelector
+
+            <BasicSelectorWithoutAll
               width={CONSTANTS.SELECTWIDTH}
-              selectedSchool={schoolId}
-              changeSchool={this.changeSchool}
-              checkSchool={this.checkSchool}
+              staticOpts={schoolOpts}
+              selectedOpt={schoolId}
+              changeOpt={this.changeSchool}
+              checkOpt={this.checkSchool}
             />
             {schoolError ? (
-              <span className="checkInvalid">请选择学校</span>
+              <span className="checkInvalid">学校不能为空！</span>
             ) : null}
           </li>
           <li>
@@ -467,7 +498,7 @@ class UserInfoView extends React.Component {
         </ul>
         <div className="btnArea">
           {importMethod === Import_Method_Manual ? (
-            <Button type="primary" onClick={this.submitManual}>
+            <Button type="primary" onClick={this.confirmManual}>
               确认
             </Button>
           ) : null}
@@ -479,12 +510,14 @@ class UserInfoView extends React.Component {
 }
 
 const mapStateToInfoProps = (state, ownProps) => ({
-  forbiddenStatus: state.setAuthenData.forbiddenStatus
+  forbiddenStatus: state.setAuthenData.forbiddenStatus,
+  schools: state.setSchoolList.schools,
+  schoolSet: state.setSchoolList.schoolSet
 })
 
 export default withRouter(
   connect(mapStateToInfoProps, {
     changeOrder,
     changeFund
-  })(UserInfoView)
+  })(FoxImportView)
 )

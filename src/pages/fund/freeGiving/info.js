@@ -26,8 +26,10 @@ class FreeGivingInfo extends React.Component {
       initialSchool = 0,
       id = 0
     this.state = {
+      id,
       schoolId,
       schoolError,
+      initialSchool,
       amount: '',
       amountError: false,
       startDay: 1,
@@ -48,8 +50,6 @@ class FreeGivingInfo extends React.Component {
         minute: 59
       },
 
-      initialSchool,
-      id,
       posting: false,
       released: false,
 
@@ -99,7 +99,7 @@ class FreeGivingInfo extends React.Component {
         }
         if (status === FREEGIVING_ONLINE) {
           nextState.released = true
-        } else {
+        } else if (this.state.released) {
           nextState.released = false
         }
         this.setState(nextState)
@@ -135,6 +135,9 @@ class FreeGivingInfo extends React.Component {
       })
     }
   }
+  /**
+   * check if inputs are ready, note 'startTime' and 'endTime' does not need checking.
+   */
   checkComplete = () => {
     const {
       schoolId,
@@ -195,7 +198,7 @@ class FreeGivingInfo extends React.Component {
     return true
   }
   postInfo = () => {
-    let {
+    const {
       schoolId,
       amount,
       period,
@@ -208,6 +211,9 @@ class FreeGivingInfo extends React.Component {
       posting,
       validateTimeOption
     } = this.state
+    if (posting) {
+      return
+    }
     if (!this.checkComplete()) {
       return
     }
@@ -229,9 +235,6 @@ class FreeGivingInfo extends React.Component {
     const resource = '/api/givingRule/activity/save'
     if (this.props.match.params.id) {
       body.id = parseInt(this.props.match.params.id.slice(1), 10)
-    }
-    if (posting) {
-      return
     }
     this.setState({
       posting: true
@@ -364,10 +367,10 @@ class FreeGivingInfo extends React.Component {
       this.setState({
         checking: false
       })
-      if (json && json.data && json.data.result) {
-        Noti.hintLock('操作出错', '当前学校已有赠送金额设置，请勿重复添加')
-      } else {
-        if (callback) {
+      if (json && json.data) {
+        if (json.data.result) {
+          Noti.hintLock('操作出错', '当前学校已有赠送金额设置，请勿重复添加')
+        } else if (callback) {
           callback()
         }
       }
