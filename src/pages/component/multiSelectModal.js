@@ -77,6 +77,7 @@ export default class MultiSelectModal extends React.Component {
   selectRow = (record, index, event) => {
     this.changeSelect(null, index)
   }
+
   render() {
     const { dataSource } = this.state
     const { show, suportAllChoose } = this.props
@@ -91,7 +92,6 @@ export default class MultiSelectModal extends React.Component {
           {r.value || r.name}/
         </span>
       ))
-
     return (
       <Modal
         wrapClassName="modal"

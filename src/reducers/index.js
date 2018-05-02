@@ -489,6 +489,7 @@ const statModule = (state = initialStatState, action) => {
 const rootReducer = combineReducers({
   schoolModule,
   heaterModule,
+  doorForbidModule,
   deviceModule,
   orderModule,
   fundModule,
@@ -499,7 +500,6 @@ const rootReducer = combineReducers({
   employeeModule,
   notifyModule,
   versionModule,
-  doorForbidModule,
   setSchoolList,
   statModule,
   setAuthenData,
