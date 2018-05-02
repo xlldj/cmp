@@ -53,9 +53,6 @@ const SchoolDisp = asyncComponent(() =>
 const DoorForbidDisp = asyncComponent(() =>
   import(/* webpackChunkName: "doorForbid" */ './doorForbid/doorForbidDisp')
 )
-const DoorForbidDisp = asyncComponent(() =>
-  import(/* webpackChunkName: "doorForbid" */ './doorForbid/doorForbidDisp')
-)
 const OrderDisp = asyncComponent(() =>
   import(/* webpackChunkName: "order" */ './order/orderDisp')
 )

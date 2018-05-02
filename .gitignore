@@ -12,4 +12,7 @@ coverage
 npm-debug.log
 
 bash
-.gitignore
+
+./.gitignore
+
+.idea
