@@ -8,7 +8,8 @@ const SCHOOL = {
   SCHOOL_TYPES: {
     1: '真实学校',
     2: '测试学校'
-  }
+  },
+  WXCERTSIZE: 65534 // cert file should not exceed 64k bytes.
 }
 
 export default SCHOOL
