@@ -464,7 +464,7 @@ class SchoolInfoEdit extends React.Component {
         }
         this.addSchoolToReducer(school)
         // always reload when confirm
-        this.reloadAlipay()
+        this.reloadAccount()
       }
       this.setState(nextState)
     })
@@ -486,31 +486,27 @@ class SchoolInfoEdit extends React.Component {
     })
   }
 
-  reloadAlipay = () => {
-    Promise.all([this.tellServerAccount(), this.tellClientAccount()])
+  reloadAccount = () => {
+    Promise.all([
+      this.tellServerAccount(),
+      this.tellClientAccount(),
+      this.tellServerWxAccount(),
+      this.tellClientWxAccount()
+    ])
       .then(json => {
-        const { serverReloaded, clientReloaded } = this.state
-        if (serverReloaded && clientReloaded) {
+        const {
+          serverReloaded,
+          clientReloaded,
+          wxServerReloaded,
+          wxClientReloaded
+        } = this.state
+        if (
+          serverReloaded &&
+          clientReloaded &&
+          wxServerReloaded &&
+          wxClientReloaded
+        ) {
           // check wx account here
-          const { wxpayAppId, wxValidateSuccess } = this.state
-          if (wxpayAppId && wxpayAppId !== '********' && wxValidateSuccess) {
-            this.reloadWxAccount()
-          } else {
-            this.hintSuccess()
-          }
-        } else {
-          Noti.hintWarning('', '账号绑定失败，请稍后重试')
-        }
-      })
-      .catch(err => {
-        Noti.hintWarning('', '账号绑定失败，请稍后重试')
-      })
-  }
-  reloadWxAccount = () => {
-    Promise.all([this.tellServerWxAccount(), this.tellClientWxAccount()])
-      .then(json => {
-        const { wxServerReloaded, wxClientReloaded } = this.state
-        if (wxServerReloaded && wxClientReloaded) {
           this.hintSuccess()
         } else {
           Noti.hintWarning('', '账号绑定失败，请稍后重试')
@@ -598,7 +594,7 @@ class SchoolInfoEdit extends React.Component {
     }
     // if both alipay and wx are not validated, and this is creating new school, return
     if (!validateSuccess && !wxValidateSuccess && id) {
-      return Noti.hintWarning('', '请先验证收款账号再提交！')
+      return Noti.hintWarning('', '请输入并验证至少一个收款账号！')
     }
 
     if (id && initialName === name) {

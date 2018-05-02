@@ -230,7 +230,7 @@ class BuildTask extends React.Component {
         descError: true
       })
     }
-    if (!/^1[3|4|5|7|8][0-9]{9}$/.test(userMobile)) {
+    if (!/^1[0-9]{10}$/.test(userMobile)) {
       return this.setState({
         mobileFormatError: true
       })
