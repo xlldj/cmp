@@ -467,10 +467,6 @@ class Main extends React.Component {
                 render={props => <DoorForbidDisp hide={this.hide} {...props} />}
               />
               <Route
-                path="/doorForbid"
-                render={props => <DoorForbidDisp hide={this.hide} {...props} />}
-              />
-              <Route
                 path="/device"
                 render={props => <DeviceDisp hide={this.hide} {...props} />}
               />
