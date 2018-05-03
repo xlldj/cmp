@@ -290,6 +290,24 @@ class UserInfoView extends React.Component {
             <p>手机型号:</p>
             {data.mobileModel || '未知'}
           </li>
+          {data.authStatus ? (
+            <li>
+              <p>身份类别:</p>
+              {data.authStatus}
+            </li>
+          ) : null}
+          {data.userNo ? (
+            <li>
+              <p>员工号:</p>
+              {data.userNo}
+            </li>
+          ) : null}
+          {data.userName ? (
+            <li>
+              <p>姓名:</p>
+              {data.userName}
+            </li>
+          ) : null}
           <li>
             <p>学校:</p>
             {data.schoolName}
