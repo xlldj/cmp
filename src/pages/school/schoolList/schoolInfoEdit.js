@@ -518,6 +518,7 @@ class SchoolInfoEdit extends React.Component {
   }
 
   tellServerAccount = () => {
+    // 管理端reload
     const resource = '/api/alipay/trade/client/reload'
     return AjaxHandler.fetch(resource, null).then(json => {
       if (json && json.data && json.data.result) {
@@ -528,14 +529,17 @@ class SchoolInfoEdit extends React.Component {
     })
   }
   tellClientAccount = () => {
+    // 用户端reload
     const resource = '/api/alipay/trade/client/reload'
-    return AjaxHandler.fetch(resource, null).then(json => {
-      if (json && json.data && json.data.result) {
-        this.setState({
-          clientReloaded: true
-        })
+    return AjaxHandler.fetch(resource, null, null, { userPort: true }).then(
+      json => {
+        if (json && json.data && json.data.result) {
+          this.setState({
+            clientReloaded: true
+          })
+        }
       }
-    })
+    )
   }
   tellServerWxAccount = () => {
     const resource = '/api/wxpay/trade/client/reload'
@@ -549,13 +553,15 @@ class SchoolInfoEdit extends React.Component {
   }
   tellClientWxAccount = () => {
     const resource = '/api/wxpay/trade/client/reload'
-    return AjaxHandler.fetch(resource, null).then(json => {
-      if (json && json.data && json.data.result) {
-        this.setState({
-          wxClientReloaded: true
-        })
+    return AjaxHandler.fetch(resource, null, null, { userPort: true }).then(
+      json => {
+        if (json && json.data && json.data.result) {
+          this.setState({
+            wxClientReloaded: true
+          })
+        }
       }
-    })
+    )
   }
 
   hintSuccess = () => {
