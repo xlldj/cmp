@@ -22,7 +22,8 @@ const FUND = {
     2: '否'
   },
   FREEGIVING_ONLINE: 1,
-  FREEGIVING_OFFLINE: 2
+  FREEGIVING_OFFLINE: 2,
+  FREEGIVING_TARGETS: { 1: '所有用户', 2: '已认证用户' }
 }
 
 export default FUND
