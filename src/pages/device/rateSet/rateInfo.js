@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import { Button } from 'antd'
 
@@ -10,6 +10,7 @@ import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { mul, div } from '../../../util/numberHandle'
+const Fragment = React.Fragment
 const {
   DEVICE_TYPE_HEATER,
   DEVICE_TYPE_DRINGKER,
@@ -178,7 +179,8 @@ class RateInfo extends React.Component {
                 r.rateGroups &&
                 r.rateGroups.map(rate => ({
                   price: rate.price ? mul(rate.price, 100) : '',
-                  pulse: rate.pulse ? rate.pulse : ''
+                  pulse: rate.pulse ? rate.pulse : '',
+                  unitPrice: rate.unitPrice ? mul(rate.unitPrice) : ''
                 }))
             }
           }
@@ -341,6 +343,27 @@ class RateInfo extends React.Component {
       rateGroups: rateGroups
     })
   }
+  changeUnitPrice = (e, i) => {
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
+    rateGroups[i].unitPrice = parseInt(e.target.value, 10)
+    this.setState({
+      rateGroups: rateGroups
+    })
+  }
+  checkUnitPrice = (e, i) => {
+    debugger
+    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
+    if (!rateGroups[i].unitPrice) {
+      rateGroups[i].error = true
+      return this.setState({
+        rateGroups: rateGroups
+      })
+    }
+    rateGroups[i].error = false
+    this.setState({
+      rateGroups: rateGroups
+    })
+  }
   checkInput = () => {
     let {
       rateGroups,
@@ -447,7 +470,7 @@ class RateInfo extends React.Component {
         let rates = JSON.parse(JSON.stringify(rateGroups))
         for (let i = 0; i < rates.length; i++) {
           let r = rates[i]
-          if (!r.price || !r.pulse) {
+          if (!r.price || !r.pulse || !r.unitPrice) {
             r.error = true
             nextState.rateGroups = rates
             this.setState(nextState)
@@ -581,6 +604,7 @@ class RateInfo extends React.Component {
       rateGroups.forEach(r => {
         if (r.price) {
           r.price = div(r.price, 100)
+          r.unitPrice = div(r.unitPrice, 100)
         }
       })
       let setRateGroups = true
@@ -859,6 +883,22 @@ class RateInfo extends React.Component {
         return (
           <li className="rateSets" key={`rateA${i}`}>
             <p>费率组{i + 1}:</p>
+            <span key={`spanVolume${i}`}>1升水 =</span>
+            <input
+              type="number"
+              className="shortInput"
+              onChange={e => {
+                this.changeUnitPrice(e, i)
+              }}
+              onBlur={e => {
+                this.checkUnitPrice(e, i)
+              }}
+              key={`unitPrice${i}`}
+              value={r.unitPrice || ''}
+            />
+            <span className="rightSeperatorBig" key={`spanUnitPrice${i}`}>
+              分钱
+            </span>
             <input
               type="number"
               className="shortInput"
@@ -948,9 +988,8 @@ class RateInfo extends React.Component {
         )
       })
     // if not washer: if blower, must be rateItems; else check if XINNA agreement
-    // 将热水器/饮水机的费率模式都改为了'辛钠'模式，2018/5/2
     const notWasherRates =
-      deviceType !== DEVICE_TYPE_BLOWER.toString() ? (
+      currentAgreement === 2 && deviceType !== DEVICE_TYPE_BLOWER.toString() ? (
         <Fragment>
           {rateItemsVersionB}
           <li>
