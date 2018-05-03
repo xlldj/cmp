@@ -529,9 +529,7 @@ class SchoolInfoEdit extends React.Component {
   }
   tellClientAccount = () => {
     const resource = '/api/alipay/trade/client/reload'
-    return AjaxHandler.fetch(resource, null, null, {
-      domain: 'http://116.62.236.67:5081'
-    }).then(json => {
+    return AjaxHandler.fetch(resource, null).then(json => {
       if (json && json.data && json.data.result) {
         this.setState({
           clientReloaded: true
@@ -551,9 +549,7 @@ class SchoolInfoEdit extends React.Component {
   }
   tellClientWxAccount = () => {
     const resource = '/api/wxpay/trade/client/reload'
-    return AjaxHandler.fetch(resource, null, null, {
-      domain: 'http://116.62.236.67:5081'
-    }).then(json => {
+    return AjaxHandler.fetch(resource, null).then(json => {
       if (json && json.data && json.data.result) {
         this.setState({
           wxClientReloaded: true
