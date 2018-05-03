@@ -46,13 +46,9 @@ class FoxImportView extends React.Component {
     }
   }
   componentDidMount() {
-    this.props.hide(false)
     if (this.props.schoolSet) {
       this.setSchoolOpts(this.props)
     }
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   componentWillReceiveProps(nextProps) {
     if (!checkObject(this.props.schools, nextProps.schools, ['schoolSet'])) {

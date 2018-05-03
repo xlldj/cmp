@@ -4,6 +4,7 @@ import { buildAuthenData } from '../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../util/storage'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
+import { CHANGE_USER, changeUser } from '../pages/user/action'
 
 import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
 import {
@@ -211,15 +212,6 @@ export const changeLost = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_USER = 'CHANGE_USER'
-export const changeUser = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_USER,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_TASK = 'CHANGE_TASK'
 export const changeTask = (subModule, keyValuePair) => {
   return {
@@ -279,5 +271,7 @@ export {
   fetchDoorForbidList,
   fetchDetailRecordList,
   SET_BUILDING_LIST,
-  fetchBuildings
+  fetchBuildings,
+  CHANGE_USER,
+  changeUser
 }

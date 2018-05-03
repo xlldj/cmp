@@ -65,6 +65,10 @@ const ORDER = {
     3: '近7日',
     5: '近30日'
   },
+  ORDER_ANALYZE_ORDERBYS: {
+    consumption: 1,
+    waterUsage: 2
+  },
   ORDER_ANALYZE_DAY_SELECT_ARR: [
     { key: 1, value: '今日' },
     { key: 9, value: '昨天' },

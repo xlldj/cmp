@@ -15,6 +15,8 @@ const BASIC = {
 
   SETTLETYPE: { 1: '消息回复', 2: '电话回复' },
 
+  ORDER: { descend: 1, ascend: 2 },
+
   FILE_TYPE_XLSX:
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 
