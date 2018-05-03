@@ -37,7 +37,6 @@ class UserInfoView extends React.Component {
     }
   }
   componentDidMount() {
-    this.props.hide(false)
     this.fetchData()
   }
   fetchData = () => {
@@ -56,9 +55,6 @@ class UserInfoView extends React.Component {
       }
     }
     AjaxHandler.ajax(resource, body, cb)
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   back = () => {
     this.props.history.goBack()

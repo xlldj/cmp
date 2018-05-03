@@ -7,6 +7,7 @@ import Time from '../util/time'
 import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
 import buildingsSet from './building'
+import userModule from '../pages/user/reducer.js'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -309,25 +310,6 @@ const lostModule = (state = initialLostState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_LOST) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
-// 用户管理
-const initialUserState = {
-  userList: {
-    page: 1,
-    schoolId: selectedSchool,
-    selectKey: '',
-    userTransfer: 'all'
-  }
-}
-const userModule = (state = initialUserState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_USER) {
     const { subModule, keyValuePair } = action
     return merge({}, state, { [subModule]: keyValuePair })
   }

@@ -25,7 +25,9 @@ const {
   ROOMTYPES,
   DEVICE_WARN_TASK_STATUS_ENUM,
   NORMAL_DAY_7,
-  ORDER_ANALYZE_DAY_SELECT_ARR
+  ORDER_ANALYZE_DAY_SELECT_ARR,
+  ORDER,
+  ORDER_ANALYZE_ORDERBYS
 } = CONSTANTS
 
 class OrderAnalyzeView extends React.Component {
@@ -65,7 +67,9 @@ class OrderAnalyzeView extends React.Component {
       thresholdType,
       deviceType,
       startTime,
-      endTime
+      endTime,
+      order,
+      orderBy
     } = props
     const body = {
       page: page,
@@ -73,6 +77,10 @@ class OrderAnalyzeView extends React.Component {
       schoolId: +schoolId, // schoolId should not be 'all', thus could be parse to int directly
       threshold,
       thresholdType
+    }
+    if (orderBy && order !== -1) {
+      body.orderBy = ORDER_ANALYZE_ORDERBYS[orderBy]
+      body.order = ORDER[order]
     }
     if (buildingIds !== 'all') {
       body.buildingIds = buildingIds
@@ -301,10 +309,12 @@ class OrderAnalyzeView extends React.Component {
   }
 
   changeTable = (pageObj, filters, sorter) => {
-    let { order } = sorter
+    let { order, field } = sorter
     let data = {}
-    if (order !== this.props.order) {
+    if (order !== this.props.order || field !== this.props.orderBy) {
       data.analyze_order = order
+      data.analyze_orderBy = field
+      data.analyze_page = 1
     }
     let page = pageObj.current
     if (page !== this.props.page) {
@@ -423,25 +433,34 @@ class OrderAnalyzeView extends React.Component {
       },
       {
         title: '学校',
+        width: '18%',
         dataIndex: 'schoolName'
       },
       {
         title: '设备',
         dataIndex: 'deviceType',
-        width: '7%',
+        width: '10%',
         render: (text, record, index) => DEVICETYPE[record.deviceType]
       },
       {
         title: '设备地址',
         dataIndex: 'location',
-        width: '10%'
+        width: '18%'
       },
       {
         title: `${dayStr}消费总额`,
-        dataIndex: 'paymentType',
+        dataIndex: 'consumption',
         className: 'shalowRed',
+        width: '12%',
         render: (text, record, index) =>
           record.consumption ? `¥${record.consumption}` : 0,
+        sorter: true
+      },
+      {
+        title: `${dayStr}用水量`,
+        dataIndex: 'waterUsage',
+        width: '12%',
+        render: (text, record, index) => record.waterUsage || 0,
         sorter: true
       },
       {
@@ -462,6 +481,7 @@ class OrderAnalyzeView extends React.Component {
       {
         title: <p className="lastCol">操作</p>,
         dataIndex: 'operation',
+        width: '8%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <a

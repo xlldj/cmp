@@ -3,15 +3,13 @@ import { Route } from 'react-router-dom'
 import Bread from '../component/bread'
 import './style/style.css'
 import { getLocal } from '../../util/storage'
-import UserTableView from './userTable'
-import UserInfoView from './userInfo'
+import UserList from './userList'
+import UserInfoView from './userInfo.js'
 import UserFoxconn from './foxconn'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeUser, changeOrder, changeFund } from '../../actions'
-
-const subModule = 'userList'
 
 const mapStateToInfoProps = (state, ownProps) => ({
   forbiddenStatus: state.setAuthenData.forbiddenStatus
@@ -24,26 +22,18 @@ const UserInfo = withRouter(
   })(UserInfoView)
 )
 
-const mapStateToTableProps = (state, ownProps) => ({
-  schoolId: state.userModule[subModule].schoolId,
-  selectKey: state.userModule[subModule].selectKey,
-  page: state.userModule[subModule].page,
-  userTransfer: state.userModule[subModule].userTransfer,
-  forbiddenStatus: state.setAuthenData.forbiddenStatus
-})
-
-const UserTable = withRouter(
-  connect(mapStateToTableProps, {
-    changeUser
-  })(UserTableView)
-)
-
 const breadcrumbNameMap = {
   '/userInfo': '详情',
   '/foxconn': '导入富士康员工'
 }
 
 class UserDisp extends React.Component {
+  componentDidMount() {
+    this.props.hide(false)
+  }
+  componentWillUnmount() {
+    this.props.hide(true)
+  }
   setStatusForuser = () => {
     this.getDefaultSchool()
     this.props.changeUser('userList', { page: 1, selectKey: '' })
@@ -89,7 +79,7 @@ class UserDisp extends React.Component {
           <Route
             exact
             path="/user"
-            render={props => <UserTable hide={this.props.hide} {...props} />}
+            render={props => <UserList hide={this.props.hide} {...props} />}
           />
         </div>
       </div>

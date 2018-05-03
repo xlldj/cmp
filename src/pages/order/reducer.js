@@ -36,7 +36,8 @@ const initialOrderState = {
     analyze_threshold: 50,
     analyze_thresholdType: 2, // 1 means minimun, 2 means maximum
     analyze_page: 1,
-    analyze_order: '',
+    analyze_order: -1,
+    analyze_orderBy: '',
     analyze_warnTaskStatus: 'all' // if device has task of order warning type. 'all' for all devices
   },
   orderWarn: {

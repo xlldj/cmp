@@ -87,7 +87,6 @@ const TASK = {
   ],
 
   // order userd in task/report
-  ORDER: { descend: 1, ascend: 2 },
   ORDER_DESCEND: 1,
   ORDER_ASCEND: 2,
   ORDERBYS: {
