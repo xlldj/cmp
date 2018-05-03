@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import { Button } from 'antd'
 
@@ -10,7 +10,6 @@ import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { mul, div } from '../../../util/numberHandle'
-const Fragment = React.Fragment
 const {
   DEVICE_TYPE_HEATER,
   DEVICE_TYPE_DRINGKER,
@@ -949,8 +948,9 @@ class RateInfo extends React.Component {
         )
       })
     // if not washer: if blower, must be rateItems; else check if XINNA agreement
+    // 将热水器/饮水机的费率模式都改为了'辛钠'模式，2018/5/2
     const notWasherRates =
-      currentAgreement === 2 && deviceType !== DEVICE_TYPE_BLOWER.toString() ? (
+      deviceType !== DEVICE_TYPE_BLOWER.toString() ? (
         <Fragment>
           {rateItemsVersionB}
           <li>

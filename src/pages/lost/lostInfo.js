@@ -130,11 +130,11 @@ class LostInfo extends React.Component {
       userId: data.userId,
       level: parseInt(defriendLevel, 10)
     }
-    const cb = json => {
+    AjaxHandler.fetch(resource, body).then(json => {
       const nextState = {
         defriending: false
       }
-      if (json.data) {
+      if (json && json.data) {
         if (json.data.result) {
           Noti.hintOk('操作成功', '该用户已被拉入黑名单')
           nextState.showDefriendDate = false
@@ -145,12 +145,9 @@ class LostInfo extends React.Component {
             json.data.failReason || '请求出错,请联系客服或相关人员'
           )
         }
-      } else {
-        Noti.hintServiceError(json.error ? json.error.displayMessage : '')
       }
       this.setState(nextState)
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    })
   }
   cancelDefriend = () => {
     this.setState({
