@@ -1,9 +1,7 @@
 import React from 'react'
-import moment from 'moment'
 import { Table, Button } from 'antd'
 import { Link } from 'react-router-dom'
 import AjaxHandler from '../../../util/ajax'
-import Time from '../../../util/time'
 import CONSTANTS from '../../../constants'
 import { checkObject } from '../../../util/checkSame'
 
@@ -13,7 +11,12 @@ import CheckSelect from '../../component/checkSelect'
 
 const subModule = 'userList'
 
-const { USER_ANALYZE_DAY_SELECT, PAGINATION: SIZE, DEVICETYPE } = CONSTANTS
+const {
+  USER_ANALYZE_DAY_SELECT,
+  PAGINATION: SIZE,
+  DEVICETYPE,
+  NORMAL_DAY_7
+} = CONSTANTS
 
 class UserTableView extends React.Component {
   constructor(props) {
@@ -32,48 +35,86 @@ class UserTableView extends React.Component {
       {
         title: '学校名称',
         dataIndex: 'schoolName',
-        className: 'firstCol'
+        className: 'firstCol',
+        width: '10%'
       },
       {
-        title: '登录账号',
-        dataIndex: 'mobile'
+        title: '用户',
+        dataIndex: 'userName',
+        width: '10%'
       },
       {
-        title: '手机型号',
-        dataIndex: 'mobileBrand',
-        width: '20%',
-        render: (text, record) => {
-          let result = ''
-          if (record.mobileBrand) {
-            result += record.mobileBrand
-          }
-          if (record.mobileModel) {
-            result += `(${record.mobileModel})`
-          }
-          result = result ? result : '----'
-          return result
-        }
+        title: '使用次数',
+        dataIndex: 'useNum',
+        width: '10%'
       },
       {
-        title: '注册时间',
-        dataIndex: 'createTime',
-        render: (text, record) => Time.getTimeStr(record.createTime)
+        title: '用水量',
+        dataIndex: 'waterUsage',
+        width: '10%'
+      },
+      {
+        title: '消费总额',
+        dataIndex: 'consume',
+        width: '10%',
+        className: 'shllowRed',
+        render: (text, record, index) =>
+          record.consume ? `¥${record.consume}` : ''
+      },
+      {
+        title: '充值金额',
+        dataIndex: 'rechargeBalance',
+        width: '10%',
+        render: (text, record, index) => record.rechargeBalance || ''
+      },
+      {
+        title: '账户总余额(元)',
+        dataIndex: 'totalBalance',
+        width: '10%',
+        render: (text, record, index) => record.totalBalance || ''
+      },
+      {
+        title: '账户赠送余额(元)',
+        dataIndex: 'givingBalance',
+        width: '10%',
+        render: (text, record, index) => record.givingBalance || ''
       },
       {
         title: <p className="lastCol">操作</p>,
         dataIndex: 'operation',
-        width: '12%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/user/userInfo/:${record.id}`}>详情</Link>
+              <Link to={`/user/userInfo/:${record.userId}`}>查看用户详情</Link>
+              <span className="ant-divider" />
+              <a onClick={e => this.toOrderOfUser(e, record.userId)}>
+                查看订单记录
+              </a>
             </span>
           </div>
         )
       }
     ]
   }
-
+  toOrderOfUser = (e, id) => {
+    e.preventDefault()
+    this.props.changeOrder('orderList', {
+      tabIndex: 1,
+      page: 1,
+      schoolId: 'all',
+      deviceType: 'all',
+      day: NORMAL_DAY_7, // last 7 days
+      status: 'all',
+      selectKey: '',
+      showDetail: false,
+      selectedRowIndex: -1,
+      selectedDetailId: -1
+    })
+    this.props.history.push({
+      pathname: '/order/list',
+      state: { path: 'fromUserAnalyze', id: id }
+    })
+  }
   fetchData = props => {
     if (this.state.loading) {
       return
@@ -81,23 +122,30 @@ class UserTableView extends React.Component {
     this.setState({
       loading: true
     })
-    const resource = '/api/user/list'
+    const resource = '/api/statistics/order/user/consume'
     const {
-      list_page: page,
       schoolId,
-      list_selectKey: selectKey,
-      list_userTransfer: userTransfer
+      analyze_day: day,
+      analyze_startTime: startTime,
+      analyze_endTime: endTime,
+      analyze_deviceType: deviceType,
+      analyze_selectKey: selectKey,
+      analyze_page: page
     } =
       props || this.props
     const body = {
       page: page,
-      size: SIZE
+      size: SIZE,
+      deviceType: +deviceType
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if (userTransfer !== 'all') {
-      body.userTransfer = parseInt(userTransfer, 10)
+    if (day) {
+      body.day = parseInt(day, 10)
+    } else {
+      body.startTime = startTime
+      body.endTime = endTime
     }
     if (selectKey) {
       body.selectKey = selectKey
@@ -105,7 +153,7 @@ class UserTableView extends React.Component {
     AjaxHandler.fetch(resource, body).then(json => {
       let nextState = { loading: false }
       if (json && json.data) {
-        nextState.dataSource = json.data.users
+        nextState.dataSource = json.data.list
         nextState.total = json.data.total
       }
       this.setState(nextState)
@@ -146,13 +194,6 @@ class UserTableView extends React.Component {
     }
     this.fetchData(nextProps)
     this.syncStateWithProps(nextProps)
-  }
-  changeSchool = value => {
-    let { schoolId } = this.props
-    if (schoolId === value) {
-      return
-    }
-    this.props.changeUser(subModule, { page: 1, schoolId: value })
   }
   changeSearch = e => {
     this.setState({
@@ -195,12 +236,6 @@ class UserTableView extends React.Component {
       startTime: time
     })
   }
-  disableRule = (startTime, endTime) => {
-    return (
-      startTime < moment(endTime).subtract(1, 'M') &&
-      startTime > moment(endTime)
-    )
-  }
   changeEndTime = time => {
     this.setState({
       endTime: time
@@ -223,7 +258,10 @@ class UserTableView extends React.Component {
     if (value === deviceType) {
       return
     }
-    this.props.changeUser(subModule, { analyze_deviceType: value, page: 1 })
+    this.props.changeUser(subModule, {
+      analyze_deviceType: value,
+      analyze_page: 1
+    })
   }
 
   render() {
@@ -237,7 +275,7 @@ class UserTableView extends React.Component {
       endTime
     } = this.state
     const {
-      list_page: page,
+      analyze_page: page,
       analyze_day: day,
       analyze_deviceType: deviceType
     } = this.props
@@ -261,7 +299,6 @@ class UserTableView extends React.Component {
                 changeStartTime={this.changeStartTime}
                 changeEndTime={this.changeEndTime}
                 confirm={this.confirmTimeRange}
-                disableRule={this.disableRule}
               />
             </div>
           </div>

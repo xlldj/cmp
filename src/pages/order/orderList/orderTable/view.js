@@ -24,6 +24,7 @@ const {
 
 const BACKTITLE = {
   fromUser: '返回用户详情',
+  fromUserAnalyze: '返回用户消费分析',
   fromDevice: '返回设备详情',
   fromTask: '返回工单'
 }

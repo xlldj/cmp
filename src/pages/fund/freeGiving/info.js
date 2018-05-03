@@ -13,7 +13,8 @@ const {
   FREEGIVING_PERIOD,
   FREEGIVING_PERIOD_MONTH,
   FREEGIVING_ONLINE,
-  FREEGIVING_OFFLINE
+  FREEGIVING_OFFLINE,
+  FREEGIVING_TARGETS
 } = CONSTANTS
 const MONTH_DAY_ENUMS = generateMonthDayEnums()
 const RadioGroup = Radio.Group
@@ -55,7 +56,10 @@ class FreeGivingInfo extends React.Component {
 
       schoolOpts: {},
       validateTimeOption: '',
-      validateTimeOptionError: false
+      validateTimeOptionError: false,
+
+      target: '',
+      targetError: false
     }
   }
   fetchData = body => {
@@ -73,6 +77,7 @@ class FreeGivingInfo extends React.Component {
           endMinute,
           period,
           amount,
+          target,
           status,
           validateTimeOption
         } = json.data
@@ -82,6 +87,7 @@ class FreeGivingInfo extends React.Component {
           period,
           amount,
           status,
+          target,
           validateTimeOption
         }
         nextState.initialSchool = schoolId
@@ -146,6 +152,7 @@ class FreeGivingInfo extends React.Component {
       startDay,
       endDay,
       status,
+      target,
       validateTimeOption
     } = this.state
     if (!schoolId) {
@@ -176,6 +183,12 @@ class FreeGivingInfo extends React.Component {
     if (period === FREEGIVING_PERIOD_MONTH && !endDay) {
       this.setState({
         endDayError: true
+      })
+      return false
+    }
+    if (!target) {
+      this.setState({
+        targetError: true
       })
       return false
     }
@@ -212,9 +225,6 @@ class FreeGivingInfo extends React.Component {
       validateTimeOption
     } = this.state
     if (posting) {
-      return
-    }
-    if (!this.checkComplete()) {
       return
     }
     const body = {
@@ -311,9 +321,27 @@ class FreeGivingInfo extends React.Component {
     }
     this.setState(nextState)
   }
+  changeTarget = v => {
+    this.setState({
+      target: +v
+    })
+  }
+  checkTarget = v => {
+    const { targetError } = this.state
+    const nextState = {}
+    if (!v) {
+      nextState.targetError = true
+    } else if (targetError) {
+      nextState.targetError = false
+    }
+    this.setState(nextState)
+  }
   confirm = () => {
     let { checking, posting } = this.state
     if (checking || posting) {
+      return
+    }
+    if (!this.checkComplete()) {
       return
     }
     this.checkExist(this.postInfo)
@@ -330,6 +358,7 @@ class FreeGivingInfo extends React.Component {
       startTime,
       endDay,
       endTime,
+      target,
       status,
       validateTimeOption
     } = this.state
@@ -362,6 +391,9 @@ class FreeGivingInfo extends React.Component {
     if (period === FREEGIVING_PERIOD_MONTH) {
       body.startDay = +startDay
       body.endDay = +endDay
+    }
+    if (target && target !== 'all') {
+      body.target = +target
     }
     AjaxHandler.fetch(resource, body).then(json => {
       this.setState({
@@ -423,13 +455,15 @@ class FreeGivingInfo extends React.Component {
       return
     }
     let nextState = {
-      status: e.target.value
+      status: e.target.value,
+      statusError: false
     }
     this.setState(nextState)
   }
   setOnline = () => {
     this.setState({
-      status: 1
+      status: 1,
+      statusError: false
     })
   }
   changeValidateMonth = e => {
@@ -459,8 +493,12 @@ class FreeGivingInfo extends React.Component {
       initialSchool,
       schoolOpts,
 
+      target,
+      targetError,
+
       validateTimeOption,
-      validateTimeOptionError
+      validateTimeOptionError,
+      statusError
     } = this.state
     const startDaySelect = (
       <BasicSelectorWithoutAll
@@ -573,6 +611,20 @@ class FreeGivingInfo extends React.Component {
             </span>
           </li>
           <li>
+            <p>赠送对象:</p>
+            <BasicSelectorWithoutAll
+              disabled={released}
+              className={released ? ' disabled' : ''}
+              selectedOpt={target}
+              staticOpts={FREEGIVING_TARGETS}
+              changeOpt={this.changeTarget}
+              checkOpt={this.checkTarget}
+            />
+            {targetError ? (
+              <span className="checkInvalid">请选择赠送对象</span>
+            ) : null}
+          </li>
+          <li>
             <p>生效时间：</p>
             <RadioGroup
               disabled={released}
@@ -607,6 +659,9 @@ class FreeGivingInfo extends React.Component {
               <span className="checkInvalid">
                 上线活动不能编辑，请您先将活动下线！
               </span>
+            ) : null}
+            {statusError ? (
+              <span className="checkInvalid">请选择是否上线！</span>
             ) : null}
           </li>
           <li>

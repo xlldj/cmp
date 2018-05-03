@@ -6,17 +6,21 @@ let selectedSchool = getDefaultSchool()
 // 用户管理
 const initialUserState = {
   userList: {
-    tabIndex: 2,
+    tabIndex: 1,
     schoolId: selectedSchool,
 
     list_selectKey: '',
     list_userTransfer: 'all',
     list_page: 1,
 
+    foxconn_auth: 'all',
+    foxconn_selectKey: '',
+    foxconn_page: 1,
+
     analyze_day: 1, // 默认为1， 今天
     analyze_startTime: '',
     analyze_endTime: '',
-    analyze_deviceType: 1,
+    analyze_deviceType: 1, // 默认为热水器，1
     analyze_selectKey: '',
     analyze_page: 1
   }
