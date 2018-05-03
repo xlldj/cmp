@@ -460,12 +460,18 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
   if (resource.includes('/api')) {
     resource = resource.replace('/api', '')
   }
-  // 默认使用管理端账户，除非用domain字段传入
+  // 默认使用当前设置的服务器，除非用domain字段传入
   let url
   if (options && options.domain) {
+    // 自定义域名+端口
     url = options.domain + resource
   } else {
-    url = currentDomain.manager + resource
+    // 默认域名+自定义端口
+    if (options && options.userPort) {
+      url = currentDomain.user + resource
+    } else {
+      url = currentDomain.manager + resource
+    }
   }
 
   const token = getToken()
