@@ -19,6 +19,7 @@ import { changeDevice } from '../../../actions'
 const subModule = 'rateSet'
 const {
   DEVICE_TYPE_WASHER,
+  DEVICE_TYPE_DRINKER,
   DEVICE_TYPE_BLOWER,
   WASHER_RATE_TYPES,
   DEVICE_AGREEMENT_B
@@ -206,11 +207,19 @@ class RateList extends React.Component {
           const items = record.rateGroups.map((r, i) => {
             let denomination =
               record.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
+            const unitPrice =
+              (record.deviceType === DEVICE_TYPE_WASHER ||
+                record.deviceType === DEVICE_TYPE_DRINKER) &&
+              record.unitPrice
+                ? `1升水/${mul(record.unitPulse, 10)}分钱、`
+                : ''
             return (
               <li key={i}>
                 <span key={i}>
                   扣费：
-                  {agreementB ? `1升水/${r.unitPulse}${denomination}、` : ''}
+                  {agreementB
+                    ? `1升水/${r.unitPulse}${denomination}、`
+                    : unitPrice || ''}
                   {r.price ? mul(r.price, 100) : ''}分钱/{r.pulse || ''}
                   {denomination}
                 </span>

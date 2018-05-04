@@ -133,7 +133,7 @@ class RateInfo extends React.Component {
             billingMethod: r.billingMethod.toString()
           }
           if (json.data.unitPrice) {
-            nextState.unitPrice = json.data.unitPrice
+            nextState.unitPrice = mul(json.data.unitPrice, 100)
           }
 
           const taps = r.timeLimit && r.timeLimit.map(r => ({ value: r }))
