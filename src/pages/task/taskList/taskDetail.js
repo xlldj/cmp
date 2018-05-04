@@ -1081,7 +1081,7 @@ class TaskDetail extends React.Component {
   }
   confirmFinish = () => {
     let { note, tag, posting } = this.state
-    const { selectedDetailId: id } = this.props
+    const { selectedDetailId: id } = this.props.taskList
     let { type } = this.props.taskList.details
     if (posting) {
       return
