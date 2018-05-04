@@ -13,7 +13,9 @@ const {
   WASHER_RATE_TYPES,
   REAL_SCHOOL,
   TEST_SCHOOL,
-  SCHOOL_TYPES
+  SCHOOL_TYPES,
+  DEVICE_AGREEMENT_B,
+  DOORFORBID_WEEK
 } = CONSTANTS
 
 const RadioGroup = Radio.Group
@@ -29,6 +31,8 @@ class InfoSet extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
+      loading: true,
+      percent: '0%',
       schoolId: 0,
       schoolName: '',
       buildingNames: [],
@@ -54,17 +58,16 @@ class InfoSet extends React.Component {
       onlineChanged: false,
       status: '',
       rateDetails: [],
+      gateTime: {},
       rateDetailsSet: false,
       prepayNotMatchBusiness: false,
       rateNotMatchBusiness: false,
       type: '',
-      typeError: false
+      typeError: false,
+      suppliers: {}
     }
   }
   fetchData = body => {
-    this.setState({
-      loading: true
-    })
     let resource = '/school/basicConfig'
     const cb = json => {
       let nextState = { loading: false }
@@ -75,6 +78,7 @@ class InfoSet extends React.Component {
         if (json.data) {
           let {
             schoolName,
+            gateTime,
             buildingNames,
             businesses,
             prepayFunction,
@@ -159,6 +163,9 @@ class InfoSet extends React.Component {
           if (rateDetails) {
             nextState.rateDetails = rateDetails
           }
+          if (gateTime) {
+            nextState.gateTime = gateTime
+          }
           nextState.finished = finished
           nextState.status = status
           this.setState(nextState)
@@ -169,13 +176,19 @@ class InfoSet extends React.Component {
   }
   componentDidMount() {
     this.props.hide(false)
-    let id = parseInt(this.props.match.params.id.slice(1), 10)
+    let data = this.props.location.state
+    let { id, percent } = data
+    id = parseInt(id, 10)
     this.setState({
-      schoolId: id
+      schoolId: id,
+      percent: percent
     })
     const body = {
       id: id
     }
+    this.setState({
+      loading: true
+    })
     this.fetchData(body)
     // this.fetchSchoolInfo(body)
   }
@@ -309,7 +322,9 @@ class InfoSet extends React.Component {
 
   render() {
     let {
+      suppliers,
       schoolId,
+      percent,
       schoolName,
       buildingNames,
       buildingNamesSet,
@@ -329,6 +344,7 @@ class InfoSet extends React.Component {
       finishError,
       onlineChanged,
       status,
+      gateTime,
       rateDetails,
       rateDetailsSet,
       prepayNotMatchBusiness,
@@ -351,6 +367,216 @@ class InfoSet extends React.Component {
           {BUSINESS[r]}
         </span>
       ))
+    let equipment = []
+    prepayOptions.forEach((record, index) => {
+      equipment[record.deviceType] = {}
+      equipment[record.deviceType]['prepayOption'] = record
+    })
+    rateDetails.forEach((record, index) => {
+      equipment[record.deviceType] = equipment[record.deviceType]
+        ? equipment[record.deviceType]
+        : {}
+      equipment[record.deviceType]['rateDetail'] = equipment[record.deviceType][
+        'rateDetail'
+      ]
+        ? equipment[record.deviceType]['rateDetail']
+        : []
+      equipment[record.deviceType]['rateDetail'].push(record)
+    })
+    if (waterTimeRangeSet) {
+      waterTimeRanges.forEach((record, index) => {
+        equipment[record.deviceType] = equipment[record.deviceType]
+          ? equipment[record.deviceType]
+          : {}
+        equipment[record.deviceType]['waterTimeRange'] = record
+      })
+    }
+    let entranceContent
+    if (gateTime.items) {
+      let entranceTime = gateTime.items.map((r, index) => {
+        let subItems = r.items
+        let timeTipString = ''
+        subItems.forEach(value => {
+          var day = value.day
+          if (timeTipString === '') {
+            timeTipString += DOORFORBID_WEEK[day]
+          } else {
+            timeTipString += `、${DOORFORBID_WEEK[day]}`
+          }
+        })
+        let lateString = Format.minIntToHourMinStr(r.items[0].lateTime)
+        let notReturnString = Format.minIntToHourMinStr(
+          r.items[0].notReturnTime
+        )
+        let subTitle = `正常归寝: ${lateString}以前、晚归: ${lateString}~${notReturnString}、未归: ${notReturnString}以后`
+        return (
+          <p key={`entranceItem${index}`}>
+            {timeTipString}:{subTitle}
+          </p>
+        )
+      })
+      entranceContent = (
+        <li className="equment">
+          <div className="deviceName">门禁卡设置</div>
+          <div>
+            <span className="itemTitle">{star}预付选项</span>
+            <span className="itemContent">
+              {entranceTime ? entranceTime : null}
+            </span>
+          </div>
+        </li>
+      )
+    } else {
+    }
+    let equmentsContent =
+      prepayOptionsSet &&
+      rateDetailsSet &&
+      equipment.map((record, index) => {
+        let deviceRate = record.rateDetail.map((value, indexNum) => {
+          let deviceRateContent
+          let seeDetial = (
+            <Link
+              className="mgl15"
+              key={`rateItem${indexNum}`}
+              to={{
+                pathname: `/device/rateSet/rateInfo/:${value.id}`,
+                state: { path: 'fromInfoSet' }
+              }}
+            >
+              查看详情
+            </Link>
+          )
+          if (parseInt(value.deviceType, 10) === DEVICE_TYPE_WASHER) {
+            deviceRateContent =
+              value.rateGroups &&
+              value.rateGroups.map((r, i) => (
+                <span key={`rateDetail${i}`}>
+                  {`${WASHER_RATE_TYPES[r.pulse]}/${r.price ? r.price : ''}元`}
+                  {i + 1 === value.rateGroups.length
+                    ? `(${value.supplierName})`
+                    : ''}
+                </span>
+              ))
+          } else {
+            let denomination =
+              parseInt(value.deviceType, 10) === DEVICE_TYPE_BLOWER
+                ? '秒'
+                : '脉冲'
+            deviceRateContent =
+              value.rateGroups &&
+              value.rateGroups.map((r, i) => (
+                <span key={i}>
+                  {r.unitPulse ? `1升水/${r.unitPulse}${denomination}、` : ''}
+                  {mul(r.price, 100)}分/{r.pulse}
+                  {denomination}
+                  {i + 1 === value.rateGroups.length ||
+                  i % 2 === 1 ||
+                  r.unitPulse
+                    ? `(${value.supplierName})`
+                    : '、'}
+                  {i % 2 === 1 || r.unitPulse ? <br /> : ''}
+                </span>
+              ))
+          }
+          return (
+            <div className="deviceItem" key={`deviceItem${indexNum}`}>
+              <div className="deviceRateContent">{deviceRateContent}</div>
+              {seeDetial}
+            </div>
+          )
+        })
+        let washerRate =
+          record.rateDetail.deviceType === DEVICE_TYPE_WASHER
+            ? record.rateDetail.rateGroups &&
+              record.rateDetail.rateGroups.map((r, i) => (
+                <span key={`rateDetail${i}`}>{`${WASHER_RATE_TYPES[r.pulse]}/${
+                  r.price ? r.price : ''
+                }元`}</span>
+              ))
+            : null
+        let waterContents
+        if (record.waterTimeRange) {
+          let items = record.waterTimeRange.items
+          let timeItem =
+            items &&
+            items.map((r, i) => (
+              <span key={i} className="inlineItem">
+                {Format.adding0(r.startTime.hour)}:{Format.adding0(
+                  r.startTime.minute
+                )}~{Format.adding0(r.endTime.hour)}:{Format.adding0(
+                  r.endTime.minute
+                )}
+              </span>
+            ))
+          waterContents = record.waterTimeRange ? (
+            <div>
+              <span className="itemTitle">供水时段</span>
+              <span className="itemContent">{timeItem}</span>
+              <Link
+                className="mgl15"
+                key={`innerwtitem${index}`}
+                to={{
+                  pathname: `/device/timeset/editTimeset/:${
+                    record.waterTimeRange.id
+                  }`,
+                  state: { path: 'fromInfoSet' }
+                }}
+              >
+                查看详情
+              </Link>
+            </div>
+          ) : null
+        }
+        return (
+          <li key={`other${index}`} className="equment">
+            <div className="deviceName">
+              {CONSTANTS.DEVICETYPE[record.rateDetail[0].deviceType]}设置
+            </div>
+            <div>
+              <span className="itemTitle">{star}预付选项</span>
+              {record.prepayOption ? (
+                <span className="itemContent">
+                  <span key={`prepay${index}`}>
+                    预付¥{record.prepayOption.prepay}
+                  </span>
+                  <span key={`minpay${index}`}>
+                    最低¥{record.prepayOption.minPrepay}
+                  </span>
+                  <Link
+                    className="mgl15"
+                    to={{
+                      pathname: `/device/prepay/editPrepay/:${
+                        record.prepayOption.id
+                      }`,
+                      state: { path: 'fromInfoSet' }
+                    }}
+                  >
+                    查看详情
+                  </Link>
+                </span>
+              ) : (
+                <span className="red itemContent">
+                  请前往设置<Link
+                    className="mgl15"
+                    to={{
+                      pathname: `/device/prepay/addPrepay`,
+                      state: { path: 'fromInfoSet' }
+                    }}
+                  >
+                    前往添加
+                  </Link>
+                </span>
+              )}
+            </div>
+            <div>
+              <span className="itemTitle">设备费率{star}</span>
+              <span className="itemContent">{deviceRate}</span>
+            </div>
+            {waterContents}
+          </li>
+        )
+      })
+
     let prepayOptionsContent =
       prepayOptionsSet &&
       prepayOptions.map((record, index) => {
@@ -478,12 +704,15 @@ class InfoSet extends React.Component {
     return (
       <div className="infoList infoSetInfo">
         <ul>
-          <li>
-            <p>当前学校:</p>
+          <li className="schoolName">
             {schoolName}
+            <span>
+              （信息完整度{percent}
+              {status === 1 ? '已上线' : '未上线'}）
+            </span>
           </li>
           <li>
-            <p>{star}添加楼栋:</p>
+            <p>{star}已添加楼栋:</p>
             {buildingNamesSet ? <span>{building}</span> : null}
             {buildingNamesSet ? (
               <Link
@@ -520,7 +749,21 @@ class InfoSet extends React.Component {
               </Button>
             )}
           </li>
-          <li className="itemsWrapper ulWrapper">
+          {/* <li className="itemsWrapper  ulWrapper">
+            <p>设备供水时段:</p>
+            {waterTimeRangeSet ? <ul>{waterTimeRangeContent}</ul> : null}
+            {waterTimeRangeSet ? null : (
+              <span>
+                <Button onClick={this.toWaterTimeRangeSet} type="primary">
+                  前往添加
+                </Button>
+              </span>
+            )}
+          </li> */}
+          {equmentsContent}
+          {entranceContent ? entranceContent : null}
+
+          {/* <li className="itemsWrapper ulWrapper">
             <p>{star}设备预付选项:</p>
             {prepayOptionsSet ? <ul>{prepayOptionsContent}</ul> : null}
             {prepayOptionsSet ? null : (
@@ -535,17 +778,6 @@ class InfoSet extends React.Component {
                 设备预付与该学校功能入口项不匹配，请查看设置！
               </span>
             ) : null}
-          </li>
-          <li className="itemsWrapper  ulWrapper">
-            <p>设备供水时段:</p>
-            {waterTimeRangeSet ? <ul>{waterTimeRangeContent}</ul> : null}
-            {waterTimeRangeSet ? null : (
-              <span>
-                <Button onClick={this.toWaterTimeRangeSet} type="primary">
-                  前往添加
-                </Button>
-              </span>
-            )}
           </li>
 
           <li className="itemsWrapper  ulWrapper">
@@ -563,7 +795,7 @@ class InfoSet extends React.Component {
                 设备费率与该学校功能入口项不匹配，请查看设置！
               </span>
             ) : null}
-          </li>
+          </li> */}
           <li>
             <p>{star}充值面额设置:</p>
             {rechargeAmountsSet ? <span>{rechargeAmountsContent}</span> : null}

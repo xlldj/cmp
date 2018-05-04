@@ -314,6 +314,7 @@
 .infoSetInfo{
   ul>li>p{
     width: 150px !important;
+    text-align: left;
   }
 }
 // for schoollist
@@ -367,4 +368,82 @@
 }
 .schoolinfo_blockTitle{
   font-weight: 600;
+}
+.infoList.infoSetInfo{
+  padding: 10px;
+  ul{
+    background: #FFF;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    .schoolName{
+      font-size: 18px;
+      font-weight: 500;
+      span{
+        color: #c7c7c7;
+      }
+    }
+    li{
+      border-bottom: 1px solid #e9e9e9;
+    }
+    // .equment:nth-child(odd){
+    //   float: left;
+    // }
+    // .equment:nth-child(even){
+    //   float: right;
+    // }
+    .equment{
+      width: 400px;
+      height: auto;
+      display: inline-block;
+      margin: 10px;
+      border: 1px solid #e9e9e9;
+      .deviceName{
+        width: 100%;
+        padding: 0px 10px;
+        box-sizing: border-box;
+        background:#eee; 
+      }
+      div{
+        padding: 0px 10px;
+        position: relative;
+        border-bottom: 1px solid #e9e9e9;
+        .deviceRateItem{
+          border-bottom: 0px;
+          display: inline-block;
+        }
+        .itemTitle{
+          display: inline-block;
+          width: 100px;
+          margin-right: 10px;
+          position: absolute;
+        }
+        .itemContent{
+          display: inline-block;
+          width: 298px;
+          margin-left: 90px;
+          .deviceItem{
+            border-bottom: 0px;
+            padding: 0px
+          }
+          div{
+            position: relative;
+            .deviceRateContent{
+              width: 240px;
+              border-bottom: 0px;
+              padding: 0px;
+            }
+          }
+          span{
+            display: inline-block
+          }
+        }
+        a{
+          position: absolute;
+          right: 10px;
+          top: 0px;
+        }
+      }
+    }
+  }
 }
