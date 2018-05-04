@@ -113,7 +113,7 @@ class TaskDetail extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      id: '', // if for the task
+      id: '', // id for the task
       creatorId: '',
       userId: '',
       loading: false,
@@ -576,6 +576,7 @@ class TaskDetail extends React.Component {
         this.fetchTaskDetail(body)
       }
       this.setState(nextState)
+      console.log(nextState)
     } catch (e) {
       console.log(e)
     }
@@ -711,9 +712,6 @@ class TaskDetail extends React.Component {
             let nextState = {
               tabLoading: true
             }
-            if (id && id !== this.state.id) {
-              nextState.id = id
-            }
             if (userId && userId !== this.state.userId) {
               nextState.userId = userId
             }
@@ -741,6 +739,9 @@ class TaskDetail extends React.Component {
           this.setState({
             message: ''
           })
+        }
+        if (id && id !== this.state.id) {
+          this.setState({ id })
         }
       }
       this.props = nextProps
@@ -1079,7 +1080,8 @@ class TaskDetail extends React.Component {
     })
   }
   confirmFinish = () => {
-    let { id, note, tag, posting } = this.state
+    let { note, tag, posting } = this.state
+    const { selectedDetailId: id } = this.props
     let { type } = this.props.taskList.details
     if (posting) {
       return
