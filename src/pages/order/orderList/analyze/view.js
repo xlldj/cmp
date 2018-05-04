@@ -27,7 +27,10 @@ const {
   NORMAL_DAY_7,
   ORDER_ANALYZE_DAY_SELECT_ARR,
   ORDER,
-  ORDER_ANALYZE_ORDERBYS
+  ORDER_ANALYZE_ORDERBYS,
+  DEVICE_TYPE_HEATER,
+  DEVICE_TYPE_DRINGKER,
+  DEVICE_TYPE_BLOWER
 } = CONSTANTS
 
 class OrderAnalyzeView extends React.Component {
@@ -157,7 +160,8 @@ class OrderAnalyzeView extends React.Component {
         'threshold',
         'thresholdType',
         'warnTaskStatus',
-        'order'
+        'order',
+        'orderBy'
       ])
     ) {
       return
@@ -395,7 +399,7 @@ class OrderAnalyzeView extends React.Component {
     })
   }
   getColumns = () => {
-    let { day } = this.props
+    let { day, deviceType } = this.props
     let { startTime, endTime, allRowsOfOrderTableSelected } = this.state
     const dayStr = day
       ? ORDER_ANALYZE_DAY_SELECT[day]
@@ -404,7 +408,7 @@ class OrderAnalyzeView extends React.Component {
           'yyyy-MM-DD'
         )}`
 
-    const columns = [
+    let columns = [
       {
         title: (
           <Checkbox
@@ -455,17 +459,33 @@ class OrderAnalyzeView extends React.Component {
         render: (text, record, index) =>
           record.consumption ? `¥${record.consumption}` : 0,
         sorter: true
-      },
-      {
+      }
+    ]
+    if (deviceType === DEVICE_TYPE_BLOWER) {
+      columns.push({
+        title: `${dayStr}使用时长`,
+        dataIndex: 'timeDuration',
+        width: '12%',
+        render: (text, record) => record.timeDuration || 0,
+        sorter: true
+      })
+    } else if (
+      deviceType === DEVICE_TYPE_HEATER ||
+      deviceType === DEVICE_TYPE_DRINGKER
+    ) {
+      columns.push({
         title: `${dayStr}用水量`,
         dataIndex: 'waterUsage',
         width: '12%',
         render: (text, record, index) => record.waterUsage || 0,
         sorter: true
-      },
+      })
+    }
+    columns = columns.concat([
       {
         title: '是否存在预警工单',
         dataIndex: 'warningTaskHandling',
+        width: '12%',
         render: (text, record, index) =>
           record.warningTaskHandling ? (
             <span>
@@ -481,7 +501,6 @@ class OrderAnalyzeView extends React.Component {
       {
         title: <p className="lastCol">操作</p>,
         dataIndex: 'operation',
-        width: '8%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <a
@@ -495,7 +514,7 @@ class OrderAnalyzeView extends React.Component {
           </div>
         )
       }
-    ]
+    ])
     return columns
   }
   toTaskDetail = (e, id) => {
@@ -689,8 +708,6 @@ class OrderAnalyzeView extends React.Component {
             <div className="block">
               <span>设备类型:</span>
               <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
                 options={DEVICETYPE}
                 value={deviceType}
                 onClick={this.changeDevice}

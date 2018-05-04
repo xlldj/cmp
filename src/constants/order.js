@@ -67,7 +67,8 @@ const ORDER = {
   },
   ORDER_ANALYZE_ORDERBYS: {
     consumption: 1,
-    waterUsage: 2
+    waterUsage: 2,
+    timeDuration: 3
   },
   ORDER_ANALYZE_DAY_SELECT_ARR: [
     { key: 1, value: '今日' },

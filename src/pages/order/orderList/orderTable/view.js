@@ -113,7 +113,10 @@ class OrderTableView extends React.Component {
       if (state.path === 'fromDevice') {
         body.residenceId = state.id
         body.deviceType = state.deviceType
-      } else if (state.path === 'fromUser') {
+      } else if (
+        state.path === 'fromUser' ||
+        state.path === 'fromUserAnalyze'
+      ) {
         body.userId = state.id
       } else if (state.path === 'fromTask') {
         if (state.userId) {
