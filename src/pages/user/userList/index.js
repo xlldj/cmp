@@ -146,6 +146,7 @@ const mapStateToTableProps = (state, ownProps) => ({
   analyze_endTime: state.userModule[subModule].analyze_endTime,
   analyze_deviceType: state.userModule[subModule].analyze_deviceType,
   analyze_selectKey: state.userModule[subModule].analyze_selectKey,
+  analyze_page: state.userModule[subModule].analyze_page,
 
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   schools: state.setSchoolList.schools

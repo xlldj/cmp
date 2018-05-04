@@ -40,12 +40,6 @@ const initialOrderState = {
     analyze_orderBy: '',
     analyze_warnTaskStatus: 'all' // if device has task of order warning type. 'all' for all devices
   },
-  orderWarn: {
-    tabIndex: 2, // 1 for warn table, 2 for warn setting
-    page: 1, // page of warntable
-    schoolId: selectedSchool,
-    warnset_page: 1
-  },
   abnormal: {
     page: 1,
     schoolId: selectedSchool,

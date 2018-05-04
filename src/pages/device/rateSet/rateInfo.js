@@ -79,7 +79,9 @@ class RateInfo extends React.Component {
       twoWashPrice: '',
       twoWashPricePriceError: false,
       twoCleanPrice: '',
-      twoCleanPriceError: false
+      twoCleanPriceError: false,
+      unitPrice: '',
+      unitPriceError: false
     }
   }
   fetchSuppliers = () => {
@@ -130,6 +132,9 @@ class RateInfo extends React.Component {
             originalSchool: r.schoolId,
             billingMethod: r.billingMethod.toString()
           }
+          if (json.data.unitPrice) {
+            nextState.unitPrice = json.data.unitPrice
+          }
 
           const taps = r.timeLimit && r.timeLimit.map(r => ({ value: r }))
           if (taps) {
@@ -179,8 +184,7 @@ class RateInfo extends React.Component {
                 r.rateGroups &&
                 r.rateGroups.map(rate => ({
                   price: rate.price ? mul(rate.price, 100) : '',
-                  pulse: rate.pulse ? rate.pulse : '',
-                  unitPrice: rate.unitPrice ? mul(rate.unitPrice) : ''
+                  pulse: rate.pulse ? rate.pulse : ''
                 }))
             }
           }
@@ -343,26 +347,22 @@ class RateInfo extends React.Component {
       rateGroups: rateGroups
     })
   }
-  changeUnitPrice = (e, i) => {
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
-    rateGroups[i].unitPrice = parseInt(e.target.value, 10)
+  changeUnitPrice = e => {
     this.setState({
-      rateGroups: rateGroups
+      unitPrice: e.target.value
     })
   }
-  checkUnitPrice = (e, i) => {
-    debugger
-    const rateGroups = JSON.parse(JSON.stringify(this.state.rateGroups))
-    if (!rateGroups[i].unitPrice) {
-      rateGroups[i].error = true
-      return this.setState({
-        rateGroups: rateGroups
-      })
+  checkUnitPrice = e => {
+    const v = e.target.value.trim()
+    const nextState = { unitPrice: v }
+    if (!v) {
+      nextState.unitPriceError = true
+      return this.setState(nextState)
     }
-    rateGroups[i].error = false
-    this.setState({
-      rateGroups: rateGroups
-    })
+    if (this.state.unitPriceError) {
+      nextState.unitPriceError = false
+    }
+    this.setState(nextState)
   }
   checkInput = () => {
     let {
@@ -376,7 +376,8 @@ class RateInfo extends React.Component {
       dryPrice,
       oneWashPrice,
       twoWashPrice,
-      twoCleanPrice
+      twoCleanPrice,
+      unitPrice
     } = this.state
     if (!deviceType || deviceType === '0') {
       this.setState({
@@ -467,10 +468,15 @@ class RateInfo extends React.Component {
         }
       }
       if (checkRateGroups) {
+        // 检查unitPrice是否填入
+        if (!unitPrice) {
+          nextState.unitPriceError = true
+          return this.setState(nextState)
+        }
         let rates = JSON.parse(JSON.stringify(rateGroups))
         for (let i = 0; i < rates.length; i++) {
           let r = rates[i]
-          if (!r.price || !r.pulse || !r.unitPrice) {
+          if (!r.price || !r.pulse) {
             r.error = true
             nextState.rateGroups = rates
             this.setState(nextState)
@@ -566,7 +572,8 @@ class RateInfo extends React.Component {
       dryPrice,
       oneWashPrice,
       twoWashPrice,
-      twoCleanPrice
+      twoCleanPrice,
+      unitPrice
     } = this.state
     const body = {
       billingMethod: parseInt(billingMethod, 10),
@@ -604,7 +611,6 @@ class RateInfo extends React.Component {
       rateGroups.forEach(r => {
         if (r.price) {
           r.price = div(r.price, 100)
-          r.unitPrice = div(r.unitPrice, 100)
         }
       })
       let setRateGroups = true
@@ -627,6 +633,7 @@ class RateInfo extends React.Component {
       if (setRateGroups) {
         // set rates to rateGroups
         body.rates = rateGroups
+        body.unitPrice = div(unitPrice, 100)
       }
       body.timeLimit = taps
     }
@@ -874,7 +881,9 @@ class RateInfo extends React.Component {
       twoWashPrice,
       twoWashPriceError,
       twoCleanPrice,
-      twoCleanPriceError
+      twoCleanPriceError,
+      unitPrice, // 一升水的价格
+      unitPriceError
     } = this.state
 
     const rateItems =
@@ -883,22 +892,6 @@ class RateInfo extends React.Component {
         return (
           <li className="rateSets" key={`rateA${i}`}>
             <p>费率组{i + 1}:</p>
-            <span key={`spanVolume${i}`}>1升水 =</span>
-            <input
-              type="number"
-              className="shortInput"
-              onChange={e => {
-                this.changeUnitPrice(e, i)
-              }}
-              onBlur={e => {
-                this.checkUnitPrice(e, i)
-              }}
-              key={`unitPrice${i}`}
-              value={r.unitPrice || ''}
-            />
-            <span className="rightSeperatorBig" key={`spanUnitPrice${i}`}>
-              分钱
-            </span>
             <input
               type="number"
               className="shortInput"
@@ -1014,6 +1007,25 @@ class RateInfo extends React.Component {
               abstract={this.abstract}
             />
           </li>
+
+          {// 不是吹风机，则需要添加每升水的价格。2018/5/3
+          deviceType !== DEVICE_TYPE_BLOWER.toString() ? (
+            <li>
+              <p />
+              <span>1升水 =</span>
+              <input
+                type="number"
+                className="shortInput"
+                onChange={this.changeUnitPrice}
+                onBlur={this.checkUnitPrice}
+                value={unitPrice}
+              />
+              <span>分钱</span>
+              {unitPriceError ? (
+                <span className="checkInvalid">请输入水量单价</span>
+              ) : null}
+            </li>
+          ) : null}
         </Fragment>
       )
     const tapItems =

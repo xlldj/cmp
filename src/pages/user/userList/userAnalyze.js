@@ -15,7 +15,10 @@ const {
   USER_ANALYZE_DAY_SELECT,
   PAGINATION: SIZE,
   DEVICETYPE,
-  NORMAL_DAY_7
+  NORMAL_DAY_7,
+  DEVICE_TYPE_HEATER,
+  DEVICE_TYPE_DRINGKER,
+  DEVICE_TYPE_BLOWER
 } = CONSTANTS
 
 class UserTableView extends React.Component {
@@ -31,70 +34,6 @@ class UserTableView extends React.Component {
       startTime: '',
       endTime: ''
     }
-    this.columns = [
-      {
-        title: '学校名称',
-        dataIndex: 'schoolName',
-        className: 'firstCol',
-        width: '10%'
-      },
-      {
-        title: '用户',
-        dataIndex: 'userName',
-        width: '10%'
-      },
-      {
-        title: '使用次数',
-        dataIndex: 'useNum',
-        width: '10%'
-      },
-      {
-        title: '用水量',
-        dataIndex: 'waterUsage',
-        width: '10%'
-      },
-      {
-        title: '消费总额',
-        dataIndex: 'consume',
-        width: '10%',
-        className: 'shllowRed',
-        render: (text, record, index) =>
-          record.consume ? `¥${record.consume}` : ''
-      },
-      {
-        title: '充值金额',
-        dataIndex: 'rechargeBalance',
-        width: '10%',
-        render: (text, record, index) => record.rechargeBalance || ''
-      },
-      {
-        title: '账户总余额(元)',
-        dataIndex: 'totalBalance',
-        width: '10%',
-        render: (text, record, index) => record.totalBalance || ''
-      },
-      {
-        title: '账户赠送余额(元)',
-        dataIndex: 'givingBalance',
-        width: '10%',
-        render: (text, record, index) => record.givingBalance || ''
-      },
-      {
-        title: <p className="lastCol">操作</p>,
-        dataIndex: 'operation',
-        render: (text, record, index) => (
-          <div className="editable-row-operations lastCol">
-            <span>
-              <Link to={`/user/userInfo/:${record.userId}`}>查看用户详情</Link>
-              <span className="ant-divider" />
-              <a onClick={e => this.toOrderOfUser(e, record.userId)}>
-                查看订单记录
-              </a>
-            </span>
-          </div>
-        )
-      }
-    ]
   }
   toOrderOfUser = (e, id) => {
     e.preventDefault()
@@ -263,6 +202,88 @@ class UserTableView extends React.Component {
       analyze_page: 1
     })
   }
+  getColumns = () => {
+    const { analyze_deviceType: deviceType } = this.props
+    let columns = [
+      {
+        title: '学校名称',
+        dataIndex: 'schoolName',
+        className: 'firstCol',
+        width: '10%'
+      },
+      {
+        title: '用户',
+        dataIndex: 'userName',
+        width: '10%'
+      },
+      {
+        title: '使用次数',
+        dataIndex: 'useNum',
+        width: '10%'
+      }
+    ]
+    if (
+      deviceType === DEVICE_TYPE_HEATER ||
+      deviceType === DEVICE_TYPE_DRINGKER
+    ) {
+      columns.push({
+        title: '用水量',
+        dataIndex: 'waterUsage',
+        width: '10%'
+      })
+    } else if (deviceType === DEVICE_TYPE_BLOWER) {
+      columns.push({
+        title: '时长',
+        dataIndex: 'timeDuration',
+        width: '10%'
+      })
+    }
+
+    columns = columns.concat([
+      {
+        title: '消费总额',
+        dataIndex: 'consume',
+        width: '10%',
+        className: 'shllowRed',
+        render: (text, record, index) =>
+          record.consume ? `¥${record.consume}` : ''
+      },
+      {
+        title: '充值金额',
+        dataIndex: 'rechargeBalance',
+        width: '10%',
+        render: (text, record, index) => record.rechargeBalance || ''
+      },
+      {
+        title: '账户总余额(元)',
+        dataIndex: 'totalBalance',
+        width: '10%',
+        render: (text, record, index) => record.totalBalance || ''
+      },
+      {
+        title: '账户赠送余额(元)',
+        dataIndex: 'givingBalance',
+        width: '10%',
+        render: (text, record, index) => record.givingBalance || ''
+      },
+      {
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <span>
+              <Link to={`/user/userInfo/:${record.userId}`}>查看用户详情</Link>
+              <span className="ant-divider" />
+              <a onClick={e => this.toOrderOfUser(e, record.userId)}>
+                查看订单记录
+              </a>
+            </span>
+          </div>
+        )
+      }
+    ])
+    return columns
+  }
 
   render() {
     const {
@@ -345,7 +366,7 @@ class UserTableView extends React.Component {
             }}
             dataSource={dataSource}
             rowKey={record => record.id}
-            columns={this.columns}
+            columns={this.getColumns()}
             onChange={this.changePage}
             onRowClick={this.selectRow}
             rowClassName={this.setRowClass}
