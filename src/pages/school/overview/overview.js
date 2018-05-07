@@ -101,7 +101,6 @@ class EditableCell extends React.Component {
 
 class Overview extends React.Component {
   static propTypes = {
-    schools: PropTypes.array.isRequired,
     schoolId: PropTypes.string.isRequired,
     page: PropTypes.number.isRequired
   }
@@ -442,7 +441,6 @@ class Overview extends React.Component {
       if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
       } else {
-        /*--------redirect --------*/
         if (json.data) {
           const ds = json.data.schools.map((record, index) => {
             record.key = record.id
@@ -461,17 +459,14 @@ class Overview extends React.Component {
   componentDidMount() {
     this.props.hide(false)
     /*-----------fetch data-----------*/
-    let { schoolId, page, schools } = this.props
+    let { schoolId, page } = this.props
     const body = {
       page: page,
       size: SIZE
     }
     console.log(schoolId)
     if (schoolId !== 'all') {
-      let school = schools.find(r => r.id === parseInt(schoolId, 10))
-      if (school) {
-        body.namePrefix = school.name
-      }
+      body.id = schoolId
     }
     this.fetchData(body)
   }
@@ -479,16 +474,13 @@ class Overview extends React.Component {
     if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
       return
     }
-    let { schoolId, page, schools } = nextProps
+    let { schoolId, page } = nextProps
     const body = {
       page: page,
       size: SIZE
     }
     if (schoolId !== 'all') {
-      let school = schools.find(r => r.id === parseInt(schoolId, 10))
-      if (school) {
-        body.namePrefix = school.name
-      }
+      body.id = schoolId
     }
     this.fetchData(body)
   }
@@ -547,8 +539,7 @@ class Overview extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
   schoolId: state.schoolModule[subModule].schoolId,
-  page: state.schoolModule[subModule].page,
-  schools: state.setSchoolList.schools
+  page: state.schoolModule[subModule].page
 })
 
 export default withRouter(

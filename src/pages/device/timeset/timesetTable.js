@@ -70,7 +70,7 @@ class TimesetTable extends React.Component {
       {
         title: <p className="lastCol">操作</p>,
         dataIndex: 'operation',
-        width: '10%',
+        width: '18%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
