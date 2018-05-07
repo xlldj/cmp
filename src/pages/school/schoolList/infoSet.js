@@ -828,7 +828,7 @@ class InfoSet extends React.Component {
             </li>
           ) : null}
         </ul>
-        <div className="btnArea">
+        <div className="warn-text">
           打{star}的选项设置完成后，该学校才可正常上线
         </div>
         <div className="btnArea">
