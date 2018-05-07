@@ -8,6 +8,7 @@ import { checkObject } from '../../../util/checkSame'
 
 import SearchInput from '../../component/searchInput'
 import CheckSelect from '../../component/checkSelect'
+import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 
 const subModule = 'userList'
 
@@ -190,9 +191,9 @@ class UserTableView extends React.Component {
 
     return (
       <div className="">
-        <div className="queryPanel">
-          <div className="queryLine">
-            <div className="block">
+        <QueryPanel>
+          <QueryLine>
+            <QueryBlock>
               <span>用户类型:</span>
               <CheckSelect
                 allOptValue="all"
@@ -201,8 +202,8 @@ class UserTableView extends React.Component {
                 value={userTransfer}
                 onClick={this.changeUserTransfer}
               />
-            </div>
-            <div className="block">
+            </QueryBlock>
+            <QueryBlock>
               {showClearBtn ? (
                 <Button
                   onClick={this.clearSearch}
@@ -218,9 +219,9 @@ class UserTableView extends React.Component {
                 pressEnter={this.pressEnter}
                 changeSearch={this.changeSearch}
               />
-            </div>
-          </div>
-        </div>
+            </QueryBlock>
+          </QueryLine>
+        </QueryPanel>
 
         <div className="tableList">
           <Table

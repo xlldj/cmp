@@ -7,6 +7,9 @@ import { checkObject } from '../../../util/checkSame'
 
 import SearchInput from '../../component/searchInput'
 import CheckSelect from '../../component/checkSelect'
+import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
+import { safeGet } from '../../../util/types'
+import Noti from '../../../util/noti'
 
 const subModule = 'userList'
 
@@ -84,7 +87,26 @@ class FoxconnListView extends React.Component {
       }
     ]
   }
-  deAuth = (e, id) => {}
+  deAuth = (e, id) => {
+    const resource = '/api/user/deauth'
+    const body = {
+      id
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (safeGet(json, 'data')) {
+        if (json.data.result) {
+          Noti.hintOk('解绑成功', '已成功解绑该用户')
+          this.fetchData()
+        } else {
+          const { failReason } = json.data
+          Noti.hintWarning(
+            '解绑失败',
+            failReason || json.data.displayMessage || '请稍后重试'
+          )
+        }
+      }
+    })
+  }
   fetchData = props => {
     if (this.state.loading) {
       return
@@ -192,11 +214,10 @@ class FoxconnListView extends React.Component {
 
     return (
       <div className="">
-        <div className="queryPanel">
-          <div className="queryLine">
-            <div className="block">
+        <QueryPanel>
+          <QueryLine>
+            <QueryBlock>
               <span>是否绑定:</span>
-
               <CheckSelect
                 allOptValue="all"
                 allOptTitle="不限"
@@ -204,8 +225,8 @@ class FoxconnListView extends React.Component {
                 value={auth}
                 onClick={this.changeAuth}
               />
-            </div>
-            <div className="block">
+            </QueryBlock>
+            <QueryBlock>
               {showClearBtn ? (
                 <Button
                   onClick={this.clearSearch}
@@ -221,9 +242,9 @@ class FoxconnListView extends React.Component {
                 pressEnter={this.pressEnter}
                 changeSearch={this.changeSearch}
               />
-            </div>
-          </div>
-        </div>
+            </QueryBlock>
+          </QueryLine>
+        </QueryPanel>
 
         <div className="tableList">
           <Table
