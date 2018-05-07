@@ -201,7 +201,9 @@ class RateList extends React.Component {
               : null
           let agreementB =
             suppliers[record.supplierId] &&
-            suppliers[record.supplierId].agreement === DEVICE_AGREEMENT_B
+            suppliers[record.supplierId].agreement === DEVICE_AGREEMENT_B &&
+            (record.deviceType === DEVICE_TYPE_WASHER ||
+              record.deviceType === DEVICE_TYPE_DRINKER)
           console.log(suppliers, record.supplierId, agreementB)
           const items = record.rateGroups.map((r, i) => {
             let denomination =
