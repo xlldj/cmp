@@ -167,7 +167,11 @@ class RateInfo extends React.Component {
               const supplier = this.state.supplierData.find(
                 s => s.id === r.supplierId
               )
-              if (supplier && supplier.agreement === 2) {
+              if (
+                supplier &&
+                supplier.agreement === 2 &&
+                r.deviceType !== DEVICE_TYPE_BLOWER
+              ) {
                 setRateGroup = false // 设置rateGroupsVersionB
                 nextState.currentAgreement = 2
                 nextState.rateGroupsVersionB =
@@ -433,7 +437,11 @@ class RateInfo extends React.Component {
       if (supplierId) {
         // this will always be true. The judge is based on the former rate set, which allowed supplilerId not set.
         let supplier = supplierData.find(r => r.id === supplierId)
-        if (supplier && supplier.agreement === 2) {
+        if (
+          supplier &&
+          supplier.agreement === 2 &&
+          deviceType !== DEVICE_TYPE_BLOWER.toString()
+        ) {
           // this rate is set to versionB, need to check rateGroupsVersionB.
           checkRateGroups = false
           for (let i = 0; i < rateGroupsVersionB.length; i++) {
@@ -626,9 +634,12 @@ class RateInfo extends React.Component {
       })
       if (supplierId) {
         // body.supplierId = parseInt(supplierId, 10);
-
         const supplier = supplierData.find(r => r.id === supplierId)
-        if (supplier && supplier.agreement === 2) {
+        if (
+          supplier &&
+          supplier.agreement === 2 &&
+          deviceType !== DEVICE_TYPE_BLOWER.toString()
+        ) {
           // found, set rates to rateGroupsVersionB
           setRateGroups = false
           body.rates = rateGroupsVersionB
