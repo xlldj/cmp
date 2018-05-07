@@ -18,7 +18,8 @@ const backTitle = {
   fromRepair: '返回维修详情',
   fromRepairLog: '返回用户报修记录',
   fromFeedback: '返回意见反馈',
-  fromComplaint: '返回账单投诉'
+  fromComplaint: '返回账单投诉',
+  fromFoxconnList: '返回富士康员工信息'
 }
 class UserInfoView extends React.Component {
   static propTypes = {

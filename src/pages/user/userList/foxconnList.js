@@ -1,7 +1,9 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Table, Button, Popconfirm } from 'antd'
 import Time from '../../../util/time'
 import AjaxHandler from '../../../util/ajax'
+// import AjaxHandler from '../../../mock/ajax'
 import CONSTANTS from '../../../constants'
 import { checkObject } from '../../../util/checkSame'
 
@@ -45,7 +47,24 @@ class FoxconnListView extends React.Component {
       {
         title: '手机号(登陆账号)',
         dataIndex: 'mobile',
-        width: '20%'
+        width: '20%',
+        render: (text, record) => {
+          if (record.auth === COMPANY_USER_AHTH_PENDING) {
+            return '未绑定'
+          }
+          return record.mobile ? (
+            <Link
+              to={{
+                pathname: `/user/userInfo/:${record.userId}`,
+                state: { path: 'fromFoxconnList' }
+              }}
+            >
+              {record.mobile}
+            </Link>
+          ) : (
+            '未知'
+          )
+        }
       },
       {
         title: '绑定时间',
@@ -101,7 +120,7 @@ class FoxconnListView extends React.Component {
           const { failReason } = json.data
           Noti.hintWarning(
             '解绑失败',
-            failReason || json.data.displayMessage || '请稍后重试'
+            failReason || json.displayMessage || '请稍后重试'
           )
         }
       }
