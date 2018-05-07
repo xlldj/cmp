@@ -107,10 +107,10 @@ class TableUi extends React.Component {
       },
       {
         title: '审核时间',
-        dataIndex: 'censorTime',
+        dataIndex: 'finishTime',
         width: '12%',
         render: (text, record) =>
-          record && record.censorTime ? Time.getTimeStr(record.censorTime) : ''
+          record && record.finishTime ? Time.getTimeStr(record.finishTime) : ''
       },
       {
         title: '金额',
