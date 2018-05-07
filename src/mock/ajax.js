@@ -2,6 +2,7 @@ import heaterHandler from './heater'
 import creditsHandler from './credits'
 import orderStatHandler from './order.js'
 import orderConsumptionHandler from './orderConsumption'
+import userAuthHandler from './userAuth'
 
 const AjaxHandler = {
   showingError: false
@@ -22,6 +23,16 @@ AjaxHandler.ajax = (resource, body, cb, serviceErrorCb, options, errorCb) => {
     return orderStatHandler(resource, body, cb)
   }
 }
+const contain = (target, ...arr) => {
+  if (arr) {
+    for (let i = 0, l = arr.length; i < l; i++) {
+      if (target.indexOf(arr[i]) !== -1) {
+        return true
+      }
+    }
+  }
+  return false
+}
 AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
   /* ----handle the 'api' ----- */
   /* this is because cmp used a node.js server as a mock server at the beginning. And I used '/api' to distinguish it from Java server api */
@@ -33,8 +44,10 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return heaterHandler(resource, body)
   } else if (resource.indexOf('credits') !== -1) {
     return creditsHandler(resource, body)
-  } else if (resource.indexOf('order/consumption/device')) {
+  } else if (resource.indexOf('order/consumption/device') !== -1) {
     return orderConsumptionHandler(resource, body)
+  } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
+    return userAuthHandler(resource, body)
   }
 }
 

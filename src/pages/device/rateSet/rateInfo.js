@@ -469,7 +469,11 @@ class RateInfo extends React.Component {
       }
       if (checkRateGroups) {
         // 检查unitPrice是否填入
-        if (!unitPrice) {
+        if (
+          (deviceType === DEVICE_TYPE_HEATER.toString() ||
+            deviceType === DEVICE_TYPE_DRINGKER.toString()) &&
+          !unitPrice
+        ) {
           nextState.unitPriceError = true
           return this.setState(nextState)
         }
@@ -633,7 +637,12 @@ class RateInfo extends React.Component {
       if (setRateGroups) {
         // set rates to rateGroups
         body.rates = rateGroups
-        body.unitPrice = div(unitPrice, 100)
+        if (
+          deviceType === DEVICE_TYPE_HEATER.toString() ||
+          deviceType === DEVICE_TYPE_DRINGKER.toString()
+        ) {
+          body.unitPrice = div(unitPrice, 100)
+        }
       }
       body.timeLimit = taps
     }
