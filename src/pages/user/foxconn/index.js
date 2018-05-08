@@ -333,8 +333,7 @@ class FoxImportView extends React.Component {
       users
     }
     AjaxHandler.fetch(resource, body).then(json => {
-      debugger
-      if (json && json.result) {
+      if (json && json.data.result) {
         Noti.hintSuccess(this.props.history, '/user')
       }
     })
