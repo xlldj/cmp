@@ -370,7 +370,7 @@ class FoxImportView extends React.Component {
       schoolOpts
     } = this.state
     const userInfos = users.map((u, i) => (
-      <Fragment>
+      <Fragment key={`people${i}`}>
         <li>
           <p>登录账号(工号):</p>
           <input
