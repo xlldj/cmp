@@ -221,6 +221,7 @@ class FreeGivingInfo extends React.Component {
       endTime,
       status,
       released,
+      target,
       posting,
       validateTimeOption
     } = this.state
@@ -241,6 +242,9 @@ class FreeGivingInfo extends React.Component {
     if (period === FREEGIVING_PERIOD_MONTH) {
       body.startDay = +startDay
       body.endDay = +endDay
+    }
+    if (target && target !== 'all') {
+      body.target = +target
     }
     const resource = '/api/givingRule/activity/save'
     if (this.props.match.params.id) {
@@ -362,7 +366,6 @@ class FreeGivingInfo extends React.Component {
       status,
       validateTimeOption
     } = this.state
-
     // still the same school, no need to check.
     if (id && parseInt(schoolId, 10) === initialSchool) {
       if (callback) {
