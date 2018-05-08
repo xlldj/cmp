@@ -169,7 +169,7 @@ class FoxImportView extends React.Component {
     })
     const { schoolId, userFile } = this.state
     const file = userFile[0].originFileObj
-    const resource = '/api/user/add/import'
+    const resource = '/api/user/auth/add/import'
     AjaxHandler.postFile(file, resource, {
       keys: [{ key: 'schoolId', value: schoolId }]
     }).then(json => {
@@ -194,7 +194,7 @@ class FoxImportView extends React.Component {
   }
   checkProgress = () => {
     const { taskId } = this.state
-    const resource = '/api/user/add/import/percent'
+    const resource = '/api/user/auth/add/import/percent'
     const body = {
       taskId
     }
@@ -268,7 +268,7 @@ class FoxImportView extends React.Component {
    * @return {Promise}
    */
   checkUserNo = userNo => {
-    const resource = '/api/user/import/check'
+    const resource = '/api/user/auth/import/check'
     const body = {}
     if (userNo) {
       body.userNos = [userNo]
@@ -326,13 +326,14 @@ class FoxImportView extends React.Component {
   }
   postInfo = () => {
     const { schoolId, users, importMethod } = this.state
-    const resource = '/api/user/add/handwork'
+    const resource = '/api/user/auth/add/handwork'
     const body = {
       importType: importMethod,
       schoolId: parseInt(schoolId, 10),
       users
     }
     AjaxHandler.fetch(resource, body).then(json => {
+      debugger
       if (json && json.result) {
         Noti.hintSuccess(this.props.history, '/user')
       }

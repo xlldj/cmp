@@ -107,7 +107,7 @@ class FoxconnListView extends React.Component {
     ]
   }
   deAuth = (e, id) => {
-    const resource = '/api/user/deauth'
+    const resource = '/api/user/auth/deauth'
     const body = {
       id
     }
