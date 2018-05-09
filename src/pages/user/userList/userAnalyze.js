@@ -2,12 +2,14 @@ import React from 'react'
 import { Table, Button } from 'antd'
 import { Link } from 'react-router-dom'
 import AjaxHandler from '../../../util/ajax'
+import Format from '../../../util/format'
 import CONSTANTS from '../../../constants'
 import { checkObject } from '../../../util/checkSame'
 
 import RangeSelect from '../../component/rangeSelect'
 import SearchInput from '../../component/searchInput'
 import CheckSelect from '../../component/checkSelect'
+import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 
 const subModule = 'userList'
 
@@ -233,9 +235,11 @@ class UserTableView extends React.Component {
       })
     } else if (deviceType === DEVICE_TYPE_BLOWER) {
       columns.push({
-        title: '时长',
+        title: '时长(秒)',
         dataIndex: 'timeDuration',
-        width: '10%'
+        width: '10%',
+        render: (text, record) =>
+          record.timeDuration ? `${Format.ms2s(record.timeDuration)}秒` : 0
       })
     }
 
@@ -244,7 +248,7 @@ class UserTableView extends React.Component {
         title: '消费总额',
         dataIndex: 'consume',
         width: '10%',
-        className: 'shllowRed',
+        className: 'shalowRed',
         render: (text, record, index) =>
           record.consume ? `¥${record.consume}` : ''
       },
@@ -258,12 +262,14 @@ class UserTableView extends React.Component {
         title: '账户总余额(元)',
         dataIndex: 'totalBalance',
         width: '10%',
+        className: 'shalowRed',
         render: (text, record, index) => record.totalBalance || ''
       },
       {
         title: '账户赠送余额(元)',
         dataIndex: 'givingBalance',
         width: '10%',
+        className: 'shalowRed',
         render: (text, record, index) => record.givingBalance || ''
       },
       {
@@ -304,9 +310,9 @@ class UserTableView extends React.Component {
 
     return (
       <div className="">
-        <div className="queryPanel">
-          <div className="queryLine">
-            <div className="block">
+        <QueryPanel>
+          <QueryLine>
+            <QueryBlock>
               <span>时间筛选:</span>
               <CheckSelect
                 options={USER_ANALYZE_DAY_SELECT}
@@ -321,19 +327,19 @@ class UserTableView extends React.Component {
                 changeEndTime={this.changeEndTime}
                 confirm={this.confirmTimeRange}
               />
-            </div>
-          </div>
+            </QueryBlock>
+          </QueryLine>
 
-          <div className="queryLine">
-            <div className="block">
+          <QueryLine>
+            <QueryBlock>
               <span>设备类型:</span>
               <CheckSelect
                 options={DEVICETYPE}
                 value={deviceType}
                 onClick={this.changeDevice}
               />
-            </div>
-            <div className="block">
+            </QueryBlock>
+            <QueryBlock>
               {showClearBtn ? (
                 <Button
                   onClick={this.clearSearch}
@@ -349,9 +355,9 @@ class UserTableView extends React.Component {
                 pressEnter={this.pressEnter}
                 changeSearch={this.changeSearch}
               />
-            </div>
-          </div>
-        </div>
+            </QueryBlock>
+          </QueryLine>
+        </QueryPanel>
 
         <div className="tableList">
           <Table

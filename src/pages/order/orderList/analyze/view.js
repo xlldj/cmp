@@ -7,6 +7,7 @@ import AjaxHandler from '../../../../util/ajax'
 import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import Noti from '../../../../util/noti'
+import Format from '../../../../util/format'
 
 import CheckSelect from '../../../component/checkSelect'
 import ThresholdSelector from '../../../component/thresholdSelector'
@@ -463,10 +464,11 @@ class OrderAnalyzeView extends React.Component {
     ]
     if (deviceType === DEVICE_TYPE_BLOWER) {
       columns.push({
-        title: `${dayStr}使用时长`,
+        title: `${dayStr}使用时长(秒)`,
         dataIndex: 'timeDuration',
         width: '12%',
-        render: (text, record) => record.timeDuration || 0,
+        render: (text, record) =>
+          record.timeDuration ? `${Format.ms2s(record.timeDuration)}秒` : 0,
         sorter: true
       })
     } else if (
