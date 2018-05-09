@@ -250,27 +250,22 @@ class UserTableView extends React.Component {
         width: '10%',
         className: 'shalowRed',
         render: (text, record, index) =>
-          record.consume ? `¥${record.consume}` : ''
+          record.consume || record.consume === 0 ? `¥${record.consume}` : ''
       },
       {
         title: '充值金额',
         dataIndex: 'rechargeBalance',
-        width: '10%',
-        render: (text, record, index) => record.rechargeBalance || ''
+        width: '10%'
       },
       {
         title: '账户总余额(元)',
         dataIndex: 'totalBalance',
-        width: '10%',
-        className: 'shalowRed',
-        render: (text, record, index) => record.totalBalance || ''
+        width: '10%'
       },
       {
         title: '账户赠送余额(元)',
         dataIndex: 'givingBalance',
-        width: '10%',
-        className: 'shalowRed',
-        render: (text, record, index) => record.givingBalance || ''
+        width: '10%'
       },
       {
         title: <p className="lastCol">操作</p>,

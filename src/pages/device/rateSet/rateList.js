@@ -213,7 +213,7 @@ class RateList extends React.Component {
               (record.deviceType === DEVICE_TYPE_WASHER ||
                 record.deviceType === DEVICE_TYPE_DRINKER) &&
               record.unitPrice
-                ? `1升水/${mul(record.unitPulse, 100)}分钱、`
+                ? `1升水/${mul(record.unitPrice, 100)}分钱、`
                 : ''
             return (
               <li key={i}>

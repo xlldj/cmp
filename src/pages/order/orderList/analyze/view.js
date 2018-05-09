@@ -466,7 +466,7 @@ class OrderAnalyzeView extends React.Component {
       columns.push({
         title: `${dayStr}使用时长(秒)`,
         dataIndex: 'timeDuration',
-        width: '12%',
+        width: '14%',
         render: (text, record) =>
           record.timeDuration ? `${Format.ms2s(record.timeDuration)}秒` : 0,
         sorter: true
