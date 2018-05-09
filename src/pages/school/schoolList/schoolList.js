@@ -64,7 +64,20 @@ class SchoolList extends React.Component {
           return (
             <div className="infoSetLink">
               <span>信息完善度{percent}</span>
-              <Link to={`/school/infoSet/:${record.id}`}>前往设置</Link>
+              {
+                /* <Link to={`/school/infoSet/:${record.id}`}>前往设置</Link> */
+                <Link
+                  to={{
+                    pathname: `/school/infoSet/:${record.id}`,
+                    state: {
+                      id: record.id,
+                      percent: percent
+                    }
+                  }}
+                >
+                  前往设置
+                </Link>
+              }
             </div>
           )
         }

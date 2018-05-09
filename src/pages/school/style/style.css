@@ -162,7 +162,6 @@
   flex-wrap: nowrap;
   align-items: center;
   width: 100%;
-  height: fill-available;
   margin: 0 !important;
   border-bottom: 1px solid #e9e9e9;
 }
@@ -181,10 +180,10 @@
 }
 .schoolOverview .deviceWrapper .deviceContent .deviceItem .supplierWrapper {
   flex-direction: column;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   left: 20%;
   width: 50%;
-  height: fill-available;
+  height: 100%;
   padding: 0;
   border-right: 1px solid #e9e9e9;
 }
@@ -196,7 +195,6 @@
   .supplierItem {
   position: relative;
   width: 100%;
-  height: fill-available;
   flex-grow: 1;
 }
 .schoolOverview
@@ -330,6 +328,7 @@
 }
 .infoSetInfo ul > li > p {
   width: 150px !important;
+  text-align: left;
 }
 .infoSetLink span {
   margin-right: 10px;
@@ -376,4 +375,135 @@
 }
 .schoolinfo_blockTitle {
   font-weight: 600;
+}
+.infoList.infoSetInfo {
+  padding: 10px;
+}
+.infoList.infoSetInfo ul {
+  background: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0px 15px;
+  align-items: flex-start;
+}
+.infoList.infoSetInfo ul .ant-btn-primary {
+  padding: 0px 5px;
+}
+.infoList.infoSetInfo ul .ant-btn-primary span {
+  margin: 0px;
+}
+.infoList.infoSetInfo ul .leftModal,
+.infoList.infoSetInfo ul .rightModal {
+  display: flex;
+  flex-direction: column;
+  width: calc(50% - 10px);
+  min-width: 400px;
+}
+.infoList.infoSetInfo ul .leftModal .equment:first-child,
+.infoList.infoSetInfo ul .rightModal .equment:first-child {
+  margin-top: 0px;
+}
+.infoList.infoSetInfo ul .leftModal .equment:last-child,
+.infoList.infoSetInfo ul .rightModal .equment:last-child {
+  margin-bottom: 10px;
+}
+.infoList.infoSetInfo ul .leftModal .equment,
+.infoList.infoSetInfo ul .rightModal .equment {
+  margin-left: 0px;
+}
+.infoList.infoSetInfo ul .leftModal {
+  margin-right: 10px;
+}
+.infoList.infoSetInfo ul .schoolName {
+  font-size: 18px;
+  font-weight: 500;
+}
+.infoList.infoSetInfo ul .schoolName span {
+  color: #c7c7c7;
+}
+.infoList.infoSetInfo ul .userEnter {
+  border-bottom: 0px;
+}
+.infoList.infoSetInfo ul li {
+  border-bottom: 1px solid #e9e9e9;
+  height: auto;
+}
+.infoList.infoSetInfo ul .moneySet {
+  border-top: 1px solid #e9e9e9;
+}
+.infoList.infoSetInfo ul .equment {
+  line-height: 45px;
+  width: 100%;
+  min-width: 400px;
+  color: #222;
+  height: auto;
+  display: inline-block;
+  margin: 5px 10px;
+  border: 1px solid #e9e9e9;
+  border-bottom: 0px;
+}
+.infoList.infoSetInfo ul .equment .deviceName {
+  width: 100%;
+  padding: 0px 10px;
+  box-sizing: border-box;
+  background: #eee;
+}
+.infoList.infoSetInfo ul .equment div {
+  padding: 0px 10px;
+  position: relative;
+  border-bottom: 1px solid #e9e9e9;
+}
+.infoList.infoSetInfo ul .equment div .deviceRateItem {
+  border-bottom: 0px;
+  display: inline-block;
+}
+.infoList.infoSetInfo ul .equment div .itemTitle {
+  display: inline-block;
+  width: 100px;
+  margin-right: 10px;
+  position: absolute;
+}
+.infoList.infoSetInfo ul .equment div .itemTitle span {
+  margin-right: 5px;
+}
+.infoList.infoSetInfo ul .equment div .itemContent {
+  display: inline-block;
+  min-width: 298px;
+  width: calc(100% - 80px);
+  margin-left: 90px;
+}
+.infoList.infoSetInfo ul .equment div .itemContent .entranceItem {
+  line-height: 30px;
+  width: calc(100% - 70px);
+  min-width: 250px;
+}
+.infoList.infoSetInfo ul .equment div .itemContent .entranceItem:first-child {
+  margin-top: 8px;
+}
+.infoList.infoSetInfo ul .equment div .itemContent .deviceItem {
+  border-bottom: 0px;
+  padding: 0px;
+  line-height: 30px;
+}
+.infoList.infoSetInfo ul .equment div .itemContent .deviceItem:first-child {
+  margin-top: 8px;
+}
+.infoList.infoSetInfo ul .equment div .itemContent div {
+  position: relative;
+}
+.infoList.infoSetInfo ul .equment div .itemContent div .deviceRateContent {
+  width: 240px;
+  border-bottom: 0px;
+  padding: 0px;
+}
+.infoList.infoSetInfo ul .equment div .itemContent span {
+  display: inline-block;
+}
+.infoList.infoSetInfo ul .equment div a {
+  position: absolute;
+  right: 10px;
+  top: 0px;
+}
+.infoList.infoSetInfo .warn-text {
+  line-height: 45px;
 }
