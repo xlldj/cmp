@@ -573,22 +573,25 @@ class InfoSet extends React.Component {
             }
           }
         } else {
-          let contactItem = (
-            <li key={`other${index}`} className="equment">
-              <div className="deviceName">
-                {CONSTANTS.BUSINESS[record.deviceType]}设置
-              </div>
-              <div>
-                <span className="itemTitle">{star}归寝时间</span>
-                {record.gateTime ? (
-                  <span className="itemContent">{record.gateTime}</span>
-                ) : (
-                  <span className="red itemContent">无</span>
-                )}
-              </div>
-            </li>
-          )
-          contact.push(contactItem)
+          isShow = !isShow
+          if (isShow === modal) {
+            let contactItem = (
+              <li key={`other${index}`} className="equment">
+                <div className="deviceName">
+                  {CONSTANTS.BUSINESS[record.deviceType]}设置
+                </div>
+                <div>
+                  <span className="itemTitle">{star}归寝时间</span>
+                  {record.gateTime ? (
+                    <span className="itemContent">{record.gateTime}</span>
+                  ) : (
+                    <span className="red itemContent">无</span>
+                  )}
+                </div>
+              </li>
+            )
+            contact.push(contactItem)
+          }
         }
       }
 
@@ -720,15 +723,9 @@ class InfoSet extends React.Component {
           </li>
           <div className="leftModal">
             {equipmentsContent ? equipmentsContent : null}
-            {/* {equipment.length % 2 === 1 && entranceContent
-              ? entranceContent
-              : null} */}
           </div>
           <div className="rightModal">
             {equipmentsContentRight ? equipmentsContentRight : null}
-            {/* {equipment.length % 2 !== 1 && entranceContent
-              ? entranceContent
-              : null} */}
           </div>
           <li className="moneySet">
             <p>{star}充值面额设置:</p>
