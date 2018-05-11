@@ -369,6 +369,7 @@ class RateInfo extends React.Component {
     this.setState(nextState)
   }
   checkInput = () => {
+    debugger
     const {
       rateGroups,
       deviceType,
@@ -440,7 +441,8 @@ class RateInfo extends React.Component {
         if (
           supplier &&
           supplier.agreement === 2 &&
-          deviceType !== DEVICE_TYPE_BLOWER.toString()
+          (deviceType === DEVICE_TYPE_HEATER.toString() ||
+            deviceType === DEVICE_TYPE_DRINGKER.toString())
         ) {
           // this rate is set to versionB, need to check rateGroupsVersionB.
           checkRateGroups = false
@@ -504,7 +506,7 @@ class RateInfo extends React.Component {
           })
           if (same) {
             r.same = true
-            nextState.rates = rates
+            nextState.rateGroups = rates
             this.setState(nextState)
             return false
           }
@@ -943,6 +945,11 @@ class RateInfo extends React.Component {
             {r.error ? (
               <span key={`errorA${i}`} className="checkInvalid">
                 输入不完整
+              </span>
+            ) : null}
+            {r.same ? (
+              <span key={`same${i}`} className="checkInvalid">
+                请勿输入重复的费率设置
               </span>
             ) : null}
           </li>

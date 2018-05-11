@@ -5,9 +5,11 @@ const SCHOOL = {
   BUILDINGTYPE: { 1: '宿舍楼', 2: '其他' },
   TEST_SCHOOL: 2,
   REAL_SCHOOL: 1,
+  COMPANY_SCHOOL: 3,
   SCHOOL_TYPES: {
     1: '真实学校',
-    2: '测试学校'
+    2: '测试学校',
+    3: '工厂'
   },
   WXCERTSIZE: 65534 // cert file should not exceed 64k bytes.
 }
