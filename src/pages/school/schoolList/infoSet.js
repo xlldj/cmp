@@ -6,6 +6,7 @@ import AjaxHandler from '../../../util/ajax'
 import Format from '../../../util/format'
 import CONSTANTS from '../../../constants'
 import { mul } from '../../../util/numberHandle'
+
 const {
   DEVICE_TYPE_BLOWER,
   DEVICE_TYPE_WASHER,
@@ -70,6 +71,7 @@ class InfoSet extends React.Component {
       suppliers: {}
     }
   }
+
   fetchData = body => {
     let resource = '/school/basicConfig'
     const cb = json => {
@@ -177,6 +179,7 @@ class InfoSet extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
+
   componentDidMount() {
     this.props.hide(false)
     let data = this.props.location.state
@@ -195,9 +198,11 @@ class InfoSet extends React.Component {
     this.fetchData(body)
     // this.fetchSchoolInfo(body)
   }
+
   componentWillUnmount() {
     this.props.hide(true)
   }
+
   confirm = () => {
     let { finished, type } = this.state
     if (!finished) {
@@ -560,9 +565,10 @@ class InfoSet extends React.Component {
                     <span className="itemTitle">{star}设备费率</span>
                     <span className="itemContent">
                       {record.unitPrice ? (
-                        <div className="deviceItem">{`设备水量单价：${
-                          record.rateDetail[0].unitPrice
-                        }元/升`}</div>
+                        <div className="deviceItem">{`设备水量单价：${mul(
+                          record.unitPrice,
+                          100
+                        )}分/升`}</div>
                       ) : null}
                       {deviceRate ? deviceRate : addRateItem}
                     </span>
