@@ -356,7 +356,9 @@ class Main extends React.Component {
           this.props.changeFund('deposit', { schoolId: selectedSchool })
           this.props.changeFund('abnormal', { schoolId: selectedSchool })
           this.props.changeGift('act', { schoolId: selectedSchool })
-          this.props.changeLost('lostList', { schoolId: selectedSchool })
+          this.props.changeLost('lostListContainer', {
+            schoolId: selectedSchool
+          })
           this.props.changeUser('userList', { schoolId: selectedSchool })
           /*
           this.props.changeTask('taskList', {schoolId: selectedSchool}) 
@@ -398,7 +400,7 @@ class Main extends React.Component {
       // loading , need to show the loading div
       loading && loading.classList.remove('hide')
       // if wait for more than 5s, refresh the web
-      this.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
+      // this.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
     } else {
       // add 'hide' to not display loading
       loading && loading.classList.add('hide')

@@ -8,6 +8,7 @@ import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
 import buildingsSet from './building'
 import userModule from '../pages/user/reducer.js'
+import { lostModule, lostModal } from '../pages/lost/reducer.js'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -298,24 +299,6 @@ const giftModule = (state = initialGiftState, action) => {
   return state
 }
 
-// 失物招领
-const initialLostState = {
-  lostList: {
-    page: 1,
-    schoolId: selectedSchool,
-    type: 'all'
-  }
-}
-const lostModule = (state = initialLostState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_LOST) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
 // 客服工单
 const initialTaskState = {
   taskList: {
@@ -476,6 +459,7 @@ const rootReducer = combineReducers({
   fundModule,
   giftModule,
   lostModule,
+  lostModal,
   userModule,
   taskModule,
   employeeModule,
