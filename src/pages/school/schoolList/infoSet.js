@@ -14,6 +14,7 @@ const {
   WASHER_RATE_TYPES,
   REAL_SCHOOL,
   TEST_SCHOOL,
+  COMPANY_SCHOOL,
   SCHOOL_TYPES,
   // DEVICE_AGREEMENT_B,
   DOORFORBID_WEEK
@@ -787,6 +788,7 @@ class InfoSet extends React.Component {
                 <RadioGroup value={type} onChange={this.changeType}>
                   <Radio value={REAL_SCHOOL}>真实学校</Radio>
                   <Radio value={TEST_SCHOOL}>测试学校</Radio>
+                  <Radio value={COMPANY_SCHOOL}>工厂</Radio>
                 </RadioGroup>
               )}
               {typeError ? (
