@@ -10,6 +10,7 @@ import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { mul, div } from '../../../util/numberHandle'
+
 const Fragment = React.Fragment
 const {
   DEVICE_TYPE_HEATER,
@@ -81,9 +82,11 @@ class RateInfo extends React.Component {
       twoCleanPrice: '',
       twoCleanPriceError: false,
       unitPrice: '',
-      unitPriceError: false
+      unitPriceError: false,
+      disabledSchDev: false // 从上线设置进入
     }
   }
+
   fetchSuppliers = () => {
     const resource = '/supplier/query/list'
     const body = {
@@ -203,6 +206,15 @@ class RateInfo extends React.Component {
 
   componentDidMount() {
     this.props.hide(false)
+    let data = this.props.location.query
+    if (data) {
+      let { schoolId, deviceType } = data
+      this.setState({
+        schoolId: schoolId,
+        deviceType: deviceType.toString(),
+        disabledSchDev: true
+      })
+    }
     if (this.props.match.params.id) {
       const id = parseInt(this.props.match.params.id.slice(1), 10)
       this.setState({
@@ -211,6 +223,7 @@ class RateInfo extends React.Component {
     }
     this.fetchSuppliers()
   }
+
   componentWillUnmount() {
     this.props.hide(true)
   }
@@ -369,7 +382,6 @@ class RateInfo extends React.Component {
     this.setState(nextState)
   }
   checkInput = () => {
-    debugger
     const {
       rateGroups,
       deviceType,
@@ -881,8 +893,10 @@ class RateInfo extends React.Component {
       })
     }
   }
+
   render() {
     let {
+      disabledSchDev,
       id,
       schoolId,
       schoolError,
@@ -1087,9 +1101,9 @@ class RateInfo extends React.Component {
           <li>
             <p>学校:</p>
             <SchoolSelector
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
               invalidTitle="选择学校"
               selectedSchool={schoolId}
               changeSchool={this.changeSchool}
@@ -1105,9 +1119,9 @@ class RateInfo extends React.Component {
               selectedDevice={deviceType}
               changeDevice={this.changeDevice}
               checkDevice={this.checkDevice}
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
             />
             {deviceTypeError ? (
               <span className="checkInvalid">请选择设备类型！</span>

@@ -380,16 +380,20 @@ class InfoSet extends React.Component {
       for (let index in equipment) {
         let record = equipment[index]
         let addRateItem = (
-          <Link
-            className="mgl15"
-            key={`addRateItem${index}`}
-            to={{
-              pathname: `/device/rateSet/addRate`,
-              state: { path: 'fromInfoSet' }
-            }}
-          >
-            前往设置
-          </Link>
+          <span className="red">
+            请前往设置
+            <Link
+              className="mgl15"
+              key={`addRateItem${index}`}
+              to={{
+                pathname: `/device/rateSet/addRate`,
+                state: { path: 'fromInfoSet' },
+                query: { schoolId: schoolId, deviceType: record.deviceType }
+              }}
+            >
+              前往设置
+            </Link>
+          </span>
         )
         if (parseInt(index, 10) !== BUSI_TYPE_ENTRANCE) {
           if (record.rateDetail) {
@@ -466,13 +470,11 @@ class InfoSet extends React.Component {
                   )
                 })
               let waterContents = null
-              if (record.waterTimeRange) {
-                if (
-                  parseInt(record.waterTimeRange.deviceType, 10) ===
-                  DEVICE_TYPE_HEATER
-                ) {
+              if (parseInt(record.deviceType, 10) === DEVICE_TYPE_HEATER) {
+                let timeItem
+                if (record.waterTimeRange) {
                   let items = record.waterTimeRange.items
-                  let timeItem =
+                  timeItem =
                     items &&
                     items.map((r, i) => (
                       <span key={i} className="inlineItem">
@@ -483,42 +485,46 @@ class InfoSet extends React.Component {
                         )}
                       </span>
                     ))
-                  waterContents = record.waterTimeRange ? (
-                    <div>
-                      <span className="itemTitle">供水时段</span>
-                      <span className="itemContent">{timeItem}</span>
-                      <Link
-                        className="mgl15"
-                        key={`innerwtitem${index}`}
-                        to={{
-                          pathname: `/device/timeset/editTimeset/:${
-                            record.waterTimeRange.id
-                          }`,
-                          state: { path: 'fromInfoSet' }
-                        }}
-                      >
-                        前往设置
-                      </Link>
-                    </div>
-                  ) : (
-                    <div>
-                      <span className="itemTitle">供水时段</span>
-                      <span className="itemContent">
-                        <span>未设置即全天供应热水</span>
-                      </span>
-                      <Link
-                        className="mgl15"
-                        key={`innerwtitem${index}`}
-                        to={{
-                          pathname: `/device/timeset/addTimeset`,
-                          state: { path: 'fromInfoSet' }
-                        }}
-                      >
-                        前往设置
-                      </Link>
-                    </div>
-                  )
                 }
+                waterContents = record.waterTimeRange ? (
+                  <div>
+                    <span className="itemTitle">供水时段</span>
+                    <span className="itemContent">{timeItem}</span>
+                    <Link
+                      className="mgl15"
+                      key={`innerwtitem${index}`}
+                      to={{
+                        pathname: `/device/timeset/editTimeset/:${
+                          record.waterTimeRange.id
+                        }`,
+                        state: { path: 'fromInfoSet' }
+                      }}
+                    >
+                      前往设置
+                    </Link>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="itemTitle">供水时段</span>
+                    <span className="itemContent">
+                      <span className="red">未设置即全天供应热水</span>
+                    </span>
+                    <Link
+                      className="mgl15"
+                      key={`innerwtitem${index}`}
+                      to={{
+                        pathname: `/device/timeset/addTimeset`,
+                        state: { path: 'fromInfoSet' },
+                        query: {
+                          schoolId: schoolId,
+                          deviceType: record.deviceType
+                        }
+                      }}
+                    >
+                      前往设置
+                    </Link>
+                  </div>
+                )
               }
               let contactItem = (
                 <li key={`other${index}`} className="equment">
@@ -527,7 +533,7 @@ class InfoSet extends React.Component {
                   </div>
                   <div>
                     <span className="itemTitle">{star}预付选项</span>
-                    {record.prepayOption ? (
+                    {record.prepayOption.id ? (
                       <span className="itemContent">
                         <span key={`prepay${index}`}>
                           预付¥{record.prepayOption.prepay}
@@ -553,10 +559,14 @@ class InfoSet extends React.Component {
                           className="mgl15"
                           to={{
                             pathname: `/device/prepay/addPrepay`,
+                            query: {
+                              schoolId: schoolId,
+                              deviceType: record.deviceType
+                            },
                             state: { path: 'fromInfoSet' }
                           }}
                         >
-                          前往添加
+                          前往设置
                         </Link>
                       </span>
                     )}
