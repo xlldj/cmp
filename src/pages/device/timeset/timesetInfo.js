@@ -11,6 +11,7 @@ import SchoolSelectWithoutAll from '../../component/schoolSelectorWithoutAll'
 // import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../../constants'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
+
 const { DEVICE_TYPE_HEATER } = CONSTANTS
 const OPTIONS = {
   1: '热水器'
@@ -29,6 +30,7 @@ const initailTimeset = {
   startTime: moment('1/1/2017 0:0'),
   endTime: moment('1/1/2017 23:59')
 }
+
 class TimesetInfo extends React.Component {
   constructor(props) {
     super(props)
@@ -52,9 +54,11 @@ class TimesetInfo extends React.Component {
       buildingData: {},
       buildingError: false,
       buildingTimesets: [],
+      disabledSchDev: false, // 从上线设置进入供水时间设置
       hasOption: false // Only 'heater' has timeset, check if the school has 'heater' service online.
     }
   }
+
   fetchData = body => {
     let resource = '/api/time/range/water/one'
     const cb = json => {
@@ -113,6 +117,16 @@ class TimesetInfo extends React.Component {
 
   componentDidMount() {
     this.props.hide(false)
+    let data = this.props.location.query
+    if (data) {
+      let { schoolId, deviceType } = data
+      this.setState({
+        selectedSchool: schoolId,
+        deviceType: deviceType.toString(),
+        disabledSchDev: true
+      })
+      this.fetchDeviceTypes(schoolId)
+    }
     if (this.props.match.params.id) {
       const body = {
         id: parseInt(this.props.match.params.id.slice(1), 10)
@@ -120,9 +134,11 @@ class TimesetInfo extends React.Component {
       this.fetchData(body)
     }
   }
+
   componentWillUnmount() {
     this.props.hide(true)
   }
+
   confirm = () => {
     let { selectedSchool, deviceType } = this.state
     if (!selectedSchool || selectedSchool === '0') {
@@ -545,7 +561,8 @@ class TimesetInfo extends React.Component {
       schoolError,
       buildingData,
       buildingTimesets,
-      hasOption
+      hasOption,
+      disabledSchDev
     } = this.state
     const times =
       items &&
@@ -652,9 +669,9 @@ class TimesetInfo extends React.Component {
           <li>
             <p>选择学校:</p>
             <SchoolSelectWithoutAll
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
               selectedSchool={selectedSchool.toString()}
               changeSchool={this.changeSchool}
               checkSchool={this.checkSchool}
@@ -666,9 +683,9 @@ class TimesetInfo extends React.Component {
           <li>
             <p>设备类型:</p>
             <BasicSelector
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
               staticOpts={hasOption ? OPTIONS : {}}
               selectedOpt={deviceType}
               changeOpt={this.changeDevice}

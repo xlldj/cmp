@@ -6,6 +6,7 @@ import AjaxHandler from '../../../util/ajax'
 import Format from '../../../util/format'
 import CONSTANTS from '../../../constants'
 import { mul } from '../../../util/numberHandle'
+
 const {
   DEVICE_TYPE_BLOWER,
   DEVICE_TYPE_WASHER,
@@ -14,6 +15,7 @@ const {
   WASHER_RATE_TYPES,
   REAL_SCHOOL,
   TEST_SCHOOL,
+  COMPANY_SCHOOL,
   SCHOOL_TYPES,
   // DEVICE_AGREEMENT_B,
   DOORFORBID_WEEK
@@ -69,6 +71,7 @@ class InfoSet extends React.Component {
       suppliers: {}
     }
   }
+
   fetchData = body => {
     let resource = '/school/basicConfig'
     const cb = json => {
@@ -176,6 +179,7 @@ class InfoSet extends React.Component {
     }
     AjaxHandler.ajax(resource, body, cb)
   }
+
   componentDidMount() {
     this.props.hide(false)
     let data = this.props.location.state
@@ -194,9 +198,11 @@ class InfoSet extends React.Component {
     this.fetchData(body)
     // this.fetchSchoolInfo(body)
   }
+
   componentWillUnmount() {
     this.props.hide(true)
   }
+
   confirm = () => {
     let { finished, type } = this.state
     if (!finished) {
@@ -374,16 +380,20 @@ class InfoSet extends React.Component {
       for (let index in equipment) {
         let record = equipment[index]
         let addRateItem = (
-          <Link
-            className="mgl15"
-            key={`addRateItem${index}`}
-            to={{
-              pathname: `/device/rateSet/addRate`,
-              state: { path: 'fromInfoSet' }
-            }}
-          >
-            前往设置
-          </Link>
+          <span className="red">
+            请前往设置
+            <Link
+              className="mgl15"
+              key={`addRateItem${index}`}
+              to={{
+                pathname: `/device/rateSet/addRate`,
+                state: { path: 'fromInfoSet' },
+                query: { schoolId: schoolId, deviceType: record.deviceType }
+              }}
+            >
+              前往设置
+            </Link>
+          </span>
         )
         if (parseInt(index, 10) !== BUSI_TYPE_ENTRANCE) {
           if (record.rateDetail) {
@@ -460,13 +470,11 @@ class InfoSet extends React.Component {
                   )
                 })
               let waterContents = null
-              if (record.waterTimeRange) {
-                if (
-                  parseInt(record.waterTimeRange.deviceType, 10) ===
-                  DEVICE_TYPE_HEATER
-                ) {
+              if (parseInt(record.deviceType, 10) === DEVICE_TYPE_HEATER) {
+                let timeItem
+                if (record.waterTimeRange) {
                   let items = record.waterTimeRange.items
-                  let timeItem =
+                  timeItem =
                     items &&
                     items.map((r, i) => (
                       <span key={i} className="inlineItem">
@@ -477,42 +485,46 @@ class InfoSet extends React.Component {
                         )}
                       </span>
                     ))
-                  waterContents = record.waterTimeRange ? (
-                    <div>
-                      <span className="itemTitle">供水时段</span>
-                      <span className="itemContent">{timeItem}</span>
-                      <Link
-                        className="mgl15"
-                        key={`innerwtitem${index}`}
-                        to={{
-                          pathname: `/device/timeset/editTimeset/:${
-                            record.waterTimeRange.id
-                          }`,
-                          state: { path: 'fromInfoSet' }
-                        }}
-                      >
-                        前往设置
-                      </Link>
-                    </div>
-                  ) : (
-                    <div>
-                      <span className="itemTitle">供水时段</span>
-                      <span className="itemContent">
-                        <span>未设置即全天供应热水</span>
-                      </span>
-                      <Link
-                        className="mgl15"
-                        key={`innerwtitem${index}`}
-                        to={{
-                          pathname: `/device/timeset/addTimeset`,
-                          state: { path: 'fromInfoSet' }
-                        }}
-                      >
-                        前往设置
-                      </Link>
-                    </div>
-                  )
                 }
+                waterContents = record.waterTimeRange ? (
+                  <div>
+                    <span className="itemTitle">供水时段</span>
+                    <span className="itemContent">{timeItem}</span>
+                    <Link
+                      className="mgl15"
+                      key={`innerwtitem${index}`}
+                      to={{
+                        pathname: `/device/timeset/editTimeset/:${
+                          record.waterTimeRange.id
+                        }`,
+                        state: { path: 'fromInfoSet' }
+                      }}
+                    >
+                      前往设置
+                    </Link>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="itemTitle">供水时段</span>
+                    <span className="itemContent">
+                      <span className="red">未设置即全天供应热水</span>
+                    </span>
+                    <Link
+                      className="mgl15"
+                      key={`innerwtitem${index}`}
+                      to={{
+                        pathname: `/device/timeset/addTimeset`,
+                        state: { path: 'fromInfoSet' },
+                        query: {
+                          schoolId: schoolId,
+                          deviceType: record.deviceType
+                        }
+                      }}
+                    >
+                      前往设置
+                    </Link>
+                  </div>
+                )
               }
               let contactItem = (
                 <li key={`other${index}`} className="equment">
@@ -521,7 +533,7 @@ class InfoSet extends React.Component {
                   </div>
                   <div>
                     <span className="itemTitle">{star}预付选项</span>
-                    {record.prepayOption ? (
+                    {record.prepayOption.id ? (
                       <span className="itemContent">
                         <span key={`prepay${index}`}>
                           预付¥{record.prepayOption.prepay}
@@ -547,10 +559,14 @@ class InfoSet extends React.Component {
                           className="mgl15"
                           to={{
                             pathname: `/device/prepay/addPrepay`,
+                            query: {
+                              schoolId: schoolId,
+                              deviceType: record.deviceType
+                            },
                             state: { path: 'fromInfoSet' }
                           }}
                         >
-                          前往添加
+                          前往设置
                         </Link>
                       </span>
                     )}
@@ -559,9 +575,10 @@ class InfoSet extends React.Component {
                     <span className="itemTitle">{star}设备费率</span>
                     <span className="itemContent">
                       {record.unitPrice ? (
-                        <div className="deviceItem">{`设备水量单价：${
-                          record.rateDetail[0].unitPrice
-                        }元/升`}</div>
+                        <div className="deviceItem">{`设备水量单价：${mul(
+                          record.unitPrice,
+                          100
+                        )}分/升`}</div>
                       ) : null}
                       {deviceRate ? deviceRate : addRateItem}
                     </span>
@@ -787,6 +804,7 @@ class InfoSet extends React.Component {
                 <RadioGroup value={type} onChange={this.changeType}>
                   <Radio value={REAL_SCHOOL}>真实学校</Radio>
                   <Radio value={TEST_SCHOOL}>测试学校</Radio>
+                  <Radio value={COMPANY_SCHOOL}>工厂</Radio>
                 </RadioGroup>
               )}
               {typeError ? (
