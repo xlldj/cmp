@@ -3,6 +3,7 @@ import creditsHandler from './credits'
 import orderStatHandler from './order.js'
 import orderConsumptionHandler from './orderConsumption'
 import userAuthHandler from './userAuth'
+import lostHandler from './lost'
 
 const AjaxHandler = {
   showingError: false
@@ -48,6 +49,10 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return orderConsumptionHandler(resource, body)
   } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
     return userAuthHandler(resource, body)
+  } else if (
+    contain(resource, 'lost/list', 'lost/details', 'lost/comments/list')
+  ) {
+    return lostHandler(resource, body)
   }
 }
 

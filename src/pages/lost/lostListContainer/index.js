@@ -2,16 +2,22 @@ import React from 'react'
 
 import PhaseLine from '../../component/phaseLine'
 import SchoolSelector from '../../component/schoolSelector'
-import LostFoundList from '../lostFoundList'
+import LostFoundList from './lostFoundList'
+import BlackedList from './lostFoundList'
+import LostFoundDetail from './lostFoundDetail'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeLost } from '../action'
-import { changeSchool, changePhase } from './controller'
+import { lostFoundContainerPropsController } from './controller'
 
 import CONSTANTS from '../../../constants'
 
-const { LOST_LIST_PAGE_TAB, LOST_LIST_PAGE_TAB_LOSTFOUND } = CONSTANTS
+const {
+  LOST_LIST_PAGE_TAB,
+  LOST_LIST_PAGE_TAB_LOSTFOUND,
+  LOST_LIST_PAGE_TAB_BLACKEDLIST
+} = CONSTANTS
 const moduleName = 'lostModule'
 const subModule = 'lostListContainer'
 
@@ -20,24 +26,47 @@ class LostListContainer extends React.Component {
     super(props)
     this.state = {}
   }
+  getContent = () => {
+    const { tabIndex } = this.props
+    if (tabIndex === LOST_LIST_PAGE_TAB_LOSTFOUND) {
+      return <LostFoundList />
+    } else if (tabIndex === LOST_LIST_PAGE_TAB_BLACKEDLIST) {
+      return <BlackedList />
+    }
+  }
+  setProps = event => {
+    const value = lostFoundContainerPropsController(
+      this.state,
+      this.props,
+      event
+    )
+    if (value) {
+      this.props.changeLost(subModule, value)
+    }
+  }
   render() {
-    const { tabIndex, schoolId } = this.props
+    const { tabIndex, schoolId, showDetail } = this.props
     const selector = (
       <SchoolSelector
         key="schoolSelector"
         selectedSchool={schoolId}
-        changeSchool={v => changeSchool(this.props, v)}
+        changeSchool={v =>
+          this.setProps({ type: 'schoolId', value: { schoolId: v, page: 1 } })
+        }
       />
     )
     return (
-      <div>
+      <div className="panelWrapper">
         <PhaseLine
           staticPhase={LOST_LIST_PAGE_TAB}
           value={tabIndex}
           selectors={[selector]}
-          changePhase={v => changePhase(this.props, v)}
+          changePhase={v =>
+            this.setProps({ type: 'tabIndex', value: { tabIndex: v } })
+          }
         />
-        {tabIndex === LOST_LIST_PAGE_TAB_LOSTFOUND ? <LostFoundList /> : null}
+        {this.getContent()}
+        {showDetail ? <LostFoundDetail /> : null}
       </div>
     )
   }
@@ -46,7 +75,8 @@ class LostListContainer extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     schoolId: state[moduleName][subModule].schoolId,
-    tabIndex: state[moduleName][subModule].tabIndex
+    tabIndex: state[moduleName][subModule].tabIndex,
+    showDetail: state[moduleName].lostFoundList.showDetail
   }
 }
 

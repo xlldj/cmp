@@ -14,7 +14,10 @@ const initialLostState = {
     startTime: '',
     endTime: '',
     type: 'all',
-    status: 'all'
+    status: 'all',
+    selectedRowIndex: -1,
+    selectedDetailId: -1,
+    showDetail: false
   }
 }
 export const lostModule = (state = initialLostState, action) => {
@@ -36,13 +39,16 @@ const initialLostModal = {
   totalHidden: 0,
   listLoading: false,
   detail: {},
-  detailLoading: false
+  detailLoading: false,
+  comments: [],
+  commentsLoading: false,
+  commentsSize: 0
 }
 export const lostModal = (state = initialLostModal, action) => {
   const { type } = action
-  if (type === ActionTypes.CHANGE_LOST_MODAL) {
+  if (type === ActionTypes.CHANGE_MODAL_LOST) {
     const { value } = action
-    return { ...state, value }
+    return { ...state, ...value }
   }
   return state
 }

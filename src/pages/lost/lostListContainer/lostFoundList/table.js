@@ -2,14 +2,14 @@ import React from 'react'
 import { Table } from 'antd'
 import { Link } from 'react-router-dom'
 
-import selectedImg from '../../assets/selected.png'
-import Time from '../../../util/time'
-import CONSTANTS from '../../../constants'
-import { propsController } from './controller'
+import selectedImg from '../../../assets/selected.png'
+import Time from '../../../../util/time'
+import CONSTANTS from '../../../../constants'
+import { lostFoundListPropsController } from '../controller'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeLost } from '../action'
+import { changeLost } from '../../action'
 const moduleName = 'lostModule'
 const subModule = 'lostFoundList'
 const modalName = 'lostModal'
@@ -18,7 +18,7 @@ const { PAGINATION: SIZE } = CONSTANTS
 
 class LostFoundTable extends React.Component {
   setProps = event => {
-    const value = propsController(this.state, this.props, event)
+    const value = lostFoundListPropsController(this.state, this.props, event)
     if (value) {
       this.props.changeLost(subModule, value)
     }

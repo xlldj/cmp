@@ -21,7 +21,12 @@ import {
   fetchDetailRecordList
 } from '../pages/doorForbid/action'
 
-import { CHANGE_LOST, changeLost } from '../pages/lost/action'
+import {
+  CHANGE_LOST,
+  CHANGE_MODAL_LOST,
+  fetchLostFoundList,
+  changeLost
+} from '../pages/lost/action'
 
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
@@ -270,5 +275,7 @@ export {
   changeUser,
   moduleActionFactory,
   changeLost,
-  CHANGE_LOST
+  CHANGE_LOST,
+  CHANGE_MODAL_LOST,
+  fetchLostFoundList
 }

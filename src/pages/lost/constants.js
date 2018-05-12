@@ -24,6 +24,10 @@ const LOST = {
     { key: 3, value: '近7日' },
     { key: 5, value: '近30日' }
   ],
-  LOST_FOUND_STATUS: { 1: '正常显示', 2: '已屏蔽' }
+  LOST_FOUND_STATUS: { 1: '正常显示', 2: '已屏蔽' },
+  LOST_FOUND_STATUS_SHADOWED: 2,
+  LOST_COMMENT: 1, // 评论
+  LOST_REPLY: 2, // 评论的回复
+  COMMENT_SIZE_THRESHOLD: 2
 }
 export default LOST

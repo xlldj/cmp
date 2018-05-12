@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Popconfirm, Button } from 'antd'
-import CONSTANTS from '../constants'
+import CONSTANTS from '../../../../constants'
 const { LOST_FOUND_STATUS_SHADOWED } = CONSTANTS
 
 class LostContent extends React.Component {
@@ -8,7 +8,7 @@ class LostContent extends React.Component {
     const { data } = this.props
     const { title, user, userInBlackList } = data
     return (
-      <div className="detailPanel-content">
+      <Fragment>
         <h3 className="detailPanel-content-title">
           <span className="rightSeperator">{`${title || ''}`}</span>
         </h3>
@@ -24,16 +24,18 @@ class LostContent extends React.Component {
         </ul>
 
         {data.status !== LOST_FOUND_STATUS_SHADOWED ? (
-          <Popconfirm title="" onConfirm={this.openModal}>
-            <Button className="rightSeperator">屏蔽此条失物招领</Button>
+          <Popconfirm title="确认屏蔽此条失物招领?" onConfirm={this.openModal}>
+            <Button type="primary" className="rightSeperator">
+              屏蔽此条失物招领
+            </Button>
           </Popconfirm>
         ) : null}
         {userInBlackList ? null : (
-          <Button type="primary" onClick={this.blackUser}>
-            拉黑该发布用户
-          </Button>
+          <Popconfirm title="确认拉黑该发布用户？" onConfirm={this.blackUser}>
+            <Button type="primary">拉黑该发布用户</Button>
+          </Popconfirm>
         )}
-      </div>
+      </Fragment>
     )
   }
 }

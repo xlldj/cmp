@@ -1,25 +1,53 @@
-const subModule = 'lostListContainer'
-/**
- * 改变LostListContainer组件的schoolId
- * action for LostListContainer
- * @param {Object} props :LostListContainer组件的props
- * @param {string} v     :传入的学校id
- */
-export const changeSchool = (props, v) => {
-  const { schoolId } = props
-  if (schoolId !== v) {
-    props.changeLost(subModule, { schoolId: v })
-  }
+import {
+  schoolIdController,
+  tabIndexController,
+  syncTimeController,
+  dayController,
+  typeController,
+  statusController,
+  pageController,
+  combineControllers,
+  closeDetailController
+} from '../../../public/dispatcher'
+import store from '../../../index.js'
+import { fetchLostInfo } from '../action'
+
+export const stateController = (prevState, value) => {
+  return { ...prevState, ...value }
 }
-/**
- * 改变LostListContainer组件的tab
- * action for LostListContainer
- * @param {Object} props :LostListContainer组件的props
- * @param {string} v     :传入的tab页值
- */
-export const changePhase = (props, v) => {
-  const { tabIndex } = props
-  if (tabIndex !== v) {
-    props.changeLost(subModule, { tabIndex: v })
-  }
+
+export const lostFoundDetailPropsController = (state, props, event) => {
+  return combineControllers([closeDetailController])(state, props, event)
 }
+
+export const lostFoundListPropsController = (state, props, event) => {
+  return combineControllers([
+    syncTimeController,
+    typeController,
+    dayController,
+    statusController,
+    pageController
+  ])(state, props, event)
+}
+
+export const lostFoundContainerPropsController = (state, props, event) => {
+  return combineControllers([schoolIdController, tabIndexController])(
+    state,
+    props,
+    event
+  )
+}
+
+/**
+ * 将该用户拉黑，并更新显示的detail和comment。
+ * @param {*} userId
+ */
+export const defriend = userId => {
+  // store.dispatch(fetchLostInfo) // 更新detail的语句
+}
+
+/**
+ * 删除制定的评论，并更新显示的comments列表
+ * @param {*} commentId
+ */
+export const deleteComment = commentId => {}
