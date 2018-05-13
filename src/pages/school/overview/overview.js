@@ -229,10 +229,10 @@ class Overview extends React.Component {
                 <div className="supplierWrapper">
                   <div className="supplierItem">
                     <div className="supplierName">暂无</div>
-                    <div className="rateGroups">暂无</div>
+                    <div className="rateGroupsWrapper">暂无</div>
                   </div>
                 </div>
-                <div className="waterWrapper">暂无</div>
+                <div className="waterItemsWrapper">暂无</div>
               </div>
             )
           }
