@@ -531,46 +531,49 @@ class InfoSet extends React.Component {
                   <div className="deviceName">
                     {CONSTANTS.DEVICETYPE[record.deviceType]}设置
                   </div>
-                  <div>
-                    <span className="itemTitle">{star}预付选项</span>
-                    {record.prepayOption.id ? (
-                      <span className="itemContent">
-                        <span key={`prepay${index}`}>
-                          预付¥{record.prepayOption.prepay}
+                  {parseInt(record.deviceType, 10) ===
+                  DEVICE_TYPE_WASHER ? null : (
+                    <div>
+                      <span className="itemTitle">{star}预付选项</span>
+                      {record.prepayOption.id ? (
+                        <span className="itemContent">
+                          <span key={`prepay${index}`}>
+                            预付¥{record.prepayOption.prepay}
+                          </span>
+                          <span key={`minpay${index}`}>
+                            最低¥{record.prepayOption.minPrepay}
+                          </span>
+                          <Link
+                            className="mgl15"
+                            to={{
+                              pathname: `/device/prepay/editPrepay/:${
+                                record.prepayOption.id
+                              }`,
+                              state: { path: 'fromInfoSet' }
+                            }}
+                          >
+                            前往设置
+                          </Link>
                         </span>
-                        <span key={`minpay${index}`}>
-                          最低¥{record.prepayOption.minPrepay}
+                      ) : (
+                        <span className="red itemContent">
+                          请前往设置<Link
+                            className="mgl15"
+                            to={{
+                              pathname: `/device/prepay/addPrepay`,
+                              query: {
+                                schoolId: schoolId,
+                                deviceType: record.deviceType
+                              },
+                              state: { path: 'fromInfoSet' }
+                            }}
+                          >
+                            前往设置
+                          </Link>
                         </span>
-                        <Link
-                          className="mgl15"
-                          to={{
-                            pathname: `/device/prepay/editPrepay/:${
-                              record.prepayOption.id
-                            }`,
-                            state: { path: 'fromInfoSet' }
-                          }}
-                        >
-                          前往设置
-                        </Link>
-                      </span>
-                    ) : (
-                      <span className="red itemContent">
-                        请前往设置<Link
-                          className="mgl15"
-                          to={{
-                            pathname: `/device/prepay/addPrepay`,
-                            query: {
-                              schoolId: schoolId,
-                              deviceType: record.deviceType
-                            },
-                            state: { path: 'fromInfoSet' }
-                          }}
-                        >
-                          前往设置
-                        </Link>
-                      </span>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
                   <div>
                     <span className="itemTitle">{star}设备费率</span>
                     <span className="itemContent">
