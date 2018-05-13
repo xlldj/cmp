@@ -1,5 +1,5 @@
 /* this is a version with different timeset for different building of same school */
-import React from 'react'
+import React, { Fragment } from 'react'
 import moment from 'moment'
 
 import { Button, TimePicker } from 'antd'
@@ -613,35 +613,33 @@ class TimesetInfo extends React.Component {
             </div>
           ))
         return (
-          <div className="info innerInfo" key={`wrapper${i}`}>
-            <ul key={`ul${i}`}>
-              <li key={`building${i}`}>
-                <p>选择楼栋:</p>
-                <BasicSelector
-                  width={CONSTANTS.SELECTWIDTH}
-                  staticOpts={buildingData}
-                  selectedOpt={r.buildingId}
-                  changeOpt={v => this.changeBuilding(v, i)}
+          <Fragment key={`wrapper${i}`}>
+            <li key={`building${i}`}>
+              <p>选择楼栋:</p>
+              <BasicSelector
+                width={CONSTANTS.SELECTWIDTH}
+                staticOpts={buildingData}
+                selectedOpt={r.buildingId}
+                changeOpt={v => this.changeBuilding(v, i)}
+              />
+              {r.buildingError ? (
+                <span key={`buildingerror${i}`} className="checkInvalid">
+                  楼栋不能为空！
+                </span>
+              ) : null}
+            </li>
+            <li className="itemsWrapper" key={`buildingtime${i}`}>
+              <p key={`p${i}`}>楼栋供水时间:</p>
+              <div>
+                {times}
+                <AddPlusAbs
+                  count={r.items.length}
+                  add={() => this.addTimeset2Building(i)}
+                  abstract={() => this.abstractTimeset2Building(i)}
                 />
-                {r.buildingError ? (
-                  <span key={`buildingerror${i}`} className="checkInvalid">
-                    楼栋不能为空！
-                  </span>
-                ) : null}
-              </li>
-              <li className="itemsWrapper" key={`buildingtime${i}`}>
-                <p key={`p${i}`}>楼栋供水时间:</p>
-                <div>
-                  {times}
-                  <AddPlusAbs
-                    count={r.items.length}
-                    add={() => this.addTimeset2Building(i)}
-                    abstract={() => this.abstractTimeset2Building(i)}
-                  />
-                </div>
-              </li>
-            </ul>
-          </div>
+              </div>
+            </li>
+          </Fragment>
         )
       })
     console.log(selectedSchool)
