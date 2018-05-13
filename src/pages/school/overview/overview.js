@@ -250,7 +250,7 @@ class Overview extends React.Component {
         dataIndex: 'repairmans',
         className: 'repairmans',
         render: (text, record, index) => {
-          if (!record.repairmans.length) {
+          if (!record.repairmans || !record.repairmans.length) {
             return <div className="pad10">暂无</div>
           }
           let mans =
