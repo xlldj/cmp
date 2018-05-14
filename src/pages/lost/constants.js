@@ -30,6 +30,17 @@ const LOST = {
   LOST_FOUND_STATUS_SHADOWED: 2,
   LOST_COMMENT: 1, // 评论
   LOST_REPLY: 2, // 评论的回复
-  COMMENT_SIZE_THRESHOLD: 2
+  COMMENT_SIZE_THRESHOLD: 2,
+  LOST_BLACK_TIME_SELECTED: '1',
+  LOST_BLACK_TIME_SELECTOPTIONS: [
+    {
+      id: 1,
+      name: '拉黑1天'
+    },
+    {
+      id: 2,
+      name: '拉黑2天'
+    }
+  ]
 }
 export default LOST

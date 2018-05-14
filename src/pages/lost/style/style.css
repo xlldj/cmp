@@ -41,3 +41,8 @@
 .commentWrapper .commentItem .blueFont {
   color: #108ee9;
 }
+.commentsContent {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #e6e6e6;
+}

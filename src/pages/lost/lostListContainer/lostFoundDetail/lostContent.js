@@ -1,11 +1,24 @@
 import React, { Fragment } from 'react'
-import { Popconfirm, Button } from 'antd'
+import { Popconfirm, Button, InputNumber } from 'antd'
+import PopConfirmSelect from '../../../../pages/component/popConfirmSelect'
 import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
 import Noti from '../../../../util/noti'
+import { withRouter } from 'react-router-dom'
 import { defriend, deleteComment } from '../controller'
-const { LOST_FOUND_STATUS_SHADOWED, LOSTTYPE } = CONSTANTS
+const {
+  LOST_FOUND_STATUS_SHADOWED,
+  LOSTTYPE,
+  LOST_BLACK_TIME_SELECTOPTIONS,
+  LOST_BLACK_TIME_SELECTED
+} = CONSTANTS
 class LostContent extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      loseBlackTime: LOST_BLACK_TIME_SELECTED
+    }
+  }
   getImgsContent = () => {
     const { data } = this.props
     const { images } = data
@@ -16,23 +29,29 @@ class LostContent extends React.Component {
       })
     return imagesContent
   }
-  defriend = e => {
+  defriend = () => {
     const { data } = this.props
     const { userId, id } = data
-    let level = 2
-    defriend(userId, id, level, () => {
-      Noti.hintSuccess(this.props.history, '/lost')
+    const { loseBlackTime } = this.state
+    const level = loseBlackTime
+    defriend(userId, id, level, id)
+  }
+  changeOpt = v => {
+    this.setState({
+      loseBlackTime: v
     })
   }
-  deleteComment = e => {
-    e.preventDefault()
+  deleteComment = () => {
     const { data } = this.props
     const { type, id } = data
-    deleteComment(id, type, () => {
-      Noti.hintSuccess(this.props.history, '/lost')
-    })
+    deleteComment(id, type, id)
   }
   blackUser = () => {}
+  goToUserInfo = userId => {
+    this.props.history.push({
+      pathname: `/user/userInfo/:${userId}`
+    })
+  }
   render() {
     const { data } = this.props
     console.log(data)
@@ -45,9 +64,11 @@ class LostContent extends React.Component {
       createTime,
       description,
       commentsCount,
-      viewCount
+      viewCount,
+      userId
     } = data
     let ImagesContent = this.getImgsContent()
+    const { loseBlackTime } = this.state
     return (
       <Fragment>
         <h3 className="detailPanel-content-title">
@@ -56,7 +77,7 @@ class LostContent extends React.Component {
         <ul className="detailList">
           <li>
             <label>发布用户:</label>
-            <span>
+            <span onClick={() => this.goToUserInfo(userId)}>
               {mobile}
               {userInBlackList ? '(已拉黑)' : ''}
             </span>
@@ -92,7 +113,6 @@ class LostContent extends React.Component {
             <span>{viewCount || ''}</span>
           </li>
         </ul>
-
         {data.status !== LOST_FOUND_STATUS_SHADOWED ? (
           <Popconfirm
             title="确认屏蔽此条失物招领?"
@@ -104,12 +124,21 @@ class LostContent extends React.Component {
           </Popconfirm>
         ) : null}
         {userInBlackList ? null : (
-          <Popconfirm title="确认拉黑该发布用户？" onConfirm={this.defriend}>
-            <Button type="primary">拉黑该发布用户</Button>
-          </Popconfirm>
+          <PopConfirmSelect
+            confirmOk={this.defriend}
+            selectOptions={LOST_BLACK_TIME_SELECTOPTIONS}
+            selectedId={loseBlackTime}
+            changeOpt={this.changeOpt}
+            allTitle="选择拉黑时常"
+            contentConfirm={
+              <Button type="primary" className="rightSeperator">
+                拉黑该发布用户
+              </Button>
+            }
+          />
         )}
       </Fragment>
     )
   }
 }
-export default LostContent
+export default withRouter(LostContent)

@@ -87,6 +87,24 @@ button {
 button * {
   cursor: pointer;
 }
+.TooltipConfirm .ant-popover-inner-content {
+  display: flex;
+}
+.TooltipConfirm .ant-popover-inner-content .ant-popover-message {
+  padding: 0px;
+}
+.TooltipConfirm
+  .ant-popover-inner-content
+  .ant-popover-message
+  .anticon-exclamation-circle {
+  display: none;
+}
+.TooltipConfirm
+  .ant-popover-inner-content
+  .ant-popover-message
+  .ant-popover-message-title {
+  padding-left: 0px;
+}
 .grayBackColor {
   background-color: #bbb;
   border-color: #bbb;

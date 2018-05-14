@@ -177,3 +177,72 @@ export const fetchBlackPeopleList = body => {
     })
   }
 }
+export const deleteLostInfo = () => {
+  const { lostModal } = store.getState()
+  const { detail, detailLoading } = lostModal
+  detail.status = 2
+  if (detailLoading) {
+    return
+  }
+  return dispatch => {
+    if (detailLoading) {
+      return
+    }
+    dispatch({
+      type: CHANGE_MODAL_LOST,
+      value: {
+        detailLoading: true
+      }
+    })
+    let value = {}
+    value.detailLoading = false
+    value.detail = detail
+    dispatch({
+      type: CHANGE_MODAL_LOST,
+      value
+    })
+  }
+}
+export const deleteComments = id => {
+  const { lostModal, setUserInfo } = store.getState()
+  const { comments, commentsLoading, allRepliesLoading } = lostModal
+  const { name, id: userId } = setUserInfo
+  console.log(comments)
+  comments.forEach((element, index) => {
+    if (element.id === id) {
+      element.status = 2
+      element.delUserId = userId
+      element.delUserNickname = name
+      return true
+    }
+    element.replies.forEach((replay, index) => {
+      if (replay.id === id) {
+        debugger
+        replay.status = 2
+        replay.delUserId = userId
+        replay.delUserNickname = name
+        return true
+      }
+    })
+  })
+  return dispatch => {
+    if (commentsLoading) {
+      return
+    }
+    dispatch({
+      type: CHANGE_MODAL_LOST,
+      value: {
+        commentsLoading: true,
+        allRepliesLoading: true
+      }
+    })
+    let value = { allRepliesLoading: false }
+    value.commentsLoading = false
+    value.comments = comments
+    dispatch({
+      type: CHANGE_MODAL_LOST,
+      value
+    })
+  }
+}
+export const blackPerson = id => {}

@@ -27,8 +27,7 @@ class BlackPeopleTable extends React.Component {
       {
         title: '学校名称',
         dataIndex: 'schoolName',
-        className: 'firstCol',
-        render: (text, record, index) => <span className="">{text}</span>
+        className: 'firstCol'
       },
       {
         title: '用户手机号',
@@ -42,8 +41,7 @@ class BlackPeopleTable extends React.Component {
       {
         title: '用户昵称',
         dataIndex: 'userNickname',
-        width: '20%',
-        render: (text, record) => <span className="">{text}</span>
+        width: '20%'
       },
       {
         title: '拉黑时间',
@@ -52,13 +50,11 @@ class BlackPeopleTable extends React.Component {
       },
       {
         title: '拉黑时常',
-        dataIndex: 'blackListInfo',
-        render: (text, record) => <span className="">{text}</span>
+        dataIndex: 'blackListInfo'
       },
       {
         title: '操作人',
-        dataIndex: 'operUserNickname',
-        render: (text, record) => <span className="">{text}</span>
+        dataIndex: 'operUserNickname'
       },
       {
         title: <p className="lastCol">操作</p>,
@@ -76,6 +72,7 @@ class BlackPeopleTable extends React.Component {
   }
   render() {
     const { dataSource, total, loading, page } = this.props
+    const columns = this.getColumns()
     return (
       <div className="tableList">
         <p className="profitBanner">当前拉黑人数: {total}人</p>
@@ -91,7 +88,7 @@ class BlackPeopleTable extends React.Component {
           }}
           dataSource={dataSource}
           rowKey={record => record.id}
-          columns={this.getColumns()}
+          columns={columns}
           onChange={this.changePage}
           rowClassName={this.setRowClass}
         />
@@ -102,7 +99,7 @@ class BlackPeopleTable extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    total: state[modalName].totalNormal,
+    total: state[modalName].total,
     dataSource: state[modalName].list,
     loading: state[modalName].listLoading,
     page: state[modalName].page

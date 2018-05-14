@@ -34,16 +34,18 @@ class Comment extends React.Component {
     props.fetchCommentsList(body)
   }
   render() {
-    const { comments } = this.props
+    const { comments, commentParentId } = this.props
     console.log(comments)
     return (
-      <div>
+      <div className="commentsContent">
         {comments.map(comment => (
           <div className="commentWrapper" key={comment.id}>
             <CommentContent
               key={`commentContent${comment.id}`}
               type={LOST_COMMENT}
               comment={comment}
+              commentParentId={commentParentId}
+              {...this.props}
             />
             {comment.replies.length ? (
               <Reply
@@ -51,6 +53,7 @@ class Comment extends React.Component {
                 replies={comment.replies}
                 repliesCount={comment.repliesCount}
                 commentId={comment.id}
+                cpmmentParentId={commentParentId}
               />
             ) : null}
           </div>
@@ -60,9 +63,12 @@ class Comment extends React.Component {
   }
 }
 const mapStateToProps = (state, ownProps) => {
+  debugger
   return {
     comments: state[modalName].comments,
-    commentsSize: state[modalName].detail.commentsCount
+    commentsSize: state[modalName].detail.commentsCount,
+    commentParentId: state[modalName].detail.id,
+    commentsLoading: state[modalName].commentsLoading
   }
 }
 

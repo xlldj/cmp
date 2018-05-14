@@ -1,53 +1,88 @@
 import React from 'react'
 import CONSTANTS from '../../../../../constants'
-import { Popconfirm } from 'antd'
-import Noti from '../../../../../util/noti'
+import { Popconfirm, InputNumber } from 'antd'
+import PopConfirmSelect from '../../../../../pages/component/popConfirmSelect'
 import { defriend, deleteComment } from '../../controller'
-const { LOST_FOUND_STATUS_SHADOWED, LOST_REPLY } = CONSTANTS
+import { withRouter } from 'react-router-dom'
+const {
+  LOST_FOUND_STATUS_SHADOWED,
+  LOST_REPLY,
+  LOST_BLACK_TIME_SELECTOPTIONS,
+  LOST_BLACK_TIME_SELECTED,
+  LOST_COMMENT
+} = CONSTANTS
 class CommentContent extends React.Component {
   state = {
-    showDefriendModal: false
+    showDefriendModal: false,
+    loseBlackTime: LOST_BLACK_TIME_SELECTED
+  }
+  componentWillReceiveProps(nextprops) {
+    debugger
   }
   defriend = (e, userId) => {
     e.preventDefault()
-    defriend(userId, null, 2, () => {
-      Noti.hintSuccess(this.props.history, '/lost')
-    })
+    let { commentParentId } = this.props
+    defriend(userId, null, 2, commentParentId)
   }
   deleteComment = (e, id) => {
     e.preventDefault()
-    const { type } = this.props
-    deleteComment(id, type, () => {
-      Noti.hintSuccess(this.props.history, '/lost')
+    let { type, commentParentId } = this.props
+    if (type === LOST_REPLY) {
+      type = 4
+    }
+    if (type === LOST_COMMENT) {
+      type = 3
+    }
+    deleteComment(id, type, commentParentId)
+  }
+  changeOpt = v => {
+    this.setState({
+      loseBlackTime: v
+    })
+  }
+  goToUserInfo = userId => {
+    this.props.history.push({
+      pathname: `/user/userInfo/:${userId}`
     })
   }
   render() {
     const { comment, type } = this.props
+    const { loseBlackTime } = this.state
     return (
       <div className="commentItem">
         <span className="blueFont">
-          {comment.userMobile}({comment.userNickname})
+          <span onClick={() => this.goToUserInfo(comment.userId)}>
+            {comment.userMobile}({comment.userNickname})
+            {comment.userInBlackList ? <span>(已被拉黑)</span> : null}
+          </span>
           {type === LOST_REPLY ? (
             <span>
               <span className="balckFont">回复</span>
-              {comment.replyToUserMobile}({comment.replyToUserNickname})
+              <span onClick={() => this.goToUserInfo(comment.replyToUserId)}>
+                {comment.replyToUserMobile}({comment.replyToUserNickname})
+                {comment.replyToUserInBlackList ? (
+                  <span>(已被拉黑)</span>
+                ) : null}
+              </span>
             </span>
           ) : null}
           :
         </span>
         <span>{comment.content}</span>
         {comment.userInBlackList ? (
-          <span>(该用户已被拉黑)</span>
+          <span>该用户已被拉黑</span>
         ) : (
-          <Popconfirm
-            title="确认拉黑此条信息吗?"
-            onConfirm={e => this.defriend(e, comment.userId)}
-          >
-            <span>拉黑</span>
-          </Popconfirm>
+          <PopConfirmSelect
+            confirmOk={e => this.defriend(e, comment.id, comment.userId)}
+            selectOptions={LOST_BLACK_TIME_SELECTOPTIONS}
+            selectedId={loseBlackTime}
+            changeOpt={this.changeOpt}
+            allTitle="选择拉黑时常"
+            contentConfirm={<span className="blue_font">拉黑</span>}
+          />
         )}
         {comment.status === LOST_FOUND_STATUS_SHADOWED ? (
-          <span className="blue_font">(该评论已被删除)</span>
+          <span className="">(该评论已被{comment.delUserNickname}删除)</span>
         ) : (
           <Popconfirm
             title="确认删除此条信息吗?"
@@ -60,5 +95,4 @@ class CommentContent extends React.Component {
     )
   }
 }
-
 export default CommentContent

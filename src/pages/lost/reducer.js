@@ -49,6 +49,7 @@ const initialLostModal = {
 export const lostModal = (state = initialLostModal, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_MODAL_LOST) {
+    console.log(action)
     const { value } = action
     return { ...state, ...value }
   }

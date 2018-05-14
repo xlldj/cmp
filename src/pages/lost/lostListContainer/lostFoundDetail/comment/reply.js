@@ -4,6 +4,7 @@ import CommentContent from './commentContent'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { fetchRepliesList } from '../../../action'
+import { deepCopy } from '../../../../../util/copy'
 const { LOST_REPLY, COMMENT_SIZE_THRESHOLD } = CONSTANTS
 const modalName = 'lostModal'
 class Reply extends React.Component {
@@ -13,7 +14,9 @@ class Reply extends React.Component {
       isShowAll: true
     }
   }
-  componentWillReceiveProps(nextProps) {}
+  componentWillReceiveProps(nextProps) {
+    debugger
+  }
   showMoreComment = () => {
     const { commentId } = this.props
     const body = {
@@ -32,7 +35,12 @@ class Reply extends React.Component {
         {replies &&
           isShowAll &&
           replies.map(reply => (
-            <CommentContent key={reply.id} type={LOST_REPLY} comment={reply} />
+            <CommentContent
+              key={reply.id}
+              type={LOST_REPLY}
+              comment={reply}
+              {...this.props}
+            />
           ))}
         {repliesCount > COMMENT_SIZE_THRESHOLD && isShowAll ? (
           <a onClick={this.showMoreComment}>共{repliesCount}回复，点击展开</a>
@@ -43,7 +51,8 @@ class Reply extends React.Component {
                 <CommentContent
                   key={reply.id}
                   type={LOST_REPLY}
-                  comment={reply}
+                  comment={deepCopy(reply)}
+                  {...this.props}
                 />
               ))
             : null
@@ -53,9 +62,11 @@ class Reply extends React.Component {
   }
 }
 const mapStateToProps = (state, ownProps) => {
+  debugger
   return {
     allReplies: state[modalName].replies,
-    allRepliesLoading: state[modalName].allRepliesLoading
+    allRepliesLoading: state[modalName].allRepliesLoading,
+    ...ownProps
   }
 }
 

@@ -27,8 +27,8 @@ const domains = {
     user: 'http://10.195.90.188:5081'
   },
   zdc: {
-    manager: 'http://10.195.90.142:8080',
-    user: 'http://10.195.90.142:5081'
+    manager: 'http://10.195.90.143:8080',
+    user: 'http://10.195.90.143:5081'
   }
 }
 const currentDomain = domains.zdc
