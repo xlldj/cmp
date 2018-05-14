@@ -49,7 +49,7 @@ const initialFundState = {
     status: 'all', // 处理状态
     method: 'all', // 处理方式
     showDetail: false,
-    showHandleModal: true,
+    showHandleModal: false,
     selectedRowIndex: -1,
     selectedDetailId: -1
   }

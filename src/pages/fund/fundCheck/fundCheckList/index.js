@@ -1,19 +1,10 @@
 import React from 'react'
 
 import Query from './query'
-import FundCheckTable from './balanceTable'
-
-import CONSTANTS from '../../../../constants'
-
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeFund } from '../../../../actions'
-const moduleName = 'fundModule'
-const subModule = 'fundCheck'
+import FundCheckTable from './fundCheckTable'
 
 class FundCheckList extends React.Component {
   render() {
-    const { schoolId } = this.props
     return (
       <div className="panelWrapper">
         <Query />
@@ -23,14 +14,4 @@ class FundCheckList extends React.Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    schoolId: state[moduleName][subModule].schoolId
-  }
-}
-
-export default withRouter(
-  connect(mapStateToProps, {
-    changeFund
-  })(FundCheckList)
-)
+export default FundCheckList

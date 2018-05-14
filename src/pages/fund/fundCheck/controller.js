@@ -1,3 +1,4 @@
+import AjaxHandler from '../../../util/ajax'
 import {
   schoolIdController,
   methodController,
@@ -22,4 +23,18 @@ export const fundCheckListPropsController = (state, props, event) => {
     statusController,
     pageController
   ])(state, props, event)
+}
+
+/**
+ * 处理异常账单
+ * @param {*} body
+ */
+export const settleOrder = body => {
+  const resource = '/api/fundsCheck/mistake/settle'
+  AjaxHandler.ajax(resource, body).then(json => {
+    if (json && json.data) {
+      const data = { id: body.id }
+      store.dispatch(() => fetchFundCheckInfo(data))
+    }
+  })
 }

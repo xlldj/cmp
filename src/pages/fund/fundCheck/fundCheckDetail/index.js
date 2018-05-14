@@ -72,7 +72,7 @@ class FundCheckDetail extends React.Component {
     }
   }
   render() {
-    let { detailLoading, selectedDetailId, noRight2Handle } = this.props
+    let { detailLoading, noRight2Handle } = this.props
 
     return (
       <div

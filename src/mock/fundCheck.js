@@ -2,6 +2,7 @@ const fundCheck_mistake_list = {
   data: {
     fundsCheckMistakeRespDTOS: [
       {
+        id: 1,
         schoolName: '笑联大学',
         orderType: 1,
         mistakeType: 1,
