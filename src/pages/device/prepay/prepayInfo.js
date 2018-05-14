@@ -159,7 +159,11 @@ class PrepayInfo extends React.Component {
       } else {
         /*--------redirect --------*/
         if (json.data) {
-          Noti.hintSuccess(this.props.history, '/device/prepay')
+          if (this.props.location.state) {
+            this.props.history.goBack()
+          } else {
+            Noti.hintSuccess(this.props.history, '/device/prepay')
+          }
         }
       }
     }

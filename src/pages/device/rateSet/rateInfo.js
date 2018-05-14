@@ -675,7 +675,11 @@ class RateInfo extends React.Component {
     const resource = '/api/rate/save'
     const cb = json => {
       if (json.data) {
-        Noti.hintSuccess(this.props.history, '/device/rateSet')
+        if (this.props.location.state) {
+          this.props.history.goBack()
+        } else {
+          Noti.hintSuccess(this.props.history, '/device/rateSet')
+        }
       } else {
         throw new Error('网络出错，请稍后重试～')
       }
