@@ -209,6 +209,13 @@ class ActInfo extends React.Component {
     this.props.hide(false)
     this.fetchSchools()
     this.fetchGifts()
+    let data = this.props.location.query
+    if (data) {
+      let { schoolId } = data
+      this.setState({
+        selectedSchool: schoolId
+      })
+    }
   }
   componentWillUnmount() {
     this.props.hide(true)

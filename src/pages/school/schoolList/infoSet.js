@@ -285,7 +285,8 @@ class InfoSet extends React.Component {
   toBunusActSet = e => {
     this.props.history.push({
       pathname: `/gift/act/addAct`,
-      state: { path: 'fromInfoSet' }
+      state: { path: 'fromInfoSet' },
+      query: { schoolId: this.state.schoolId }
     })
   }
   toRepairmanSet = e => {
@@ -714,7 +715,7 @@ class InfoSet extends React.Component {
                   state: { path: 'fromInfoSet' }
                 }}
               >
-                查看详情
+                前往设置
               </Link>
             ) : (
               <Button onClick={this.toBuildingSet} type="primary">
@@ -733,7 +734,7 @@ class InfoSet extends React.Component {
                   state: { path: 'fromInfoSet' }
                 }}
               >
-                {businessSet ? '查看详情' : '前往设置'}
+                {businessSet ? '前往设置' : '前往设置'}
               </Link>
             ) : (
               <Button onClick={this.toBusinessSet} type="primary">
@@ -760,7 +761,7 @@ class InfoSet extends React.Component {
                   state: { path: 'fromInfoSet' }
                 }}
               >
-                查看详情
+                前往设置
               </Link>
             ) : (
               <Button onClick={this.toRechargeSet} type="primary">
@@ -779,7 +780,7 @@ class InfoSet extends React.Component {
                   state: { path: 'fromInfoSet' }
                 }}
               >
-                查看详情
+                前往设置
               </Link>
             ) : (
               <Button onClick={this.toBunusActSet} type="primary">
