@@ -1,6 +1,8 @@
 import React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
+import FundCheckContainer from './fundCheck'
+
 import { asyncComponent } from '../component/asyncComponent'
 
 import Bread from '../component/bread'
@@ -45,7 +47,8 @@ const breadcrumbNameMap = {
   '/deposit': '充值活动',
   '/deposit/depositInfo': '编辑充值活动',
   '/deposit/addDeposit': '创建充值活动',
-  '/abnormal': '异常资金'
+  '/abnormal': '异常资金',
+  '/fundCheck': '资金对账'
 }
 
 class FundDisp extends React.Component {
@@ -162,6 +165,12 @@ class FundDisp extends React.Component {
               path="/fund/abnormal"
               render={props => (
                 <AbnormalContainer hide={this.props.hide} {...props} />
+              )}
+            />
+            <Route
+              path="/fund/fundCheck"
+              render={props => (
+                <FundCheckContainer hide={this.props.hide} {...props} />
               )}
             />
             <Route

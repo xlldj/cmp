@@ -19,7 +19,7 @@ const domains = {
     user: 'https://api.xiaolian365.com/c'
   }
 }
-const currentDomain = domains.server
+const currentDomain = domains.qa
 
 const AjaxHandler = {
   showingError: false

@@ -6,6 +6,7 @@ import Time from '../util/time'
 
 import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
+import { fundModule, fundCheckModal } from '../pages/fund/reducer'
 import buildingsSet from './building'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
@@ -43,7 +44,7 @@ const initialAuthenData = {
   authenSet: false,
   mainNavs: [],
   subNavs: {},
-  schoolLimit: getStore('schoolLimit') ? true : false // if employee has rights to check all schools, this is true; or else is false
+  schoolLimit: !!getStore('schoolLimit') // if employee has rights to check all schools, this is true; or else is false
 }
 const setAuthenData = (state = initialAuthenData, action) => {
   const { type } = action
@@ -214,56 +215,6 @@ const deviceModule = (state = initialDeviceState, action) => {
     newSubState[subModule] = { ...state[subModule], ...keyValuePair }
     return { ...state, ...newSubState }
     // return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
-// 资金管理
-const initialFundState = {
-  fundList: {
-    page: 1,
-    schoolId: selectedSchool,
-    type: 'all',
-    status: 'all',
-    selectKey: '',
-    startTime: Time.get7DaysAgoStart(),
-    endTime: Time.getTodayEnd(),
-    userType: 'all'
-  },
-  withdrawList: {
-    page: 1,
-    schoolId: selectedSchool,
-    status: 'all',
-    selectKey: '',
-    startTime: Time.get7DaysAgoStart(),
-    endTime: Time.getTodayEnd(),
-    userType: 'all'
-  },
-  cashtime: {
-    page: 1,
-    schoolId: selectedSchool
-  },
-  charge: {
-    schoolId: selectedSchool,
-    page: 1
-  },
-  deposit: {
-    page: 1,
-    schoolId: selectedSchool
-  },
-  abnormal: {
-    schoolId: selectedSchool,
-    page: 1,
-    selectKey: '',
-    userType: 'all'
-  }
-}
-const fundModule = (state = initialFundState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_FUND) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
   }
   return state
 }
@@ -503,7 +454,8 @@ const rootReducer = combineReducers({
   setTagList,
   setUserInfo,
   setGifts,
-  buildingsSet
+  buildingsSet,
+  fundCheckModal
 })
 
 export default rootReducer
