@@ -1,60 +1,38 @@
 import React from 'react'
 import { Table } from 'antd'
-import { Link } from 'react-router-dom'
-
-import selectedImg from '../../../assets/selected.png'
 import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import { lostFoundListPropsController } from '../controller'
-
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeLost } from '../../action'
-const moduleName = 'lostModule'
-const subModule = 'lostFoundList'
-const modalName = 'lostModal'
+const modalName = 'blackModal'
 
 const { PAGINATION: SIZE, LOSTTYPE, HiddenStatus, showStatus } = CONSTANTS
 
-class LostFoundTable extends React.Component {
+class BlackPeopleTable extends React.Component {
   setProps = event => {
     const value = lostFoundListPropsController(this.state, this.props, event)
     if (value) {
-      this.props.changeLost(subModule, value)
+      this.props.changeLost(modalName, value)
     }
   }
   changePage = pageObj => {
     let page = pageObj.current
     this.setProps({ type: 'page', value: { page } })
   }
-  selectRow = (record, index, event) => {
-    let { dataSource } = this.props
-    let selectedDetailId = dataSource[index].id
-    this.props.changeLost(subModule, {
-      selectedRowIndex: index,
-      showDetail: true,
-      selectedDetailId
-    })
-  }
   getColumns = () => {
-    const { selectedRowIndex } = this.props
     return [
       {
         title: '学校名称',
         dataIndex: 'schoolName',
-        className: 'firstCol selectedHintWraper',
-        render: (text, record, index) => (
-          <span className="">
-            {index === selectedRowIndex ? (
-              <img src={selectedImg} alt="" className="selectedImg" />
-            ) : null}
-            {text}
-          </span>
-        )
+        className: 'firstCol',
+        render: (text, record, index) => <span className="">{text}</span>
       },
       {
-        title: '类型',
-        dataIndex: 'type',
+        title: '用户手机号',
+        dataIndex: 'userMobile',
         render: (text, record) => (
           <span className="">
             {LOSTTYPE[record.type] ? LOSTTYPE[record.type] : '----'}
@@ -62,49 +40,36 @@ class LostFoundTable extends React.Component {
         )
       },
       {
-        title: '标题',
-        dataIndex: 'title',
+        title: '用户昵称',
+        dataIndex: 'userNickname',
         width: '20%',
         render: (text, record) => <span className="">{text}</span>
       },
       {
-        title: '用户',
-        dataIndex: 'user',
-        render: (text, record) => <span className="">{text}</span>
-      },
-      {
-        title: '发布时间',
+        title: '拉黑时间',
         dataIndex: 'createTime',
         render: (text, record) => Time.getTimeStr(record.createTime)
       },
       {
-        title: '评论数量',
-        dataIndex: 'commentsCount',
+        title: '拉黑时常',
+        dataIndex: 'blackListInfo',
         render: (text, record) => <span className="">{text}</span>
       },
       {
-        title: '被用户查看数量',
-        dataIndex: 'viewCount',
+        title: '操作人',
+        dataIndex: 'operUserNickname',
         render: (text, record) => <span className="">{text}</span>
       },
       {
-        title: '举报次数',
-        dataIndex: 'reportCount',
-        render: (text, record) => <span className="">{text}</span>
-      },
-      {
-        title: '显示状态',
-        dataIndex: 'status',
-        render: (text, record) => (
-          <span className="">
-            {showStatus[record.type] ? showStatus[record.type] : '----'}
-            {parseInt(record.type, 10) === HiddenStatus ? (
-              <span>
-                ({record.hiddenByUserName ? record.hiddenByUserName : '--/'}
-                {record.hiddenTime ? Time.getTimeStr(record.hiddenTime) : '--'})
-              </span>
-            ) : null}
-          </span>
+        title: <p className="lastCol">操作</p>,
+        dataIndex: 'operation',
+        width: '12%',
+        render: (text, record, index) => (
+          <div className="editable-row-operations lastCol">
+            <span>
+              <Link to={`/user/userInfo/:${record.userId}`}>详情</Link>
+            </span>
+          </div>
         )
       }
     ]
@@ -113,6 +78,7 @@ class LostFoundTable extends React.Component {
     const { dataSource, total, loading, page } = this.props
     return (
       <div className="tableList">
+        <p className="profitBanner">当前拉黑人数: {total}人</p>
         <Table
           bordered
           showQuickJumper
@@ -127,7 +93,6 @@ class LostFoundTable extends React.Component {
           rowKey={record => record.id}
           columns={this.getColumns()}
           onChange={this.changePage}
-          onRowClick={this.selectRow}
           rowClassName={this.setRowClass}
         />
       </div>
@@ -140,11 +105,10 @@ const mapStateToProps = (state, ownProps) => {
     total: state[modalName].totalNormal,
     dataSource: state[modalName].list,
     loading: state[modalName].listLoading,
-    page: state[moduleName][subModule].page,
-    selectedRowIndex: state[moduleName][subModule].selectedRowIndex
+    page: state[modalName].page
   }
 }
 
 export default withRouter(
-  connect(mapStateToProps, { changeLost })(LostFoundTable)
+  connect(mapStateToProps, { changeLost })(BlackPeopleTable)
 )

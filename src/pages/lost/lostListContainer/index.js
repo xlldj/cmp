@@ -3,7 +3,7 @@ import React from 'react'
 import PhaseLine from '../../component/phaseLine'
 import SchoolSelector from '../../component/schoolSelector'
 import LostFoundList from './lostFoundList'
-import BlackedList from './lostFoundList'
+import BlackedList from './blackPeopleList'
 import LostFoundDetail from './lostFoundDetail'
 
 import { connect } from 'react-redux'

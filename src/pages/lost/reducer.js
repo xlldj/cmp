@@ -42,11 +42,31 @@ const initialLostModal = {
   detailLoading: false,
   comments: [],
   commentsLoading: false,
-  commentsSize: 0
+  commentsSize: 0,
+  replies: {},
+  allRepliesLoading: false
 }
 export const lostModal = (state = initialLostModal, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_MODAL_LOST) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}
+const initialBlackModal = {
+  list: [],
+  total: 0,
+  totalNormal: 0,
+  listLoading: false,
+  comments: [],
+  commentsLoading: false,
+  commentsSize: 0,
+  page: 1
+}
+export const blackModal = (state = initialBlackModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_MODAL_BLACK) {
     const { value } = action
     return { ...state, ...value }
   }

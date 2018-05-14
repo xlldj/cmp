@@ -20,6 +20,7 @@ class Comment extends React.Component {
     }
     this.sendFetch(nextProps)
   }
+  showMoreComment() {}
   sendFetch(props) {
     props = props || this.props
     const { selectedDetailId, commentsSize = 10 } = props
@@ -44,12 +45,16 @@ class Comment extends React.Component {
               type={LOST_COMMENT}
               comment={comment}
             />
-            <Reply key={`reply${comment.id}`} replies={comment.replies} />
+            {comment.replies.length ? (
+              <Reply
+                key={`reply${comment.id}`}
+                replies={comment.replies}
+                repliesCount={comment.repliesCount}
+                commentId={comment.id}
+              />
+            ) : null}
           </div>
         ))}
-        {comments.length > COMMENT_SIZE_THRESHOLD ? (
-          <a onClick={this.showMoreComment}>共多少回复，点击展开</a>
-        ) : null}
       </div>
     )
   }

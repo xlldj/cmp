@@ -24,6 +24,8 @@ import {
 import {
   CHANGE_LOST,
   CHANGE_MODAL_LOST,
+  CHANGE_MODAL_BLACK,
+  fetchBlackPeopleList,
   fetchLostFoundList,
   changeLost
 } from '../pages/lost/action'
@@ -269,6 +271,7 @@ export {
   changeDoorForbid,
   fetchDoorForbidList,
   fetchDetailRecordList,
+  fetchBlackPeopleList,
   SET_BUILDING_LIST,
   fetchBuildings,
   CHANGE_USER,
@@ -276,6 +279,7 @@ export {
   moduleActionFactory,
   changeLost,
   CHANGE_LOST,
+  CHANGE_MODAL_BLACK,
   CHANGE_MODAL_LOST,
   fetchLostFoundList
 }

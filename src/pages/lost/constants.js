@@ -1,6 +1,8 @@
 const LOST = {
   /* LOST */
   LOSTTYPE: { 1: '失物', 2: '招领' },
+  showStatus: { 1: '正常显示', 2: '已屏蔽' },
+  HiddenStatus: 2,
   DEFRIENDLEVEL: {
     1: '3天',
     2: '7天',

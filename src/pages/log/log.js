@@ -109,7 +109,6 @@ class Log extends React.Component {
   }
   handleSubmit = () => {
     try {
-      this.props.login()
       let { mobile, password, posting } = this.state
       /* if (!remember) {
         this.refs.pwd.type = 'text'

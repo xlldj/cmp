@@ -25,9 +25,13 @@ const domains = {
   dxy: {
     manager: 'http://10.195.90.188:5080',
     user: 'http://10.195.90.188:5081'
+  },
+  zdc: {
+    manager: 'http://10.195.90.142:8080',
+    user: 'http://10.195.90.142:5081'
   }
 }
-const currentDomain = domains.qa
+const currentDomain = domains.zdc
 const AjaxHandler = {
   showingError: false
 }

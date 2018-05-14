@@ -1,37 +1,60 @@
 import React from 'react'
 import CONSTANTS from '../../../../../constants'
+import { Popconfirm } from 'antd'
+import Noti from '../../../../../util/noti'
 import { defriend, deleteComment } from '../../controller'
 const { LOST_FOUND_STATUS_SHADOWED, LOST_REPLY } = CONSTANTS
-
 class CommentContent extends React.Component {
   state = {
     showDefriendModal: false
   }
   defriend = (e, userId) => {
     e.preventDefault()
-    defriend(userId)
+    defriend(userId, null, 2, () => {
+      Noti.hintSuccess(this.props.history, '/lost')
+    })
   }
   deleteComment = (e, id) => {
     e.preventDefault()
-    deleteComment(id)
+    const { type } = this.props
+    deleteComment(id, type, () => {
+      Noti.hintSuccess(this.props.history, '/lost')
+    })
   }
   render() {
     const { comment, type } = this.props
     return (
-      <div className="">
-        <span>
+      <div className="commentItem">
+        <span className="blueFont">
           {comment.userMobile}({comment.userNickname})
-          {type === LOST_REPLY ? <span>回复xxx</span> : null}
+          {type === LOST_REPLY ? (
+            <span>
+              <span className="balckFont">回复</span>
+              {comment.replyToUserMobile}({comment.replyToUserNickname})
+            </span>
+          ) : null}
+          :
         </span>
+        <span>{comment.content}</span>
         {comment.userInBlackList ? (
-          <span>拉黑详情:该用户已被谁拉黑</span>
+          <span>(该用户已被拉黑)</span>
         ) : (
-          <a onClick={e => this.defriend(e, comment.userId)}>拉黑</a>
+          <Popconfirm
+            title="确认拉黑此条信息吗?"
+            onConfirm={e => this.defriend(e, comment.userId)}
+          >
+            <span>拉黑</span>
+          </Popconfirm>
         )}
         {comment.status === LOST_FOUND_STATUS_SHADOWED ? (
-          <span>该用户已被谁删除</span>
+          <span className="blue_font">(该评论已被删除)</span>
         ) : (
-          <a onClick={e => this.deleteComment(e, comment.id)}>删除</a>
+          <Popconfirm
+            title="确认删除此条信息吗?"
+            onConfirm={e => this.deleteComment(e, comment.id)}
+          >
+            <span className="blue_font">删除</span>
+          </Popconfirm>
         )}
       </div>
     )
