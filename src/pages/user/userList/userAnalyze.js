@@ -9,6 +9,7 @@ import { checkObject } from '../../../util/checkSame'
 import RangeSelect from '../../component/rangeSelect'
 import SearchInput from '../../component/searchInput'
 import CheckSelect from '../../component/checkSelect'
+import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 
 const subModule = 'userList'
@@ -34,7 +35,8 @@ class UserTableView extends React.Component {
       loading: false,
       total: 0,
       startTime: '',
-      endTime: ''
+      endTime: '',
+      showBuildingSelect: false
     }
   }
   toOrderOfUser = (e, id) => {
@@ -71,7 +73,8 @@ class UserTableView extends React.Component {
       analyze_endTime: endTime,
       analyze_deviceType: deviceType,
       analyze_selectKey: selectKey,
-      analyze_page: page
+      analyze_page: page,
+      buildingIds
     } =
       props || this.props
     const body = {
@@ -81,6 +84,9 @@ class UserTableView extends React.Component {
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
+    }
+    if (buildingIds !== 'all') {
+      body.buildingIds = buildingIds
     }
     if (day) {
       body.day = parseInt(day, 10)
@@ -128,7 +134,8 @@ class UserTableView extends React.Component {
         'analyze_startTime',
         'analyze_endTime',
         'analyze_selectKey',
-        'analyze_deviceType'
+        'analyze_deviceType',
+        'buildingIds'
       ])
     ) {
       return
@@ -286,6 +293,28 @@ class UserTableView extends React.Component {
     return columns
   }
 
+  showBuildingSelect = () => {
+    this.setState({
+      showBuildingSelect: true
+    })
+  }
+  confirmBuildings = ({ all, dataSource }) => {
+    this.setState({
+      showBuildingSelect: false
+    })
+    let buildingIds = all
+      ? 'all'
+      : dataSource.filter(d => d.selected === true).map(d => d.id)
+    this.props.changeUser(subModule, {
+      buildingIds: buildingIds
+    })
+  }
+  closeBuildingSelect = () => {
+    this.setState({
+      showBuildingSelect: false
+    })
+  }
+
   render() {
     const {
       dataSource,
@@ -294,13 +323,28 @@ class UserTableView extends React.Component {
       searchingText,
 
       startTime,
-      endTime
+      endTime,
+      showBuildingSelect
     } = this.state
     const {
       analyze_page: page,
       analyze_day: day,
-      analyze_deviceType: deviceType
+      analyze_deviceType: deviceType,
+      buildingIds,
+      schoolId,
+      buildingsOfSchoolId
     } = this.props
+    const buildingNames =
+      buildingIds === 'all'
+        ? '全部楼栋'
+        : buildingIds
+            .map(
+              b =>
+                buildingsOfSchoolId[+schoolId] &&
+                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
+                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
+            )
+            .join('、')
     const showClearBtn = !!searchingText
 
     return (
@@ -352,6 +396,22 @@ class UserTableView extends React.Component {
               />
             </QueryBlock>
           </QueryLine>
+
+          <QueryLine>
+            <QueryBlock>
+              <span>楼栋筛选:</span>
+              <span className="customized_select_option leftSeperator">
+                {buildingNames}
+              </span>
+              <Button
+                className="leftSeperator"
+                type="primary"
+                onClick={this.showBuildingSelect}
+              >
+                点击选择
+              </Button>
+            </QueryBlock>
+          </QueryLine>
         </QueryPanel>
 
         <div className="tableList">
@@ -373,6 +433,15 @@ class UserTableView extends React.Component {
             rowClassName={this.setRowClass}
           />
         </div>
+        {showBuildingSelect ? (
+          <BuildingMultiSelectModal
+            all={buildingIds === 'all'}
+            selectedItems={buildingIds !== 'all' ? buildingIds : []}
+            schoolId={schoolId}
+            closeModal={this.closeBuildingSelect}
+            confirmBuildings={this.confirmBuildings}
+          />
+        ) : null}
       </div>
     )
   }

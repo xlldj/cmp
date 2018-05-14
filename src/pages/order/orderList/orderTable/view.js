@@ -9,6 +9,7 @@ import selectedImg from '../../../assets/selected.png'
 import RangeSelect from '../../../component/rangeSelect'
 import SearchInput from '../../../component/searchInput'
 import CheckSelect from '../../../component/checkSelect'
+import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
 import OrderDetail from './orderInfo'
 
 import { checkObject } from '../../../../util/checkSame'
@@ -43,7 +44,8 @@ class OrderTableView extends React.Component {
       totalChargeback: 0,
       searchingText: '',
       subStartTime: this.props.startTime,
-      subEndTime: this.props.endTime
+      subEndTime: this.props.endTime,
+      showBuildingSelect: false
     }
   }
   fetchList = props => {
@@ -79,7 +81,8 @@ class OrderTableView extends React.Component {
       startTime,
       endTime,
       userType,
-      day
+      day,
+      buildingIds
     } = props
     const body = {
       page: page,
@@ -97,6 +100,9 @@ class OrderTableView extends React.Component {
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
+    }
+    if (buildingIds !== 'all') {
+      body.buildingIds = buildingIds
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
@@ -197,7 +203,8 @@ class OrderTableView extends React.Component {
         'page',
         'startTime',
         'endTime',
-        'userType'
+        'userType',
+        'buildingIds'
       ])
     ) {
       return
@@ -219,7 +226,8 @@ class OrderTableView extends React.Component {
         'selectKey',
         'startTime',
         'endTime',
-        'userType'
+        'userType',
+        'buildingIds'
       ])
     ) {
       return true
@@ -354,6 +362,28 @@ class OrderTableView extends React.Component {
     }
   }
 
+  showBuildingSelect = () => {
+    this.setState({
+      showBuildingSelect: true
+    })
+  }
+  confirmBuildings = ({ all, dataSource }) => {
+    this.setState({
+      showBuildingSelect: false
+    })
+    let buildingIds = all
+      ? 'all'
+      : dataSource.filter(d => d.selected === true).map(d => d.id)
+    this.props.changeOrder(subModule, {
+      buildingIds: buildingIds
+    })
+  }
+  closeBuildingSelect = () => {
+    this.setState({
+      showBuildingSelect: false
+    })
+  }
+
   render() {
     const {
       page,
@@ -363,9 +393,13 @@ class OrderTableView extends React.Component {
       day,
       selectedRowIndex,
       showDetail,
-      selectedDetailId
+      selectedDetailId,
+      buildingIds,
+      schoolId,
+      buildingsOfSchoolId
     } = this.props
     const {
+      showBuildingSelect,
       dataSource,
       total,
       totalIncome,
@@ -378,6 +412,17 @@ class OrderTableView extends React.Component {
     const showClearBtn = !!searchingText
     const { state } = this.props.location
 
+    const buildingNames =
+      buildingIds === 'all'
+        ? '全部楼栋'
+        : buildingIds
+            .map(
+              b =>
+                buildingsOfSchoolId[+schoolId] &&
+                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
+                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
+            )
+            .join('、')
     const columns = [
       {
         title: '订单号',
@@ -485,6 +530,15 @@ class OrderTableView extends React.Component {
 
           <div className="queryLine">
             <div className="block">
+              <span>楼栋筛选:</span>
+              <span className="customized_select_option">{buildingNames}</span>
+              <Button type="primary" onClick={this.showBuildingSelect}>
+                点击选择
+              </Button>
+            </div>
+          </div>
+          <div className="queryLine">
+            <div className="block">
               <span>用户类型:</span>
               <CheckSelect
                 allOptTitle="不限"
@@ -577,6 +631,15 @@ class OrderTableView extends React.Component {
           <div className="btnRight marginBottom">
             <Button onClick={this.back}>{BACKTITLE[state.path]}</Button>
           </div>
+        ) : null}
+        {showBuildingSelect ? (
+          <BuildingMultiSelectModal
+            all={buildingIds === 'all'}
+            selectedItems={buildingIds !== 'all' ? buildingIds : []}
+            schoolId={schoolId}
+            closeModal={this.closeBuildingSelect}
+            confirmBuildings={this.confirmBuildings}
+          />
         ) : null}
       </div>
     )

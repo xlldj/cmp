@@ -50,6 +50,7 @@ class UserListView extends React.Component {
       nextProps.list_page = 1
     } else if (tabIndex === USER_LIST_TAB_ANALYZE) {
       nextProps.analyze_page = 1
+      nextProps.buildingIds = 'all'
     }
     this.props.changeUser(subModule, nextProps)
   }
@@ -147,6 +148,8 @@ const mapStateToTableProps = (state, ownProps) => ({
   analyze_deviceType: state.userModule[subModule].analyze_deviceType,
   analyze_selectKey: state.userModule[subModule].analyze_selectKey,
   analyze_page: state.userModule[subModule].analyze_page,
+  buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
+  buildingIds: state.userModule[subModule].buildingIds,
 
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   schools: state.setSchoolList.schools

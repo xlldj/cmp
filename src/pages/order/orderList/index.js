@@ -71,6 +71,7 @@ class OrderList extends React.Component {
     let nextProps = { schoolId: value }
     if (tabIndex === ORDER_LIST_TABLE) {
       nextProps.page = 1
+      nextProps.buildingIds = 'all'
     } else if (tabIndex === ORDER_LIST_STAT) {
       nextProps.stat_page = 1
     } else if (tabIndex === ORDER_LIST_ANALYZE) {
