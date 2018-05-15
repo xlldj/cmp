@@ -45,7 +45,7 @@ const initialFundState = {
   fundCheck: {
     schoolId: selectedSchool,
     page: 1,
-    type: '1', // 异常类型
+    type: 'all', // 异常类型
     status: 'all', // 处理状态
     method: 'all', // 处理方式
     showDetail: false,

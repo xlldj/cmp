@@ -50,6 +50,12 @@ a:active {
 .outLink:hover {
   color: #108ee9;
 }
+.softLink {
+  color: #222;
+}
+.softLink:hover {
+  color: #108ee9;
+}
 input,
 textarea {
   border-radius: 4px;

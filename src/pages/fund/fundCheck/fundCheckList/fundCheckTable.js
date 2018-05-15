@@ -1,6 +1,5 @@
 import React from 'react'
 import { Table } from 'antd'
-import { Link } from 'react-router-dom'
 
 import selectedImg from '../../../assets/selected.png'
 import Time from '../../../../util/time'
@@ -14,7 +13,13 @@ const moduleName = 'fundModule'
 const subModule = 'fundCheck'
 const modalName = 'fundCheckModal'
 
-const { PAGINATION: SIZE } = CONSTANTS
+const {
+  PAGINATION: SIZE,
+  FUNDTYPE,
+  FUND_MISTAKE_TYPE,
+  FUND_MISTAKE_METHOD,
+  FUND_MISTAKE_STATUS
+} = CONSTANTS
 
 class BalanceTable extends React.Component {
   setProps = event => {
@@ -53,41 +58,72 @@ class BalanceTable extends React.Component {
         )
       },
       {
-        title: '登录账号',
-        dataIndex: 'mobile'
+        title: '类型',
+        dataIndex: 'orderType',
+        width: '10%',
+        render: (text, record) => FUNDTYPE[record.orderType]
       },
       {
-        title: '手机型号',
-        dataIndex: 'mobileBrand',
-        width: '20%',
-        render: (text, record) => {
-          let result = ''
-          if (record.mobileBrand) {
-            result += record.mobileBrand
-          }
-          if (record.mobileModel) {
-            result += `(${record.mobileModel})`
-          }
-          result = result ? result : '----'
-          return result
+        title: '异常类型',
+        dataIndex: 'mistakeType',
+        width: '10%',
+        render: (text, record) =>
+          record.mistakeType !== undefined
+            ? FUND_MISTAKE_TYPE[record.mistakeType]
+            : ''
+      },
+      {
+        title: '异常原因',
+        dataIndex: 'mistakeReason',
+        width: '10%'
+      },
+      {
+        title: '异常金额',
+        dataIndex: 'mistakeAmount',
+        width: '10%',
+        render: (text, record) =>
+          record.mistakeAmount !== undefined ? (
+            <span className="shalowRed">¥{record.mistakeAmount}</span>
+          ) : null
+      },
+      {
+        title: '订单创建时间',
+        dataIndex: 'createTime',
+        width: '10%',
+        render: (text, record, index) => {
+          return record.createTime ? Time.getTimeStr(record.createTime) : ''
         }
       },
       {
-        title: '注册时间',
-        dataIndex: 'createTime',
-        render: (text, record) => Time.getTimeStr(record.createTime)
+        title: '处理方式',
+        dataIndex: 'settleMethod',
+        width: '10%',
+        render: (text, record) =>
+          record.settleMethod !== undefined
+            ? FUND_MISTAKE_METHOD[record.settleMethod]
+            : ''
       },
       {
-        title: <p className="lastCol">操作</p>,
-        dataIndex: 'operation',
-        width: '12%',
-        render: (text, record, index) => (
-          <div className="editable-row-operations lastCol">
-            <span>
-              <Link to={`/user/userInfo/:${record.id}`}>详情</Link>
-            </span>
-          </div>
-        )
+        title: '处理状态',
+        dataIndex: 'settleStatus',
+        width: '10%',
+        render: (text, record) =>
+          record.settleStatus !== undefined
+            ? FUND_MISTAKE_STATUS[record.settleStatus]
+            : ''
+      },
+      {
+        title: '处理人',
+        dataIndex: 'settleUser'
+      },
+      {
+        title: '处理时间',
+        dataIndex: 'settleTime',
+        render: (text, record, index) => {
+          return record.settleTime !== undefined
+            ? Time.getTimeStr(record.settleTime)
+            : ''
+        }
       }
     ]
   }

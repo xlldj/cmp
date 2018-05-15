@@ -1,6 +1,6 @@
 import store from '../../index'
-// import AjaxHandler from '../../util/ajax'
-import AjaxHandler from '../../mock/ajax'
+import AjaxHandler from '../../util/ajax'
+// import AjaxHandler from '../../mock/ajax'
 import { moduleActionFactory } from '../../actions/moduleActions.js'
 
 export const CHANGE_FUND = 'CHANGE_FUND'

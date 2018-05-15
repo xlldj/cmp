@@ -28,25 +28,22 @@ class FundCheckQuery extends React.Component {
   }
   sendFetch(props) {
     props = props || this.props
-    const { page, day, type, status, startTime, endTime, schoolId } = props
+    const { page, type, status, schoolId, method } = props
     const body = {
       page: page,
       size: SIZE
-    }
-    if (day) {
-      body.day = +day
-    } else {
-      body.startTime = startTime
-      body.endTime = endTime
     }
     if (schoolId !== 'all') {
       body.schoolId = +schoolId
     }
     if (type !== 'all') {
-      body.type = +type
+      body.mistakeType = +type
     }
     if (status !== 'all') {
-      body.status = +status
+      body.settleStatus = +status
+    }
+    if (method !== 'all') {
+      body.settleMethod = +method
     }
     props.fetchFundCheckList(body)
   }
@@ -110,7 +107,7 @@ class FundCheckQuery extends React.Component {
               selectedSchool={schoolId}
               changeSchool={v =>
                 this.setProps({
-                  type: 'school',
+                  type: 'schoolId',
                   value: { schoolId: v, page: 1 }
                 })
               }
@@ -119,7 +116,7 @@ class FundCheckQuery extends React.Component {
         </QueryLine>
         <QueryLine>
           <QueryBlock>
-            <span>处理状态:</span>
+            <span>处理方式:</span>
             <CheckSelect
               allOptValue="all"
               allOptTitle="不限"
@@ -148,7 +145,8 @@ const mapStateToProps = (state, ownProps) => {
     type: state[moduleName][subModule].type,
     status: state[moduleName][subModule].status,
     method: state[moduleName][subModule].method,
-    listLoading: state[modalName].listLoading
+    listLoading: state[modalName].listLoading,
+    total: state[modalName].total
   }
 }
 

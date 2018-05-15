@@ -17,9 +17,13 @@ const domains = {
   server: {
     manager: 'https://api.xiaolian365.com/m',
     user: 'https://api.xiaolian365.com/c'
+  },
+  dxy: {
+    manager: 'http://10.195.90.187:8080',
+    user: 'http://10.195.90.187:8080'
   }
 }
-const currentDomain = domains.qa
+const currentDomain = domains.dxy
 
 const AjaxHandler = {
   showingError: false
