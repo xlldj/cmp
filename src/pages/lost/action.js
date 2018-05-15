@@ -2,6 +2,7 @@ import store from '../../index'
 import AjaxHandler from '../../util/ajax'
 // import AjaxHandler from '../../mock/ajax'
 import { moduleActionFactory } from '../../actions/moduleActions.js'
+import { deepCopy } from '../../util/copy'
 export const CHANGE_LOST = 'CHANGE_LOST'
 export const CHANGE_MODAL_LOST = 'CHANGE_MODAL_LOST'
 export const CHANGE_MODAL_BLACK = 'CHANGE_MODAL_BLACK'
@@ -205,9 +206,9 @@ export const deleteLostInfo = () => {
 }
 export const deleteComments = id => {
   const { lostModal, setUserInfo } = store.getState()
-  const { comments, commentsLoading, allRepliesLoading } = lostModal
+  const { commentsLoading } = lostModal
   const { name, id: userId } = setUserInfo
-  console.log(comments)
+  const comments = deepCopy(lostModal.comments)
   comments.forEach((element, index) => {
     if (element.id === id) {
       element.status = 2
@@ -217,7 +218,6 @@ export const deleteComments = id => {
     }
     element.replies.forEach((replay, index) => {
       if (replay.id === id) {
-        debugger
         replay.status = 2
         replay.delUserId = userId
         replay.delUserNickname = name

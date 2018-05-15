@@ -3,7 +3,6 @@ import CONSTANTS from '../../../../../constants'
 import { Popconfirm, InputNumber } from 'antd'
 import PopConfirmSelect from '../../../../../pages/component/popConfirmSelect'
 import { defriend, deleteComment } from '../../controller'
-import { withRouter } from 'react-router-dom'
 const {
   LOST_FOUND_STATUS_SHADOWED,
   LOST_REPLY,
@@ -15,9 +14,6 @@ class CommentContent extends React.Component {
   state = {
     showDefriendModal: false,
     loseBlackTime: LOST_BLACK_TIME_SELECTED
-  }
-  componentWillReceiveProps(nextprops) {
-    debugger
   }
   defriend = (e, userId) => {
     e.preventDefault()

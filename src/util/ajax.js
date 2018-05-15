@@ -38,7 +38,6 @@ const AjaxHandler = {
 
 /* tell user current token is out-of-date, force to refresh */
 const hintExpire = () => {
-  return
   // alert('expire')
   const logout = () => {
     removeStore('logged')

@@ -14,9 +14,7 @@ class Reply extends React.Component {
       isShowAll: true
     }
   }
-  componentWillReceiveProps(nextProps) {
-    debugger
-  }
+  componentWillReceiveProps(nextProps) {}
   showMoreComment = () => {
     const { commentId } = this.props
     const body = {
@@ -38,7 +36,7 @@ class Reply extends React.Component {
             <CommentContent
               key={reply.id}
               type={LOST_REPLY}
-              comment={reply}
+              comment={deepCopy(reply)}
               {...this.props}
             />
           ))}
@@ -62,7 +60,6 @@ class Reply extends React.Component {
   }
 }
 const mapStateToProps = (state, ownProps) => {
-  debugger
   return {
     allReplies: state[modalName].replies,
     allRepliesLoading: state[modalName].allRepliesLoading,

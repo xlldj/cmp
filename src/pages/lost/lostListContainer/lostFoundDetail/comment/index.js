@@ -63,7 +63,6 @@ class Comment extends React.Component {
   }
 }
 const mapStateToProps = (state, ownProps) => {
-  debugger
   return {
     comments: state[modalName].comments,
     commentsSize: state[modalName].detail.commentsCount,
