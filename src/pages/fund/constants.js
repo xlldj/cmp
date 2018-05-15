@@ -18,7 +18,14 @@ const FUND = {
   FUND_MISTAKE_STATUS: { 1: '未处理', 2: '已处理' },
   FUND_MISTAKE_METHOD: { 1: '自动处理', 2: '人工处理' },
   FUND_CHECK_STATUS_HANDLING: 1,
-  FUND_CHECK_METHOD_MANUAL: 2
+  FUND_CHECK_METHOD_MANUAL: 2,
+  FUND_CHECK_MISTAKE_TYPES: {
+    1: '订单不一致',
+    2: '状态不一致',
+    3: '金额不一致'
+  },
+  FUND_CHECK_MISTAKE_TYPE_ORDER: 1,
+  REMOTE_ORDER_STATUS_SUCCESS: 4 // 第三方平台订单状态支付成功
 }
 
 export default FUND

@@ -1,16 +1,24 @@
-import React, { Fragment } from 'react'
-import { Button } from 'antd'
+import React from 'react'
+import { Button, Badge } from 'antd'
 import CONSTANTS from '../../../../constants'
+import Time from '../../../../util/time'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../action'
 const subModule = 'fundCheck'
+const STATUS_CLASSNAME = {
+  1: 'error', // 未处理
+  2: 'success'
+}
 
 const {
   FUND_CHECK_STATUS_HANDLING,
   FUND_CHECK_METHOD_MANUAL,
-  FUNDTYPE
+  FUNDTYPE,
+  FUND_CHECK_MISTAKE_TYPES,
+  FUND_MISTAKE_METHOD,
+  FUND_MISTAKE_STATUS
 } = CONSTANTS
 
 class FundCheckContent extends React.Component {
@@ -20,12 +28,22 @@ class FundCheckContent extends React.Component {
   render() {
     const { detail, noRight2Handle } = this.props
     const { fundsMistake, platformOrder, thirdOrder } = detail
-    const { orderType = 1, settleMethod, settleStatus, schoolName } =
+    const {
+      orderType = 1,
+      settleMethod,
+      settleStatus,
+      schoolName,
+      mistakeReason,
+      mistakeAmount,
+      settleUser,
+      settleTime,
+      mistakeType
+    } =
       fundsMistake || {}
     const isHandleStatusNotOver = settleStatus === FUND_CHECK_STATUS_HANDLING
     const isTypeManual = settleMethod === FUND_CHECK_METHOD_MANUAL
     return (
-      <Fragment>
+      <div className="detailPanel-contentBlock">
         <h3 className="detailPanel-content-title">
           <span className="rightSeperator">{`${schoolName || ''}`}</span>
         </h3>
@@ -33,6 +51,39 @@ class FundCheckContent extends React.Component {
           <li>
             <label>账单类型:</label>
             <span>{FUNDTYPE[orderType]}</span>
+          </li>
+          <li>
+            <label>异常类型:</label>
+            <span>{FUND_CHECK_MISTAKE_TYPES[mistakeType]}</span>
+          </li>
+          <li>
+            <label>异常原因:</label>
+            <span>{mistakeReason || '--'}</span>
+          </li>
+          <li>
+            <label>异常金额:</label>
+            <span className="shallowRed">
+              {mistakeAmount !== undefined ? mistakeAmount : '--'}
+            </span>
+          </li>
+          <li>
+            <label>处理方式:</label>
+            <span>{FUND_MISTAKE_METHOD[settleMethod]}</span>
+          </li>
+          <li>
+            <label>处理状态:</label>
+            <Badge
+              text={FUND_MISTAKE_STATUS[settleStatus]}
+              status={STATUS_CLASSNAME[settleStatus]}
+            />
+          </li>
+          <li>
+            <label>处理人员:</label>
+            <span>{settleUser}</span>
+          </li>
+          <li>
+            <label>处理时间:</label>
+            <span>{Time.getTimeStr(settleTime)}</span>
           </li>
         </ul>
 
@@ -45,7 +96,7 @@ class FundCheckContent extends React.Component {
             立即处理
           </Button>
         ) : null}
-      </Fragment>
+      </div>
     )
   }
 }

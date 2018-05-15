@@ -1151,6 +1151,14 @@ shortSeperator {
   padding: 20px 30px;
   overflow-y: scroll;
 }
+.detailPanelWrapper .detailPanel-content .detailPanel-contentBlock {
+  border-bottom: 1px solid #ddd;
+  margin: -20px -30px;
+  padding: 20px 30px;
+}
+.detailPanelWrapper .detailPanel-content .detailPanel-contentBlock:last-child {
+  border-bottom: none;
+}
 .detailPanelWrapper .detailPanel-content .detailPanel-sidebar {
   display: inline-block;
   padding: 20px 30px;

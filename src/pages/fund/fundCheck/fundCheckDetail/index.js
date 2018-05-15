@@ -4,6 +4,7 @@ import { checkObject } from '../../../../util/checkSame'
 import LoadWrapper from '../../../component/loadWrapper'
 import DetailHeader from '../../../component/detailHeader'
 import FundCheckContent from './fundCheckContent'
+import FundCheckDetailTables from './fundCheckDetailTables'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -84,6 +85,7 @@ class FundCheckDetail extends React.Component {
         <DetailHeader close={e => this.closeDetail(e, true)} />
         <div className="detailPanel-content">
           <FundCheckContent noRight2Handle={noRight2Handle} {...this.props} />
+          <FundCheckDetailTables {...this.props} />
         </div>
       </div>
     )

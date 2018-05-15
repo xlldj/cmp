@@ -37,19 +37,19 @@ const detail = {
       amount: 0,
       createTime: '2018-05-14T04:42:19.974Z',
       finishTime: '2018-05-14T04:42:19.974Z',
-      orderNo: 'string',
-      orderStatus: 0,
-      orderType: 0,
-      userPhone: 'string'
+      orderNo: 'orderNo',
+      orderStatus: 3,
+      orderType: 1,
+      userPhone: 'userPhone'
     },
     thirdOrder: {
       amount: 0,
       oderCreateTime: '2018-05-14T04:42:19.974Z',
       orderFinishTime: '2018-05-14T04:42:19.974Z',
-      platformOrderNo: 'string',
-      status: 0,
-      thirdType: 0,
-      userAccount: 'string'
+      platformOrderNo: 'platformOrderNo',
+      status: 1,
+      thirdType: 1,
+      userAccount: 'userAccount'
     }
   },
   error: {
