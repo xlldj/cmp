@@ -14,9 +14,7 @@ class Reply extends React.Component {
       isShowAll: true
     }
   }
-  componentWillReceiveProps(nextProps) {
-    debugger
-  }
+  componentWillReceiveProps(nextProps) {}
   showMoreComment = () => {
     const { commentId } = this.props
     const body = {
@@ -38,31 +36,28 @@ class Reply extends React.Component {
             <CommentContent
               key={reply.id}
               type={LOST_REPLY}
-              comment={reply}
+              comment={deepCopy(reply)}
               {...this.props}
             />
           ))}
         {repliesCount > COMMENT_SIZE_THRESHOLD && isShowAll ? (
           <a onClick={this.showMoreComment}>共{repliesCount}回复，点击展开</a>
         ) : null}
-        {allReplies && !isShowAll
-          ? allReplies[commentId]
-            ? allReplies[commentId].map(reply => (
-                <CommentContent
-                  key={reply.id}
-                  type={LOST_REPLY}
-                  comment={deepCopy(reply)}
-                  {...this.props}
-                />
-              ))
-            : null
+        {allReplies && !isShowAll && allReplies[commentId]
+          ? allReplies[commentId].map(reply => (
+              <CommentContent
+                key={reply.id}
+                type={LOST_REPLY}
+                comment={deepCopy(reply)}
+                {...this.props}
+              />
+            ))
           : null}
       </div>
     )
   }
 }
 const mapStateToProps = (state, ownProps) => {
-  debugger
   return {
     allReplies: state[modalName].replies,
     allRepliesLoading: state[modalName].allRepliesLoading,

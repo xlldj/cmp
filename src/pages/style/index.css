@@ -61,6 +61,12 @@ input.shortInput {
   width: 45px;
   text-align: center;
 }
+.softLink {
+  color: #222;
+}
+.softLink:hover {
+  color: #108ee9;
+}
 .horiInput.horiInput input {
   margin-right: 10px;
 }

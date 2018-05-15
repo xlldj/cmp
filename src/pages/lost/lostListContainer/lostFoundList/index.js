@@ -9,7 +9,7 @@ class LostListContainer extends React.Component {
     return (
       <div className="">
         <Query />
-        <LostFoundTable />
+        <LostFoundTable {...this.props} />
       </div>
     )
   }

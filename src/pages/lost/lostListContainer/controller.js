@@ -12,13 +12,7 @@ import {
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
 import store from '../../../index'
-import {
-  fetchLostInfo,
-  fetchCommentsList,
-  deleteLostInfo,
-  deleteComments,
-  blackPerson
-} from '../action'
+import { deleteLostInfo, deleteComments, blackPerson } from '../action'
 export const stateController = (prevState, value) => {
   return { ...prevState, ...value }
 }
@@ -55,25 +49,13 @@ export const defriend = (userId, id, level, commentParentId) => {
     id: id,
     level: level
   }
-  store.dispatch(blackPerson(id, commentParentId))
-  // let resource = '/api/lost/defriend'
-  // AjaxHandler.fetch(resource, body).then(json => {
-  //   if (json && json.data) {
-  //     Noti.hintOk('拉黑成功')
-  //     const lostInfoBody = {
-  //       id: commentParentId
-  //     }
-  //     const lostComments = {
-  //       id: commentParentId,
-  //       from: 1,
-  //       repliesSize: 2,
-  //       commentsSize: 10
-  //     }
-  //     fetchLostInfo(lostInfoBody)
-  //     store.dispatch(fetchLostInfo(lostInfoBody)) // 更新detail的语句
-  //     store.dispatch(fetchCommentsList(lostComments))
-  //   }
-  // })
+  let resource = '/api/lost/defriend'
+  AjaxHandler.fetch(resource, body).then(json => {
+    if (json && json.data) {
+      Noti.hintOk('拉黑成功')
+      store.dispatch(blackPerson(userId))
+    }
+  })
 }
 
 /**
@@ -86,28 +68,15 @@ export const deleteComment = (commentId, type, commentParentId) => {
     type: type ? type : 1
   }
   let resource = '/api/lost/delete'
-  if (commentId === commentParentId) {
-    store.dispatch(deleteLostInfo())
-  } else {
-    store.dispatch(deleteComments(commentId))
-  }
-  // AjaxHandler.fetch(resource, body).then(json => {
-  //   if (json && json.data) {
-  //     Noti.hintOk('删除成功')
-  //     if (commentId === commentParentId) {
-  //       store.dispatch(deleteLostInfo())
-  //     }
-  //     // const lostInfoBody = {
-  //     //   id: commentParentId
-  //     // }
-  //     // const lostComments = {
-  //     //   id: commentParentId,
-  //     //   from: 1,
-  //     //   repliesSize: 2,
-  //     //   commentsSize: 10
-  //     // }
-  //     // store.dispatch(fetchLostInfo(lostInfoBody)) // 更新detail的语句
-  //     // store.dispatch(fetchCommentsList(lostComments))
-  //   }
-  // })
+
+  AjaxHandler.fetch(resource, body).then(json => {
+    if (json && json.data) {
+      Noti.hintOk('删除成功')
+      if (commentId === commentParentId) {
+        store.dispatch(deleteLostInfo())
+      } else {
+        store.dispatch(deleteComments(commentId))
+      }
+    }
+  })
 }

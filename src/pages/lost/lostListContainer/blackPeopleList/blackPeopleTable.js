@@ -9,7 +9,7 @@ import { withRouter } from 'react-router-dom'
 import { changeLost } from '../../action'
 const modalName = 'blackModal'
 
-const { PAGINATION: SIZE, LOSTTYPE, HiddenStatus, showStatus } = CONSTANTS
+const { PAGINATION: SIZE, LOSTTYPE } = CONSTANTS
 
 class BlackPeopleTable extends React.Component {
   setProps = event => {

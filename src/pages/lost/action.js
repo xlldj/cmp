@@ -2,6 +2,7 @@ import store from '../../index'
 import AjaxHandler from '../../util/ajax'
 // import AjaxHandler from '../../mock/ajax'
 import { moduleActionFactory } from '../../actions/moduleActions.js'
+import { deepCopy } from '../../util/copy'
 export const CHANGE_LOST = 'CHANGE_LOST'
 export const CHANGE_MODAL_LOST = 'CHANGE_MODAL_LOST'
 export const CHANGE_MODAL_BLACK = 'CHANGE_MODAL_BLACK'
@@ -104,6 +105,13 @@ export const fetchLostInfo = body => {
       }
       if (json && json.data) {
         value.detail = json.data
+        const commentsBody = {
+          id: json.data.id,
+          from: 1,
+          commentsSize: json.data.id.commentsSize || 10,
+          repliesSize: 2
+        }
+        store.dispatch(fetchCommentsList(commentsBody))
       }
       dispatch({
         type: CHANGE_MODAL_LOST,
@@ -114,10 +122,10 @@ export const fetchLostInfo = body => {
 }
 export const fetchRepliesList = body => {
   const { lostModal } = store.getState()
-  const { detailLoading, replies } = lostModal
+  const { allRepliesLoading, replies } = lostModal
 
   return dispatch => {
-    if (detailLoading) {
+    if (allRepliesLoading) {
       return
     }
     dispatch({
@@ -205,9 +213,21 @@ export const deleteLostInfo = () => {
 }
 export const deleteComments = id => {
   const { lostModal, setUserInfo } = store.getState()
-  const { comments, commentsLoading, allRepliesLoading } = lostModal
+  const { commentsLoading } = lostModal
   const { name, id: userId } = setUserInfo
-  console.log(comments)
+  const comments = deepCopy(lostModal.comments)
+  const replies = deepCopy(lostModal.replies)
+  if (replies) {
+    for (let replay in replies) {
+      replies[replay].forEach((replayItem, index) => {
+        if (replayItem.id === id) {
+          replayItem.status = 2
+          replayItem.delUserId = userId
+          replayItem.delUserNickname = name
+        }
+      })
+    }
+  }
   comments.forEach((element, index) => {
     if (element.id === id) {
       element.status = 2
@@ -217,7 +237,6 @@ export const deleteComments = id => {
     }
     element.replies.forEach((replay, index) => {
       if (replay.id === id) {
-        debugger
         replay.status = 2
         replay.delUserId = userId
         replay.delUserNickname = name
@@ -239,10 +258,60 @@ export const deleteComments = id => {
     let value = { allRepliesLoading: false }
     value.commentsLoading = false
     value.comments = comments
+    value.replies = replies
     dispatch({
       type: CHANGE_MODAL_LOST,
       value
     })
   }
 }
-export const blackPerson = id => {}
+export const blackPerson = userId => {
+  const { lostModal } = store.getState()
+  const { detail, detailLoading } = lostModal
+  const comments = deepCopy(lostModal.comments)
+  const replies = deepCopy(lostModal.replies)
+  if (detail.userId === userId) {
+    detail.userInBlackList = true
+  }
+  // const { replies } = deepCopy(lostModal.replies)
+  comments.forEach((element, index) => {
+    if (element.userId === userId) {
+      element.userInBlackList = true
+    }
+    element.replies.forEach((replay, index) => {
+      if (replay.userId === userId) {
+        replay.userInBlackList = true
+      }
+    })
+  })
+  if (replies) {
+    for (let replay in replies) {
+      replies[replay].forEach((replayItem, index) => {
+        if (replayItem.userId === userId) {
+          replayItem.userInBlackList = true
+        }
+      })
+    }
+  }
+  return dispatch => {
+    if (detailLoading) {
+      return
+    }
+    dispatch({
+      type: CHANGE_MODAL_LOST,
+      value: {
+        detailLoading: true,
+        allRepliesLoading: true
+      }
+    })
+    let value = { allRepliesLoading: false }
+    value.detailLoading = false
+    value.comments = comments
+    value.detail = detail
+    value.replies = replies
+    dispatch({
+      type: CHANGE_MODAL_LOST,
+      value
+    })
+  }
+}

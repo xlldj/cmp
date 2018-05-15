@@ -1,6 +1,5 @@
 import React from 'react'
 import { Table } from 'antd'
-import { Link } from 'react-router-dom'
 
 import selectedImg from '../../../assets/selected.png'
 import Time from '../../../../util/time'
@@ -14,7 +13,12 @@ const moduleName = 'lostModule'
 const subModule = 'lostFoundList'
 const modalName = 'lostModal'
 
-const { PAGINATION: SIZE, LOSTTYPE, HiddenStatus, showStatus } = CONSTANTS
+const {
+  PAGINATION: SIZE,
+  LOSTTYPE,
+  LOST_HIDDEN_STATUS,
+  LOST_SHOW_STATUS
+} = CONSTANTS
 
 class LostFoundTable extends React.Component {
   setProps = event => {
@@ -28,13 +32,15 @@ class LostFoundTable extends React.Component {
     this.setProps({ type: 'page', value: { page } })
   }
   selectRow = (record, index, event) => {
-    let { dataSource } = this.props
+    let { dataSource, forbiddenStatus } = this.props
     let selectedDetailId = dataSource[index].id
-    this.props.changeLost(subModule, {
-      selectedRowIndex: index,
-      showDetail: true,
-      selectedDetailId
-    })
+    if (!forbiddenStatus.LOST_DETAIL) {
+      this.props.changeLost(subModule, {
+        selectedRowIndex: index,
+        showDetail: true,
+        selectedDetailId
+      })
+    }
   }
   getColumns = () => {
     const { selectedRowIndex } = this.props
@@ -97,8 +103,10 @@ class LostFoundTable extends React.Component {
         dataIndex: 'status',
         render: (text, record) => (
           <span className="">
-            {showStatus[record.type] ? showStatus[record.type] : '----'}
-            {parseInt(record.type, 10) === HiddenStatus ? (
+            {LOST_SHOW_STATUS[record.status]
+              ? LOST_SHOW_STATUS[record.status]
+              : '----'}
+            {parseInt(record.status, 10) === LOST_HIDDEN_STATUS ? (
               <span>
                 ({record.hiddenByUserName ? record.hiddenByUserName : '--/'}
                 {record.hiddenTime ? Time.getTimeStr(record.hiddenTime) : '--'})

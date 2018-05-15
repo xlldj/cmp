@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react'
-import { Popconfirm, Button, InputNumber } from 'antd'
+import { Popconfirm, Button, Modal, Carousel } from 'antd'
 import PopConfirmSelect from '../../../../pages/component/popConfirmSelect'
 import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
-import Noti from '../../../../util/noti'
+import { Link } from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
 import { defriend, deleteComment } from '../controller'
 const {
@@ -16,7 +16,25 @@ class LostContent extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      loseBlackTime: LOST_BLACK_TIME_SELECTED
+      loseBlackTime: LOST_BLACK_TIME_SELECTED,
+      showDetailImgs: false,
+      initialSlide: 0
+    }
+  }
+  showDetailImgModel = i => {
+    this.setState({
+      initialSlide: i,
+      showDetailImgs: true
+    })
+  }
+  setWH = (e, value) => {
+    let img = e.target
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
+    if (w < h) {
+      img.style.width = value ? `${value}px` : '50px'
+    } else {
+      img.style.height = value ? `${value}px` : '50px'
     }
   }
   getImgsContent = () => {
@@ -25,7 +43,17 @@ class LostContent extends React.Component {
     let imagesContent =
       images &&
       images.map((image, index) => {
-        return <img src={image} alt="图片加载失败" key={`image${index}`} />
+        return (
+          <img
+            src={image}
+            key={`image${index}`}
+            alt=""
+            onClick={() => {
+              this.showDetailImgModel(index)
+            }}
+            onLoad={e => this.setWH(e, 30)}
+          />
+        )
       })
     return imagesContent
   }
@@ -53,8 +81,9 @@ class LostContent extends React.Component {
     })
   }
   render() {
-    const { data } = this.props
+    const { data, forbiddenStatus } = this.props
     console.log(data)
+    const { showDetailImgs, initialSlide } = this.state
     const {
       title,
       user,
@@ -65,9 +94,34 @@ class LostContent extends React.Component {
       description,
       commentsCount,
       viewCount,
-      userId
+      userId,
+      images
     } = data
-    let ImagesContent = this.getImgsContent()
+    let imagesContent = this.getImgsContent()
+    const carouselItems =
+      images &&
+      images.map((r, i) => {
+        return (
+          <img
+            key={`carousel${i}`}
+            alt=""
+            src={CONSTANTS.FILEADDR + r}
+            className="carouselImg"
+          />
+        )
+      })
+    const carousel = (
+      <Carousel
+        dots={true}
+        accessibility={true}
+        className="carouselItem"
+        autoplay={false}
+        arrows={true}
+        initialSlide={initialSlide}
+      >
+        {carouselItems}
+      </Carousel>
+    )
     const { loseBlackTime } = this.state
     return (
       <Fragment>
@@ -77,9 +131,11 @@ class LostContent extends React.Component {
         <ul className="detailList">
           <li>
             <label>发布用户:</label>
-            <span onClick={() => this.goToUserInfo(userId)}>
-              {mobile}
-              {userInBlackList ? '(已拉黑)' : ''}
+            <span>
+              <Link className="softLink" to={`/user/userInfo/:${userId}`}>
+                {mobile}
+                {userInBlackList ? '(已拉黑)' : ''}
+              </Link>
             </span>
           </li>
           <li>
@@ -96,10 +152,13 @@ class LostContent extends React.Component {
             <label>发布时间:</label>
             <span>{createTime ? Time.getTimeStr(createTime) : '--'}</span>
           </li>
-          <li>
-            <label>发布图片:</label>
-            <span>{ImagesContent ? ImagesContent : '--'}</span>
-          </li>
+          {images && images.length ? (
+            <li>
+              <label>发布图片:</label>
+              <span>{imagesContent}</span>
+            </li>
+          ) : null}
+
           <li>
             <label>发布内容:</label>
             <span>{description ? description : '--'}</span>
@@ -113,7 +172,8 @@ class LostContent extends React.Component {
             <span>{viewCount || ''}</span>
           </li>
         </ul>
-        {data.status !== LOST_FOUND_STATUS_SHADOWED ? (
+        {data.status !== LOST_FOUND_STATUS_SHADOWED &&
+        !forbiddenStatus.SHIELD_LOST_INFO ? (
           <Popconfirm
             title="确认屏蔽此条失物招领?"
             onConfirm={this.deleteComment}
@@ -123,7 +183,7 @@ class LostContent extends React.Component {
             </Button>
           </Popconfirm>
         ) : null}
-        {userInBlackList ? null : (
+        {userInBlackList || forbiddenStatus.DEACTIVE_USER ? null : (
           <PopConfirmSelect
             confirmOk={this.defriend}
             selectOptions={LOST_BLACK_TIME_SELECTOPTIONS}
@@ -137,6 +197,20 @@ class LostContent extends React.Component {
             }
           />
         )}
+        {/* images in task detail */}
+        <Modal
+          visible={showDetailImgs}
+          title=""
+          closable={true}
+          onCancel={this.closeDetailImgs}
+          className="carouselModal"
+          okText=""
+          footer={null}
+        >
+          <div className="carouselContainer">
+            {showDetailImgs ? carousel : null}
+          </div>
+        </Modal>
       </Fragment>
     )
   }

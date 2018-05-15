@@ -20,6 +20,7 @@ const {
 } = CONSTANTS
 const moduleName = 'lostModule'
 const subModule = 'lostListContainer'
+const authModule = 'setAuthenData'
 
 class LostListContainer extends React.Component {
   constructor(props) {
@@ -29,7 +30,7 @@ class LostListContainer extends React.Component {
   getContent = () => {
     const { tabIndex } = this.props
     if (tabIndex === LOST_LIST_PAGE_TAB_LOSTFOUND) {
-      return <LostFoundList />
+      return <LostFoundList {...this.prop} />
     } else if (tabIndex === LOST_LIST_PAGE_TAB_BLACKEDLIST) {
       return <BlackedList />
     }
@@ -66,7 +67,7 @@ class LostListContainer extends React.Component {
           }
         />
         {this.getContent()}
-        {showDetail ? <LostFoundDetail /> : null}
+        {showDetail ? <LostFoundDetail {...this.props} /> : null}
       </div>
     )
   }
@@ -76,7 +77,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     schoolId: state[moduleName][subModule].schoolId,
     tabIndex: state[moduleName][subModule].tabIndex,
-    showDetail: state[moduleName].lostFoundList.showDetail
+    showDetail: state[moduleName].lostFoundList.showDetail,
+    forbiddenStatus: state[authModule].forbiddenStatus
   }
 }
 

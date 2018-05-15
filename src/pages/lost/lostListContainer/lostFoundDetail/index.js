@@ -80,8 +80,8 @@ class LostFoundDetail extends React.Component {
         {detailLoading ? <LoadWrapper /> : null}
         <DetailHeader close={e => this.closeDetail(e, true)} />
         <div className="detailPanel-content">
-          <LostContent data={data} />
-          <Comment selectedDetailId={selectedDetailId} />
+          <LostContent data={data} {...this.props} />
+          <Comment selectedDetailId={selectedDetailId} {...this.props} />
         </div>
       </div>
     )

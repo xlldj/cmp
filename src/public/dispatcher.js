@@ -119,9 +119,7 @@ export const closeDetailController = (
     if (props[showDetailName] === value[showDetailName]) {
       return
     }
-    const action = {}
-    action[showDetailName] = false
-    return action
+    return value
   }
 }
 

@@ -8,17 +8,17 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { fetchCommentsList } from '../../../action'
 const modalName = 'lostModal'
-const { LOST_COMMENT, COMMENT_SIZE_THRESHOLD } = CONSTANTS
+const { LOST_COMMENT } = CONSTANTS
 
 class Comment extends React.Component {
   componentDidMount() {
-    this.sendFetch()
+    // this.sendFetch()
   }
   componentWillReceiveProps(nextProps) {
     if (checkObject(this.props, nextProps, ['selectedDetailId'])) {
       return
     }
-    this.sendFetch(nextProps)
+    // this.sendFetch(nextProps)
   }
   showMoreComment() {}
   sendFetch(props) {
@@ -54,6 +54,7 @@ class Comment extends React.Component {
                 repliesCount={comment.repliesCount}
                 commentId={comment.id}
                 cpmmentParentId={commentParentId}
+                {...this.props}
               />
             ) : null}
           </div>
@@ -63,7 +64,6 @@ class Comment extends React.Component {
   }
 }
 const mapStateToProps = (state, ownProps) => {
-  debugger
   return {
     comments: state[modalName].comments,
     commentsSize: state[modalName].detail.commentsCount,

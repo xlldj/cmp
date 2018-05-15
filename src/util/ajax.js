@@ -31,14 +31,13 @@ const domains = {
     user: 'http://10.195.90.143:5081'
   }
 }
-const currentDomain = domains.zdc
+const currentDomain = domains.qa
 const AjaxHandler = {
   showingError: false
 }
 
 /* tell user current token is out-of-date, force to refresh */
 const hintExpire = () => {
-  return
   // alert('expire')
   const logout = () => {
     removeStore('logged')

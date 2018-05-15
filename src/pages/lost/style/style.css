@@ -25,6 +25,9 @@
   color: #000000;
   margin: 0px 5px;
 }
+.commentWrapper .replyWrapper .commentItem .blueFont:hover {
+  color: #108ee9;
+}
 .commentWrapper .commentItem {
   line-height: 30px;
 }
