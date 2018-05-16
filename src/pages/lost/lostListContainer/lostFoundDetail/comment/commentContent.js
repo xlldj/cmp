@@ -63,7 +63,6 @@ class CommentContent extends React.Component {
               >
                 {comment.replyToUserMobile}({comment.replyToUserNickname})
                 <span>(已被拉黑)</span>
-                ) : null}
               </Link>
             </span>
           ) : null}

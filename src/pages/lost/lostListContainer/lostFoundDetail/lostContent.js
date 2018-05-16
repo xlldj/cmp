@@ -10,7 +10,8 @@ const {
   LOST_FOUND_STATUS_SHADOWED,
   LOSTTYPE,
   LOST_BLACK_TIME_SELECTOPTIONS,
-  LOST_BLACK_TIME_SELECTED
+  LOST_BLACK_TIME_SELECTED,
+  FILEADDR
 } = CONSTANTS
 class LostContent extends React.Component {
   constructor(props) {
@@ -45,13 +46,13 @@ class LostContent extends React.Component {
       images.map((image, index) => {
         return (
           <img
-            src={image}
+            src={FILEADDR + image}
             key={`image${index}`}
             alt=""
             onClick={() => {
               this.showDetailImgModel(index)
             }}
-            onLoad={e => this.setWH(e, 30)}
+            onLoad={e => this.setWH(e, 50)}
           />
         )
       })
@@ -80,6 +81,11 @@ class LostContent extends React.Component {
       pathname: `/user/userInfo/:${userId}`
     })
   }
+  closeDetailImgs = () => {
+    this.setState({
+      showDetailImgs: false
+    })
+  }
   render() {
     const { data, forbiddenStatus } = this.props
     console.log(data)
@@ -105,7 +111,7 @@ class LostContent extends React.Component {
           <img
             key={`carousel${i}`}
             alt=""
-            src={CONSTANTS.FILEADDR + r}
+            src={FILEADDR + r}
             className="carouselImg"
           />
         )

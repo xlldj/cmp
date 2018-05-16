@@ -1,6 +1,10 @@
 .lostFoundDetail {
   width: 50%;
 }
+.lostFoundDetail .detailList li {
+  height: auto;
+  display: flex;
+}
 .lostFoundDetail .detailList li img {
   height: 50px;
   width: 50px;
