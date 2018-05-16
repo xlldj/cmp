@@ -5,6 +5,7 @@ import { getStore, setStore, removeStore } from '../util/storage'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
 import { CHANGE_USER, changeUser } from '../pages/user/action'
+import { moduleActionFactory } from './moduleActions'
 
 import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
 import {
@@ -19,6 +20,15 @@ import {
   fetchDoorForbidList,
   fetchDetailRecordList
 } from '../pages/doorForbid/action'
+
+import {
+  CHANGE_LOST,
+  CHANGE_MODAL_LOST,
+  CHANGE_MODAL_BLACK,
+  fetchBlackPeopleList,
+  fetchLostFoundList,
+  changeLost
+} from '../pages/lost/action'
 
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
@@ -203,15 +213,6 @@ export const changeGift = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_LOST = 'CHANGE_LOST'
-export const changeLost = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_LOST,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_TASK = 'CHANGE_TASK'
 export const changeTask = (subModule, keyValuePair) => {
   return {
@@ -270,8 +271,15 @@ export {
   changeDoorForbid,
   fetchDoorForbidList,
   fetchDetailRecordList,
+  fetchBlackPeopleList,
   SET_BUILDING_LIST,
   fetchBuildings,
   CHANGE_USER,
-  changeUser
+  changeUser,
+  moduleActionFactory,
+  changeLost,
+  CHANGE_LOST,
+  CHANGE_MODAL_BLACK,
+  CHANGE_MODAL_LOST,
+  fetchLostFoundList
 }
