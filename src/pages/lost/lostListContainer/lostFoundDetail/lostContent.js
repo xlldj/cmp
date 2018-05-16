@@ -3,9 +3,10 @@ import { Popconfirm, Button, Modal, Carousel } from 'antd'
 import PopConfirmSelect from '../../../../pages/component/popConfirmSelect'
 import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
+import { notEmpty } from '../../../../util/types'
 import { Link } from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
-import { defriend, deleteComment } from '../controller'
+import { defriend, deleteCommentOrLostinfo } from '../controller'
 const {
   LOST_FOUND_STATUS_SHADOWED,
   LOSTTYPE,
@@ -73,7 +74,7 @@ class LostContent extends React.Component {
   deleteComment = () => {
     const { data } = this.props
     const { type, id } = data
-    deleteComment(id, type, id)
+    deleteCommentOrLostinfo(id, type)
   }
   blackUser = () => {}
   goToUserInfo = userId => {
@@ -171,11 +172,11 @@ class LostContent extends React.Component {
           </li>
           <li>
             <label>评论数量:</label>
-            <span>{commentsCount || ''}</span>
+            <span>{notEmpty(commentsCount) ? commentsCount : ''}</span>
           </li>
           <li>
             <label>查看数量:</label>
-            <span>{viewCount || ''}</span>
+            <span>{notEmpty(viewCount) ? viewCount : ''}</span>
           </li>
         </ul>
         {data.status !== LOST_FOUND_STATUS_SHADOWED &&

@@ -17,7 +17,8 @@ const {
   PAGINATION: SIZE,
   LOSTTYPE,
   LOST_HIDDEN_STATUS,
-  LOST_SHOW_STATUS
+  LOST_SHOW_STATUS,
+  LOST_ORDER
 } = CONSTANTS
 
 class LostFoundTable extends React.Component {
@@ -27,9 +28,21 @@ class LostFoundTable extends React.Component {
       this.props.changeLost(subModule, value)
     }
   }
-  changePage = pageObj => {
+
+  changeTable = (pageObj, filters, sorter) => {
+    let { order, field } = sorter
+    if (order !== this.props.order) {
+      const nextOrder = field ? LOST_ORDER[field][order] : 0
+      const value = {
+        order: nextOrder,
+        page: 1
+      }
+      this.setProps({ type: 'order', value })
+    }
     let page = pageObj.current
-    this.setProps({ type: 'page', value: { page } })
+    if (page !== this.props.page) {
+      this.setProps({ type: 'page', value: { page } })
+    }
   }
   selectRow = (record, index, event) => {
     let { dataSource, forbiddenStatus } = this.props
@@ -86,17 +99,20 @@ class LostFoundTable extends React.Component {
       {
         title: '评论数量',
         dataIndex: 'commentsCount',
-        render: (text, record) => <span className="">{text}</span>
+        render: (text, record) => <span className="">{text}</span>,
+        sorter: true
       },
       {
         title: '被用户查看数量',
         dataIndex: 'viewCount',
-        render: (text, record) => <span className="">{text}</span>
+        render: (text, record) => <span className="">{text}</span>,
+        sorter: true
       },
       {
         title: '举报次数',
         dataIndex: 'reportCount',
-        render: (text, record) => <span className="">{text}</span>
+        render: (text, record) => <span className="">{text}</span>,
+        sorter: true
       },
       {
         title: '显示状态',
@@ -134,7 +150,7 @@ class LostFoundTable extends React.Component {
           dataSource={dataSource}
           rowKey={record => record.id}
           columns={this.getColumns()}
-          onChange={this.changePage}
+          onChange={this.changeTable}
           onRowClick={this.selectRow}
           rowClassName={this.setRowClass}
         />
@@ -145,11 +161,12 @@ class LostFoundTable extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    total: state[modalName].totalNormal,
+    total: state[modalName].total,
     dataSource: state[modalName].list,
     loading: state[modalName].listLoading,
     page: state[moduleName][subModule].page,
-    selectedRowIndex: state[moduleName][subModule].selectedRowIndex
+    selectedRowIndex: state[moduleName][subModule].selectedRowIndex,
+    order: state[moduleName][subModule].order
   }
 }
 
