@@ -181,6 +181,17 @@ shortSeperator {
 .rightSeperator {
   margin-right: 10px;
 }
+.topSeperator {
+  margin-top: 20px;
+}
+/* 详情表单中文字换行的容器和span元素 */
+.wrapBlock {
+  white-space: nowrap;
+}
+.wrapBlock .wrapText {
+  white-space: pre-line;
+  vertical-align: top;
+}
 /* for time picker in gift/act and notify */
 .timePicker {
   width: 140px !important;
@@ -1213,7 +1224,7 @@ shortSeperator {
   background: #ebf4fd;
 }
 .detailList li {
-  height: 22px;
+  min-height: 22px;
   line-height: 22px;
 }
 .detailList li label {

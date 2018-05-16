@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, Badge } from 'antd'
 import CONSTANTS from '../../../../constants'
 import Time from '../../../../util/time'
+import { notEmpty } from '../../../../util/types'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -18,7 +19,8 @@ const {
   FUNDTYPE,
   FUND_CHECK_MISTAKE_TYPES,
   FUND_MISTAKE_METHOD,
-  FUND_MISTAKE_STATUS
+  FUND_MISTAKE_STATUS,
+  FUND_CHECK_MISTAKES
 } = CONSTANTS
 
 class FundCheckContent extends React.Component {
@@ -27,7 +29,7 @@ class FundCheckContent extends React.Component {
   }
   render() {
     const { detail, noRight2Handle } = this.props
-    const { fundsMistake, platformOrder, thirdOrder } = detail
+    const { fundsMistake } = detail
     const {
       orderType = 1,
       settleMethod,
@@ -37,7 +39,8 @@ class FundCheckContent extends React.Component {
       mistakeAmount,
       settleUser,
       settleTime,
-      mistakeType
+      mistakeType,
+      settleLog
     } =
       fundsMistake || {}
     const isHandleStatusNotOver = settleStatus === FUND_CHECK_STATUS_HANDLING
@@ -58,12 +61,16 @@ class FundCheckContent extends React.Component {
           </li>
           <li>
             <label>异常原因:</label>
-            <span>{mistakeReason || '--'}</span>
+            <span>
+              {notEmpty(mistakeReason)
+                ? FUND_CHECK_MISTAKES[mistakeReason]
+                : '--'}
+            </span>
           </li>
           <li>
             <label>异常金额:</label>
             <span className="shallowRed">
-              {mistakeAmount !== undefined ? mistakeAmount : '--'}
+              {notEmpty(mistakeAmount) ? `¥${mistakeAmount}` : '--'}
             </span>
           </li>
           <li>
@@ -83,8 +90,16 @@ class FundCheckContent extends React.Component {
           </li>
           <li>
             <label>处理时间:</label>
-            <span>{Time.getTimeStr(settleTime)}</span>
+            <span>
+              {notEmpty(settleTime) ? Time.getTimeStr(settleTime) : ''}
+            </span>
           </li>
+          {isHandleStatusNotOver ? null : (
+            <li className="wrapBlock">
+              <label>处理方式记录:</label>
+              <span className="wrapText">{settleLog}</span>
+            </li>
+          )}
         </ul>
 
         {isHandleStatusNotOver && isTypeManual && !noRight2Handle ? (

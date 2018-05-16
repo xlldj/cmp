@@ -210,6 +210,19 @@ shortSeperator{
 .rightSeperator{
   margin-right: 10px;
 }
+.topSeperator{
+  margin-top: 20px;
+}
+
+/* 详情表单中文字换行的容器和span元素 */
+.wrapBlock{
+  white-space: nowrap;
+  .wrapText{
+    white-space: pre-line;
+    vertical-align: top;
+  }
+}
+
 
 /* for time picker in gift/act and notify */
 .timePicker{
@@ -1134,7 +1147,7 @@ shortSeperator{
 // for style like info in task/detail 
 .detailList{
   li{
-    height: 22px;
+    min-height: 22px;
     line-height: 22px;
     label{
       color: #aaa;

@@ -23,7 +23,7 @@ const detail = {
   data: {
     fundsMistake: {
       mistakeAmount: 222,
-      mistakeReason: 0,
+      mistakeReason: 1,
       mistakeType: 2,
       orderCreateTime: 14444444444,
       orderType: 1,

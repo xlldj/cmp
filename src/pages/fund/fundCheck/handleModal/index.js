@@ -1,12 +1,20 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Modal, Button, Radio } from 'antd'
+import CONSTANTS from '../../../../constants'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../action'
 import { settleOrder } from '../controller'
+import { safeGet } from '../../../../util/types'
 const moduleName = 'fundModule'
 const subModule = 'fundCheck'
+const modalName = 'fundCheckModal'
+const {
+  FUND_CHECK_REASON_NOREMOTE,
+  FUND_CHECK_REASON_NOLOCAL,
+  FUND_CHECK_NOLOCAL_HANDLE_TEXT
+} = CONSTANTS
 
 const RadioGroup = Radio.Group
 
@@ -29,6 +37,13 @@ class HandleModal extends Component {
   confirmFinish = e => {
     const { selectedDetailId } = this.props
     const { settleLog, flatAccount } = this.state
+    const mistakeReason = safeGet(
+      this.props,
+      'detail.fundsMistake.mistakeReason'
+    )
+    const noBalanceOption =
+      mistakeReason === FUND_CHECK_REASON_NOLOCAL ||
+      mistakeReason === FUND_CHECK_REASON_NOREMOTE
     if (settleLog.length === 0) {
       return this.setState({
         empty: true
@@ -39,10 +54,20 @@ class HandleModal extends Component {
       settleLog: settleLog.trim(),
       flatAccount: flatAccount === 1 ? true : false
     }
+    if (noBalanceOption) {
+      delete body.flatAccount
+    }
     settleOrder(body)
   }
   render() {
     const { settleLog, flatAccount, empty } = this.state
+    const mistakeReason = safeGet(
+      this.props,
+      'detail.fundsMistake.mistakeReason'
+    )
+    const noBalanceOption =
+      mistakeReason === FUND_CHECK_REASON_NOLOCAL ||
+      mistakeReason === FUND_CHECK_REASON_NOREMOTE
     return (
       <Modal
         wrapClassName="modal finish"
@@ -56,11 +81,17 @@ class HandleModal extends Component {
         <div className="info">
           <ul style={{ backgroundColor: 'white', padding: '0px' }}>
             <li>
-              <p>是否平账:</p>
-              <RadioGroup onChange={this.changeBalance} value={flatAccount}>
-                <Radio value={1}>是</Radio>
-                <Radio value={2}>否</Radio>
-              </RadioGroup>
+              {noBalanceOption ? (
+                <Fragment>
+                  <p>是否平账:</p>
+                  <RadioGroup onChange={this.changeBalance} value={flatAccount}>
+                    <Radio value={1}>是</Radio>
+                    <Radio value={2}>否</Radio>
+                  </RadioGroup>
+                </Fragment>
+              ) : (
+                <span>{FUND_CHECK_NOLOCAL_HANDLE_TEXT}</span>
+              )}
             </li>
             <li className="itemsWrapper">
               <p>处理方式记录:</p>
@@ -91,7 +122,8 @@ class HandleModal extends Component {
 }
 const mapStateToProps = state => {
   return {
-    selectedDetailId: state[moduleName][subModule].selectedDetailId
+    selectedDetailId: state[moduleName][subModule].selectedDetailId,
+    detail: state[modalName].detail
   }
 }
 export default withRouter(connect(mapStateToProps, { changeFund })(HandleModal))

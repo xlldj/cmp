@@ -3,8 +3,9 @@ import { Table } from 'antd'
 
 import selectedImg from '../../../assets/selected.png'
 import Time from '../../../../util/time'
+import { notEmpty } from '../../../../util/types'
 import CONSTANTS from '../../../../constants'
-import { balanceListPropsController } from '../controller'
+import { fundCheckListPropsController } from '../controller'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -18,12 +19,13 @@ const {
   FUNDTYPE,
   FUND_MISTAKE_TYPE,
   FUND_MISTAKE_METHOD,
-  FUND_MISTAKE_STATUS
+  FUND_MISTAKE_STATUS,
+  FUND_CHECK_MISTAKES
 } = CONSTANTS
 
-class BalanceTable extends React.Component {
+class FundCheckTable extends React.Component {
   setProps = event => {
-    const value = balanceListPropsController(this.state, this.props, event)
+    const value = fundCheckListPropsController(this.state, this.props, event)
     if (value) {
       this.props.changeFund(subModule, value)
     }
@@ -68,21 +70,22 @@ class BalanceTable extends React.Component {
         dataIndex: 'mistakeType',
         width: '10%',
         render: (text, record) =>
-          record.mistakeType !== undefined
+          notEmpty(record.mistakeType)
             ? FUND_MISTAKE_TYPE[record.mistakeType]
             : ''
       },
       {
         title: '异常原因',
         dataIndex: 'mistakeReason',
-        width: '10%'
+        width: '10%',
+        render: (text, record) => FUND_CHECK_MISTAKES[record.mistakere]
       },
       {
         title: '异常金额',
         dataIndex: 'mistakeAmount',
         width: '10%',
         render: (text, record) =>
-          record.mistakeAmount !== undefined ? (
+          notEmpty(record.mistakeAmount) ? (
             <span className="shalowRed">¥{record.mistakeAmount}</span>
           ) : null
       },
@@ -99,7 +102,7 @@ class BalanceTable extends React.Component {
         dataIndex: 'settleMethod',
         width: '10%',
         render: (text, record) =>
-          record.settleMethod !== undefined
+          notEmpty(record.settleMethod)
             ? FUND_MISTAKE_METHOD[record.settleMethod]
             : ''
       },
@@ -108,7 +111,7 @@ class BalanceTable extends React.Component {
         dataIndex: 'settleStatus',
         width: '10%',
         render: (text, record) =>
-          record.settleStatus !== undefined
+          notEmpty(record.settleStatus)
             ? FUND_MISTAKE_STATUS[record.settleStatus]
             : ''
       },
@@ -120,7 +123,7 @@ class BalanceTable extends React.Component {
         title: '处理时间',
         dataIndex: 'settleTime',
         render: (text, record, index) => {
-          return record.settleTime !== undefined
+          return notEmpty(record.settleTime)
             ? Time.getTimeStr(record.settleTime)
             : ''
         }
@@ -165,5 +168,5 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 export default withRouter(
-  connect(mapStateToProps, { changeFund })(BalanceTable)
+  connect(mapStateToProps, { changeFund })(FundCheckTable)
 )

@@ -19,7 +19,7 @@ class FundCheckDetailTables extends React.Component {
       width: '20%',
       render: (text, record) => (
         <Link
-          to={{ pathname: '/fund/list/info/:${record.orderId' }}
+          to={{ pathname: `/fund/list/info/:${record.id}` }}
           className="softLink"
         >
           {record.orderNo}
@@ -32,7 +32,7 @@ class FundCheckDetailTables extends React.Component {
       width: '10%',
       render: (text, record) => (
         <Link
-          to={{ pathname: '/fund/list/info/:${record.userId' }}
+          to={{ pathname: `/fund/list/info/:${record.userId}` }}
           className="softLink"
         >
           {record.userPhone}
@@ -162,6 +162,7 @@ class FundCheckDetailTables extends React.Component {
     const remoteOrder = thirdOrder ? [thirdOrder] : []
     return (
       <div className="detailPanel-contentBlock">
+        <h3 className="topSeperator">本地账单:</h3>
         <Table
           bordered
           pagination={false}
@@ -171,6 +172,7 @@ class FundCheckDetailTables extends React.Component {
           columns={this.localOrderColumns}
           style={{ marginTop: '20px' }}
         />
+        <h3 className="topSeperator">第三方账单:</h3>
         <Table
           bordered
           pagination={false}
