@@ -35,14 +35,23 @@ class LostFoundListQuery extends React.Component {
   }
   sendFetch(props) {
     props = props || this.props
-    const { page, day, type, status, startTime, endTime, schoolId } = props
+    const {
+      page,
+      day,
+      type,
+      status,
+      startTime,
+      endTime,
+      schoolId,
+      order
+    } = props
     const body = {
       page: page,
       size: SIZE
     }
-    if (day) {
+    if (day && day !== 'all') {
       body.day = +day
-    } else {
+    } else if (startTime && endTime) {
       body.startTime = startTime
       body.endTime = endTime
     }
@@ -55,6 +64,9 @@ class LostFoundListQuery extends React.Component {
     if (status !== 'all') {
       body.status = +status
     }
+    if (order) {
+      body.orderBy = order
+    }
     props.fetchLostFoundList(body)
   }
   componentWillReceiveProps(nextProps) {
@@ -66,7 +78,8 @@ class LostFoundListQuery extends React.Component {
         'type',
         'status',
         'schoolId',
-        'page'
+        'page',
+        'order'
       ])
     ) {
       return
@@ -102,10 +115,15 @@ class LostFoundListQuery extends React.Component {
           <QueryBlock>
             <span>时间筛选:</span>
             <CheckSelect
+              allOptValue="all"
+              allOptTitle="不限"
               options={LOST_FOUND_LIST_DAY_SELECT}
-              value={+day}
+              value={day}
               onClick={v =>
-                this.setProps({ type: 'day', value: { day: v, page: 1 } })
+                this.setProps({
+                  type: 'day',
+                  value: { day: v, page: 1, startTime: '', endTime: '' }
+                })
               }
             />
             <RangeSelect
@@ -165,7 +183,8 @@ const mapStateToProps = (state, ownProps) => {
     status: state[moduleName][subModule].status,
     totalNormal: state[modalName].totalNormal,
     totalHidden: state[modalName].totalHidden,
-    listLoading: state[modalName].listLoading
+    listLoading: state[modalName].listLoading,
+    order: state[moduleName][subModule].order
   }
 }
 

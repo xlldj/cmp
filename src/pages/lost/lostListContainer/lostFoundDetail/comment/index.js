@@ -50,10 +50,7 @@ class Comment extends React.Component {
             {comment.replies.length ? (
               <Reply
                 key={`reply${comment.id}`}
-                replies={comment.replies}
-                repliesCount={comment.repliesCount}
-                commentId={comment.id}
-                cpmmentParentId={commentParentId}
+                comment={comment}
                 {...this.props}
               />
             ) : null}

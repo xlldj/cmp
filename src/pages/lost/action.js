@@ -3,6 +3,9 @@ import AjaxHandler from '../../util/ajax'
 // import AjaxHandler from '../../mock/ajax'
 import { moduleActionFactory } from '../../actions/moduleActions.js'
 import { deepCopy } from '../../util/copy'
+import CONSTANTS from '../../constants'
+import { nextTick } from '../../public/ayncs'
+const { COMMENT_SIZE_THRESHOLD, LOST_FOUND_STATUS_SHADOWED } = CONSTANTS
 export const CHANGE_LOST = 'CHANGE_LOST'
 export const CHANGE_MODAL_LOST = 'CHANGE_MODAL_LOST'
 export const CHANGE_MODAL_BLACK = 'CHANGE_MODAL_BLACK'
@@ -72,9 +75,59 @@ export const fetchCommentsList = body => {
     return AjaxHandler.fetch(resource, body).then(json => {
       const value = { commentsLoading: false }
       if (json && json.data) {
-        const { commentsSize, comments } = json.data
+        const { comments } = json.data
+        comments.forEach(comment => {
+          comment.loadingMore = false
+          if (comment.repliesCount > COMMENT_SIZE_THRESHOLD) {
+            comment.allRepliesLoaded = false
+          } else {
+            comment.allRepliesLoaded = true
+          }
+        })
         value.comments = comments
-        value.commentsSize = commentsSize
+      }
+      dispatch({
+        type: CHANGE_MODAL_LOST,
+        value
+      })
+    })
+  }
+}
+export const fetchRepliesList = body => {
+  const { lostModal } = store.getState()
+
+  return dispatch => {
+    // 将对应的comment中的loadingMore改为true
+    const comments = deepCopy(lostModal.comments)
+    const comment = comments.find(comment => comment.id === body.id)
+    if (comment) {
+      if (comment.loadingMore) {
+        return
+      }
+      comment.loadingMore = true
+    }
+    dispatch({
+      type: CHANGE_MODAL_LOST,
+      value: {
+        comments
+      }
+    })
+    let resource = '/api/lost/repliesList'
+    return AjaxHandler.fetch(resource, body).then(json => {
+      // 将对应的comment中的loadingMore改为false
+      const comments = deepCopy(lostModal.comments)
+      const comment = comments.find(comment => comment.id === body.id)
+      if (comment) {
+        comment.loadingMore = false
+      }
+      const value = {
+        comments
+      }
+      if (json && json.data) {
+        if (comment) {
+          comment.replies = comment.replies.concat(json.data.replies)
+          comment.allRepliesLoaded = true
+        }
       }
       dispatch({
         type: CHANGE_MODAL_LOST,
@@ -105,43 +158,14 @@ export const fetchLostInfo = body => {
       }
       if (json && json.data) {
         value.detail = json.data
+        value.commentsSize = json.data.commentsCount
         const commentsBody = {
           id: json.data.id,
-          from: 1,
-          commentsSize: json.data.id.commentsSize || 10,
-          repliesSize: 2
+          from: 0,
+          commentsSize: json.data.commentsCount,
+          repliesSize: COMMENT_SIZE_THRESHOLD
         }
         store.dispatch(fetchCommentsList(commentsBody))
-      }
-      dispatch({
-        type: CHANGE_MODAL_LOST,
-        value
-      })
-    })
-  }
-}
-export const fetchRepliesList = body => {
-  const { lostModal } = store.getState()
-  const { allRepliesLoading, replies } = lostModal
-
-  return dispatch => {
-    if (allRepliesLoading) {
-      return
-    }
-    dispatch({
-      type: CHANGE_MODAL_LOST,
-      value: {
-        allRepliesLoading: true
-      }
-    })
-    let resource = '/api/lost/repliesList'
-    return AjaxHandler.fetch(resource, body).then(json => {
-      let value = {
-        allRepliesLoading: false
-      }
-      if (json && json.data) {
-        value.replies = replies
-        value.replies[body.id] = json.data.replies
       }
       dispatch({
         type: CHANGE_MODAL_LOST,
@@ -185,10 +209,13 @@ export const fetchBlackPeopleList = body => {
     })
   }
 }
-export const deleteLostInfo = () => {
-  const { lostModal } = store.getState()
-  const { detail, detailLoading } = lostModal
-  detail.status = 2
+
+export const deleteLostInfo = id => {
+  const { lostModal, setUserInfo } = store.getState()
+  const { detailLoading } = lostModal
+  const detail = deepCopy(lostModal.detail)
+  const list = deepCopy(lostModal.list)
+  detail.status = LOST_FOUND_STATUS_SHADOWED
   if (detailLoading) {
     return
   }
@@ -205,9 +232,20 @@ export const deleteLostInfo = () => {
     let value = {}
     value.detailLoading = false
     value.detail = detail
-    dispatch({
-      type: CHANGE_MODAL_LOST,
-      value
+    const userName = setUserInfo.name
+    list.forEach(lost => {
+      if (lost.id === id) {
+        lost.status = LOST_FOUND_STATUS_SHADOWED
+        lost.hiddenByUserName = userName
+        lost.hiddenTime = Date.now()
+      }
+    })
+    value.list = list
+    nextTick().then(() => {
+      dispatch({
+        type: CHANGE_MODAL_LOST,
+        value
+      })
     })
   }
 }
@@ -216,18 +254,18 @@ export const deleteComments = id => {
   const { commentsLoading } = lostModal
   const { name, id: userId } = setUserInfo
   const comments = deepCopy(lostModal.comments)
-  const replies = deepCopy(lostModal.replies)
-  if (replies) {
-    for (let replay in replies) {
-      replies[replay].forEach((replayItem, index) => {
-        if (replayItem.id === id) {
-          replayItem.status = 2
-          replayItem.delUserId = userId
-          replayItem.delUserNickname = name
-        }
-      })
-    }
-  }
+  // const replies = deepCopy(lostModal.replies)
+  // if (replies) {
+  //   for (let replay in replies) {
+  //     replies[replay].forEach((replayItem, index) => {
+  //       if (replayItem.id === id) {
+  //         replayItem.status = 2
+  //         replayItem.delUserId = userId
+  //         replayItem.delUserNickname = name
+  //       }
+  //     })
+  //   }
+  // }
   comments.forEach((element, index) => {
     if (element.id === id) {
       element.status = 2
@@ -258,7 +296,7 @@ export const deleteComments = id => {
     let value = { allRepliesLoading: false }
     value.commentsLoading = false
     value.comments = comments
-    value.replies = replies
+    // value.replies = replies
     dispatch({
       type: CHANGE_MODAL_LOST,
       value
@@ -269,7 +307,6 @@ export const blackPerson = userId => {
   const { lostModal } = store.getState()
   const { detail, detailLoading } = lostModal
   const comments = deepCopy(lostModal.comments)
-  const replies = deepCopy(lostModal.replies)
   if (detail.userId === userId) {
     detail.userInBlackList = true
   }
@@ -284,15 +321,6 @@ export const blackPerson = userId => {
       }
     })
   })
-  if (replies) {
-    for (let replay in replies) {
-      replies[replay].forEach((replayItem, index) => {
-        if (replayItem.userId === userId) {
-          replayItem.userInBlackList = true
-        }
-      })
-    }
-  }
   return dispatch => {
     if (detailLoading) {
       return
@@ -308,7 +336,6 @@ export const blackPerson = userId => {
     value.detailLoading = false
     value.comments = comments
     value.detail = detail
-    value.replies = replies
     dispatch({
       type: CHANGE_MODAL_LOST,
       value

@@ -7,12 +7,15 @@ import {
   statusController,
   pageController,
   combineControllers,
+  orderController,
   closeDetailController
 } from '../../../public/dispatcher'
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
+import CONSTANTS from '../../../constants'
 import store from '../../../index'
 import { deleteLostInfo, deleteComments, blackPerson } from '../action'
+const { LOST_REPLY, LOST_COMMENT } = CONSTANTS
 export const stateController = (prevState, value) => {
   return { ...prevState, ...value }
 }
@@ -27,7 +30,8 @@ export const lostFoundListPropsController = (state, props, event) => {
     typeController,
     dayController,
     statusController,
-    pageController
+    pageController,
+    orderController
   ])(state, props, event)
 }
 
@@ -53,29 +57,34 @@ export const defriend = (userId, id, level, commentParentId) => {
   AjaxHandler.fetch(resource, body).then(json => {
     if (json && json.data) {
       Noti.hintOk('拉黑成功')
-      store.dispatch(blackPerson(userId))
+      const { lostModal } = store.getState()
+      const { comments } = lostModal
+      if (comments && comments.length > 0) {
+        store.dispatch(blackPerson(userId))
+      }
     }
   })
 }
 
 /**
- * 删除制定的评论，并更新显示的comments列表
+ * 删除评论或者失物招领信息，并在本地更新显示的comments列表
  * @param {*} commentId
  */
-export const deleteComment = (commentId, type, commentParentId) => {
+export const deleteCommentOrLostinfo = (id, type) => {
   const body = {
-    id: commentId,
+    id,
     type: type ? type : 1
   }
   let resource = '/api/lost/delete'
 
   AjaxHandler.fetch(resource, body).then(json => {
     if (json && json.data) {
-      Noti.hintOk('删除成功')
-      if (commentId === commentParentId) {
-        store.dispatch(deleteLostInfo())
+      if (type === LOST_REPLY || type === LOST_COMMENT) {
+        Noti.hintOk('操作成功', '删除成功')
+        store.dispatch(deleteComments(id))
       } else {
-        store.dispatch(deleteComments(commentId))
+        Noti.hintOk('操作成功', '屏蔽成功')
+        store.dispatch(deleteLostInfo(id))
       }
     }
   })
