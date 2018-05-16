@@ -40,12 +40,7 @@ class LostListContainer extends React.Component {
       },
       {
         title: '用户手机号',
-        dataIndex: 'userMobile',
-        render: (text, record) => (
-          <span className="">
-            {LOSTTYPE[record.type] ? LOSTTYPE[record.type] : '----'}
-          </span>
-        )
+        dataIndex: 'userMobile'
       },
       {
         title: '用户昵称',
@@ -58,7 +53,7 @@ class LostListContainer extends React.Component {
         render: (text, record) => Time.getTimeStr(record.createTime)
       },
       {
-        title: '拉黑时常',
+        title: '拉黑时长',
         dataIndex: 'blackListInfo'
       },
       {

@@ -9,7 +9,7 @@ const initialLostState = {
     schoolId: selectedSchool
   },
   lostFoundList: {
-    day: 1, // 1 : 今天
+    day: 'all',
     page: 1,
     startTime: '',
     endTime: '',
@@ -17,7 +17,8 @@ const initialLostState = {
     status: 'all',
     selectedRowIndex: -1,
     selectedDetailId: -1,
-    showDetail: false
+    showDetail: false,
+    order: 0 // 默认无排序，
   }
 }
 export const lostModule = (state = initialLostState, action) => {
@@ -42,9 +43,7 @@ const initialLostModal = {
   detailLoading: false,
   comments: [],
   commentsLoading: false,
-  commentsSize: 0,
-  replies: {},
-  allRepliesLoading: false
+  commentsSize: 0
 }
 export const lostModal = (state = initialLostModal, action) => {
   const { type } = action
