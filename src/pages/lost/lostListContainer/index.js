@@ -28,9 +28,9 @@ class LostListContainer extends React.Component {
     this.state = {}
   }
   getContent = () => {
-    const { tabIndex } = this.props
+    const { tabIndex, forbiddenStatus } = this.props
     if (tabIndex === LOST_LIST_PAGE_TAB_LOSTFOUND) {
-      return <LostFoundList {...this.prop} />
+      return <LostFoundList forbiddenStatus={forbiddenStatus} />
     } else if (tabIndex === LOST_LIST_PAGE_TAB_BLACKEDLIST) {
       return <BlackedList />
     }
