@@ -1,6 +1,8 @@
 import React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
+import FundCheckContainer from './fundCheck'
+
 import { asyncComponent } from '../component/asyncComponent'
 
 import Bread from '../component/bread'
@@ -51,7 +53,8 @@ const breadcrumbNameMap = {
   '/abnormal': '异常资金',
   '/freeGiving': '赠送金额',
   '/freeGiving/add': '新建赠送规则',
-  '/freeGiving/info': '详情'
+  '/freeGiving/info': '详情',
+  '/fundCheck': '资金对账'
 }
 
 class FundDisp extends React.Component {
@@ -174,6 +177,12 @@ class FundDisp extends React.Component {
             <Route
               path="/fund/freeGiving"
               render={props => <FreeGiving hide={this.props.hide} {...props} />}
+            />
+            <Route
+              path="/fund/fundCheck"
+              render={props => (
+                <FundCheckContainer hide={this.props.hide} {...props} />
+              )}
             />
             <Route
               exact

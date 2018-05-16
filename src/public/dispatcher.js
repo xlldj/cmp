@@ -28,6 +28,20 @@ export const dayController = (
     return value
   }
 }
+export const methodController = (
+  state,
+  props,
+  event,
+  { methodName } = { methodName: 'method' }
+) => {
+  const { type, value } = event
+  if (type === 'method') {
+    if (props[methodName] === value[methodName]) {
+      return
+    }
+    return value
+  }
+}
 export const statusController = (
   state,
   props,
