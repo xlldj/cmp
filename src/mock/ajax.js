@@ -4,6 +4,7 @@ import orderStatHandler from './order.js'
 import orderConsumptionHandler from './orderConsumption'
 import userAuthHandler from './userAuth'
 import lostHandler from './lost'
+import fundCheckHandler from './fundCheck'
 
 const AjaxHandler = {
   showingError: false
@@ -53,6 +54,15 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     contain(resource, 'lost/list', 'lost/details', 'lost/comments/list')
   ) {
     return lostHandler(resource, body)
+  } else if (
+    contain(
+      resource,
+      'fundsCheck/mistake/list',
+      'fundsCheck/mistake/detail',
+      'fundsCheck/mistake/settle'
+    )
+  ) {
+    return fundCheckHandler(resource, body)
   }
 }
 

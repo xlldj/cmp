@@ -32,6 +32,7 @@ const domains = {
   }
 }
 const currentDomain = domains.qa
+
 const AjaxHandler = {
   showingError: false
 }

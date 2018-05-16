@@ -163,6 +163,11 @@ const BASIC = {
           name: '异常资金',
           path: 'abnormal',
           key: 4
+        },
+        {
+          name: '资金对账',
+          path: 'fundCheck',
+          key: 6
         }
       ]
     },
@@ -476,7 +481,8 @@ const BASIC = {
     审核: 'CENSOR_NOTIFY',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
-    添加标签: 'BUILD_COMPLAINT_TAG'
+    添加标签: 'BUILD_COMPLAINT_TAG',
+    人工处理: 'HANDLE_FUND_CHECK'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
