@@ -5,7 +5,7 @@
 @liHeight: 45px;
 @labelWidth: 130px;
 @border: #aaa;
-@fontColor:#222;
+@fontColor: #222;
 .fi(@alignItems: center; @justifyContent: flex-start){
   display: inline-flex;
   flex: none;
@@ -63,6 +63,12 @@ a:hover{
 }
 a:active{
   text-decoration: none;
+}
+.softLink{
+  color: @fontColor;
+}
+.softLink:hover{
+  color: @deepBlue;
 }
 .outLink{
   color: #585c5e;

@@ -44,6 +44,12 @@ a:hover {
 a:active {
   text-decoration: none;
 }
+.softLink {
+  color: #222;
+}
+.softLink:hover {
+  color: #108ee9;
+}
 .outLink {
   color: #585c5e;
 }
