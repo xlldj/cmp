@@ -29,6 +29,10 @@ const domains = {
   zdc: {
     manager: 'http://10.195.90.143:8080',
     user: 'http://10.195.90.143:5081'
+  },
+  pre: {
+    manager: 'http://47.106.62.186/m',
+    user: 'http://47.106.62.186/c'
   }
 }
 const currentDomain = domains.qa
@@ -513,18 +517,18 @@ AjaxHandler.postFile = (file, resource, options) => {
     var xhr = new XMLHttpRequest()
     xhr.timeout = 4000
 
-    //监听文件上传进度
+    // 监听文件上传进度
     xhr.upload.onprogress = function(evt) {
-      //lengthComputabel: 文件长度是否可计算
+      // lengthComputabel: 文件长度是否可计算
       if (evt.lengthComputable) {
-        //evt.loaded: 已下载的字节数
-        //evt.total: 文件总字节数
+        // evt.loaded: 已下载的字节数
+        // evt.total: 文件总字节数
         var percent = Math.round(evt.loaded * 100 / evt.total)
         console.log(percent)
       }
     }
 
-    //监听传输结束事件: 不管成功或者失败都会触发
+    // 监听传输结束事件: 不管成功或者失败都会触发
     xhr.onreadystatechange = function(evt) {
       if (xhr.readyState === 4 && xhr.status === 200) {
         const res = xhr.response
@@ -537,7 +541,7 @@ AjaxHandler.postFile = (file, resource, options) => {
     xhr.onerror = errorHandler
     xhr.ontimeout = errorHandler
 
-    //*发起ajax请求数据
+    //* 发起ajax请求数据
     if (resource.includes('/api')) {
       resource = resource.replace('/api', '')
     }

@@ -8,7 +8,19 @@ const USER = {
   },
   Import_Method_Batch: 1,
   Import_Method_Manual: 2,
+  USER_LIST_PAGE_TAB_USERS: {
+    value: 1,
+    text: '用户列表'
+  },
 
+  USER_LIST_PAGE_TAB_FOXCONN: {
+    value: 2,
+    text: '富士康员工信息'
+  },
+  USER_LIST_PAGE_TAB_ANALYZE: {
+    value: 3,
+    text: '用户消费分析'
+  },
   USER_LIST_PAGE_TABS_WITHOUT_FOX: [
     {
       value: 1,

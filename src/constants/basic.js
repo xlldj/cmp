@@ -469,8 +469,10 @@ const BASIC = {
     删除评论: 'DELETE_COMMENT',
     失物招领详情: 'LOST_DETAIL',
     重置用户密码: 'RESET_USER_PWD',
-    富士康用户列表: 'FOX_USER_LIST', // 用户列表中是否可以查看富士康员工列表
-    用户导入: 'IMPORT_USERS', // 用户列表中'导入富士康员工'的按钮，以及相关接口的权限控制
+    '富士康用户列表/查询': 'FOX_USER_LIST', // 用户列表中是否可以查看富士康员工列表
+    导入富士康员工: 'IMPORT_USERS', // 用户列表中'导入富士康员工'的按钮，以及相关接口的权限控制
+    富士康员工解除绑定: 'UNBIND_COMPNAY_USRE',
+    '用户消费分析列表/查询': 'USER_CONSUME_ANALYZE',
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
     删除员工: 'DELETE_EMPLOYEE',
