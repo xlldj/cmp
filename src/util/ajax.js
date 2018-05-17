@@ -31,7 +31,7 @@ const domains = {
     user: 'http://47.106.62.186/c'
   }
 }
-const currentDomain = domains.pre
+const currentDomain = domains.server
 const AjaxHandler = {
   showingError: false
 }
