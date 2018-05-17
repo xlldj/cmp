@@ -25,9 +25,13 @@ const domains = {
   dxy: {
     manager: 'http://10.195.90.188:5080',
     user: 'http://10.195.90.188:5081'
+  },
+  pre: {
+    manager: 'http://47.106.62.186/m',
+    user: 'http://47.106.62.186/c'
   }
 }
-const currentDomain = domains.server
+const currentDomain = domains.pre
 const AjaxHandler = {
   showingError: false
 }
