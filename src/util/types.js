@@ -66,3 +66,7 @@ function hasOwn(o, key) {
   }
   return false
 }
+
+export const trueWhen0 = v => {
+  return v || v === 0
+}
