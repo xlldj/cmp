@@ -146,7 +146,7 @@ class LostListContainer extends React.Component {
                 </Button>
               ) : null}
               <SearchInput
-                placeholder="手机号/手机型号"
+                placeholder="手机号"
                 searchingText={searchingText}
                 pressEnter={this.pressEnter}
                 changeSearch={this.changeSearch}
