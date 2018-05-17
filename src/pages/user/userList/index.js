@@ -19,9 +19,10 @@ const subModule = 'userList'
 const {
   USER_LIST_TAB_TABLE,
   USER_LIST_TAB_ANALYZE,
-  USER_LIST_PAGE_TABS_WITHOUT_FOX,
-  USER_LIST_PAGE_TABS_WITH_FOX,
-  USER_LSIT_TAB_FOXCONN
+  USER_LSIT_TAB_FOXCONN,
+  USER_LIST_PAGE_TAB_USERS,
+  USER_LIST_PAGE_TAB_FOXCONN,
+  USER_LIST_PAGE_TAB_ANALYZE
 } = CONSTANTS
 
 class UserListView extends React.Component {
@@ -99,9 +100,14 @@ class UserListView extends React.Component {
   }
   render() {
     const { tabIndex, forbiddenStatus } = this.props
-    const tabs = forbiddenStatus.FOX_USER_LIST
-      ? USER_LIST_PAGE_TABS_WITHOUT_FOX
-      : USER_LIST_PAGE_TABS_WITH_FOX
+    const tabs = [USER_LIST_PAGE_TAB_USERS]
+
+    if (!forbiddenStatus.FOX_USER_LIST) {
+      tabs.push(USER_LIST_PAGE_TAB_FOXCONN)
+    }
+    if (!forbiddenStatus.USER_CONSUME_ANALYZE) {
+      tabs.push(USER_LIST_PAGE_TAB_ANALYZE)
+    }
     const selector1 = this.getSelectors()
     const tabContent = this.getContent(tabIndex)
 

@@ -221,10 +221,17 @@ class UserTableView extends React.Component {
               />
             </QueryBlock>
           </QueryLine>
+          <QueryLine>
+            <QueryBlock />
+            <QueryBlock>
+              <span>总用户数: {total}</span>
+            </QueryBlock>
+          </QueryLine>
         </QueryPanel>
 
         <div className="tableList">
           <Table
+            className="noCursor"
             bordered
             showQuickJumper
             loading={loading}

@@ -54,6 +54,7 @@ class FoxconnListView extends React.Component {
           }
           return record.mobile ? (
             <Link
+              className="softLink"
               to={{
                 pathname: `/user/userInfo/:${record.userId}`,
                 state: { path: 'fromFoxconnList' }
@@ -81,7 +82,10 @@ class FoxconnListView extends React.Component {
         title: <p className="lastCol">操作</p>,
         dataIndex: 'operation',
         render: (text, record, index) => {
-          if (record.auth === COMPANY_USER_AHTH_PENDING) {
+          if (
+            record.auth === COMPANY_USER_AHTH_PENDING ||
+            this.props.forbiddenStatus.UNBIND_COMPNAY_USRE
+          ) {
             return
           } else {
             return (
@@ -265,7 +269,7 @@ class FoxconnListView extends React.Component {
           </QueryLine>
         </QueryPanel>
 
-        <div className="tableList">
+        <div className="tableList noCursor">
           <Table
             bordered
             showQuickJumper

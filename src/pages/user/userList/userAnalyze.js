@@ -416,6 +416,7 @@ class UserTableView extends React.Component {
 
         <div className="tableList">
           <Table
+            className="noCursor"
             bordered
             showQuickJumper
             loading={loading}
