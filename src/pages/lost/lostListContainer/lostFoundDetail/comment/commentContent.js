@@ -37,7 +37,15 @@ class CommentContent extends React.Component {
     })
   }
   render() {
-    const { comment, type, forbiddenStatus } = this.props
+    const {
+      comment,
+      type,
+      forbiddenStatus,
+      commentUserId,
+      commentUserMobile,
+      commentNickName,
+      commentUserInBlack
+    } = this.props
     const { loseBlackTime } = this.state
     return (
       <div className="commentItem">
@@ -51,12 +59,26 @@ class CommentContent extends React.Component {
               <span className="balckFont">回复</span>
               <Link
                 className="softLink"
-                to={`/user/userInfo/:${comment.userId}`}
+                to={`/user/userInfo/:${
+                  comment.replyToUserId ? comment.replyToUserId : commentUserId
+                }`}
               >
-                {comment.replyToUserMobile}({comment.replyToUserNickname})
-                {comment.replyToUserInBlackList ? (
-                  <span>(已被拉黑)</span>
-                ) : null}
+                {comment.replyToUserMobile
+                  ? comment.replyToUserMobile
+                  : commentUserMobile}({comment.replyToUserNickname
+                  ? comment.replyToUserNickname
+                  : commentNickName})
+                {comment.replyToUserId ? (
+                  <span>
+                    {comment.replyToUserInBlackList ? (
+                      <span>(已被拉黑)</span>
+                    ) : null}
+                  </span>
+                ) : (
+                  <span>
+                    {commentUserInBlack ? <span>(已被拉黑)</span> : null}
+                  </span>
+                )}
               </Link>
             </span>
           ) : null}

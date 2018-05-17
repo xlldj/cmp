@@ -29,7 +29,15 @@ class Reply extends React.Component {
   }
   render() {
     const { comment } = this.props
-    const { repliesCount, loadingMore, allRepliesLoaded } = comment
+    const {
+      repliesCount,
+      loadingMore,
+      allRepliesLoaded,
+      userId: commentUserId,
+      userMobile: commentUserMobile,
+      userNickname: commentNickName,
+      userInBlackList: commentUserInBlack
+    } = comment
     const loadMore = loadingMore ? (
       <Spin />
     ) : (
@@ -43,6 +51,10 @@ class Reply extends React.Component {
             type={LOST_REPLY}
             comment={deepCopy(reply)}
             forbiddenStatus={this.props.forbiddenStatus}
+            commentUserInBlack={commentUserInBlack}
+            commentUserId={commentUserId}
+            commentUserMobile={commentUserMobile}
+            commentNickName={commentNickName}
           />
         ))}
         {allRepliesLoaded ? null : loadMore}

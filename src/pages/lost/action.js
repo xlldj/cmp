@@ -161,7 +161,7 @@ export const fetchLostInfo = body => {
         value.commentsSize = json.data.commentsCount
         const commentsBody = {
           id: json.data.id,
-          from: 1,
+          from: 0,
           commentsSize: json.data.commentsCount,
           repliesSize: COMMENT_SIZE_THRESHOLD
         }
@@ -254,18 +254,18 @@ export const deleteComments = id => {
   const { commentsLoading } = lostModal
   const { name, id: userId } = setUserInfo
   const comments = deepCopy(lostModal.comments)
-  const replies = deepCopy(lostModal.replies)
-  if (replies) {
-    for (let replay in replies) {
-      replies[replay].forEach((replayItem, index) => {
-        if (replayItem.id === id) {
-          replayItem.status = 2
-          replayItem.delUserId = userId
-          replayItem.delUserNickname = name
-        }
-      })
-    }
-  }
+  // const replies = deepCopy(lostModal.replies)
+  // if (replies) {
+  //   for (let replay in replies) {
+  //     replies[replay].forEach((replayItem, index) => {
+  //       if (replayItem.id === id) {
+  //         replayItem.status = 2
+  //         replayItem.delUserId = userId
+  //         replayItem.delUserNickname = name
+  //       }
+  //     })
+  //   }
+  // }
   comments.forEach((element, index) => {
     if (element.id === id) {
       element.status = 2
@@ -296,7 +296,7 @@ export const deleteComments = id => {
     let value = { allRepliesLoading: false }
     value.commentsLoading = false
     value.comments = comments
-    value.replies = replies
+    // value.replies = replies
     dispatch({
       type: CHANGE_MODAL_LOST,
       value

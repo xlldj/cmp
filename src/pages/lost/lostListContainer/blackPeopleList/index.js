@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table } from 'antd'
+import { Table, Button } from 'antd'
 import Time from '../../../../util/time'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -8,10 +8,43 @@ import { changeLost, fetchBlackPeopleList } from '../../action'
 import CONSTANTS from '../../../../constants'
 import { checkObject } from '../../../../util/checkSame'
 import { lostFoundListPropsController } from '../controller'
+import { QueryPanel, QueryLine, QueryBlock } from '../../../component/query'
+import SearchInput from '../../../component/searchInput'
 const moduleName = 'lostModule'
 const modalName = 'blackModal'
 const { PAGINATION: SIZE, LOSTTYPE } = CONSTANTS
 class LostListContainer extends React.Component {
+  constructor(props) {
+    super(props)
+    let searchingText = ''
+    this.state = {
+      searchingText
+    }
+  }
+  clearSearch = () => {
+    this.setState(
+      {
+        searchingText: ''
+      },
+      this.pressEnter
+    )
+  }
+  changeSearch = e => {
+    this.setState({
+      searchingText: e.target.value
+    })
+  }
+  pressEnter = () => {
+    let v = this.state.searchingText.trim()
+    this.setState({
+      searchingText: v
+    })
+    let selectKey = this.props.list_selectKey
+    if (v === selectKey) {
+      return
+    }
+    this.sendFetch()
+  }
   setProps = event => {
     const value = lostFoundListPropsController(this.state, this.props, event)
     if (value) {
@@ -77,6 +110,7 @@ class LostListContainer extends React.Component {
   sendFetch(props) {
     props = props || this.props
     const { page, schoolId } = this.props
+    const { searchingText } = this.state
     const body = {
       page: page,
       size: SIZE
@@ -84,14 +118,42 @@ class LostListContainer extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = +schoolId
     }
+    if (searchingText) {
+      body.selectKey = searchingText
+    }
     this.props.fetchBlackPeopleList(body)
   }
   render() {
     const { dataSource, total, loading, page } = this.props
+    const { searchingText } = this.state
+    const showClearBtn = !!searchingText
     const columns = this.getColumns()
     return (
       <div className="tableList blackTable">
-        <p className="profitBanner">当前拉黑人数: {total}人</p>
+        <QueryPanel>
+          <QueryLine>
+            <QueryBlock>
+              <p className="profitBanner">当前拉黑人数: {total}人</p>
+            </QueryBlock>
+            <QueryBlock>
+              {showClearBtn ? (
+                <Button
+                  onClick={this.clearSearch}
+                  className="rightSeperator"
+                  type="primary"
+                >
+                  清空
+                </Button>
+              ) : null}
+              <SearchInput
+                placeholder="手机号/手机型号"
+                searchingText={searchingText}
+                pressEnter={this.pressEnter}
+                changeSearch={this.changeSearch}
+              />
+            </QueryBlock>
+          </QueryLine>
+        </QueryPanel>
         <Table
           bordered
           showQuickJumper
