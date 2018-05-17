@@ -6,6 +6,10 @@ const domains = {
     manager: 'http://116.62.236.67:5080',
     user: 'http://116.62.236.67:5081'
   },
+  qa2: {
+    manager: 'http://39.108.97.229:5080',
+    user: 'http://39.108.97.229:5080'
+  },
   local: {
     manager: 'http://10.0.0.4:5080',
     user: 'http://10.0.0.4:5081'
@@ -23,7 +27,7 @@ const domains = {
     user: 'http://10.195.90.187:8080'
   }
 }
-const currentDomain = domains.qa
+const currentDomain = domains.qa2
 
 const AjaxHandler = {
   showingError: false

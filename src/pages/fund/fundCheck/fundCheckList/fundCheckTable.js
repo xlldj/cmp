@@ -78,7 +78,7 @@ class FundCheckTable extends React.Component {
         title: '异常原因',
         dataIndex: 'mistakeReason',
         width: '10%',
-        render: (text, record) => FUND_CHECK_MISTAKES[record.mistakere]
+        render: (text, record) => FUND_CHECK_MISTAKES[record.mistakeReason]
       },
       {
         title: '异常金额',
