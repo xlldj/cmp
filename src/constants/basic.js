@@ -458,6 +458,7 @@ const BASIC = {
     版本更新: 'version'
   },
   DESC2STATUS: {
+    '添加/编辑学校信息': 'SCHOOL_ADD_OR_EDIT',
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
     拉黑用户: 'DEACTIVE_USER',
