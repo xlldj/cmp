@@ -480,7 +480,15 @@ const BASIC = {
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
     '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
-    版本更新列表: 'VERSON_LIST_GET'
+    版本更新列表: 'VERSON_LIST_GET',
+    统计分析图表: 'STATISTICS_GET',
+    '员工列表搜索/查询': 'EMPLOYEE_LIST_GET',
+    维修员权限: 'MAINTENANCE_MAN_AUTH',
+    '添加/编辑员工': 'EMPLOYEE_AND_OR_EDIT',
+    身份列表: 'ROLE_LIST_GET',
+    创建身份: 'ROLE_ADD',
+    权限列表: 'AUTH_LIST_GET',
+    '添加/编辑/删除权限点': 'AUTH_ADD_EDIT_DELETE'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],

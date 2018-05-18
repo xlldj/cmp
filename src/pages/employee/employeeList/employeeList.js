@@ -293,13 +293,13 @@ class EmployeeList extends React.Component {
       loading,
       hintDeleteModal
     } = this.state
-    const { page, schoolId } = this.props
-
+    const { page, schoolId, forbiddenStatus } = this.props
+    const { EMPLOYEE_AND_OR_EDIT } = forbiddenStatus
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加新员工"
-          addLink="/employee/list/add"
+          addTitle={EMPLOYEE_AND_OR_EDIT ? null : '添加新员工'}
+          addLink={EMPLOYEE_AND_OR_EDIT ? null : '/employee/list/add'}
           searchInputText="身份／姓名"
           searchingText={searchingText}
           pressEnter={this.pressEnter}
