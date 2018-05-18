@@ -458,7 +458,8 @@ const BASIC = {
     版本更新: 'version'
   },
   DESC2STATUS: {
-    '学校列表/搜索/查询': 'SCHOOL_LIST_SEARCH',
+    // 学校部分的权限
+    '学校列表/搜索/查询': 'SCHOOL_LIST_GET',
     楼栋列表: 'BUILDING_LIST', // 查看楼栋列表
     '添加/编辑学校信息': 'SCHOOL_ADD_OR_EDIT',
     '添加/编辑楼栋': 'BUILDING_ADD_OR_EDIT',
@@ -468,6 +469,15 @@ const BASIC = {
     删除楼栋: 'DELETE_BUILDING',
     账号迁移: 'ACCOUNT_TRANSFER',
     '信息总览列表/搜索/查询': 'SCHOOL_INFO_OVERVIEW',
+
+    // 订单部分的权限
+    '设备订单列表/搜索/查询': 'ORDER_LIST_GET',
+    设备消费统计查看: 'ORDER_CONSUME_ANALYZE_GET',
+    消费预警查看: 'ORDER_CONSUME_WARN_GET',
+    '订单详情（处理退单）': 'ORDER_DETAIL_AND_CHARGEBACK',
+    根据设备消费统计创建工单: 'BUILD_TASK_BY_DEVICE_CONSUMPTION',
+    '异常订单列表/搜索/查询': 'ABNORMAL_ORDER_GET',
+    '异常订单详情（处理退单）': 'ABNORMAL_ORDER_DETAIL_AND_CHARGEBACK',
 
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',

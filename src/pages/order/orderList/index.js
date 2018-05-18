@@ -34,7 +34,9 @@ const {
   ORDER_LIST_TABLE,
   ORDER_LIST_STAT,
   ORDER_LIST_ANALYZE,
-  ORDER_LIST_PAGE_TABS
+  ORDER_LIST_PAGE_ORDER_TABLE,
+  ORDER_LIST_PAGE_DEVICE_CONSUMPTION_ANALYZE,
+  ORDER_LIST_PAGE_DEVICE_CONSUMPTION_WARN
 } = CONSTANTS
 
 /* state explanation */
@@ -43,6 +45,34 @@ const {
 class OrderList extends React.Component {
   componentDidMount() {
     this.props.hide(false)
+    this.resetTabIndexIfNeeded()
+  }
+  resetTabIndexIfNeeded = () => {
+    const { forbiddenStatus } = this.props
+    const {
+      ORDER_LIST_GET,
+      ORDER_CONSUME_ANALYZE_GET,
+      ORDER_CONSUME_WARN_GET
+    } = forbiddenStatus
+    const hasRight2SeeOrderList = !(
+      ORDER_LIST_GET &&
+      ORDER_CONSUME_ANALYZE_GET &&
+      ORDER_CONSUME_WARN_GET
+    )
+    if (hasRight2SeeOrderList) {
+      // 有查看订单列表的权限，无需进一步操作
+      if (!ORDER_LIST_GET) {
+        return
+      } else if (!ORDER_CONSUME_ANALYZE_GET) {
+        this.props.changeOrder(subModule, {
+          tabIndex: ORDER_LIST_STAT
+        })
+      } else if (!ORDER_CONSUME_WARN_GET) {
+        this.props.changeOrder(subModule, {
+          tabIndex: ORDER_LIST_ANALYZE
+        })
+      }
+    }
   }
   componentWillUnmount() {
     this.props.hide(true)
@@ -100,6 +130,25 @@ class OrderList extends React.Component {
         return <OrderTable />
     }
   }
+  getTabs = () => {
+    const { forbiddenStatus } = this.props
+    const {
+      ORDER_LIST_GET,
+      ORDER_CONSUME_ANALYZE_GET,
+      ORDER_CONSUME_WARN_GET
+    } = forbiddenStatus
+    const tabs = []
+    if (!ORDER_LIST_GET) {
+      tabs.push(ORDER_LIST_PAGE_ORDER_TABLE)
+    }
+    if (!ORDER_CONSUME_ANALYZE_GET) {
+      tabs.push(ORDER_LIST_PAGE_DEVICE_CONSUMPTION_ANALYZE)
+    }
+    if (!ORDER_CONSUME_WARN_GET) {
+      tabs.push(ORDER_LIST_PAGE_DEVICE_CONSUMPTION_WARN)
+    }
+    return tabs
+  }
   render() {
     const { tabIndex, schoolId } = this.props
     const selector1 =
@@ -117,12 +166,13 @@ class OrderList extends React.Component {
         />
       )
     const tabContent = this.getContent(tabIndex)
+    const tabs = this.getTabs()
 
     return (
       <div className="panelWrapper" ref="wrapper">
         <PhaseLine
           value={+tabIndex}
-          staticPhase={ORDER_LIST_PAGE_TABS}
+          staticPhase={tabs}
           selectors={[selector1]}
           changePhase={this.changePhase}
         />
@@ -137,7 +187,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     tabIndex: state.orderModule[subModule].tabIndex,
     schoolId: state.orderModule[subModule].schoolId,
-    schools: state.setSchoolList.schools
+    schools: state.setSchoolList.schools,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 

@@ -78,15 +78,16 @@ class SchoolDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
     const {
       SCHOOL_ADD_OR_EDIT,
       BUILDING_ADD_OR_EDIT,
       BUILDING_LIST,
       SCHOOL_SETONLINE,
       SCHOOL_BUSINESS_MANAGE,
-      SCHOOL_LIST_SEARCH,
+      SCHOOL_LIST_GET,
       SCHOOL_INFO_OVERVIEW
-    } = this.props
+    } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -158,7 +159,7 @@ class SchoolDisp extends React.Component {
                 )}
               />
             )}
-            {SCHOOL_LIST_SEARCH ? null : (
+            {SCHOOL_LIST_GET ? null : (
               <Route
                 exact
                 path="/school/list"
@@ -179,7 +180,7 @@ class SchoolDisp extends React.Component {
                 render={props => <InfoSet hide={this.props.hide} {...props} />}
               />
             )}
-            {SCHOOL_LIST_SEARCH ? null : (
+            {SCHOOL_LIST_GET ? null : (
               <Route
                 exact
                 path="/school"
