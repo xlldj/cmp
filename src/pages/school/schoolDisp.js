@@ -78,6 +78,15 @@ class SchoolDisp extends React.Component {
     }
   }
   render() {
+    const {
+      SCHOOL_ADD_OR_EDIT,
+      BUILDING_ADD_OR_EDIT,
+      BUILDING_LIST,
+      SCHOOL_SETONLINE,
+      SCHOOL_BUSINESS_MANAGE,
+      SCHOOL_LIST_SEARCH,
+      SCHOOL_INFO_OVERVIEW
+    } = this.props
     return (
       <div>
         <div className="breadc">
@@ -92,67 +101,91 @@ class SchoolDisp extends React.Component {
 
         <div className="disp">
           <Switch>
-            <Route
-              path="/school/list/edit/:id"
-              render={props => (
-                <SchoolInfoEdit hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/school/list/add"
-              render={props => (
-                <SchoolInfoEdit hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/school/list/blockManage/edit/:id"
-              render={props => (
-                <AddingBlock hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/school/list/blockManage/add"
-              render={props => (
-                <AddingBlock hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/school/list/blockManage/:id"
-              render={props => (
-                <BlockManage hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              exact
-              path="/school/list/blockManage"
-              render={props => (
-                <BlockManage hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/school/list/business/:id"
-              render={props => (
-                <SchoolBusiness hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              exact
-              path="/school/list"
-              render={props => <SchoolList hide={this.props.hide} {...props} />}
-            />
-            <Route
-              path="/school/overview"
-              render={props => <Overview hide={this.props.hide} {...props} />}
-            />
-            <Route
-              path="/school/infoSet/:id"
-              render={props => <InfoSet hide={this.props.hide} {...props} />}
-            />
-            <Route
-              exact
-              path="/school"
-              render={props => <Redirect to="/school/list" />}
-            />
+            {SCHOOL_ADD_OR_EDIT ? null : (
+              <Route
+                path="/school/list/edit/:id"
+                render={props => (
+                  <SchoolInfoEdit hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {SCHOOL_ADD_OR_EDIT ? null : (
+              <Route
+                path="/school/list/add"
+                render={props => (
+                  <SchoolInfoEdit hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {BUILDING_ADD_OR_EDIT ? null : (
+              <Route
+                path="/school/list/blockManage/edit/:id"
+                render={props => (
+                  <AddingBlock hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {BUILDING_ADD_OR_EDIT ? null : (
+              <Route
+                path="/school/list/blockManage/add"
+                render={props => (
+                  <AddingBlock hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {BUILDING_LIST ? null : (
+              <Route
+                path="/school/list/blockManage/:id"
+                render={props => (
+                  <BlockManage hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {BUILDING_LIST ? null : (
+              <Route
+                exact
+                path="/school/list/blockManage"
+                render={props => (
+                  <BlockManage hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {SCHOOL_BUSINESS_MANAGE ? null : (
+              <Route
+                path="/school/list/business/:id"
+                render={props => (
+                  <SchoolBusiness hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {SCHOOL_LIST_SEARCH ? null : (
+              <Route
+                exact
+                path="/school/list"
+                render={props => (
+                  <SchoolList hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {SCHOOL_INFO_OVERVIEW ? null : (
+              <Route
+                path="/school/overview"
+                render={props => <Overview hide={this.props.hide} {...props} />}
+              />
+            )}
+            {SCHOOL_SETONLINE ? null : (
+              <Route
+                path="/school/infoSet/:id"
+                render={props => <InfoSet hide={this.props.hide} {...props} />}
+              />
+            )}
+            {SCHOOL_LIST_SEARCH ? null : (
+              <Route
+                exact
+                path="/school"
+                render={props => <Redirect to="/school/list" />}
+              />
+            )}
           </Switch>
         </div>
       </div>
@@ -160,9 +193,12 @@ class SchoolDisp extends React.Component {
   }
 }
 
-// export default SchoolDisp
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
+
 export default withRouter(
-  connect(null, {
+  connect(mapStateToProps, {
     changeSchool
   })(SchoolDisp)
 )

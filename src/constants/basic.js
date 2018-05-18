@@ -458,7 +458,17 @@ const BASIC = {
     版本更新: 'version'
   },
   DESC2STATUS: {
+    '学校列表/搜索/查询': 'SCHOOL_LIST_SEARCH',
+    楼栋列表: 'BUILDING_LIST', // 查看楼栋列表
     '添加/编辑学校信息': 'SCHOOL_ADD_OR_EDIT',
+    '添加/编辑楼栋': 'BUILDING_ADD_OR_EDIT',
+    功能入口管理: 'SCHOOL_BUSINESS_MANAGE',
+    禁用学校: 'DEACTIVATE_SCHOOL',
+    上线设置: 'SCHOOL_SETONLINE',
+    删除楼栋: 'DELETE_BUILDING',
+    账号迁移: 'ACCOUNT_TRANSFER',
+    '信息总览列表/搜索/查询': 'SCHOOL_INFO_OVERVIEW',
+
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
     拉黑用户: 'DEACTIVE_USER',
@@ -481,7 +491,6 @@ const BASIC = {
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
-    楼栋列表: ['/school/list/blockManage'],
     上线设置: ['school/infoSet'],
     '添加/编辑学校信息': ['/school/list/add', '/school/list/edit'],
     '添加/编辑楼栋': [
