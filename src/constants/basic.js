@@ -490,6 +490,7 @@ const BASIC = {
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
     删除员工: 'DELETE_EMPLOYEE',
+    '公告列表/搜索/查询': 'NOTIFY_LIST_GET',
     '发布/编辑紧急公告': 'EDIT_EMERGENCY_NOTIFY',
     '发布/编辑系统公告': 'EDIT_SYSTEM_NOTIFY',
     '发布/编辑客服公告': 'EDIT_CUSTOM_NOTIFY',
@@ -497,7 +498,10 @@ const BASIC = {
     审核: 'CENSOR_NOTIFY',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
-    添加标签: 'BUILD_COMPLAINT_TAG'
+    添加标签: 'BUILD_COMPLAINT_TAG',
+    '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
+    版本更新列表: 'VERSON_LIST_GET',
+    统计分析图表: 'STATISTICS_GET'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],

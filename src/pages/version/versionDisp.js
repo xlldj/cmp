@@ -25,6 +25,8 @@ class VersionDisp extends React.Component {
     this.props.changeVersion('version', { page: 1 })
   }
   render() {
+    const { forbiddenStatus } = this.props
+    const { VERSON_LIST_GET, VERSON_ADD_OR_EDIT } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -38,27 +40,41 @@ class VersionDisp extends React.Component {
         </div>
 
         <div className="disp">
-          <Route
-            path="/version/detail/:id"
-            render={props => <VersionInfo hide={this.props.hide} {...props} />}
-          />
-          <Route
-            path="/version/add"
-            render={props => <VersionInfo hide={this.props.hide} {...props} />}
-          />
-          <Route
-            exact
-            path="/version"
-            render={props => <VersionTable hide={this.props.hide} {...props} />}
-          />
+          {VERSON_LIST_GET ? null : (
+            <Route
+              path="/version/detail/:id"
+              render={props => (
+                <VersionInfo hide={this.props.hide} {...props} />
+              )}
+            />
+          )}
+          {VERSON_ADD_OR_EDIT ? null : (
+            <Route
+              path="/version/add"
+              render={props => (
+                <VersionInfo hide={this.props.hide} {...props} />
+              )}
+            />
+          )}
+          {VERSON_ADD_OR_EDIT ? null : (
+            <Route
+              exact
+              path="/version"
+              render={props => (
+                <VersionTable hide={this.props.hide} {...props} />
+              )}
+            />
+          )}
         </div>
       </div>
     )
   }
 }
-
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToProps, {
     changeVersion
   })(VersionDisp)
 )
