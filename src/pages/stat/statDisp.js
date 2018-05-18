@@ -4,7 +4,8 @@ import Bread from '../component/bread'
 import './style/style.css'
 import Stat from './stat'
 import { getLocal } from '../../util/storage'
-
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 const breadcrumbNameMap = {}
 
 class StatDisp extends React.Component {
@@ -30,6 +31,8 @@ class StatDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
+    const { STATISTICS_GET } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -43,15 +46,19 @@ class StatDisp extends React.Component {
         </div>
 
         <div>
-          <Route
-            exact
-            path="/stat"
-            render={props => <Stat hide={this.props.hide} {...props} />}
-          />
+          {STATISTICS_GET ? null : (
+            <Route
+              exact
+              path="/stat"
+              render={props => <Stat hide={this.props.hide} {...props} />}
+            />
+          )}
         </div>
       </div>
     )
   }
 }
-
-export default StatDisp
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
+export default withRouter(connect(mapStateToProps, null)(StatDisp))

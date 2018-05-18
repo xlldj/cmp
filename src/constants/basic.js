@@ -480,7 +480,8 @@ const BASIC = {
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
     '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
-    版本更新列表: 'VERSON_LIST_GET'
+    版本更新列表: 'VERSON_LIST_GET',
+    统计分析图表: 'STATISTICS_GET'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
