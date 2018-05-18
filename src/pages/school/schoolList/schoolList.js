@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { Table, Popconfirm, Badge } from 'antd'
 import AjaxHandler from '../../../util/ajax'
@@ -39,7 +39,10 @@ class SchoolList extends React.Component {
     let loading = false,
       total = 0
     this.state = { searchingText, dataSource, loading, total }
-    this.columns = [
+  }
+  getColumns = () => {
+    const { forbiddenStatus } = this.props
+    const columns = [
       {
         title: <p className="firstCol">学校名称</p>,
         dataIndex: 'name',
@@ -105,8 +108,14 @@ class SchoolList extends React.Component {
         render: (text, record, index) => (
           <div className="lastCol">
             <span>
-              <Link to={`/school/list/edit/:${record.id}`}>编辑学校信息</Link>
-              <span className="ant-divider" />
+              {forbiddenStatus.SCHOOL_ADD_OR_EDIT ? null : (
+                <Fragment>
+                  <Link to={`/school/list/edit/:${record.id}`}>
+                    编辑学校信息
+                  </Link>
+                  <span className="ant-divider" />
+                </Fragment>
+              )}
               <Link to={`/school/list/blockManage/:${record.id}`}>
                 楼栋管理
               </Link>
@@ -131,6 +140,7 @@ class SchoolList extends React.Component {
         )
       }
     ]
+    return columns
   }
   fetchData = body => {
     this.setState({
@@ -246,12 +256,14 @@ class SchoolList extends React.Component {
   }
   render() {
     const { dataSource, total, loading } = this.state
-    const { page, schoolId } = this.props
+    const { page, schoolId, forbiddenStatus } = this.props
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加学校"
-          addLink="/school/list/add"
+          addTitle={forbiddenStatus.SCHOOL_ADD_OR_EDIT ? false : '添加学校'}
+          addLink={
+            forbiddenStatus.SCHOOL_ADD_OR_EDIT ? false : '/school/list/add'
+          }
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}
@@ -267,7 +279,7 @@ class SchoolList extends React.Component {
             pagination={{ total: total, pageSize: SIZE, current: page }}
             rowClassName={() => 'schoolRow'}
             dataSource={dataSource}
-            columns={this.columns}
+            columns={this.getColumns()}
             onChange={this.changeTable}
           />
         </div>
@@ -280,7 +292,8 @@ class SchoolList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
   schoolId: state.schoolModule.schoolList.schoolId,
-  page: state.schoolModule.schoolList.page
+  page: state.schoolModule.schoolList.page,
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
 export default withRouter(

@@ -458,6 +458,7 @@ const BASIC = {
     版本更新: 'version'
   },
   DESC2STATUS: {
+    '添加/编辑学校信息': 'SCHOOL_ADD_OR_EDIT',
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
     拉黑用户: 'DEACTIVE_USER',
@@ -476,7 +477,9 @@ const BASIC = {
     审核: 'CENSOR_NOTIFY',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
-    添加标签: 'BUILD_COMPLAINT_TAG'
+    添加标签: 'BUILD_COMPLAINT_TAG',
+    '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
+    版本更新列表: 'VERSON_LIST_GET'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
