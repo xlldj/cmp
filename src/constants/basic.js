@@ -469,7 +469,6 @@ const BASIC = {
     '用户消费分析列表/查询': 'USER_CONSUME_ANALYZE',
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
-    删除员工: 'DELETE_EMPLOYEE',
     '公告列表/搜索/查询': 'NOTIFY_LIST_GET',
     '发布/编辑紧急公告': 'EDIT_EMERGENCY_NOTIFY',
     '发布/编辑系统公告': 'EDIT_SYSTEM_NOTIFY',
@@ -479,14 +478,19 @@ const BASIC = {
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
+    //版本更新模块
     '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
     版本更新列表: 'VERSON_LIST_GET',
+    //统计分析模块
     统计分析图表: 'STATISTICS_GET',
+    //员工管理模块
     '员工列表搜索/查询': 'EMPLOYEE_LIST_GET',
     维修员权限: 'MAINTENANCE_MAN_AUTH',
     '添加/编辑员工': 'EMPLOYEE_AND_OR_EDIT',
+    删除员工: 'DELETE_EMPLOYEE',
     身份列表: 'ROLE_LIST_GET',
     创建身份: 'ROLE_ADD',
+    删除身份: 'ROLE_DELETE',
     权限列表: 'AUTH_LIST_GET',
     '添加/编辑/删除权限点': 'AUTH_ADD_EDIT_DELETE'
   },

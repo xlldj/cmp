@@ -11,22 +11,30 @@ const RoleInfo = asyncComponent(() =>
 
 class RoleContainer extends React.Component {
   render() {
+    const { forbiddenStatus } = this.props
+    const { ROLE_LIST_GET, ROLE_ADD } = forbiddenStatus
     return (
       <div>
         <Switch>
-          <Route
-            path="/employee/role/detail/:id"
-            render={props => <RoleInfo hide={this.props.hide} {...props} />}
-          />
-          <Route
-            path="/employee/role/add"
-            render={props => <RoleInfo hide={this.props.hide} {...props} />}
-          />
-          <Route
-            exact
-            path="/employee/role"
-            render={props => <RoleTable hide={this.props.hide} {...props} />}
-          />
+          {ROLE_LIST_GET ? null : (
+            <Route
+              exact
+              path="/employee/role"
+              render={props => <RoleTable hide={this.props.hide} {...props} />}
+            />
+          )}
+          {ROLE_ADD ? null : (
+            <Route
+              path="/employee/role/detail/:id"
+              render={props => <RoleInfo hide={this.props.hide} {...props} />}
+            />
+          )}
+          {ROLE_ADD ? null : (
+            <Route
+              path="/employee/role/add"
+              render={props => <RoleInfo hide={this.props.hide} {...props} />}
+            />
+          )}
         </Switch>
       </div>
     )

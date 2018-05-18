@@ -94,7 +94,11 @@ class EmployeeDisp extends React.Component {
             <Route
               path="/employee/role"
               render={props => (
-                <RoleContainer hide={this.props.hide} {...props} />
+                <RoleContainer
+                  forbiddenStatus={forbiddenStatus}
+                  hide={this.props.hide}
+                  {...props}
+                />
               )}
             />
           )}
@@ -102,7 +106,11 @@ class EmployeeDisp extends React.Component {
             <Route
               path="/employee/authen"
               render={props => (
-                <AuthenContainer hide={this.props.hide} {...props} />
+                <AuthenContainer
+                  forbiddenStatus={forbiddenStatus}
+                  hide={this.props.hide}
+                  {...props}
+                />
               )}
             />
           )}

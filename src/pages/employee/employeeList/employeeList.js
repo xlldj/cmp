@@ -42,6 +42,8 @@ class EmployeeList extends React.Component {
       deletingId: '',
       hintDeleteModal: false
     }
+    const { forbiddenStatus } = this.props
+    const { EMPLOYEE_AND_OR_EDIT, DELETE_EMPLOYEE } = forbiddenStatus
     this.columns = [
       {
         title: '登录账号',
@@ -114,18 +116,24 @@ class EmployeeList extends React.Component {
             key={index}
             className="editable-row-operations"
           >
-            <Link to={`/employee/list/detail/:${record.id}`}>编辑</Link>
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要删除此员工?"
-              onConfirm={e => {
-                this.delete(e, record.id, false)
-              }}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">删除</a>
-            </Popconfirm>
+            {EMPLOYEE_AND_OR_EDIT ? null : (
+              <Link to={`/employee/list/detail/:${record.id}`}>编辑</Link>
+            )}
+            {DELETE_EMPLOYEE && EMPLOYEE_AND_OR_EDIT ? null : (
+              <span className="ant-divider" />
+            )}
+            {DELETE_EMPLOYEE ? null : (
+              <Popconfirm
+                title="确定要删除此员工?"
+                onConfirm={e => {
+                  this.delete(e, record.id, false)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            )}
           </div>
         )
       }
