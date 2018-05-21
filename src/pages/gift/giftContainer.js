@@ -24,7 +24,9 @@ class GiftContainer extends React.Component {
           />
           <Route
             path="/gift/list"
-            render={props => <GiftTable hide={this.props.hide} {...props} />}
+            render={props => (
+              <GiftTable hide={this.props.hide} {...props} {...this.props} />
+            )}
           />
         </Switch>
       </div>

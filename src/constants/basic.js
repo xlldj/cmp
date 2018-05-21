@@ -542,7 +542,10 @@ const BASIC = {
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
     工作报表查看: 'REPORT_LIST_GET',
-    添加标签: 'BUILD_COMPLAINT_TAG'
+    添加标签: 'BUILD_COMPLAINT_TAG',
+    //红包管理
+    '红包列表/搜索/查询': 'GIFT_LIST_GET',
+    '添加/编辑红包': 'GIFT_ADD_OR_EDIT'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],

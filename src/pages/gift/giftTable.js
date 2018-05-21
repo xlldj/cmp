@@ -33,6 +33,8 @@ class GiftTable extends React.Component {
       loading: false,
       page: 1
     }
+    const { forbiddenStatus } = this.props
+    const { GIFT_ADD_OR_EDIT } = forbiddenStatus
     this.columns = [
       {
         title: '红包金额',
@@ -71,18 +73,22 @@ class GiftTable extends React.Component {
         className: 'lastCol',
         render: (text, record, index) => (
           <div className="editable-row-operations">
-            <Link to={`/gift/list/giftInfo/:${record.id}`}>编辑</Link>
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要失效此红包么?"
-              onConfirm={e => {
-                this.delete(e, record.id)
-              }}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">失效</a>
-            </Popconfirm>
+            {GIFT_ADD_OR_EDIT ? null : (
+              <span>
+                <Link to={`/gift/list/giftInfo/:${record.id}`}>编辑</Link>
+                <span className="ant-divider" />
+                <Popconfirm
+                  title="确定要失效此红包么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">失效</a>
+                </Popconfirm>
+              </span>
+            )}
           </div>
         )
       }
@@ -185,12 +191,12 @@ class GiftTable extends React.Component {
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page, deviceType } = this.props
-
+    const { page, deviceType, forbiddenStatus } = this.props
+    const { GIFT_ADD_OR_EDIT } = forbiddenStatus
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="创建红包"
+          addTitle={GIFT_ADD_OR_EDIT ? null : '创建红包'}
           addLink="/gift/list/addGift"
           selector1={
             <DeviceSelector
