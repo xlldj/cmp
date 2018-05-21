@@ -479,6 +479,26 @@ const BASIC = {
     '异常订单列表/搜索/查询': 'ABNORMAL_ORDER_GET',
     '异常订单详情（处理退单）': 'ABNORMAL_ORDER_DETAIL_AND_CHARGEBACK',
 
+    // 充值提现
+    '充值提现列表/搜索/查询': 'FUND_LIST_GET',
+    '充值提现详情（提现审核）': 'FUND_RECHARGE_DETAIL',
+    '提现时间列表/搜索/查询': 'FUND_WITHDRAW_TIMESET_GET',
+    '添加/编辑提现时间': 'FUND_WITHDRAW_TIMESET_EDIT',
+    删除提现时间: 'FUND_WITHDRAW_TIMESET_DELETE',
+    '充值面额列表/搜索/查询': 'FUND_WITHDRAW_DENO_GET',
+    '添加/编辑充值面额': 'FUND_DENO_ADD_AND_EDIT',
+    '充值活动列表/搜索/查询': 'FUND_WITHDRAW_ACT_LIST_GET',
+    '添加/编辑充值活动': 'FUND_WITHDRAW_ACT_ADD_AND_EDIT',
+    删除充值活动: 'FUND_WITHDRAW_ACT_DELETE',
+    '异常充值提现列表/搜索/查询': 'FUND_ABNORMAL_LIST_GET', // 此处的异常指的是不符合我们平台规则的订单
+    '增加/减少用户账户余额': 'CHANGE_USER_ACCOUNT_BALANCE',
+    '提现列表/搜索/查询': 'FUND_CASH_LIST_GET',
+    '提现详情/审核': 'FUND_CASH_DETAIL',
+    '赠送规则新增/编辑': 'FUND_GIVING_RULE_ADD_AND_EDIT',
+    '赠送规则列表/查询': 'FUND_GIVING_RULE_LIST_GET',
+    处理对账: 'FUND_HANDLE_ACCOUNT_CHECK',
+    查看异常订单: 'FUND_ACCOUNT_CHECK_LIST_GET', // 查看异常订单列表，此处的异常订单指平台与第三方对不上的订单
+
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
     拉黑用户: 'DEACTIVE_USER',
@@ -490,12 +510,15 @@ const BASIC = {
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
     删除员工: 'DELETE_EMPLOYEE',
+
+    // 公告管理
     '公告列表/搜索/查询': 'NOTIFY_LIST_GET',
     '发布/编辑紧急公告': 'EDIT_EMERGENCY_NOTIFY',
     '发布/编辑系统公告': 'EDIT_SYSTEM_NOTIFY',
     '发布/编辑客服公告': 'EDIT_CUSTOM_NOTIFY',
     删除公告: 'DELETE_NOTIFY',
     审核: 'CENSOR_NOTIFY',
+
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
