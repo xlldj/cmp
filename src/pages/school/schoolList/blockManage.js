@@ -7,6 +7,9 @@ import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
 import { setStore, getStore } from '../../../util/storage'
 
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { changeSchool } from '../../../actions'
 const Panel = Collapse.Panel
 const TabPane = Tabs.TabPane
 const BACKTITLE = {
@@ -170,33 +173,36 @@ class BlockManage extends React.Component {
 
   render() {
     const { data } = this.state
+    const { forbiddenStatus } = this.props
     const { state } = this.props.location
     const panels = data.map((block, index) => {
       const head = (
         <div key={`header${index}`} className="panelHeader">
           <span>{block.fullName}</span>
-          <span className="editLink">
-            <Link
-              to={'/school/list/blockManage/edit/:' + block.id}
-              onClick={e => {
-                this.routeToDetail(e, block.id)
-              }}
-            >
-              编辑
-            </Link>
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要删除此楼么?"
-              onClick={this.alertDelete}
-              onConfirm={e => {
-                this.deleteBlock(e, block.id)
-              }}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">删除</a>
-            </Popconfirm>
-          </span>
+          {forbiddenStatus.BUILDING_ADD_OR_EDIT ? null : (
+            <span className="editLink">
+              <Link
+                to={'/school/list/blockManage/edit/:' + block.id}
+                onClick={e => {
+                  this.routeToDetail(e, block.id)
+                }}
+              >
+                编辑
+              </Link>
+              <span className="ant-divider" />
+              <Popconfirm
+                title="确定要删除此楼么?"
+                onClick={this.alertDelete}
+                onConfirm={e => {
+                  this.deleteBlock(e, block.id)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            </span>
+          )}
         </div>
       )
       const content =
@@ -255,11 +261,13 @@ class BlockManage extends React.Component {
           <div className="schoolName">
             当前管理的学校：{this.state.schoolName}
           </div>
-          <div>
-            <Link to="/school/list/blockManage/add">
-              <Button type="primary">添加楼栋</Button>
-            </Link>
-          </div>
+          {forbiddenStatus.BUILDING_ADD_OR_EDIT ? null : (
+            <div>
+              <Link to="/school/list/blockManage/add">
+                <Button type="primary">添加楼栋</Button>
+              </Link>
+            </div>
+          )}
         </div>
         <Collapse accordion onChange={this.changePanel}>
           {panels}
@@ -274,4 +282,12 @@ class BlockManage extends React.Component {
   }
 }
 
-export default BlockManage
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
+
+export default withRouter(
+  connect(mapStateToProps, {
+    changeSchool
+  })(BlockManage)
+)

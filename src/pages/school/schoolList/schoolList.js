@@ -42,6 +42,7 @@ class SchoolList extends React.Component {
   }
   getColumns = () => {
     const { forbiddenStatus } = this.props
+    const { SCHOOL_SETONLINE } = forbiddenStatus
     const columns = [
       {
         title: <p className="firstCol">学校名称</p>,
@@ -67,8 +68,7 @@ class SchoolList extends React.Component {
           return (
             <div className="infoSetLink">
               <span>信息完善度{percent}</span>
-              {
-                /* <Link to={`/school/infoSet/:${record.id}`}>前往设置</Link> */
+              {SCHOOL_SETONLINE ? null : (
                 <Link
                   to={{
                     pathname: `/school/infoSet/:${record.id}`,
@@ -80,7 +80,7 @@ class SchoolList extends React.Component {
                 >
                   前往设置
                 </Link>
-              }
+              )}
             </div>
           )
         }
@@ -116,25 +116,35 @@ class SchoolList extends React.Component {
                   <span className="ant-divider" />
                 </Fragment>
               )}
-              <Link to={`/school/list/blockManage/:${record.id}`}>
-                楼栋管理
-              </Link>
-              <span className="ant-divider" />
-              <Link to={`/school/list/business/:${record.id}`}>
-                功能入口管理
-              </Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要禁用此学校么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                onCancel={this.cancelDelete}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">禁用</a>
-              </Popconfirm>
+              {forbiddenStatus.BUILDING_LIST ? null : (
+                <Fragment>
+                  <Link to={`/school/list/blockManage/:${record.id}`}>
+                    楼栋管理
+                  </Link>
+                  <span className="ant-divider" />
+                </Fragment>
+              )}
+              {forbiddenStatus.SCHOOL_BUSINESS_MANAGE ? null : (
+                <Fragment>
+                  <Link to={`/school/list/business/:${record.id}`}>
+                    功能入口管理
+                  </Link>
+                  <span className="ant-divider" />
+                </Fragment>
+              )}
+              {forbiddenStatus.DEACTIVATE_SCHOOL ? null : (
+                <Popconfirm
+                  title="确定要禁用此学校么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  onCancel={this.cancelDelete}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">禁用</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )

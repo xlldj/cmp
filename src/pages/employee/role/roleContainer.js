@@ -20,7 +20,13 @@ class RoleContainer extends React.Component {
             <Route
               exact
               path="/employee/role"
-              render={props => <RoleTable hide={this.props.hide} {...props} />}
+              render={props => (
+                <RoleTable
+                  hide={this.props.hide}
+                  forbiddenStatus={forbiddenStatus}
+                  {...props}
+                />
+              )}
             />
           )}
           {ROLE_ADD ? null : (

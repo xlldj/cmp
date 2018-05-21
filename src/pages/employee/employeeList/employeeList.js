@@ -119,7 +119,7 @@ class EmployeeList extends React.Component {
             {EMPLOYEE_AND_OR_EDIT ? null : (
               <Link to={`/employee/list/detail/:${record.id}`}>编辑</Link>
             )}
-            {DELETE_EMPLOYEE && EMPLOYEE_AND_OR_EDIT ? null : (
+            {DELETE_EMPLOYEE || EMPLOYEE_AND_OR_EDIT ? null : (
               <span className="ant-divider" />
             )}
             {DELETE_EMPLOYEE ? null : (

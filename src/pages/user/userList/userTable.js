@@ -25,6 +25,8 @@ class UserTableView extends React.Component {
       loading: false,
       total: 0
     }
+    const { forbiddenStatus } = props
+    const { USER_INFO_DETILE } = forbiddenStatus
     this.columns = [
       {
         title: '学校名称',
@@ -63,7 +65,9 @@ class UserTableView extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/user/userInfo/:${record.id}`}>详情</Link>
+              {USER_INFO_DETILE ? null : (
+                <Link to={`/user/userInfo/:${record.id}`}>详情</Link>
+              )}
             </span>
           </div>
         )

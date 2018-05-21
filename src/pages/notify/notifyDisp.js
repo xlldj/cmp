@@ -33,7 +33,7 @@ class NotifyDisp extends React.Component {
   }
   render() {
     const { forbiddenStatus } = this.props
-    const { NOTIFY_LIST_GET, CENSOR_NOTIFY } = forbiddenStatus
+    const { NOTIFY_LIST_GET, CENSOR_GET_LIST } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -49,7 +49,7 @@ class NotifyDisp extends React.Component {
 
         <div className="disp">
           <Switch>
-            {CENSOR_NOTIFY ? null : (
+            {CENSOR_GET_LIST ? null : (
               <Route
                 path="/notify/censor"
                 render={props => (

@@ -40,7 +40,7 @@ class VersionDisp extends React.Component {
         </div>
 
         <div className="disp">
-          {VERSON_LIST_GET ? null : (
+          {VERSON_ADD_OR_EDIT ? null : (
             <Route
               path="/version/detail/:id"
               render={props => (
@@ -56,7 +56,7 @@ class VersionDisp extends React.Component {
               )}
             />
           )}
-          {VERSON_ADD_OR_EDIT ? null : (
+          {VERSON_LIST_GET ? null : (
             <Route
               exact
               path="/version"
