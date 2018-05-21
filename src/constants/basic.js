@@ -167,7 +167,7 @@ const BASIC = {
         {
           name: '资金对账',
           path: 'fundCheck',
-          key: 6
+          key: 7
         }
       ]
     },

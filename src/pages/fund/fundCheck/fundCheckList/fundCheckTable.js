@@ -91,10 +91,12 @@ class FundCheckTable extends React.Component {
       },
       {
         title: '订单创建时间',
-        dataIndex: 'createTime',
+        dataIndex: 'orderCreateTime',
         width: '10%',
         render: (text, record, index) => {
-          return record.createTime ? Time.getTimeStr(record.createTime) : ''
+          return record.orderCreateTime
+            ? Time.getTimeStr(record.orderCreateTime)
+            : ''
         }
       },
       {
