@@ -73,10 +73,12 @@ class FundCheckContent extends React.Component {
               {notEmpty(mistakeAmount) ? `¥${mistakeAmount}` : '--'}
             </span>
           </li>
-          <li>
-            <label>处理方式:</label>
-            <span>{FUND_MISTAKE_METHOD[settleMethod]}</span>
-          </li>
+          {isHandleStatusNotOver ? null : (
+            <li>
+              <label>处理方式:</label>
+              <span>{FUND_MISTAKE_METHOD[settleMethod]}</span>
+            </li>
+          )}
           <li>
             <label>处理状态:</label>
             <Badge
@@ -94,12 +96,16 @@ class FundCheckContent extends React.Component {
               {notEmpty(settleTime) ? Time.getTimeStr(settleTime) : ''}
             </span>
           </li>
-          {isHandleStatusNotOver ? null : (
+          <li className="wrapBlock">
+            <label>处理方式记录:</label>
+            <span className="wrapText">{settleLog}</span>
+          </li>
+          {/* {isHandleStatusNotOver ? null : (
             <li className="wrapBlock">
               <label>处理方式记录:</label>
               <span className="wrapText">{settleLog}</span>
             </li>
-          )}
+          )} */}
         </ul>
 
         {isHandleStatusNotOver && isTypeManual && !noRight2Handle ? (

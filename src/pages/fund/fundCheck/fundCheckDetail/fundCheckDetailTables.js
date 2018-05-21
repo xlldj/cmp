@@ -8,87 +8,98 @@ const {
   FUNDTYPE,
   ACCOUNTTYPE,
   REMOTE_ORDER_STATUS_SUCCESS,
-  WITHDRAWSTATUS
+  WITHDRAWSTATUS,
+  TOP_UP_TYPE
 } = CONSTANTS
 
 class FundCheckDetailTables extends React.Component {
-  localOrderColumns = [
-    {
-      title: '订单号',
-      dataIndex: 'orderNo',
-      width: '20%',
-      render: (text, record) => (
-        <Link
-          to={{ pathname: `/fund/list/info/:${record.id}` }}
-          className="softLink"
-        >
-          {record.orderNo}
-        </Link>
-      )
-    },
-    {
-      title: '用户',
-      dataIndex: 'userPhone',
-      width: '10%',
-      render: (text, record) => (
-        <Link
-          to={{ pathname: `/fund/list/info/:${record.userId}` }}
-          className="softLink"
-        >
-          {record.userPhone}
-        </Link>
-      )
-    },
-    {
-      title: '类型',
-      dataIndex: 'orderType',
-      width: '10%',
-      render: (text, record) => (
-        <span>
-          {record.orderType !== null ? FUNDTYPE[record.orderType] : ''}
-        </span>
-      )
-    },
-    {
-      title: '金额',
-      dataIndex: 'amount',
-      width: '10%',
-      render: (text, record) =>
-        record.amount !== null ? (
-          <span className="shalowRed">¥{record.amount}</span>
-        ) : (
-          <span>未知</span>
+  constructor(props) {
+    super(props)
+    this.state = {}
+    const { orderType = 1 } = this.props
+    this.localOrderColumns = [
+      {
+        title: '订单号',
+        dataIndex: 'orderNo',
+        width: '20%',
+        render: (text, record) => (
+          <Link
+            to={
+              orderType === TOP_UP_TYPE
+                ? { pathname: `/fund/list/info/:${record.id}` }
+                : { pathname: `/fund/withdrawList/info/:${record.id}` }
+            }
+            className="softLink"
+          >
+            {record.orderNo}
+          </Link>
         )
-    },
-    {
-      title: '状态',
-      dataIndex: 'orderStatus',
-      width: '10%',
-      render: (text, record) => (
-        <span>{WITHDRAWSTATUS[record.orderStatus] || '未知'}</span>
-      )
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      width: '10%',
-      render: (text, record, index) => (
-        <span>
-          {record.createTime ? Time.getTimeStr(record.createTime) : ''}
-        </span>
-      )
-    },
-    {
-      title: '结束时间',
-      dataIndex: 'finishTime',
-      width: '10%',
-      render: (text, record, index) => (
-        <span>
-          {record.finishTime ? Time.getTimeStr(record.finishTime) : ''}
-        </span>
-      )
-    }
-  ]
+      },
+      {
+        title: '用户',
+        dataIndex: 'userPhone',
+        width: '10%',
+        render: (text, record) => (
+          <Link
+            to={{ pathname: `/user/userInfo/:${record.userId}` }}
+            className="softLink"
+          >
+            {record.userPhone}
+          </Link>
+        )
+      },
+      {
+        title: '类型',
+        dataIndex: 'orderType',
+        width: '10%',
+        render: (text, record) => (
+          <span>
+            {record.orderType !== null ? FUNDTYPE[record.orderType] : ''}
+          </span>
+        )
+      },
+      {
+        title: '金额',
+        dataIndex: 'amount',
+        width: '10%',
+        render: (text, record) =>
+          record.amount !== null ? (
+            <span className="shalowRed">¥{record.amount}</span>
+          ) : (
+            <span>未知</span>
+          )
+      },
+      {
+        title: '状态',
+        dataIndex: 'orderStatus',
+        width: '10%',
+        render: (text, record) => (
+          <span>{WITHDRAWSTATUS[record.orderStatus] || '未知'}</span>
+        )
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'createTime',
+        width: '10%',
+        render: (text, record, index) => (
+          <span>
+            {record.createTime ? Time.getTimeStr(record.createTime) : ''}
+          </span>
+        )
+      },
+      {
+        title: '结束时间',
+        dataIndex: 'finishTime',
+        width: '10%',
+        render: (text, record, index) => (
+          <span>
+            {record.finishTime ? Time.getTimeStr(record.finishTime) : ''}
+          </span>
+        )
+      }
+    ]
+  }
+
   remoteOrderColumns = [
     {
       title: '商户订单号',
