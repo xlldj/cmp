@@ -27,21 +27,33 @@ const FundTable = withRouter(
 class FundListContainer extends React.Component {
   render() {
     const { forbiddenStatus } = this.props
-    const { FUND_LIST_GET, FUND_RECHARGE_DETAIL } = forbiddenStatus
+    const { FUND_LIST_GET } = forbiddenStatus
     return (
       <div>
         <Switch>
-          {FUND_RECHARGE_DETAIL ? null : (
+          {FUND_LIST_GET ? null : (
             <Route
               exact
               path="/fund/list"
-              render={props => <FundTable hide={this.props.hide} {...props} />}
+              render={props => (
+                <FundTable
+                  hide={this.props.hide}
+                  {...props}
+                  forbiddenStatus={forbiddenStatus}
+                />
+              )}
             />
           )}
           <Route
             exact
             path="/fund"
-            render={props => <FundTable hide={this.props.hide} {...props} />}
+            render={props => (
+              <FundTable
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
+            )}
           />
         </Switch>
       </div>

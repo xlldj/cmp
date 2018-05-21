@@ -38,6 +38,7 @@ class CashtimeTable extends React.Component {
       loading: false,
       total: 0
     }
+    const { forbiddenStatus } = this.props
     this.columns = [
       {
         title: '学校',
@@ -76,18 +77,27 @@ class CashtimeTable extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/fund/cashtime/editCashtime/:${record.id}`}>编辑</Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除此么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
+              {forbiddenStatus.FUND_WITHDRAW_TIMESET_EDIT ? null : (
+                <Link to={`/fund/cashtime/editCashtime/:${record.id}`}>
+                  编辑
+                </Link>
+              )}
+              {forbiddenStatus.FUND_WITHDRAW_TIMESET_EDIT ||
+              forbiddenStatus.FUND_WITHDRAW_TIMESET_DELETE ? null : (
+                <span className="ant-divider" />
+              )}
+              {forbiddenStatus.FUND_WITHDRAW_TIMESET_DELETE ? null : (
+                <Popconfirm
+                  title="确定要删除此么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )
@@ -184,12 +194,18 @@ class CashtimeTable extends React.Component {
   render() {
     let { total, loading } = this.state
     let { page, schoolId } = this.props
-
+    const { forbiddenStatus } = this.props
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加提现时间"
-          addLink="/fund/cashtime/addCashtime"
+          addTitle={
+            forbiddenStatus.FUND_WITHDRAW_TIMESET_EDIT ? null : '添加提现时间'
+          }
+          addLink={
+            forbiddenStatus.FUND_WITHDRAW_TIMESET_EDIT
+              ? null
+              : '/fund/cashtime/addCashtime'
+          }
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}

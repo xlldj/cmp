@@ -148,7 +148,11 @@ class FundDisp extends React.Component {
               <Route
                 path="/fund/deposit"
                 render={props => (
-                  <DepositContainer hide={this.props.hide} {...props} />
+                  <DepositContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
                 )}
               />
             )}
@@ -156,7 +160,11 @@ class FundDisp extends React.Component {
               <Route
                 path="/fund/charge"
                 render={props => (
-                  <ChargeContainer hide={this.props.hide} {...props} />
+                  <ChargeContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
                 )}
               />
             )}
@@ -165,7 +173,11 @@ class FundDisp extends React.Component {
               <Route
                 path="/fund/cashtime"
                 render={props => (
-                  <CashtimeContainer hide={this.props.hide} {...props} />
+                  <CashtimeContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
                 )}
               />
             )}
@@ -186,7 +198,11 @@ class FundDisp extends React.Component {
               <Route
                 path="/fund/withdrawList"
                 render={props => (
-                  <WithdrawContainer hide={this.props.hide} {...props} />
+                  <WithdrawContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
                 )}
               />
             )}
@@ -194,7 +210,11 @@ class FundDisp extends React.Component {
               <Route
                 path="/fund/abnormal"
                 render={props => (
-                  <AbnormalContainer hide={this.props.hide} {...props} />
+                  <AbnormalContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
                 )}
               />
             )}
@@ -202,7 +222,11 @@ class FundDisp extends React.Component {
               <Route
                 path="/fund/freeGiving"
                 render={props => (
-                  <FreeGiving hide={this.props.hide} {...props} />
+                  <FreeGiving
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
                 )}
               />
             )}
