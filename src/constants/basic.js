@@ -512,6 +512,7 @@ const BASIC = {
     '用户消费分析列表/查询': 'USER_CONSUME_ANALYZE',
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
+    删除员工: 'DELETE_EMPLOYEE',
 
     // 公告管理
     '公告列表/搜索/查询': 'NOTIFY_LIST_GET',
