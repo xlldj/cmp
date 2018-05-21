@@ -43,7 +43,8 @@ class ActTable extends React.Component {
       loading: false,
       total: 0
     }
-
+    const { forbiddenStatus } = this.props
+    const { GIFT_ACT_ADD_EDIT, DELETE_GIFT_ACT } = forbiddenStatus
     this.columns = [
       {
         title: '学校名称',
@@ -110,18 +111,24 @@ class ActTable extends React.Component {
         dataIndex: 'operation',
         render: (text, record, index) => (
           <div className="editable-row-operations">
-            <Link to={`/gift/act/actInfo/:${record.id}`}>编辑</Link>
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要删除此任务么?"
-              onConfirm={e => {
-                this.delete(e, record.id)
-              }}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">删除</a>
-            </Popconfirm>
+            {GIFT_ACT_ADD_EDIT ? null : (
+              <Link to={`/gift/act/actInfo/:${record.id}`}>编辑</Link>
+            )}
+            {GIFT_ACT_ADD_EDIT || DELETE_GIFT_ACT ? null : (
+              <span className="ant-divider" />
+            )}
+            {DELETE_GIFT_ACT ? null : (
+              <Popconfirm
+                title="确定要删除此任务么?"
+                onConfirm={e => {
+                  this.delete(e, record.id)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            )}
           </div>
         ),
         className: 'lastCol'
@@ -228,13 +235,13 @@ class ActTable extends React.Component {
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page, schoolId } = this.props
-
+    const { page, schoolId, forbiddenStatus } = this.props
+    const { GIFT_ACT_ADD_EDIT } = forbiddenStatus
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="创建红包活动"
-          addLink="/gift/act/addAct"
+          addTitle={GIFT_ACT_ADD_EDIT ? null : '创建红包活动'}
+          addLink={GIFT_ACT_ADD_EDIT ? null : '/gift/act/addAct'}
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}

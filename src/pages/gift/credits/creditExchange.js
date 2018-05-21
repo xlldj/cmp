@@ -71,7 +71,7 @@ class CreditExchange extends React.Component {
       editingDeviceType: 0,
       editingGiftId: 0
     }
-
+    const { forbiddenStatus } = this.props
     this.columns = [
       {
         title: '学校',
@@ -137,20 +137,24 @@ class CreditExchange extends React.Component {
         dataIndex: 'operation',
         render: (text, record, index) => (
           <div className="editable-row-operations">
-            <a href="" onClick={e => this.editCredit(e, record.id)}>
-              编辑
-            </a>
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要删除此任务么?"
-              onConfirm={e => {
-                this.delete(e, record.id)
-              }}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">删除</a>
-            </Popconfirm>
+            {forbiddenStatus.GIFT_CREDITS_EDIT ? null : (
+              <span>
+                <a href="" onClick={e => this.editCredit(e, record.id)}>
+                  编辑
+                </a>
+                <span className="ant-divider" />
+                <Popconfirm
+                  title="确定要删除此任务么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              </span>
+            )}
           </div>
         ),
         className: 'lastCol'
@@ -661,7 +665,7 @@ class CreditExchange extends React.Component {
       editingGiftId
     } = this.state
     let editingSchoolId = editingCredit.schoolId ? editingCredit.schoolId : ''
-    const { page, schoolId, gifts } = this.props
+    const { page, schoolId, gifts, forbiddenStatus } = this.props
 
     // editing items in build/edit credit exchange.
     let editingItems = editingCredit.items.map((item, ind) => {
@@ -708,7 +712,7 @@ class CreditExchange extends React.Component {
     return (
       <div className="contentArea">
         <SearchLine
-          openTitle="创建积分兑换"
+          openTitle={forbiddenStatus.GIFT_CREDITS_EDIT ? null : '创建积分兑换'}
           openModal={this.addCredit}
           selector1={
             <SchoolSelector

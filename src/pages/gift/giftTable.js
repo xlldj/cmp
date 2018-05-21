@@ -197,7 +197,7 @@ class GiftTable extends React.Component {
       <div className="contentArea">
         <SearchLine
           addTitle={GIFT_ADD_OR_EDIT ? null : '创建红包'}
-          addLink="/gift/list/addGift"
+          addLink={GIFT_ADD_OR_EDIT ? null : '/gift/list/addGift'}
           selector1={
             <DeviceSelector
               selectedDevice={deviceType}

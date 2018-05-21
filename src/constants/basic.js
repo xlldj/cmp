@@ -545,7 +545,22 @@ const BASIC = {
     添加标签: 'BUILD_COMPLAINT_TAG',
     //红包管理
     '红包列表/搜索/查询': 'GIFT_LIST_GET',
-    '添加/编辑红包': 'GIFT_ADD_OR_EDIT'
+    '添加/编辑红包': 'GIFT_ADD_OR_EDIT',
+    '红包活动列表/搜索/查询': 'GIFT_ACT_LIST_GET',
+    '添加/编辑红包活动': 'GIFT_ACT_ADD_EDIT',
+    删除红包活动: 'DELETE_GIFT_ACT',
+    积分兑换列表: 'GIFT_CREDITS_LIST',
+    编辑积分兑换: 'GIFT_CREDITS_EDIT',
+    //设备管理
+    设备详情: 'DEVICE_DETILE',
+    '配件类型管理/添加配件/编辑配件': 'COMPONENTS_ADD_EDIT',
+    删除配件: 'DELETE_COMPONENTS',
+    '添加/编辑预付选项': 'REPLY_EDIT_ADD',
+    '添加/编辑供水时段': 'TIMESET_ADD_EDIT',
+    删除供水时段: 'DELETE_TIMESET',
+    '添加/编辑供应商': 'SUPPLIERS_ADD_EDIT',
+    删除供应商: 'DELETE_SUPPLIERS',
+    '添加/编辑设备费率': 'RATE_ADD_EDIT'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
