@@ -25,7 +25,8 @@ const mapStateToProps = (state, ownProps) => {
     orderBy: state.orderModule[subModule].analyze_orderBy,
     warnTaskStatus: state.orderModule[subModule].analyze_warnTaskStatus,
     schools: state.setSchoolList.schools,
-    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId
+    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 

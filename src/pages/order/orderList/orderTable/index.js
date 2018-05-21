@@ -21,7 +21,8 @@ const mapStateToProps = (state, ownProps) => {
     selectedRowIndex: state.orderModule[subModule].selectedRowIndex,
     selectedDetailId: state.orderModule[subModule].selectedDetailId,
     showDetail: state.orderModule[subModule].showDetail,
-    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId
+    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 
