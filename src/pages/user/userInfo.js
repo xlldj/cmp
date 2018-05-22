@@ -4,11 +4,10 @@ import Time from '../../util/time'
 import Noti from '../../util/noti'
 import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
+import { trueWhen0 } from '../../util/types'
 
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { changeOrder, changeFund } from '../../actions'
+
 const { NORMAL_DAY_7 } = CONSTANTS
 const SEX = {
   1: '男',
@@ -20,9 +19,10 @@ const backTitle = {
   fromRepair: '返回维修详情',
   fromRepairLog: '返回用户报修记录',
   fromFeedback: '返回意见反馈',
-  fromComplaint: '返回账单投诉'
+  fromComplaint: '返回账单投诉',
+  fromFoxconnList: '返回富士康员工信息'
 }
-class UserInfo extends React.Component {
+class UserInfoView extends React.Component {
   static propTypes = {
     forbiddenStatus: PropTypes.object.isRequired
   }
@@ -39,7 +39,6 @@ class UserInfo extends React.Component {
     }
   }
   componentDidMount() {
-    this.props.hide(false)
     this.fetchData()
   }
   fetchData = () => {
@@ -58,9 +57,6 @@ class UserInfo extends React.Component {
       }
     }
     AjaxHandler.ajax(resource, body, cb)
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
   }
   back = () => {
     this.props.history.goBack()
@@ -289,13 +285,31 @@ class UserInfo extends React.Component {
             </Fragment>
           ) : null}
           <li>
-            <p>手机号:</p>
+            <p>登录账号:</p>
             {data.mobile}
           </li>
           <li>
             <p>手机型号:</p>
             {data.mobileModel || '未知'}
           </li>
+          {data.auth ? (
+            <li>
+              <p>身份类别:</p>
+              {data.auth}
+            </li>
+          ) : null}
+          {data.userNo ? (
+            <li>
+              <p>员工号:</p>
+              {data.userNo}
+            </li>
+          ) : null}
+          {data.userName ? (
+            <li>
+              <p>姓名:</p>
+              {data.userName}
+            </li>
+          ) : null}
           <li>
             <p>学校:</p>
             {data.schoolName}
@@ -314,9 +328,20 @@ class UserInfo extends React.Component {
           </li>
           <li>
             <p>账户余额:</p>
-            {data.balance ? '¥' + data.balance : '暂无'}
+
+            {trueWhen0(data.balance) ? (
+              <span className="shalowRed">{'¥' + data.balance}</span>
+            ) : (
+              '未知'
+            )}
           </li>
-          {data.credits !== undefined ? (
+          {trueWhen0(data.givingBalance) ? (
+            <li>
+              <p>赠送金额:</p>
+              {`¥${data.givingBalance}`}
+            </li>
+          ) : null}
+          {trueWhen0(data.credits) ? (
             <li>
               <p>用户积分:</p>
               {data.credits}
@@ -410,13 +435,5 @@ class UserInfo extends React.Component {
     )
   }
 }
-const mapStateToProps = (state, ownProps) => ({
-  forbiddenStatus: state.setAuthenData.forbiddenStatus
-})
 
-export default withRouter(
-  connect(mapStateToProps, {
-    changeOrder,
-    changeFund
-  })(UserInfo)
-)
+export default UserInfoView

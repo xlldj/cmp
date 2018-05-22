@@ -1,26 +1,39 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
 import Bread from '../component/bread'
-import { asyncComponent } from '../component/asyncComponent'
 import './style/style.css'
 import { getLocal } from '../../util/storage'
+import UserList from './userList'
+import UserInfoView from './userInfo.js'
+import UserFoxconn from './foxconn'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeUser } from '../../actions'
+import { changeUser, changeOrder, changeFund } from '../../actions'
 
-const UserTable = asyncComponent(() =>
-  import(/* webpackChunkName: "userTable" */ './userTable')
-)
-const UserInfo = asyncComponent(() =>
-  import(/* webpackChunkName: "userInfo" */ './userInfo')
+const mapStateToInfoProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
+
+const UserInfo = withRouter(
+  connect(mapStateToInfoProps, {
+    changeOrder,
+    changeFund
+  })(UserInfoView)
 )
 
 const breadcrumbNameMap = {
-  '/userInfo': '详情'
+  '/userInfo': '详情',
+  '/foxconn': '导入富士康员工'
 }
 
 class UserDisp extends React.Component {
+  componentDidMount() {
+    this.props.hide(false)
+  }
+  componentWillUnmount() {
+    this.props.hide(true)
+  }
   setStatusForuser = () => {
     this.getDefaultSchool()
     this.props.changeUser('userList', { page: 1, selectKey: '' })
@@ -42,6 +55,14 @@ class UserDisp extends React.Component {
   }
 
   render() {
+    const { forbiddenStatus } = this.props
+    const {
+      FOX_USER_LIST,
+      USER_LIST_GET,
+      USER_CONSUME_ANALYZE,
+      USER_INFO_DETILE,
+      IMPORT_USERS
+    } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -55,23 +76,38 @@ class UserDisp extends React.Component {
         </div>
 
         <div className="disp">
-          <Route
-            path="/user/userInfo/:id"
-            render={props => <UserInfo hide={this.props.hide} {...props} />}
-          />
-          <Route
-            exact
-            path="/user"
-            render={props => <UserTable hide={this.props.hide} {...props} />}
-          />
+          {USER_INFO_DETILE ? null : (
+            <Route
+              path="/user/userInfo/:id"
+              render={props => <UserInfo hide={this.props.hide} {...props} />}
+            />
+          )}
+          {IMPORT_USERS ? null : (
+            <Route
+              path="/user/foxconn"
+              render={props => (
+                <UserFoxconn hide={this.props.hide} {...props} />
+              )}
+            />
+          )}
+
+          {FOX_USER_LIST && USER_LIST_GET && USER_CONSUME_ANALYZE ? null : (
+            <Route
+              exact
+              path="/user"
+              render={props => <UserList hide={this.props.hide} {...props} />}
+            />
+          )}
         </div>
       </div>
     )
   }
 }
-
+const mapStateToTableProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToTableProps, {
     changeUser
   })(UserDisp)
 )

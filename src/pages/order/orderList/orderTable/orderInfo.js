@@ -178,6 +178,11 @@ class OrderInfo extends React.Component {
       selectedDetailId: -1
     })
   }
+  close = () => {
+    this.props.changeOrder(subModule, {
+      showDetail: false
+    })
+  }
   render() {
     let { data, modalClosable, detailLoading } = this.state
     const { schoolName, deviceLocation, prepay, orderNo, deviceType } =

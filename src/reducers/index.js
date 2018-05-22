@@ -8,6 +8,7 @@ import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
 import { fundModule, fundCheckModal } from '../pages/fund/reducer'
 import buildingsSet from './building'
+import userModule from '../pages/user/reducer.js'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -219,6 +220,60 @@ const deviceModule = (state = initialDeviceState, action) => {
   return state
 }
 
+// // 资金管理
+// const initialFundState = {
+//   fundList: {
+//     page: 1,
+//     schoolId: selectedSchool,
+//     type: 'all',
+//     status: 'all',
+//     selectKey: '',
+//     startTime: Time.get7DaysAgoStart(),
+//     endTime: Time.getTodayEnd(),
+//     userType: 'all'
+//   },
+//   withdrawList: {
+//     page: 1,
+//     schoolId: selectedSchool,
+//     status: 'all',
+//     selectKey: '',
+//     startTime: Time.get7DaysAgoStart(),
+//     endTime: Time.getTodayEnd(),
+//     userType: 'all'
+//   },
+//   cashtime: {
+//     page: 1,
+//     schoolId: selectedSchool
+//   },
+//   charge: {
+//     schoolId: selectedSchool,
+//     page: 1
+//   },
+//   deposit: {
+//     page: 1,
+//     schoolId: selectedSchool
+//   },
+//   abnormal: {
+//     schoolId: selectedSchool,
+//     page: 1,
+//     selectKey: '',
+//     userType: 'all'
+//   },
+//   freeGiving: {
+//     schoolId: selectedSchool,
+//     page: 1
+//   }
+// }
+// const fundModule = (state = initialFundState, action) => {
+//   const { type } = action
+
+//   if (type === ActionTypes.CHANGE_FUND) {
+//     const { subModule, keyValuePair } = action
+//     return merge({}, state, { [subModule]: keyValuePair })
+//   }
+//   return state
+// }
+
 // 红包管理
 const initialGiftState = {
   giftList: {
@@ -256,25 +311,6 @@ const lostModule = (state = initialLostState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_LOST) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
-// 用户管理
-const initialUserState = {
-  userList: {
-    page: 1,
-    schoolId: selectedSchool,
-    selectKey: '',
-    userTransfer: 'all'
-  }
-}
-const userModule = (state = initialUserState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_USER) {
     const { subModule, keyValuePair } = action
     return merge({}, state, { [subModule]: keyValuePair })
   }

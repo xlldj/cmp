@@ -1,3 +1,5 @@
+import { div } from './numberHandle'
+
 const Format = {}
 /* ------these are for data build in fetchdata----- */
 Format.dayFormat = v => {
@@ -131,4 +133,9 @@ Format.minIntToHourMinStr = minInt => {
   }
   return hourMinStr
 }
+
+/**
+ * 将毫秒为单位的数字转化为秒
+ */
+Format.ms2s = ms => div(ms, 1000)
 export default Format

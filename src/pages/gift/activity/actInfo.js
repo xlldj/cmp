@@ -209,6 +209,13 @@ class ActInfo extends React.Component {
     this.props.hide(false)
     this.fetchSchools()
     this.fetchGifts()
+    let data = this.props.location.query
+    if (data) {
+      let { schoolId } = data
+      this.setState({
+        selectedSchool: schoolId
+      })
+    }
   }
   componentWillUnmount() {
     this.props.hide(true)
@@ -359,6 +366,7 @@ class ActInfo extends React.Component {
         })
       }
     }
+    // if online already, just route back when clicked '确认'
     if (released && online) {
       return this.props.history.push('/gift/act')
     }

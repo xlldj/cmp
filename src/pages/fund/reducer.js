@@ -52,6 +52,10 @@ const initialFundState = {
     showHandleModal: false,
     selectedRowIndex: -1,
     selectedDetailId: -1
+  },
+  freeGiving: {
+    schoolId: selectedSchool,
+    page: 1
   }
 }
 export const fundModule = (state = initialFundState, action) => {

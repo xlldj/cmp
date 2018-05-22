@@ -70,3 +70,6 @@ function hasOwn(o, key) {
 export const notEmpty = v => {
   return v !== null && v !== undefined
 }
+export const trueWhen0 = v => {
+  return v || v === 0
+}

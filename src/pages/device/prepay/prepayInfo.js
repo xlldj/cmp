@@ -7,6 +7,7 @@ import Noti from '../../../util/noti'
 import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
+
 const BACKTITLE = {
   fromInfoSet: '返回学校信息设置'
 }
@@ -16,6 +17,7 @@ const initialDrinkItems = [
   [{ prepay: '', usefor: 2 }],
   [{ prepay: '', usefor: 3 }]
 ]
+
 class PrepayInfo extends React.Component {
   constructor(props) {
     super(props)
@@ -39,9 +41,11 @@ class PrepayInfo extends React.Component {
       prepay: '',
       prepayError: false,
       businesses: [],
-      minErrorMsg: ''
+      minErrorMsg: '',
+      disabledSchDev: false
     }
   }
+
   fetchData = body => {
     let resource = '/api/device/prepay/option/one'
     const cb = json => {
@@ -73,6 +77,16 @@ class PrepayInfo extends React.Component {
 
   componentDidMount() {
     this.props.hide(false)
+    let data = this.props.location.query
+    if (data) {
+      let { schoolId, deviceType } = data
+      this.setState({
+        schoolId: schoolId,
+        deviceType: deviceType,
+        disabledSchDev: true
+      })
+      this.fetchDeviceTypes(schoolId)
+    }
     if (this.props.match.params.id) {
       const body = {
         id: parseInt(this.props.match.params.id.slice(1), 10)
@@ -80,9 +94,11 @@ class PrepayInfo extends React.Component {
       this.fetchData(body)
     }
   }
+
   componentWillUnmount() {
     this.props.hide(true)
   }
+
   checkItems = () => {
     let items = JSON.parse(JSON.stringify(this.state.items)),
       nextState = { items: items }
@@ -143,7 +159,11 @@ class PrepayInfo extends React.Component {
       } else {
         /*--------redirect --------*/
         if (json.data) {
-          Noti.hintSuccess(this.props.history, '/device/prepay')
+          if (this.props.location.state) {
+            this.props.history.goBack()
+          } else {
+            Noti.hintSuccess(this.props.history, '/device/prepay')
+          }
         }
       }
     }
@@ -428,7 +448,8 @@ class PrepayInfo extends React.Component {
       schoolError,
       minPrepay,
       minError,
-      minErrorMsg
+      minErrorMsg,
+      disabledSchDev
     } = this.state
     let deviceOptions = {}
     businesses.forEach((d, i) => (deviceOptions[d] = CONSTANTS.DEVICETYPE[d]))
@@ -439,9 +460,9 @@ class PrepayInfo extends React.Component {
           <li>
             <p>学校:</p>
             <SchoolSelector
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
               selectedSchool={schoolId}
               changeSchool={this.changeSchool}
               checkSchool={this.checkSchool}
@@ -453,9 +474,9 @@ class PrepayInfo extends React.Component {
           <li>
             <p>设备类型:</p>
             <BasicSelector
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
               invalidTitle="选择设备"
               selectedOpt={deviceType}
               staticOpts={deviceOptions}

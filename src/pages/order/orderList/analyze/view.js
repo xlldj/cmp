@@ -7,6 +7,7 @@ import AjaxHandler from '../../../../util/ajax'
 import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import Noti from '../../../../util/noti'
+import Format from '../../../../util/format'
 
 import CheckSelect from '../../../component/checkSelect'
 import ThresholdSelector from '../../../component/thresholdSelector'
@@ -25,7 +26,12 @@ const {
   ROOMTYPES,
   DEVICE_WARN_TASK_STATUS_ENUM,
   NORMAL_DAY_7,
-  ORDER_ANALYZE_DAY_SELECT_ARR
+  ORDER_ANALYZE_DAY_SELECT_ARR,
+  ORDER,
+  ORDER_ANALYZE_ORDERBYS,
+  DEVICE_TYPE_HEATER,
+  DEVICE_TYPE_DRINGKER,
+  DEVICE_TYPE_BLOWER
 } = CONSTANTS
 
 class OrderAnalyzeView extends React.Component {
@@ -65,7 +71,9 @@ class OrderAnalyzeView extends React.Component {
       thresholdType,
       deviceType,
       startTime,
-      endTime
+      endTime,
+      order,
+      orderBy
     } = props
     const body = {
       page: page,
@@ -73,6 +81,10 @@ class OrderAnalyzeView extends React.Component {
       schoolId: +schoolId, // schoolId should not be 'all', thus could be parse to int directly
       threshold,
       thresholdType
+    }
+    if (orderBy && order !== -1) {
+      body.orderBy = ORDER_ANALYZE_ORDERBYS[orderBy]
+      body.order = ORDER[order]
     }
     if (buildingIds !== 'all') {
       body.buildingIds = buildingIds
@@ -149,7 +161,8 @@ class OrderAnalyzeView extends React.Component {
         'threshold',
         'thresholdType',
         'warnTaskStatus',
-        'order'
+        'order',
+        'orderBy'
       ])
     ) {
       return
@@ -301,10 +314,12 @@ class OrderAnalyzeView extends React.Component {
   }
 
   changeTable = (pageObj, filters, sorter) => {
-    let { order } = sorter
+    let { order, field } = sorter
     let data = {}
-    if (order !== this.props.order) {
+    if (order !== this.props.order || field !== this.props.orderBy) {
       data.analyze_order = order
+      data.analyze_orderBy = field
+      data.analyze_page = 1
     }
     let page = pageObj.current
     if (page !== this.props.page) {
@@ -385,7 +400,7 @@ class OrderAnalyzeView extends React.Component {
     })
   }
   getColumns = () => {
-    let { day } = this.props
+    let { day, deviceType, forbiddenStatus } = this.props
     let { startTime, endTime, allRowsOfOrderTableSelected } = this.state
     const dayStr = day
       ? ORDER_ANALYZE_DAY_SELECT[day]
@@ -394,7 +409,7 @@ class OrderAnalyzeView extends React.Component {
           'yyyy-MM-DD'
         )}`
 
-    const columns = [
+    let columns = [
       {
         title: (
           <Checkbox
@@ -407,7 +422,10 @@ class OrderAnalyzeView extends React.Component {
         dataIndex: 'selected',
         className: 'center',
         render: (text, record) => {
-          if (record.warningTaskHandling) {
+          if (
+            record.warningTaskHandling ||
+            forbiddenStatus.BUILD_TASK_BY_DEVICE_CONSUMPTION
+          ) {
             return ''
           } else {
             return (
@@ -423,30 +441,56 @@ class OrderAnalyzeView extends React.Component {
       },
       {
         title: '学校',
+        width: '18%',
         dataIndex: 'schoolName'
       },
       {
         title: '设备',
         dataIndex: 'deviceType',
-        width: '7%',
+        width: '10%',
         render: (text, record, index) => DEVICETYPE[record.deviceType]
       },
       {
         title: '设备地址',
         dataIndex: 'location',
-        width: '10%'
+        width: '18%'
       },
       {
         title: `${dayStr}消费总额`,
-        dataIndex: 'paymentType',
+        dataIndex: 'consumption',
         className: 'shalowRed',
+        width: '12%',
         render: (text, record, index) =>
           record.consumption ? `¥${record.consumption}` : 0,
         sorter: true
-      },
+      }
+    ]
+    if (deviceType === DEVICE_TYPE_BLOWER) {
+      columns.push({
+        title: `${dayStr}使用时长(秒)`,
+        dataIndex: 'timeDuration',
+        width: '14%',
+        render: (text, record) =>
+          record.timeDuration ? `${Format.ms2s(record.timeDuration)}秒` : 0,
+        sorter: true
+      })
+    } else if (
+      deviceType === DEVICE_TYPE_HEATER ||
+      deviceType === DEVICE_TYPE_DRINGKER
+    ) {
+      columns.push({
+        title: `${dayStr}用水量`,
+        dataIndex: 'waterUsage',
+        width: '12%',
+        render: (text, record, index) => record.waterUsage || 0,
+        sorter: true
+      })
+    }
+    columns = columns.concat([
       {
         title: '是否存在预警工单',
         dataIndex: 'warningTaskHandling',
+        width: '12%',
         render: (text, record, index) =>
           record.warningTaskHandling ? (
             <span>
@@ -475,7 +519,7 @@ class OrderAnalyzeView extends React.Component {
           </div>
         )
       }
-    ]
+    ])
     return columns
   }
   toTaskDetail = (e, id) => {
@@ -669,8 +713,6 @@ class OrderAnalyzeView extends React.Component {
             <div className="block">
               <span>设备类型:</span>
               <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
                 options={DEVICETYPE}
                 value={deviceType}
                 onClick={this.changeDevice}

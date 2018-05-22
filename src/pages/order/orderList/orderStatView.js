@@ -5,7 +5,7 @@ import AjaxHandler from '../../../util/ajax'
 // import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
 
-import QueryLine from '../../component/queryLine'
+import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 import CheckSelect from '../../component/checkSelect'
 import OrderBarChart from './orderBarChart'
 
@@ -252,24 +252,30 @@ class OrderStatView extends React.Component {
 
     return (
       <div className="orderStat">
-        <div className="queryPanel">
+        <QueryPanel>
           <QueryLine labelName="时间筛选">
-            <CheckSelect
-              allOptTitle="不限"
-              allOptValue="all"
-              options={ORDER_STAT_DAY_SELECT}
-              value={day}
-              onClick={this.changeRange}
-            />
+            <QueryBlock>
+              <span>时间筛选:</span>
+              <CheckSelect
+                allOptTitle="不限"
+                allOptValue="all"
+                options={ORDER_STAT_DAY_SELECT}
+                value={day}
+                onClick={this.changeRange}
+              />
+            </QueryBlock>
           </QueryLine>
-          <QueryLine labelName="设备类型">
-            <CheckSelect
-              options={DEVICETYPE}
-              value={deviceType}
-              onClick={this.changeDevice}
-            />
+          <QueryLine>
+            <QueryBlock>
+              <span>设备类型:</span>
+              <CheckSelect
+                options={DEVICETYPE}
+                value={deviceType}
+                onClick={this.changeDevice}
+              />
+            </QueryBlock>
           </QueryLine>
-        </div>
+        </QueryPanel>
 
         <div className="statWrapper">
           <div className="tableList">

@@ -10,6 +10,7 @@ import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import DeviceWithoutAll from '../../component/deviceWithoutAll'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { mul, div } from '../../../util/numberHandle'
+
 const Fragment = React.Fragment
 const {
   DEVICE_TYPE_HEATER,
@@ -35,13 +36,13 @@ const BACKTITLE = {
 class RateInfo extends React.Component {
   constructor(props) {
     super(props)
-    let id = 0,
+    const id = 0,
       deviceType = '',
       schoolId = '',
       billingMethod = '',
       originalDT = 0,
       originalSchool = 0
-    let rateGroups = [{}],
+    const rateGroups = [{}],
       deviceTypeError = false,
       schoolError = false,
       billError = false,
@@ -49,7 +50,7 @@ class RateInfo extends React.Component {
     let supplierId = '',
       supplierError = false,
       suppliers = {}
-    let rateGroupsVersionB = [{}],
+    const rateGroupsVersionB = [{}],
       currentAgreement = 1
     this.state = {
       id,
@@ -79,11 +80,15 @@ class RateInfo extends React.Component {
       twoWashPrice: '',
       twoWashPricePriceError: false,
       twoCleanPrice: '',
-      twoCleanPriceError: false
+      twoCleanPriceError: false,
+      unitPrice: '',
+      unitPriceError: false,
+      disabledSchDev: false // 从上线设置进入
     }
   }
+
   fetchSuppliers = () => {
-    let resource = '/supplier/query/list'
+    const resource = '/supplier/query/list'
     const body = {
       page: 1,
       size: 100
@@ -116,19 +121,22 @@ class RateInfo extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   fetchData = body => {
-    let resource = '/api/rate/one'
+    const resource = '/api/rate/one'
     const cb = json => {
       if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
       } else {
         if (json.data) {
-          let r = json.data
-          let nextState = {
+          const r = json.data
+          const nextState = {
             deviceType: r.deviceType.toString(),
             originalDT: r.deviceType,
             schoolId: r.schoolId,
             originalSchool: r.schoolId,
             billingMethod: r.billingMethod.toString()
+          }
+          if (json.data.unitPrice) {
+            nextState.unitPrice = mul(json.data.unitPrice, 100)
           }
 
           const taps = r.timeLimit && r.timeLimit.map(r => ({ value: r }))
@@ -140,13 +148,13 @@ class RateInfo extends React.Component {
             nextState.originalSupplier = r.supplierId
           }
           if (r.deviceType === DEVICE_TYPE_WASHER) {
-            let dryPrice =
+            const dryPrice =
               r.rateGroups && r.rateGroups.find(rate => rate.pulse === 1).price
-            let oneWashPrice =
+            const oneWashPrice =
               r.rateGroups && r.rateGroups.find(rate => rate.pulse === 2).price
-            let twoWashPrice =
+            const twoWashPrice =
               r.rateGroups && r.rateGroups.find(rate => rate.pulse === 3).price
-            let twoCleanPrice =
+            const twoCleanPrice =
               r.rateGroups && r.rateGroups.find(rate => rate.pulse === 4).price
             nextState.dryPrice = dryPrice ? dryPrice : ''
             nextState.oneWashPrice = oneWashPrice ? oneWashPrice : ''
@@ -159,10 +167,14 @@ class RateInfo extends React.Component {
             let setRateGroup = true // true时设置rateGroups, false设置rateGroupsVersionB
             if (r.supplierId) {
               // nextState.supplierId = r.supplierId;
-              let supplier = this.state.supplierData.find(
+              const supplier = this.state.supplierData.find(
                 s => s.id === r.supplierId
               )
-              if (supplier && supplier.agreement === 2) {
+              if (
+                supplier &&
+                supplier.agreement === 2 &&
+                r.deviceType !== DEVICE_TYPE_BLOWER
+              ) {
                 setRateGroup = false // 设置rateGroupsVersionB
                 nextState.currentAgreement = 2
                 nextState.rateGroupsVersionB =
@@ -194,21 +206,31 @@ class RateInfo extends React.Component {
 
   componentDidMount() {
     this.props.hide(false)
+    let data = this.props.location.query
+    if (data) {
+      let { schoolId, deviceType } = data
+      this.setState({
+        schoolId: schoolId,
+        deviceType: deviceType.toString(),
+        disabledSchDev: true
+      })
+    }
     if (this.props.match.params.id) {
-      let id = parseInt(this.props.match.params.id.slice(1), 10)
+      const id = parseInt(this.props.match.params.id.slice(1), 10)
       this.setState({
         id: id
       })
     }
     this.fetchSuppliers()
   }
+
   componentWillUnmount() {
     this.props.hide(true)
   }
 
   changeDevice = v => {
-    let nextState = { deviceType: v }
-    let rateGroups = [{}],
+    const nextState = { deviceType: v }
+    const rateGroups = [{}],
       rateGroupsVersionB = [{}]
     if (v === '2') {
       rateGroups.push({})
@@ -272,7 +294,7 @@ class RateInfo extends React.Component {
     this.setState({
       checking: true
     })
-    let resource = '/rate/check'
+    const resource = '/rate/check'
     const { deviceType, schoolId, supplierId } = this.state
     const body = {
       deviceType: parseInt(deviceType, 10),
@@ -342,8 +364,25 @@ class RateInfo extends React.Component {
       rateGroups: rateGroups
     })
   }
+  changeUnitPrice = e => {
+    this.setState({
+      unitPrice: e.target.value
+    })
+  }
+  checkUnitPrice = e => {
+    const v = e.target.value.trim()
+    const nextState = { unitPrice: v }
+    if (!v) {
+      nextState.unitPriceError = true
+      return this.setState(nextState)
+    }
+    if (this.state.unitPriceError) {
+      nextState.unitPriceError = false
+    }
+    this.setState(nextState)
+  }
   checkInput = () => {
-    let {
+    const {
       rateGroups,
       deviceType,
       billingMethod,
@@ -354,7 +393,8 @@ class RateInfo extends React.Component {
       dryPrice,
       oneWashPrice,
       twoWashPrice,
-      twoCleanPrice
+      twoCleanPrice,
+      unitPrice
     } = this.state
     if (!deviceType || deviceType === '0') {
       this.setState({
@@ -362,7 +402,7 @@ class RateInfo extends React.Component {
       })
       return false
     }
-    let nextState = { deviceTypeError: false }
+    const nextState = { deviceTypeError: false }
     if (!schoolId || schoolId === '0') {
       nextState.schoolError = true
       this.setState(nextState)
@@ -410,11 +450,16 @@ class RateInfo extends React.Component {
       if (supplierId) {
         // this will always be true. The judge is based on the former rate set, which allowed supplilerId not set.
         let supplier = supplierData.find(r => r.id === supplierId)
-        if (supplier && supplier.agreement === 2) {
+        if (
+          supplier &&
+          supplier.agreement === 2 &&
+          (deviceType === DEVICE_TYPE_HEATER.toString() ||
+            deviceType === DEVICE_TYPE_DRINGKER.toString())
+        ) {
           // this rate is set to versionB, need to check rateGroupsVersionB.
           checkRateGroups = false
           for (let i = 0; i < rateGroupsVersionB.length; i++) {
-            let r = rateGroupsVersionB[i]
+            const r = rateGroupsVersionB[i]
             if (!r.price || !r.pulse || !r.unitPulse) {
               r.error = true
               nextState.rateGroupsVersionB = rateGroupsVersionB
@@ -422,7 +467,7 @@ class RateInfo extends React.Component {
               return false
             }
             // check if same to another rateset
-            let same = rateGroupsVersionB.find((another, ind) => {
+            const same = rateGroupsVersionB.find((another, ind) => {
               // skip self
               if (ind === i) {
                 return false
@@ -445,9 +490,18 @@ class RateInfo extends React.Component {
         }
       }
       if (checkRateGroups) {
-        let rates = JSON.parse(JSON.stringify(rateGroups))
+        // 检查unitPrice是否填入
+        if (
+          (deviceType === DEVICE_TYPE_HEATER.toString() ||
+            deviceType === DEVICE_TYPE_DRINGKER.toString()) &&
+          !unitPrice
+        ) {
+          nextState.unitPriceError = true
+          return this.setState(nextState)
+        }
+        const rates = JSON.parse(JSON.stringify(rateGroups))
         for (let i = 0; i < rates.length; i++) {
-          let r = rates[i]
+          const r = rates[i]
           if (!r.price || !r.pulse) {
             r.error = true
             nextState.rateGroups = rates
@@ -455,7 +509,7 @@ class RateInfo extends React.Component {
             return false
           }
           // check if same to another rateset
-          let same = rates.find((another, ind) => {
+          const same = rates.find((another, ind) => {
             // skip self
             if (ind === i) {
               return false
@@ -464,7 +518,7 @@ class RateInfo extends React.Component {
           })
           if (same) {
             r.same = true
-            nextState.rates = rates
+            nextState.rateGroups = rates
             this.setState(nextState)
             return false
           }
@@ -474,7 +528,7 @@ class RateInfo extends React.Component {
       }
 
       // check close tap setting.
-      let taps = JSON.parse(JSON.stringify(closeTapGroups))
+      const taps = JSON.parse(JSON.stringify(closeTapGroups))
       for (let i = 0; i < taps.length; i++) {
         if (!taps[i].value) {
           taps[i].error = true
@@ -544,7 +598,8 @@ class RateInfo extends React.Component {
       dryPrice,
       oneWashPrice,
       twoWashPrice,
-      twoCleanPrice
+      twoCleanPrice,
+      unitPrice
     } = this.state
     const body = {
       billingMethod: parseInt(billingMethod, 10),
@@ -559,7 +614,7 @@ class RateInfo extends React.Component {
     }
 
     if (deviceType === DEVICE_TYPE_WASHER.toString()) {
-      let rates = [
+      const rates = [
         {
           pulse: 1,
           price: +dryPrice
@@ -593,9 +648,12 @@ class RateInfo extends React.Component {
       })
       if (supplierId) {
         // body.supplierId = parseInt(supplierId, 10);
-
-        let supplier = supplierData.find(r => r.id === supplierId)
-        if (supplier && supplier.agreement === 2) {
+        const supplier = supplierData.find(r => r.id === supplierId)
+        if (
+          supplier &&
+          supplier.agreement === 2 &&
+          deviceType !== DEVICE_TYPE_BLOWER.toString()
+        ) {
           // found, set rates to rateGroupsVersionB
           setRateGroups = false
           body.rates = rateGroupsVersionB
@@ -604,14 +662,24 @@ class RateInfo extends React.Component {
       if (setRateGroups) {
         // set rates to rateGroups
         body.rates = rateGroups
+        if (
+          deviceType === DEVICE_TYPE_HEATER.toString() ||
+          deviceType === DEVICE_TYPE_DRINGKER.toString()
+        ) {
+          body.unitPrice = div(unitPrice, 100)
+        }
       }
       body.timeLimit = taps
     }
 
-    let resource = '/api/rate/save'
+    const resource = '/api/rate/save'
     const cb = json => {
       if (json.data) {
-        Noti.hintSuccess(this.props.history, '/device/rateSet')
+        if (this.props.location.state) {
+          this.props.history.goBack()
+        } else {
+          Noti.hintSuccess(this.props.history, '/device/rateSet')
+        }
       } else {
         throw new Error('网络出错，请稍后重试～')
       }
@@ -651,21 +719,21 @@ class RateInfo extends React.Component {
     })
   }
   addTime = e => {
-    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
+    const closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
     closeTapGroups.push({})
     this.setState({
       closeTapGroups: closeTapGroups
     })
   }
   abstractTime = e => {
-    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
+    const closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
     closeTapGroups.pop()
     this.setState({
       closeTapGroups: closeTapGroups
     })
   }
   changeTime = (e, i) => {
-    let closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
+    const closeTapGroups = JSON.parse(JSON.stringify(this.state.closeTapGroups))
     closeTapGroups[i].value = parseInt(e.target.value, 10)
     this.setState({
       closeTapGroups: closeTapGroups
@@ -686,10 +754,10 @@ class RateInfo extends React.Component {
   }
   changeSupplier = v => {
     let id = parseInt(v, 10)
-    let nextState = {
+    const nextState = {
       supplierId: id
     }
-    let supplier =
+    const supplier =
       this.state.supplierData && this.state.supplierData.find(r => r.id === id)
     console.log(supplier)
     if (supplier && supplier.agreement === 2) {
@@ -700,32 +768,32 @@ class RateInfo extends React.Component {
     this.setState(nextState)
   }
   changeWaterB = (e, i) => {
-    let v = e.target.value
-    let o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
+    const v = e.target.value
+    const o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
     o[i].volume = parseFloat(v)
     this.setState({
       rateGroupsVersionB: o
     })
   }
   changePriceB = (e, i) => {
-    let v = e.target.value
-    let o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
+    const v = e.target.value
+    const o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
     o[i].price = parseInt(v, 10)
     this.setState({
       rateGroupsVersionB: o
     })
   }
   changePulseB = (e, i) => {
-    let v = e.target.value
-    let o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
+    const v = e.target.value
+    const o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
     o[i].pulse = parseInt(v, 10)
     this.setState({
       rateGroupsVersionB: o
     })
   }
   changeUnitPulseB = (e, i) => {
-    let v = e.target.value
-    let o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
+    const v = e.target.value
+    const o = JSON.parse(JSON.stringify(this.state.rateGroupsVersionB))
     o[i].unitPulse = parseInt(v, 10)
     this.setState({
       rateGroupsVersionB: o
@@ -755,7 +823,7 @@ class RateInfo extends React.Component {
     })
   }
   checkPriceForDryer = e => {
-    let v = e.target.value
+    const v = e.target.value
     if (!v) {
       return this.setState({
         dryPriceError: true,
@@ -775,7 +843,7 @@ class RateInfo extends React.Component {
     })
   }
   checkPriceForOneWash = e => {
-    let v = e.target.value
+    const v = e.target.value
     if (!v) {
       return this.setState({
         oneWashPriceError: true,
@@ -795,7 +863,7 @@ class RateInfo extends React.Component {
     })
   }
   checkPriceForTwoWash = e => {
-    let v = e.target.value
+    const v = e.target.value
     if (!v) {
       return this.setState({
         twoWashPriceError: true,
@@ -815,7 +883,7 @@ class RateInfo extends React.Component {
     })
   }
   checkPriceForTwoClean = e => {
-    let v = e.target.value
+    const v = e.target.value
     if (!v) {
       return this.setState({
         twoCleanPriceError: true,
@@ -829,8 +897,10 @@ class RateInfo extends React.Component {
       })
     }
   }
+
   render() {
     let {
+      disabledSchDev,
       id,
       schoolId,
       schoolError,
@@ -851,7 +921,9 @@ class RateInfo extends React.Component {
       twoWashPrice,
       twoWashPriceError,
       twoCleanPrice,
-      twoCleanPriceError
+      twoCleanPriceError,
+      unitPrice, // 一升水的价格
+      unitPriceError
     } = this.state
 
     const rateItems =
@@ -891,6 +963,11 @@ class RateInfo extends React.Component {
             {r.error ? (
               <span key={`errorA${i}`} className="checkInvalid">
                 输入不完整
+              </span>
+            ) : null}
+            {r.same ? (
+              <span key={`same${i}`} className="checkInvalid">
+                请勿输入重复的费率设置
               </span>
             ) : null}
           </li>
@@ -975,6 +1052,25 @@ class RateInfo extends React.Component {
               abstract={this.abstract}
             />
           </li>
+
+          {// 不是吹风机，则需要添加每升水的价格。2018/5/3
+          deviceType !== DEVICE_TYPE_BLOWER.toString() ? (
+            <li>
+              <p />
+              <span>1升水 =</span>
+              <input
+                type="number"
+                className="shortInput"
+                onChange={this.changeUnitPrice}
+                onBlur={this.checkUnitPrice}
+                value={unitPrice}
+              />
+              <span>分钱</span>
+              {unitPriceError ? (
+                <span className="checkInvalid">请输入水量单价</span>
+              ) : null}
+            </li>
+          ) : null}
         </Fragment>
       )
     const tapItems =
@@ -1009,9 +1105,9 @@ class RateInfo extends React.Component {
           <li>
             <p>学校:</p>
             <SchoolSelector
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
               invalidTitle="选择学校"
               selectedSchool={schoolId}
               changeSchool={this.changeSchool}
@@ -1027,9 +1123,9 @@ class RateInfo extends React.Component {
               selectedDevice={deviceType}
               changeDevice={this.changeDevice}
               checkDevice={this.checkDevice}
-              disabled={id}
+              disabled={id || disabledSchDev}
               width={CONSTANTS.SELECTWIDTH}
-              className={id ? 'disabled' : ''}
+              className={id || disabledSchDev ? 'disabled' : ''}
             />
             {deviceTypeError ? (
               <span className="checkInvalid">请选择设备类型！</span>

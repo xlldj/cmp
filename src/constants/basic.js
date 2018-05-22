@@ -15,6 +15,11 @@ const BASIC = {
 
   SETTLETYPE: { 1: '消息回复', 2: '电话回复' },
 
+  ORDER: { descend: 1, ascend: 2 },
+
+  FILE_TYPE_XLSX:
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
   RECENTCOUNT: 4,
   NOIMAGE:
     'data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%3F%3E%0A%3Csvg%20width%3D%22153%22%20height%3D%22153%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%0A%20%3Cg%3E%0A%20%20%3Ctitle%3ENo%20image%3C/title%3E%0A%20%20%3Crect%20id%3D%22externRect%22%20height%3D%22150%22%20width%3D%22150%22%20y%3D%221.5%22%20x%3D%221.500024%22%20stroke-width%3D%223%22%20stroke%3D%22%23666666%22%20fill%3D%22%23e1e1e1%22/%3E%0A%20%20%3Ctext%20transform%3D%22matrix%286.66667%2C%200%2C%200%2C%206.66667%2C%20-960.5%2C%20-1099.33%29%22%20xml%3Aspace%3D%22preserve%22%20text-anchor%3D%22middle%22%20font-family%3D%22Fantasy%22%20font-size%3D%2214%22%20id%3D%22questionMark%22%20y%3D%22181.249569%22%20x%3D%22155.549819%22%20stroke-width%3D%220%22%20stroke%3D%22%23666666%22%20fill%3D%22%23000000%22%3E%3F%3C/text%3E%0A%20%3C/g%3E%0A%3C/svg%3E',
@@ -143,6 +148,11 @@ const BASIC = {
           name: '充值面额',
           path: 'charge',
           key: 2
+        },
+        {
+          name: '赠送金额',
+          path: 'freeGiving',
+          key: 6
         },
         {
           name: '充值活动',
@@ -453,26 +463,94 @@ const BASIC = {
     版本更新: 'version'
   },
   DESC2STATUS: {
+    // 学校部分的权限
+    '学校列表/搜索/查询': 'SCHOOL_LIST_GET',
+    楼栋列表: 'BUILDING_LIST', // 查看楼栋列表
+    '添加/编辑学校信息': 'SCHOOL_ADD_OR_EDIT',
+    '添加/编辑楼栋': 'BUILDING_ADD_OR_EDIT',
+    功能入口管理: 'SCHOOL_BUSINESS_MANAGE',
+    禁用学校: 'DEACTIVATE_SCHOOL',
+    上线设置: 'SCHOOL_SETONLINE',
+    删除楼栋: 'DELETE_BUILDING',
+    账号迁移: 'ACCOUNT_TRANSFER',
+    '信息总览列表/搜索/查询': 'SCHOOL_INFO_OVERVIEW',
+
+    // 订单部分的权限
+    '设备订单列表/搜索/查询': 'ORDER_LIST_GET',
+    设备消费统计查看: 'ORDER_CONSUME_ANALYZE_GET',
+    消费预警查看: 'ORDER_CONSUME_WARN_GET',
+    '订单详情（处理退单）': 'ORDER_DETAIL_AND_CHARGEBACK',
+    根据设备消费统计创建工单: 'BUILD_TASK_BY_DEVICE_CONSUMPTION',
+    '异常订单列表/搜索/查询': 'ABNORMAL_ORDER_GET',
+    '异常订单详情（处理退单）': 'ABNORMAL_ORDER_DETAIL_AND_CHARGEBACK',
+
+    // 充值提现
+    '充值提现列表/搜索/查询': 'FUND_LIST_GET',
+    '充值提现详情（提现审核）': 'FUND_RECHARGE_DETAIL',
+    '提现时间列表/搜索/查询': 'FUND_WITHDRAW_TIMESET_GET',
+    '添加/编辑提现时间': 'FUND_WITHDRAW_TIMESET_EDIT',
+    删除提现时间: 'FUND_WITHDRAW_TIMESET_DELETE',
+    '充值面额列表/搜索/查询': 'FUND_WITHDRAW_DENO_GET',
+    '添加/编辑充值面额': 'FUND_DENO_ADD_AND_EDIT',
+    '充值活动列表/搜索/查询': 'FUND_WITHDRAW_ACT_LIST_GET',
+    '添加/编辑充值活动': 'FUND_WITHDRAW_ACT_ADD_AND_EDIT',
+    删除充值活动: 'FUND_WITHDRAW_ACT_DELETE',
+    '异常充值提现列表/搜索/查询': 'FUND_ABNORMAL_LIST_GET', // 此处的异常指的是不符合我们平台规则的订单
+    '增加/减少用户账户余额': 'CHANGE_USER_ACCOUNT_BALANCE',
+    '提现列表/搜索/查询': 'FUND_CASH_LIST_GET',
+    '提现详情/审核': 'FUND_CASH_DETAIL',
+    '赠送规则新增/编辑': 'FUND_GIVING_RULE_ADD_AND_EDIT',
+    '赠送规则列表/查询': 'FUND_GIVING_RULE_LIST_GET',
+    处理对账: 'FUND_HANDLE_ACCOUNT_CHECK',
+    查看异常订单: 'FUND_ACCOUNT_CHECK_LIST_GET', // 查看异常订单列表，此处的异常订单指平台与第三方对不上的订单
+
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
+    //用户管理
+    '用户列表/搜索/查询': 'USER_LIST_GET',
+    用户详情: 'USER_INFO_DETILE',
     拉黑用户: 'DEACTIVE_USER',
     重置用户密码: 'RESET_USER_PWD',
+    '富士康用户列表/查询': 'FOX_USER_LIST', // 用户列表中是否可以查看富士康员工列表
+    导入富士康员工: 'IMPORT_USERS', // 用户列表中'导入富士康员工'的按钮，以及相关接口的权限控制
+    富士康员工解除绑定: 'UNBIND_COMPNAY_USRE',
+    '用户消费分析列表/查询': 'USER_CONSUME_ANALYZE',
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
-    删除员工: 'DELETE_EMPLOYEE',
+
+    // 公告管理
+    '公告列表/搜索/查询': 'NOTIFY_LIST_GET',
     '发布/编辑紧急公告': 'EDIT_EMERGENCY_NOTIFY',
     '发布/编辑系统公告': 'EDIT_SYSTEM_NOTIFY',
     '发布/编辑客服公告': 'EDIT_CUSTOM_NOTIFY',
+    '公告审核列表/详情': 'CENSOR_GET_LIST',
     删除公告: 'DELETE_NOTIFY',
     审核: 'CENSOR_NOTIFY',
+    //版本更新模块
+    '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
+    版本更新列表: 'VERSON_LIST_GET',
+    //统计分析模块
+    统计分析图表: 'STATISTICS_GET',
+    //员工管理模块
+    '员工列表搜索/查询': 'EMPLOYEE_LIST_GET',
+    维修员权限: 'MAINTENANCE_MAN_AUTH',
+    '添加/编辑员工': 'EMPLOYEE_AND_OR_EDIT',
+    删除员工: 'DELETE_EMPLOYEE',
+    身份列表: 'ROLE_LIST_GET',
+    创建身份: 'ROLE_ADD',
+    删除身份: 'ROLE_DELETE',
+    权限列表: 'AUTH_LIST_GET',
+    '添加/编辑/删除权限点': 'AUTH_ADD_EDIT_DELETE',
+    //客服工单
+    '工单列表查询/搜索/详情': 'TASK_LIST_GET',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
-    人工处理: 'HANDLE_FUND_CHECK'
+    人工处理: 'HANDLE_FUND_CHECK',
+    工作报表查看: 'REPORT_LIST_GET'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
-    楼栋列表: ['/school/list/blockManage'],
     上线设置: ['school/infoSet'],
     '添加/编辑学校信息': ['/school/list/add', '/school/list/edit'],
     '添加/编辑楼栋': [

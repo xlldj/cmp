@@ -22,9 +22,11 @@ const mapStateToProps = (state, ownProps) => {
     thresholdType: state.orderModule[subModule].analyze_thresholdType,
     page: state.orderModule[subModule].analyze_page,
     order: state.orderModule[subModule].analyze_order,
+    orderBy: state.orderModule[subModule].analyze_orderBy,
     warnTaskStatus: state.orderModule[subModule].analyze_warnTaskStatus,
     schools: state.setSchoolList.schools,
-    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId
+    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 

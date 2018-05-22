@@ -77,6 +77,18 @@ class OrderDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
+    const {
+      ORDER_LIST_GET,
+      ABNORMAL_ORDER_GET,
+      ORDER_CONSUME_WARN_GET,
+      ORDER_CONSUME_ANALYZE_GET
+    } = forbiddenStatus
+    const hasRight2SeeOrderList = !(
+      ORDER_LIST_GET &&
+      ORDER_CONSUME_ANALYZE_GET &&
+      ORDER_CONSUME_WARN_GET
+    )
     return (
       <div>
         <div className="breadc">
@@ -91,32 +103,40 @@ class OrderDisp extends React.Component {
         </div>
 
         <div className="disp">
-          <Route
-            exact
-            path="/order"
-            render={props => <Redirect to="/order/list" />}
-          />
-          <Route
-            exact
-            path="/order/list"
-            render={props => <OrderList hide={this.props.hide} {...props} />}
-          />
-          <Route
-            path="/order/abnormal"
-            render={props => (
-              <AbnormalOrder hide={this.props.hide} {...props} />
-            )}
-          />
+          {hasRight2SeeOrderList ? (
+            <Route
+              exact
+              path="/order"
+              render={props => <Redirect to="/order/list" />}
+            />
+          ) : null}
+          {hasRight2SeeOrderList ? (
+            <Route
+              exact
+              path="/order/list"
+              render={props => <OrderList hide={this.props.hide} {...props} />}
+            />
+          ) : null}
+          {ABNORMAL_ORDER_GET ? null : (
+            <Route
+              path="/order/abnormal"
+              render={props => (
+                <AbnormalOrder hide={this.props.hide} {...props} />
+              )}
+            />
+          )}
         </div>
       </div>
     )
   }
 }
 
-// export default OrderDisp
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 
 export default withRouter(
-  connect(null, {
+  connect(mapStateToProps, {
     changeOrder
   })(OrderDisp)
 )

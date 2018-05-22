@@ -32,6 +32,9 @@ const CashtimeContainer = asyncComponent(() =>
 const AbnormalContainer = asyncComponent(() =>
   import(/* webpackChunkName: "abnormalFund" */ './abnormal/abnormal')
 )
+const FreeGiving = asyncComponent(() =>
+  import(/* webpackChunkName: "freeGiving" */ './freeGiving/container.js')
+)
 
 const breadcrumbNameMap = {
   '/list': '充值列表',
@@ -48,7 +51,10 @@ const breadcrumbNameMap = {
   '/deposit/depositInfo': '编辑充值活动',
   '/deposit/addDeposit': '创建充值活动',
   '/abnormal': '异常资金',
-  '/fundCheck': '资金对账'
+  '/fundCheck': '资金对账',
+  '/freeGiving': '赠送金额',
+  '/freeGiving/add': '新建赠送规则',
+  '/freeGiving/info': '详情'
 }
 
 class FundDisp extends React.Component {
@@ -113,6 +119,16 @@ class FundDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
+    const {
+      FUND_LIST_GET,
+      FUND_WITHDRAW_DENO_GET,
+      FUND_ABNORMAL_LIST_GET,
+      FUND_GIVING_RULE_LIST_GET,
+      FUND_WITHDRAW_TIMESET_GET,
+      FUND_WITHDRAW_ACT_LIST_GET,
+      FUND_CASH_LIST_GET
+    } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -131,42 +147,92 @@ class FundDisp extends React.Component {
 
         <div className="disp">
           <Switch>
-            <Route
-              path="/fund/deposit"
-              render={props => (
-                <DepositContainer hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/fund/charge"
-              render={props => (
-                <ChargeContainer hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/fund/cashtime"
-              render={props => (
-                <CashtimeContainer hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/fund/list"
-              render={props => (
-                <RechargeContainer hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/fund/withdrawList"
-              render={props => (
-                <WithdrawContainer hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/fund/abnormal"
-              render={props => (
-                <AbnormalContainer hide={this.props.hide} {...props} />
-              )}
-            />
+            {FUND_WITHDRAW_ACT_LIST_GET ? null : (
+              <Route
+                path="/fund/deposit"
+                render={props => (
+                  <DepositContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+            {FUND_WITHDRAW_DENO_GET ? null : (
+              <Route
+                path="/fund/charge"
+                render={props => (
+                  <ChargeContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+
+            {FUND_WITHDRAW_TIMESET_GET ? null : (
+              <Route
+                path="/fund/cashtime"
+                render={props => (
+                  <CashtimeContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+
+            {FUND_LIST_GET ? null : (
+              <Route
+                path="/fund/list"
+                render={props => (
+                  <RechargeContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+            {FUND_CASH_LIST_GET ? null : (
+              <Route
+                path="/fund/withdrawList"
+                render={props => (
+                  <WithdrawContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+            {FUND_ABNORMAL_LIST_GET ? null : (
+              <Route
+                path="/fund/abnormal"
+                render={props => (
+                  <AbnormalContainer
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+            {FUND_GIVING_RULE_LIST_GET ? null : (
+              <Route
+                path="/fund/freeGiving"
+                render={props => (
+                  <FreeGiving
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
             <Route
               path="/fund/fundCheck"
               render={props => (
@@ -184,9 +250,11 @@ class FundDisp extends React.Component {
     )
   }
 }
-
+const mapStateToTableProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToTableProps, {
     changeFund
   })(FundDisp)
 )

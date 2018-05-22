@@ -38,7 +38,18 @@ const FUND = {
   },
   FUND_CHECK_REASON_NOREMOTE: 1,
   FUND_CHECK_REASON_NOLOCAL: 2,
-  FUND_CHECK_NOLOCAL_HANDLE_TEXT: '此账单系统无法平账，请前往第三方平台处理'
+  FUND_CHECK_NOLOCAL_HANDLE_TEXT: '此账单系统无法平账，请前往第三方平台处理',
+  /* FUND */
+  FREEGIVING_PERIOD: { 1: '每月', 2: '每日' },
+  FREEGIVING_PERIOD_DAY: 2,
+  FREEGIVING_PERIOD_MONTH: 1,
+  FREEGIVING_STATUS: {
+    1: '是',
+    2: '否'
+  },
+  FREEGIVING_ONLINE: 1,
+  FREEGIVING_OFFLINE: 2,
+  FREEGIVING_TARGETS: { 1: '所有用户', 2: '已认证用户' }
 }
 
 export default FUND

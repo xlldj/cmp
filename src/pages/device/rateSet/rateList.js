@@ -19,6 +19,7 @@ import { changeDevice } from '../../../actions'
 const subModule = 'rateSet'
 const {
   DEVICE_TYPE_WASHER,
+  DEVICE_TYPE_DRINKER,
   DEVICE_TYPE_BLOWER,
   WASHER_RATE_TYPES,
   DEVICE_AGREEMENT_B
@@ -56,7 +57,7 @@ class RateList extends React.Component {
     this.fetchSuppliers()
   }
   fetchSuppliers = () => {
-    let resource = '/supplier/query/list'
+    const resource = '/supplier/query/list'
     const body = {
       page: 1,
       size: 100
@@ -88,7 +89,7 @@ class RateList extends React.Component {
     if (checkObject(this.props, nextProps, ['page', 'schoolId'])) {
       return
     }
-    let { page, schoolId } = nextProps
+    const { page, schoolId } = nextProps
     const body = {
       page: page,
       size: SIZE
@@ -103,9 +104,9 @@ class RateList extends React.Component {
     this.setState({
       loading: true
     })
-    let resource = '/rate/list'
+    const resource = '/rate/list'
     const cb = json => {
-      let nextState = { loading: false }
+      const nextState = { loading: false }
       if (json.error) {
         this.setState(nextState)
         throw new Error(json.error.displayMessage || json.error)
@@ -121,7 +122,7 @@ class RateList extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   delete = (e, id) => {
-    let resource = '/api/rate/delete'
+    const resource = '/api/rate/delete'
     const body = {
       id: id
     }
@@ -147,19 +148,19 @@ class RateList extends React.Component {
     AjaxHandler.ajax(resource, body, cb)
   }
   changePage = pageObj => {
-    let page = pageObj.current
+    const page = pageObj.current
     this.props.changeDevice(subModule, { page: page })
   }
   changeSchool = value => {
-    let { schoolId } = this.props
+    const { schoolId } = this.props
     if (schoolId === value) {
       return
     }
     this.props.changeDevice(subModule, { page: 1, schoolId: value })
   }
   render() {
-    let { dataSource, loading, total, suppliers } = this.state
-    let { page, schoolId } = this.props
+    const { dataSource, loading, total, suppliers } = this.state
+    const { page, schoolId } = this.props
     const columns = [
       {
         title: '学校',
@@ -199,18 +200,28 @@ class RateList extends React.Component {
                   </li>
                 ))
               : null
-          let agreementB =
+          const agreementB =
             suppliers[record.supplierId] &&
-            suppliers[record.supplierId].agreement === DEVICE_AGREEMENT_B
+            suppliers[record.supplierId].agreement === DEVICE_AGREEMENT_B &&
+            (record.deviceType === DEVICE_TYPE_WASHER ||
+              record.deviceType === DEVICE_TYPE_DRINKER)
           console.log(suppliers, record.supplierId, agreementB)
           const items = record.rateGroups.map((r, i) => {
-            let denomination =
+            const denomination =
               record.deviceType === DEVICE_TYPE_BLOWER ? '秒' : '脉冲'
+            const unitPrice =
+              (record.deviceType === DEVICE_TYPE_WASHER ||
+                record.deviceType === DEVICE_TYPE_DRINKER) &&
+              record.unitPrice
+                ? `1升水/${mul(record.unitPrice, 100)}分钱、`
+                : ''
             return (
               <li key={i}>
                 <span key={i}>
                   扣费：
-                  {agreementB ? `1升水/${r.unitPulse}${denomination}、` : ''}
+                  {agreementB
+                    ? `1升水/${r.unitPulse}${denomination}、`
+                    : unitPrice || ''}
                   {r.price ? mul(r.price, 100) : ''}分钱/{r.pulse || ''}
                   {denomination}
                 </span>

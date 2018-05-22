@@ -147,7 +147,8 @@ class NotifyTable extends React.Component {
     let {
       EDIT_EMERGENCY_NOTIFY,
       EDIT_SYSTEM_NOTIFY,
-      EDIT_CUSTOM_NOTIFY
+      EDIT_CUSTOM_NOTIFY,
+      DELETE_NOTIFY
     } = this.props.forbiddenStatus
     // only if all three is true, has no right to add or edit
     let noRight2Edit =
@@ -248,17 +249,21 @@ class NotifyTable extends React.Component {
                 {forbidden ? null : (
                   <Link to={`/notify/list/notifyInfo/:${record.id}`}>编辑</Link>
                 )}
-                {forbidden ? null : <span className="ant-divider" />}
-                <Popconfirm
-                  title="确定要删除此么?"
-                  onConfirm={e => {
-                    this.delete(e, record.id)
-                  }}
-                  okText="确认"
-                  cancelText="取消"
-                >
-                  <a href="">删除</a>
-                </Popconfirm>
+                {forbidden || DELETE_NOTIFY ? null : (
+                  <span className="ant-divider" />
+                )}
+                {DELETE_NOTIFY ? null : (
+                  <Popconfirm
+                    title="确定要删除此么?"
+                    onConfirm={e => {
+                      this.delete(e, record.id)
+                    }}
+                    okText="确认"
+                    cancelText="取消"
+                  >
+                    <a href="">删除</a>
+                  </Popconfirm>
+                )}
               </span>
             </div>
           )

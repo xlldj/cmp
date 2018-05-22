@@ -25,18 +25,29 @@ const WithdrawTable = withRouter(
 
 class FundListContainer extends React.Component {
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <Switch>
           <Route
             path="/fund/withdrawList/info/:id"
-            render={props => <WithdrawInfo hide={this.props.hide} {...props} />}
+            render={props => (
+              <WithdrawInfo
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
+            )}
           />
           <Route
             exact
             path="/fund/withdrawList"
             render={props => (
-              <WithdrawTable hide={this.props.hide} {...props} />
+              <WithdrawTable
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
         </Switch>

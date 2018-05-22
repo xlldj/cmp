@@ -32,6 +32,8 @@ class NotifyDisp extends React.Component {
     this.props.changeNotify('notify', { page: 1, type: 'all' })
   }
   render() {
+    const { forbiddenStatus } = this.props
+    const { NOTIFY_LIST_GET, CENSOR_GET_LIST } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -47,34 +49,42 @@ class NotifyDisp extends React.Component {
 
         <div className="disp">
           <Switch>
-            <Route
-              path="/notify/censor"
-              render={props => (
-                <CensorContainer hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              path="/notify/list"
-              render={props => (
-                <NotifyContainer hide={this.props.hide} {...props} />
-              )}
-            />
-            <Route
-              exact
-              path="/notify"
-              render={props => (
-                <NotifyContainer hide={this.props.hide} {...props} />
-              )}
-            />
+            {CENSOR_GET_LIST ? null : (
+              <Route
+                path="/notify/censor"
+                render={props => (
+                  <CensorContainer hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {NOTIFY_LIST_GET ? null : (
+              <Route
+                path="/notify/list"
+                render={props => (
+                  <NotifyContainer hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
+            {NOTIFY_LIST_GET ? null : (
+              <Route
+                exact
+                path="/notify"
+                render={props => (
+                  <NotifyContainer hide={this.props.hide} {...props} />
+                )}
+              />
+            )}
           </Switch>
         </div>
       </div>
     )
   }
 }
-
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToProps, {
     changeNotify
   })(NotifyDisp)
 )

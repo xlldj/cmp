@@ -20,6 +20,7 @@ const initialOrderState = {
     selectedRowIndex: '',
     selectedDetailId: '',
     showDetail: false,
+    buildingIds: 'all',
     // below is stat related state
     stat_day: 3, // 3 for today, 4 for 7 days, 5 for 30 days,  'all' for '不限', note need to change 'all' to 6 when sending to server
     stat_dt: 1, // for devicetype of stat.
@@ -36,14 +37,9 @@ const initialOrderState = {
     analyze_threshold: 50,
     analyze_thresholdType: 2, // 1 means minimun, 2 means maximum
     analyze_page: 1,
-    analyze_order: '',
+    analyze_order: -1,
+    analyze_orderBy: '',
     analyze_warnTaskStatus: 'all' // if device has task of order warning type. 'all' for all devices
-  },
-  orderWarn: {
-    tabIndex: 2, // 1 for warn table, 2 for warn setting
-    page: 1, // page of warntable
-    schoolId: selectedSchool,
-    warnset_page: 1
   },
   abnormal: {
     page: 1,

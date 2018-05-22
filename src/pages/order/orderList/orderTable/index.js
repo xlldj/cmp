@@ -9,6 +9,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     tabIndex: state.orderModule[subModule].tabIndex,
     schoolId: state.orderModule[subModule].schoolId,
+    buildingIds: state.orderModule[subModule].buildingIds,
     day: state.orderModule[subModule].day,
     deviceType: state.orderModule[subModule].deviceType,
     status: state.orderModule[subModule].status,
@@ -19,7 +20,9 @@ const mapStateToProps = (state, ownProps) => {
     endTime: state.orderModule[subModule].endTime,
     selectedRowIndex: state.orderModule[subModule].selectedRowIndex,
     selectedDetailId: state.orderModule[subModule].selectedDetailId,
-    showDetail: state.orderModule[subModule].showDetail
+    showDetail: state.orderModule[subModule].showDetail,
+    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 
