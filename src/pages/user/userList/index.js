@@ -46,7 +46,7 @@ class UserListView extends React.Component {
     }
   }
   resetTabIndexIfNeeded = () => {
-    const { forbiddenStatus } = this.props
+    const { forbiddenStatus, tabIndex } = this.props
     const {
       USER_LIST_GET,
       FOX_USER_LIST,
@@ -58,8 +58,11 @@ class UserListView extends React.Component {
       USER_CONSUME_ANALYZE
     )
     if (hasRight2SeeOrderList) {
-      // 有查看订单列表的权限，无需进一步操作
-      if (!USER_LIST_GET) {
+      // 有查看订单列表的权限，如果当前tabIndex不一致，更改之
+      if (!USER_LIST_GET && tabIndex !== USER_LIST_TAB_TABLE) {
+        this.props.changeUser(subModule, {
+          tabIndex: USER_LIST_TAB_TABLE
+        })
         return
       } else if (!FOX_USER_LIST) {
         this.props.changeUser(subModule, {
