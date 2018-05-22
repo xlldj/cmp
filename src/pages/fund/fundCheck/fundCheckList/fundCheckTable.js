@@ -119,7 +119,7 @@ class FundCheckTable extends React.Component {
       },
       {
         title: '处理人',
-        dataIndex: 'settleUser'
+        dataIndex: 'settleUserName'
       },
       {
         title: '处理时间',

@@ -37,7 +37,7 @@ class FundCheckContent extends React.Component {
       schoolName,
       mistakeReason,
       mistakeAmount,
-      settleUser,
+      settleUserName,
       settleTime,
       mistakeType,
       settleLog
@@ -88,7 +88,7 @@ class FundCheckContent extends React.Component {
           </li>
           <li>
             <label>处理人员:</label>
-            <span>{settleUser}</span>
+            <span>{settleUserName}</span>
           </li>
           <li>
             <label>处理时间:</label>

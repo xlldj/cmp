@@ -82,6 +82,8 @@ class HandleModal extends Component {
           <ul style={{ backgroundColor: 'white', padding: '0px' }}>
             <li>
               {noBalanceOption ? (
+                <span>{FUND_CHECK_NOLOCAL_HANDLE_TEXT}</span>
+              ) : (
                 <Fragment>
                   <p>是否平账:</p>
                   <RadioGroup onChange={this.changeBalance} value={flatAccount}>
@@ -89,8 +91,6 @@ class HandleModal extends Component {
                     <Radio value={2}>否</Radio>
                   </RadioGroup>
                 </Fragment>
-              ) : (
-                <span>{FUND_CHECK_NOLOCAL_HANDLE_TEXT}</span>
               )}
             </li>
             <li className="itemsWrapper">
