@@ -58,7 +58,8 @@ class RepairList extends React.Component {
       total,
       loading
     }
-
+    const { forbiddenStatus } = this.props
+    const { REPAIR_DETILE } = forbiddenStatus
     this.columns = [
       {
         title: <p className="firstCol">学校名称</p>,
@@ -120,7 +121,9 @@ class RepairList extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/device/repair/repairInfo/:${record.id}`}>详情</Link>
+              {REPAIR_DETILE ? null : (
+                <Link to={`/device/repair/repairInfo/:${record.id}`}>详情</Link>
+              )}
             </span>
           </div>
         )

@@ -42,6 +42,8 @@ class RepairProblem extends React.Component {
       page: 1,
       total: 0
     }
+    const { forbiddenStatus } = this.props
+    const { EDIT_REPAIR_PROBLEM, DELETE_REPAIR_PROBLEM } = forbiddenStatus
     this.columns = [
       {
         title: '常见问题选项内容',
@@ -67,25 +69,31 @@ class RepairProblem extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <a
-                href=""
-                onClick={e => {
-                  this.edit(e, index)
-                }}
-              >
-                编辑
-              </a>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除此么?"
-                onConfirm={e => {
-                  this.delete(e, index)
-                }}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
+              {EDIT_REPAIR_PROBLEM ? null : (
+                <a
+                  href=""
+                  onClick={e => {
+                    this.edit(e, index)
+                  }}
+                >
+                  编辑
+                </a>
+              )}
+              {EDIT_REPAIR_PROBLEM || DELETE_REPAIR_PROBLEM ? null : (
+                <span className="ant-divider" />
+              )}
+              {DELETE_REPAIR_PROBLEM ? null : (
+                <Popconfirm
+                  title="确定要删除此么?"
+                  onConfirm={e => {
+                    this.delete(e, index)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )

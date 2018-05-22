@@ -13,6 +13,18 @@ const DOORFORBID = {
       text: '归寝时间设置'
     }
   ],
+  DOORFORBID_RECORD_TAB: {
+    value: 1,
+    text: '归寝记录'
+  },
+  DOORFORBID_REPORT_TAB: {
+    value: 2,
+    text: '归寝报表'
+  },
+  DOORFORBID_TIMESETTING_TAB: {
+    value: 3,
+    text: '归寝时间设置'
+  },
   DOORFORBID_PAGE_TAB_RECORD: 1,
   DOORFORBID_PAGE_TAB_REPORT: 2,
   DOORFORBID_PAGE_TAB_TIME: 3,

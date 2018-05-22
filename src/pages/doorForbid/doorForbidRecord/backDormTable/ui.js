@@ -12,18 +12,22 @@ import BackDormReportTable from './report'
 import BackDormRecordTable from './record'
 import BackDormRecordDetail from './record/detail'
 import { fetchBuildings } from '../../action'
+// import DOORFORBID from '../../../../constants/doorForbid'
 
 const {
   DOORFORBID_PAGE_TAB_RECORD,
   DOORFORBID_PAGE_TAB_REPORT,
   DOORFORBID_PAGE_TAB_TIME,
-  DOORFORBID_PAGE_TABS
+  DOORFORBID_RECORD_TAB,
+  DOORFORBID_REPORT_TAB,
+  DOORFORBID_TIMESETTING_TAB
 } = CONSTANTS
 const subModule = 'backDormRecord'
 
 class BackDormTable extends React.Component {
   componentDidMount() {
     const { schoolId } = this.props
+    this.resetTabIndexIfNeeded()
     fetchBuildings(schoolId, this.props, subModule)
   }
   state = {
@@ -93,15 +97,62 @@ class BackDormTable extends React.Component {
   settingBackDormTime = v => {
     this.props.history.push({ pathname: '/doorForbid/record/setting' })
   }
-
+  getTabs = () => {
+    const { forbiddenStatus } = this.props
+    let tabs = []
+    const {
+      BACK_TIME_LIST_GET,
+      BACK_RECORD_GET,
+      BACK_REPORT_GET
+    } = forbiddenStatus
+    if (!BACK_RECORD_GET) {
+      tabs.push(DOORFORBID_RECORD_TAB)
+    }
+    if (!BACK_REPORT_GET) {
+      tabs.push(DOORFORBID_REPORT_TAB)
+    }
+    if (!BACK_TIME_LIST_GET) {
+      tabs.push(DOORFORBID_TIMESETTING_TAB)
+    }
+    return tabs
+  }
+  resetTabIndexIfNeeded = () => {
+    const { forbiddenStatus } = this.props
+    const {
+      BACK_TIME_LIST_GET,
+      BACK_RECORD_GET,
+      BACK_REPORT_GET
+    } = forbiddenStatus
+    const hasRight2SeeOrderList = !(
+      BACK_TIME_LIST_GET &&
+      BACK_RECORD_GET &&
+      BACK_REPORT_GET
+    )
+    if (hasRight2SeeOrderList) {
+      // 有查看订单列表的权限，无需进一步操作
+      if (!BACK_RECORD_GET) {
+        return
+      } else if (!BACK_REPORT_GET) {
+        this.props.changeDoorForbid(subModule, {
+          tabIndex: DOORFORBID_PAGE_TAB_REPORT
+        })
+      } else if (!BACK_TIME_LIST_GET) {
+        this.props.changeDoorForbid(subModule, {
+          tabIndex: DOORFORBID_PAGE_TAB_TIME
+        })
+      }
+    }
+  }
   render() {
     const {
       tabIndex,
       schoolId,
       buildingId,
       buildingMap,
-      detail_show
+      detail_show,
+      forbiddenStatus
     } = this.props
+    const tabs = this.getTabs()
     const selector1 = (
       <SchoolSelector
         key={'schoolSelector'}
@@ -120,11 +171,12 @@ class BackDormTable extends React.Component {
         changeOpt={this.changeBuilding}
       />
     )
+    const { BACK_TIME_SETTING } = forbiddenStatus
     return (
       <div className="panelWrapper doorForbidWrapper" ref="wrapper">
         <PhaseLine
           value={tabIndex}
-          staticPhase={DOORFORBID_PAGE_TABS}
+          staticPhase={tabs}
           selectors={
             tabIndex === DOORFORBID_PAGE_TAB_TIME
               ? [selector1]
@@ -133,7 +185,8 @@ class BackDormTable extends React.Component {
           changePhase={this.changeTab}
         >
           <div className="block">
-            {tabIndex !== DOORFORBID_PAGE_TAB_TIME ? null : (
+            {tabIndex !== DOORFORBID_PAGE_TAB_TIME ||
+            BACK_TIME_SETTING ? null : (
               <Button
                 type="primary"
                 className="rightBtn"
@@ -146,17 +199,29 @@ class BackDormTable extends React.Component {
         </PhaseLine>
 
         {tabIndex === DOORFORBID_PAGE_TAB_RECORD ? (
-          <BackDormRecordTable hide={this.props.hide} />
+          <BackDormRecordTable
+            hide={this.props.hide}
+            forbiddenStatus={forbiddenStatus}
+          />
         ) : null}
         {tabIndex === DOORFORBID_PAGE_TAB_REPORT ? (
-          <BackDormReportTable hide={this.props.hide} />
+          <BackDormReportTable
+            hide={this.props.hide}
+            forbiddenStatus={forbiddenStatus}
+          />
         ) : null}
         {tabIndex === DOORFORBID_PAGE_TAB_TIME ? (
-          <BackDormTimeTable hide={this.props.hide} />
+          <BackDormTimeTable
+            hide={this.props.hide}
+            forbiddenStatus={forbiddenStatus}
+          />
         ) : null}
 
         <div ref="detailWrapper">
-          <BackDormRecordDetail show={detail_show} />
+          <BackDormRecordDetail
+            show={detail_show}
+            forbiddenStatus={forbiddenStatus}
+          />
         </div>
       </div>
     )

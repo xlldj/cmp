@@ -31,6 +31,8 @@ class ComponentTable extends React.Component {
       total,
       loading
     }
+    const { forbiddenStatus } = this.props
+    const { DELETE_COMPONENTS, COMPONENTS_ADD_EDIT } = forbiddenStatus
     this.columns = [
       {
         title: '设备类型',
@@ -55,20 +57,26 @@ class ComponentTable extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/device/components/editComponent/:${record.id}`}>
-                编辑
-              </Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除此么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
+              {COMPONENTS_ADD_EDIT ? null : (
+                <Link to={`/device/components/editComponent/:${record.id}`}>
+                  编辑
+                </Link>
+              )}
+              {COMPONENTS_ADD_EDIT || DELETE_COMPONENTS ? null : (
+                <span className="ant-divider" />
+              )}
+              {DELETE_COMPONENTS ? null : (
+                <Popconfirm
+                  title="确定要删除此么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )
@@ -151,13 +159,15 @@ class ComponentTable extends React.Component {
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page } = this.props
-
+    const { page, forbiddenStatus } = this.props
+    const { COMPONENTS_ADD_EDIT } = forbiddenStatus
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="配件类型管理"
-          addLink="/device/components/componentType"
+          addTitle={COMPONENTS_ADD_EDIT ? null : '配件类型管理'}
+          addLink={
+            COMPONENTS_ADD_EDIT ? null : '/device/components/componentType'
+          }
           addTitle2="添加配件"
           addLink2="/device/components/addComponent"
         />

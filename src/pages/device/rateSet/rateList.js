@@ -160,7 +160,8 @@ class RateList extends React.Component {
   }
   render() {
     const { dataSource, loading, total, suppliers } = this.state
-    const { page, schoolId } = this.props
+    const { page, schoolId, forbiddenStatus } = this.props
+    const { RATE_ADD_EDIT, DELETE_RATE } = forbiddenStatus
     const columns = [
       {
         title: '学校',
@@ -249,18 +250,24 @@ class RateList extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/device/rateSet/rateInfo/:${record.id}`}>编辑</Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除此么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
+              {RATE_ADD_EDIT ? null : (
+                <Link to={`/device/rateSet/rateInfo/:${record.id}`}>编辑</Link>
+              )}
+              {DELETE_RATE || RATE_ADD_EDIT ? null : (
+                <span className="ant-divider" />
+              )}
+              {DELETE_RATE ? null : (
+                <Popconfirm
+                  title="确定要删除此么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )
@@ -269,8 +276,8 @@ class RateList extends React.Component {
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="创建费率"
-          addLink="/device/rateSet/addRate"
+          addTitle={RATE_ADD_EDIT ? null : '创建费率'}
+          addLink={RATE_ADD_EDIT ? null : '/device/rateSet/addRate'}
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}

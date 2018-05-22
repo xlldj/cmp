@@ -28,6 +28,8 @@ class SupplierTable extends React.Component {
       loading: false,
       total: 0
     }
+    let { forbiddenStatus } = this.props
+    let { SUPPLIERS_ADD_EDIT, DELETE_SUPPLIERS } = forbiddenStatus
     this.columns = [
       {
         title: <p className="firstCol">供应商名字</p>,
@@ -47,18 +49,24 @@ class SupplierTable extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/device/suppliers/info/:${record.id}`}>编辑</Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除此么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
+              {SUPPLIERS_ADD_EDIT ? null : (
+                <Link to={`/device/suppliers/info/:${record.id}`}>编辑</Link>
+              )}
+              {SUPPLIERS_ADD_EDIT || DELETE_SUPPLIERS ? null : (
+                <span className="ant-divider" />
+              )}
+              {DELETE_SUPPLIERS ? null : (
+                <Popconfirm
+                  title="确定要删除此么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )
@@ -140,12 +148,16 @@ class SupplierTable extends React.Component {
   }
   render() {
     let { loading, total } = this.state
-    let { page } = this.props
-
+    let { page, forbiddenStatus } = this.props
+    let { SUPPLIERS_ADD_EDIT } = forbiddenStatus
     return (
       <div className="contentArea">
-        <SearchLine addTitle="添加供应商" addLink="/device/suppliers/addInfo" />
-
+        {SUPPLIERS_ADD_EDIT ? null : (
+          <SearchLine
+            addTitle="添加供应商"
+            addLink="/device/suppliers/addInfo"
+          />
+        )}
         <div className="tableList">
           <Table
             bordered

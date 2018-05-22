@@ -499,7 +499,6 @@ const BASIC = {
     处理对账: 'FUND_HANDLE_ACCOUNT_CHECK',
     查看异常订单: 'FUND_ACCOUNT_CHECK_LIST_GET', // 查看异常订单列表，此处的异常订单指平台与第三方对不上的订单
 
-    '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
     //用户管理
     '用户列表/搜索/查询': 'USER_LIST_GET',
@@ -512,7 +511,6 @@ const BASIC = {
     '用户消费分析列表/查询': 'USER_CONSUME_ANALYZE',
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
-    删除员工: 'DELETE_EMPLOYEE',
 
     // 公告管理
     '公告列表/搜索/查询': 'NOTIFY_LIST_GET',
@@ -560,7 +558,18 @@ const BASIC = {
     删除供水时段: 'DELETE_TIMESET',
     '添加/编辑供应商': 'SUPPLIERS_ADD_EDIT',
     删除供应商: 'DELETE_SUPPLIERS',
-    '添加/编辑设备费率': 'RATE_ADD_EDIT'
+    '添加/编辑设备费率': 'RATE_ADD_EDIT',
+    删除设备费率: 'DELETE_RATE',
+    '添加/编辑扣费速率': 'ADD_RATELIMITE',
+    '报修详情(处理报修任务)': 'REPAIR_DETILE',
+    '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
+    删除报修常见问题: 'DELETE_REPAIR_PROBLEM',
+    归寝时间列表: 'BACK_TIME_LIST_GET',
+    归寝记录查询: 'BACK_RECORD_GET',
+    归寝报表查询: 'BACK_REPORT_GET',
+    归寝时间设置: 'BACK_TIME_SETTING',
+    修改归寝异常: 'CHANGE_BACK_ERROR',
+    门禁解绑: 'DOOR_FORBID_UNBUNDLING'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
