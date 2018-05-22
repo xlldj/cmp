@@ -59,7 +59,7 @@ class RepairList extends React.Component {
       loading
     }
     const { forbiddenStatus } = this.props
-    const { REPAIR_DETILE } = forbiddenStatus
+    const { REPAIR_DETAIL } = forbiddenStatus
     this.columns = [
       {
         title: <p className="firstCol">学校名称</p>,
@@ -121,7 +121,7 @@ class RepairList extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              {REPAIR_DETILE ? null : (
+              {REPAIR_DETAIL ? null : (
                 <Link to={`/device/repair/repairInfo/:${record.id}`}>详情</Link>
               )}
             </span>
@@ -294,17 +294,22 @@ class RepairList extends React.Component {
   }
   render() {
     const { dataSource, loading, total } = this.state
-    const { schoolId, deviceType, status, page } = this.props
+    const { schoolId, deviceType, status, page, forbiddenStatus } = this.props
+    const { REPAIR_PROBLEMS_LIST, REPAIRMEN_COMMENT_LIST } = forbiddenStatus
     const { state } = this.props.location
     return (
       <div className="contentArea">
         <div className="navLink">
-          <Link to="/device/repair/repairProblem">
-            <Button type="primary">常见问题设置</Button>
-          </Link>
-          <Link to="/device/repair/repairRate">
-            <Button type="primary">评价列表</Button>
-          </Link>
+          {REPAIR_PROBLEMS_LIST ? null : (
+            <Link to="/device/repair/repairProblem">
+              <Button type="primary">常见问题设置</Button>
+            </Link>
+          )}
+          {REPAIRMEN_COMMENT_LIST ? null : (
+            <Link to="/device/repair/repairRate">
+              <Button type="primary">评价列表</Button>
+            </Link>
+          )}
         </div>
         <SearchLine
           selector1={

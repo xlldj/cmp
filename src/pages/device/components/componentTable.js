@@ -168,8 +168,10 @@ class ComponentTable extends React.Component {
           addLink={
             COMPONENTS_ADD_EDIT ? null : '/device/components/componentType'
           }
-          addTitle2="添加配件"
-          addLink2="/device/components/addComponent"
+          addTitle2={COMPONENTS_ADD_EDIT ? null : '添加配件'}
+          addLink2={
+            COMPONENTS_ADD_EDIT ? null : '/device/components/addComponent'
+          }
         />
 
         <div className="tableList">

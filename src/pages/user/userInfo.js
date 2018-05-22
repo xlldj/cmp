@@ -231,6 +231,11 @@ class UserInfoView extends React.Component {
   render() {
     let { data, cancelDefriending, reseting } = this.state
     const { forbiddenStatus } = this.props
+    const {
+      ORDER_LIST_GET,
+      FUND_LIST_GET,
+      FUND_CASH_LIST_GET
+    } = forbiddenStatus
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
     return (
       <div className="infoList">
@@ -351,18 +356,24 @@ class UserInfoView extends React.Component {
             <p>注册时间:</p>
             {time}
           </li>
-          <li>
-            <p>用户订单记录:</p>
-            <a onClick={this.toOrderOfUser}>查看详情</a>
-          </li>
-          <li>
-            <p>充值记录:</p>
-            <a onClick={this.toRechargeOfUser}>查看详情</a>
-          </li>
-          <li>
-            <p>提现记录:</p>
-            <a onClick={this.toWithdrawOfUser}>查看详情</a>
-          </li>
+          {ORDER_LIST_GET ? null : (
+            <li>
+              <p>用户订单记录:</p>
+              <a onClick={this.toOrderOfUser}>查看详情</a>
+            </li>
+          )}
+          {FUND_LIST_GET ? null : (
+            <li>
+              <p>充值记录:</p>
+              <a onClick={this.toRechargeOfUser}>查看详情</a>
+            </li>
+          )}
+          {FUND_CASH_LIST_GET ? null : (
+            <li>
+              <p>提现记录:</p>
+              <a onClick={this.toWithdrawOfUser}>查看详情</a>
+            </li>
+          )}
           {forbiddenStatus.RESET_USER_PWD ? null : (
             <li>
               <p>重置密码:</p>
