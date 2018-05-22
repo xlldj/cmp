@@ -36,7 +36,8 @@ class UserTableView extends React.Component {
       total: 0,
       startTime: '',
       endTime: '',
-      showBuildingSelect: false
+      showBuildingSelect: false,
+      isFushikang: false
     }
   }
   toOrderOfUser = (e, id) => {
@@ -110,6 +111,7 @@ class UserTableView extends React.Component {
   componentDidMount() {
     this.fetchData()
     this.syncStateWithProps()
+    this.checkSchoolFsk()
   }
   syncStateWithProps = props => {
     let { analyze_startTime, analyze_endTime, analyze_selectKey } =
@@ -135,13 +137,40 @@ class UserTableView extends React.Component {
         'analyze_endTime',
         'analyze_selectKey',
         'analyze_deviceType',
-        'buildingIds'
+        'buildingIds',
+        'schools'
       ])
     ) {
       return
     }
     this.fetchData(nextProps)
     this.syncStateWithProps(nextProps)
+    this.checkSchoolFsk(nextProps)
+  }
+  //检查选择学校是否为富士康
+  checkSchoolFsk = props => {
+    const { schools, schoolId } = props || this.props
+    const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
+    if (fox_index !== -1) {
+      const school = schools[fox_index]
+      if (school.name === '富士康' || school.name === '富士康工厂') {
+        this.setState({
+          isFushikang: true
+        })
+        let { analyze_deviceType: deviceType } = this.props
+        if (deviceType === DEVICE_TYPE_HEATER) {
+          return
+        }
+        this.props.changeUser(subModule, {
+          analyze_deviceType: DEVICE_TYPE_HEATER,
+          analyze_page: 1
+        })
+        return true
+      }
+    }
+    this.setState({
+      isFushikang: false
+    })
   }
   changeSearch = e => {
     this.setState({
@@ -228,8 +257,7 @@ class UserTableView extends React.Component {
       },
       {
         title: '使用次数',
-        dataIndex: 'useNum',
-        width: '10%'
+        dataIndex: 'useNum'
       }
     ]
     if (
@@ -238,19 +266,40 @@ class UserTableView extends React.Component {
     ) {
       columns.push({
         title: '用水量',
-        dataIndex: 'waterUsage',
-        width: '10%'
+        dataIndex: 'waterUsage'
       })
     } else if (deviceType === DEVICE_TYPE_BLOWER) {
       columns.push({
         title: '时长(秒)',
         dataIndex: 'timeDuration',
-        width: '10%',
         render: (text, record) =>
           record.timeDuration ? `${Format.ms2s(record.timeDuration)}秒` : 0
       })
     }
-
+    const { isFushikang } = this.state
+    if (isFushikang) {
+      columns = columns.concat([
+        {
+          title: '充值金额消费',
+          dataIndex: 'rechargeConsume',
+          width: '10%',
+          className: 'shalowRed',
+          render: (text, record, index) =>
+            record.consume || record.consume === 0 ? `¥${record.consume}` : ''
+        },
+        {
+          title: '赠送金额消费',
+          dataIndex: 'givingConsume',
+          width: '10%'
+        }
+      ])
+      columns.splice(0, 1, {
+        title: '公寓',
+        dataIndex: 'schoolName',
+        className: 'firstCol',
+        width: '10%'
+      })
+    }
     columns = columns.concat([
       {
         title: '消费总额',
@@ -333,7 +382,8 @@ class UserTableView extends React.Component {
 
       startTime,
       endTime,
-      showBuildingSelect
+      showBuildingSelect,
+      isFushikang
     } = this.state
     const {
       analyze_page: page,
@@ -377,35 +427,36 @@ class UserTableView extends React.Component {
               />
             </QueryBlock>
           </QueryLine>
+          {isFushikang ? null : (
+            <QueryLine>
+              <QueryBlock>
+                <span>设备类型:</span>
+                <CheckSelect
+                  options={DEVICETYPE}
+                  value={deviceType}
+                  onClick={this.changeDevice}
+                />
+              </QueryBlock>
 
-          <QueryLine>
-            <QueryBlock>
-              <span>设备类型:</span>
-              <CheckSelect
-                options={DEVICETYPE}
-                value={deviceType}
-                onClick={this.changeDevice}
-              />
-            </QueryBlock>
-            <QueryBlock>
-              {showClearBtn ? (
-                <Button
-                  onClick={this.clearSearch}
-                  className="rightSeperator"
-                  type="primary"
-                >
-                  清空
-                </Button>
-              ) : null}
-              <SearchInput
-                placeholder="手机号/手机型号"
-                searchingText={searchingText}
-                pressEnter={this.pressEnter}
-                changeSearch={this.changeSearch}
-              />
-            </QueryBlock>
-          </QueryLine>
-
+              <QueryBlock>
+                {showClearBtn ? (
+                  <Button
+                    onClick={this.clearSearch}
+                    className="rightSeperator"
+                    type="primary"
+                  >
+                    清空
+                  </Button>
+                ) : null}
+                <SearchInput
+                  placeholder="手机号/手机型号"
+                  searchingText={searchingText}
+                  pressEnter={this.pressEnter}
+                  changeSearch={this.changeSearch}
+                />
+              </QueryBlock>
+            </QueryLine>
+          )}
           <QueryLine>
             <QueryBlock>
               <span>楼栋筛选:</span>
@@ -420,6 +471,25 @@ class UserTableView extends React.Component {
                 点击选择
               </Button>
             </QueryBlock>
+            {isFushikang ? (
+              <QueryBlock>
+                {showClearBtn ? (
+                  <Button
+                    onClick={this.clearSearch}
+                    className="rightSeperator"
+                    type="primary"
+                  >
+                    清空
+                  </Button>
+                ) : null}
+                <SearchInput
+                  placeholder="手机号/手机型号"
+                  searchingText={searchingText}
+                  pressEnter={this.pressEnter}
+                  changeSearch={this.changeSearch}
+                />
+              </QueryBlock>
+            ) : null}
           </QueryLine>
         </QueryPanel>
 

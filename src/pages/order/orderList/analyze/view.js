@@ -51,7 +51,8 @@ class OrderAnalyzeView extends React.Component {
       selectedRowKeys: [],
       buildingDataSet: {},
       showBuildingSelect: false,
-      notHandlingCount: ''
+      notHandlingCount: '',
+      isFushikang: ''
     }
   }
   fetchData = props => {
@@ -142,6 +143,7 @@ class OrderAnalyzeView extends React.Component {
     // fetch buildings if not set
     // here guarantees schoolId is always set and buildings are always fetched when mounted.
     // thus only need to fetch buildings when schoolId is changed through user click.
+    this.checkSchoolFsk()
     if (!buildingsOfSchoolId[schoolId]) {
       this.props.fetchBuildings(+schoolId)
     }
@@ -162,7 +164,8 @@ class OrderAnalyzeView extends React.Component {
         'thresholdType',
         'warnTaskStatus',
         'order',
-        'orderBy'
+        'orderBy',
+        'schools'
       ])
     ) {
       return
@@ -171,8 +174,33 @@ class OrderAnalyzeView extends React.Component {
     if (this.props.schoolId !== nextProps.schoolId) {
       this.props.fetchBuildings(+nextProps.schoolId)
     }
-
+    this.checkSchoolFsk(nextProps)
     this.syncStateWithProps(nextProps)
+  }
+  //检查选择学校是否为富士康
+  checkSchoolFsk = props => {
+    const { schools, schoolId } = props || this.props
+    const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
+    if (fox_index !== -1) {
+      const school = schools[fox_index]
+      if (school.name === '富士康' || school.name === '富士康工厂') {
+        this.setState({
+          isFushikang: true
+        })
+        let { deviceType } = this.props
+        if (deviceType === DEVICE_TYPE_HEATER) {
+          return
+        }
+        this.props.changeOrder(subModule, {
+          analyze_deviceType: DEVICE_TYPE_HEATER,
+          page: 1
+        })
+        return true
+      }
+    }
+    this.setState({
+      isFushikang: false
+    })
   }
   syncStateWithProps = props => {
     let { startTime, endTime, threshold, thresholdType } = props || this.props
@@ -666,7 +694,8 @@ class OrderAnalyzeView extends React.Component {
       showBuildingSelect,
       showRepairmanSelect,
       allRowsOfOrderTableSelected,
-      notHandlingCount
+      notHandlingCount,
+      isFushikang
     } = this.state
     const selectedRowLengthsOfOrderTable = dataSource.filter(
       d => d.selected === true && d.warningTaskHandling === false
@@ -708,17 +737,18 @@ class OrderAnalyzeView extends React.Component {
               />
             </div>
           </div>
-
-          <div className="queryLine">
-            <div className="block">
-              <span>设备类型:</span>
-              <CheckSelect
-                options={DEVICETYPE}
-                value={deviceType}
-                onClick={this.changeDevice}
-              />
+          {isFushikang ? null : (
+            <div className="queryLine">
+              <div className="block">
+                <span>设备类型:</span>
+                <CheckSelect
+                  options={DEVICETYPE}
+                  value={deviceType}
+                  onClick={this.changeDevice}
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="queryLine">
             <div className="block">
