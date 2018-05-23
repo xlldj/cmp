@@ -4,19 +4,13 @@ import Bread from '../component/bread'
 import './style/style.css'
 import AjaxHandler from '../../util/ajax'
 
-import { asyncComponent } from '../component/asyncComponent'
-
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, setTagList } from '../../actions'
 
 import { getLocal } from '../../util/storage'
-const TaskList = asyncComponent(() =>
-  import(/* webpackChunkName: "taskList" */ './taskList/taskList')
-)
-const TaskReport = asyncComponent(() =>
-  import(/* webpackChunkName: "taskReport" */ './report/taskReport')
-)
+import TaskListContainer from './taskList'
+import TaskReportContainer from './report/taskReport'
 
 const breadcrumbNameMap = {
   '/list': '工单列表',
@@ -116,7 +110,7 @@ class TaskDisp extends React.Component {
               <Route
                 path="/task/list"
                 render={props => (
-                  <TaskList
+                  <TaskListContainer
                     hide={this.props.hide}
                     {...props}
                     forbiddenStatus={forbiddenStatus}
@@ -128,7 +122,7 @@ class TaskDisp extends React.Component {
               <Route
                 path="/task/report"
                 render={props => (
-                  <TaskReport
+                  <TaskReportContainer
                     hide={this.props.hide}
                     {...props}
                     forbiddenStatus={forbiddenStatus}

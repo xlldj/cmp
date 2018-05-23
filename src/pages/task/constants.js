@@ -1,4 +1,12 @@
 const TASK = {
+  TASK_LIST_TAB_PENDING: 1,
+  TASK_LIST_TAB_HANDLING: 2,
+  TASK_LIST_TAB_FINISHED: 3,
+  TAB_TO_REDUX_NAME: {
+    1: 'pendingList',
+    2: 'handlingList',
+    3: 'finishedList'
+  },
   /* TASK */
   TASK_LIST_PAGE_TABS: [
     {

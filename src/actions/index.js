@@ -1,7 +1,12 @@
-import { heartBeat, stopBeat } from '../tasks/heartBeat'
+import { heartBeat } from '../tasks/heartBeat'
 import AjaxHandler from '../util/ajax'
-import { buildAuthenData } from '../util/authenDataHandle'
-import { getStore, setStore, removeStore } from '../util/storage'
+import { setStore } from '../util/storage'
+import {
+  changeOffline,
+  fetchPrivileges,
+  changeTask,
+  CHANGE_TASK
+} from '../pages/task/action.js'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
 import { CHANGE_USER, changeUser } from '../pages/user/action'
@@ -54,67 +59,6 @@ export const changeOnline = () => {
         setStore('online', 1)
         // each time change online, start heart beat.
         heartBeat()
-      }
-    }
-    return AjaxHandler.ajax(resource, body, cb)
-  }
-}
-
-export const changeOffline = (forceOffline, stillHasTaskCallback) => {
-  return dispatch => {
-    let resource = '/employee/cs/offline'
-    const body = {
-      force: forceOffline
-    }
-    const cb = json => {
-      if (json.data) {
-        let data = {}
-        if (forceOffline || json.data.amount === 0) {
-          data.csOnline = false
-
-          // set data into store
-          dispatch({
-            type: 'SET_USERINFO',
-            value: data
-          })
-          removeStore('online')
-          stopBeat()
-        } else {
-          if (stillHasTaskCallback) {
-            stillHasTaskCallback()
-          }
-        }
-      }
-    }
-    return AjaxHandler.ajax(resource, body, cb)
-  }
-}
-// fetch privilege/list
-export const fetchPrivileges = () => {
-  return dispatch => {
-    let resource = '/privilege/list'
-    const body = null
-    const cb = json => {
-      let fullPrivileges = json.data.privileges
-      // set full privileges data
-      let full = buildAuthenData(fullPrivileges)
-      let data = {
-        full: full,
-        originalPrivileges: fullPrivileges,
-        authenSet: true
-      }
-      // set data into store
-      dispatch({
-        type: 'SET_AUTHENDATA',
-        value: data
-      })
-      // store info into sessionStorage so it will remain when refresh
-      // sessionStorage/authenInfo should always exist here, because it's set when login
-      let authenInfo = JSON.parse(getStore('authenInfo'))
-      if (authenInfo) {
-        let auth = Object.assign({}, authenInfo, { full: full })
-        console.log(auth)
-        setStore('authenInfo', JSON.stringify(auth))
       }
     }
     return AjaxHandler.ajax(resource, body, cb)
@@ -211,16 +155,6 @@ export const changeLost = (subModule, keyValuePair) => {
     keyValuePair
   }
 }
-
-export const CHANGE_TASK = 'CHANGE_TASK'
-export const changeTask = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_TASK,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_EMPLOYEE = 'CHANGE_EMPLOYEE'
 export const changeEmployee = (subModule, keyValuePair) => {
   return {
@@ -273,5 +207,9 @@ export {
   SET_BUILDING_LIST,
   fetchBuildings,
   CHANGE_USER,
-  changeUser
+  changeUser,
+  changeOffline,
+  fetchPrivileges,
+  changeTask,
+  CHANGE_TASK
 }
