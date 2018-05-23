@@ -42,6 +42,7 @@ export const methodController = (
     return value
   }
 }
+
 export const statusController = (
   state,
   props,
@@ -51,6 +52,20 @@ export const statusController = (
   const { type, value } = event
   if (type === 'status') {
     if (props[statusName] === value[statusName]) {
+      return
+    }
+    return value
+  }
+}
+export const orderController = (
+  state,
+  props,
+  event,
+  { orderName } = { orderName: 'order' }
+) => {
+  const { type, value } = event
+  if (type === 'order') {
+    if (props[orderName] === value[orderName]) {
       return
     }
     return value

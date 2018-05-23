@@ -1625,7 +1625,7 @@ class TaskDetail extends React.Component {
             {type ? TASKTYPE[type] : ''} {schoolName ? schoolName : ''}
           </h3>
           {type === 1 ? (
-            <ul className="task-detailList">
+            <ul className="detailList">
               <li>
                 <label>设备类型:</label>
                 <span>{CONSTANTS.DEVICETYPE[deviceType]}</span>
@@ -1657,7 +1657,7 @@ class TaskDetail extends React.Component {
             </ul>
           ) : null}
           {type === 2 ? (
-            <ul className="task-detailList">
+            <ul className="detailList">
               <li>
                 <label>投诉类型:</label>
                 <span>{CONSTANTS.COMPLAINTTYPES[orderType]}</span>
@@ -1683,7 +1683,7 @@ class TaskDetail extends React.Component {
             </ul>
           ) : null}
           {type === 3 ? (
-            <ul className="task-detailList">
+            <ul className="detailList">
               <li>
                 <label>反馈类型:</label>
                 <span>{CONSTANTS.FEEDBACKTYPES[opt]}</span>
@@ -1705,7 +1705,7 @@ class TaskDetail extends React.Component {
             </ul>
           ) : null}
           {type === 4 ? (
-            <ul className="task-detailList">
+            <ul className="detailList">
               <li>
                 <label>设备类型:</label>
                 <span>{CONSTANTS.DEVICETYPE[deviceType]}</span>
@@ -1830,7 +1830,7 @@ class TaskDetail extends React.Component {
           {env === 1 ? (
             <div className="taskDetail-panelWrapper">
               {currentTab === 1 ? (
-                <ul className="task-detailList">
+                <ul className="detailList">
                   <li>
                     <label>手机型号:</label>
                     <span>
@@ -1891,7 +1891,7 @@ class TaskDetail extends React.Component {
               ) : null}
               {currentTab === 4 ? (
                 exist ? (
-                  <ul className="task-detailList">
+                  <ul className="detailList">
                     <li>
                       <label>绑定时间:</label>
                       <span>
@@ -1922,7 +1922,7 @@ class TaskDetail extends React.Component {
                     ) : null}
                   </ul>
                 ) : (
-                  <ul className="task-detailList">
+                  <ul className="detailList">
                     <li>
                       <label>绑定时间:</label>
                       <span>该设备已解绑</span>
@@ -2048,7 +2048,7 @@ class TaskDetail extends React.Component {
 
         <div className="taskDetail-sidebar">
           <h3>工单信息</h3>
-          <ul className="task-detailList">
+          <ul className="detailList">
             <li>
               <label>工单编号:</label>
               <span>{id}</span>

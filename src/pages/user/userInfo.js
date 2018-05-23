@@ -4,7 +4,7 @@ import Time from '../../util/time'
 import Noti from '../../util/noti'
 import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
-import { trueWhen0 } from '../../util/types'
+import { notEmpty } from '../../util/types'
 
 import PropTypes from 'prop-types'
 
@@ -231,6 +231,11 @@ class UserInfoView extends React.Component {
   render() {
     let { data, cancelDefriending, reseting } = this.state
     const { forbiddenStatus } = this.props
+    const {
+      ORDER_LIST_GET,
+      FUND_LIST_GET,
+      FUND_CASH_LIST_GET
+    } = forbiddenStatus
     let time = data.createTime ? Time.showDate(data.createTime) : '暂无'
     return (
       <div className="infoList">
@@ -329,19 +334,19 @@ class UserInfoView extends React.Component {
           <li>
             <p>账户余额:</p>
 
-            {trueWhen0(data.balance) ? (
+            {notEmpty(data.balance) ? (
               <span className="shalowRed">{'¥' + data.balance}</span>
             ) : (
               '未知'
             )}
           </li>
-          {trueWhen0(data.givingBalance) ? (
+          {notEmpty(data.givingBalance) ? (
             <li>
               <p>赠送金额:</p>
               {`¥${data.givingBalance}`}
             </li>
           ) : null}
-          {trueWhen0(data.credits) ? (
+          {notEmpty(data.credits) ? (
             <li>
               <p>用户积分:</p>
               {data.credits}
@@ -351,18 +356,24 @@ class UserInfoView extends React.Component {
             <p>注册时间:</p>
             {time}
           </li>
-          <li>
-            <p>用户订单记录:</p>
-            <a onClick={this.toOrderOfUser}>查看详情</a>
-          </li>
-          <li>
-            <p>充值记录:</p>
-            <a onClick={this.toRechargeOfUser}>查看详情</a>
-          </li>
-          <li>
-            <p>提现记录:</p>
-            <a onClick={this.toWithdrawOfUser}>查看详情</a>
-          </li>
+          {ORDER_LIST_GET ? null : (
+            <li>
+              <p>用户订单记录:</p>
+              <a onClick={this.toOrderOfUser}>查看详情</a>
+            </li>
+          )}
+          {FUND_LIST_GET ? null : (
+            <li>
+              <p>充值记录:</p>
+              <a onClick={this.toRechargeOfUser}>查看详情</a>
+            </li>
+          )}
+          {FUND_CASH_LIST_GET ? null : (
+            <li>
+              <p>提现记录:</p>
+              <a onClick={this.toWithdrawOfUser}>查看详情</a>
+            </li>
+          )}
           {forbiddenStatus.RESET_USER_PWD ? null : (
             <li>
               <p>重置密码:</p>

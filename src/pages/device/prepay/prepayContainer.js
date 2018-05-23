@@ -1,18 +1,39 @@
 import React from 'react'
-import { Route, Switch} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
+import { Route, Switch } from 'react-router-dom'
+import { asyncComponent } from '../../component/asyncComponent'
 
-const PrepayTable = asyncComponent(() => import(/* webpackChunkName: "prepayTable" */ "./prepayTable"))
-const PrepayInfo = asyncComponent(() => import(/* webpackChunkName: "prepayInfo" */ "./prepayInfo"))
+const PrepayTable = asyncComponent(() =>
+  import(/* webpackChunkName: "prepayTable" */ './prepayTable')
+)
+const PrepayInfo = asyncComponent(() =>
+  import(/* webpackChunkName: "prepayInfo" */ './prepayInfo')
+)
 
 class PrepayContainer extends React.Component {
-  render () {
+  render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <Switch>
-          <Route path='/device/prepay/editPrepay/:id' render={(props)=>(<PrepayInfo hide={this.props.hide} {...props} />)} />
-          <Route path='/device/prepay/addPrepay' render={(props)=>(<PrepayInfo hide={this.props.hide} {...props} />)} />
-          <Route exact path='/device/prepay' render={(props)=>(<PrepayTable hide={this.props.hide} {...props} />)} />
+          <Route
+            path="/device/prepay/editPrepay/:id"
+            render={props => <PrepayInfo hide={this.props.hide} {...props} />}
+          />
+          <Route
+            path="/device/prepay/addPrepay"
+            render={props => <PrepayInfo hide={this.props.hide} {...props} />}
+          />
+          <Route
+            exact
+            path="/device/prepay"
+            render={props => (
+              <PrepayTable
+                hide={this.props.hide}
+                forbiddenStatus={forbiddenStatus}
+                {...props}
+              />
+            )}
+          />
         </Switch>
       </div>
     )

@@ -143,6 +143,7 @@ class DeviceDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <div className="breadc">
@@ -166,45 +167,81 @@ class DeviceDisp extends React.Component {
           <Route
             path="/device/list"
             render={props => (
-              <DeviceContainer hide={this.props.hide} {...props} />
+              <DeviceContainer
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
           <Route
             path="/device/suppliers"
             render={props => (
-              <SupplierContainer hide={this.props.hide} {...props} />
+              <SupplierContainer
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
           <Route
             path="/device/rateSet"
-            render={props => <RateSet hide={this.props.hide} {...props} />}
+            render={props => (
+              <RateSet
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
+            )}
           />
           <Route
             path="/device/repair"
-            render={props => <Repair hide={this.props.hide} {...props} />}
+            render={props => (
+              <Repair
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
+            )}
           />
           <Route
             path="/device/components"
             render={props => (
-              <ComponentContainer hide={this.props.hide} {...props} />
+              <ComponentContainer
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
           <Route
             path="/device/prepay"
             render={props => (
-              <PrepayContainer hide={this.props.hide} {...props} />
+              <PrepayContainer
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
           <Route
             path="/device/timeset"
             render={props => (
-              <TimesetContainer hide={this.props.hide} {...props} />
+              <TimesetContainer
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
           <Route
             path="/device/rateLimit"
             render={props => (
-              <RateLimitContainer hide={this.props.hide} {...props} />
+              <RateLimitContainer
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
           <Route
@@ -217,10 +254,12 @@ class DeviceDisp extends React.Component {
     )
   }
 }
-
+const mapStateToTableProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 // export default DeviceDisp
 export default withRouter(
-  connect(null, {
+  connect(mapStateToTableProps, {
     changeDevice
   })(DeviceDisp)
 )

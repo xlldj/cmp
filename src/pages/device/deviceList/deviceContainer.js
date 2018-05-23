@@ -9,6 +9,7 @@ const DeviceInfo = asyncComponent(() =>
 
 class DeviceContainer extends React.Component {
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <Switch>
@@ -19,7 +20,13 @@ class DeviceContainer extends React.Component {
           <Route
             exact
             path="/device/list"
-            render={props => <DeviceTable hide={this.props.hide} {...props} />}
+            render={props => (
+              <DeviceTable
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
+            )}
           />
         </Switch>
       </div>
