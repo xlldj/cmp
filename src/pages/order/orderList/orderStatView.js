@@ -1,13 +1,13 @@
 import React from 'react'
 
-import { Table, Button } from 'antd'
+import { Table } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 // import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
 
 import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 import CheckSelect from '../../component/checkSelect'
-import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
+// import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import OrderBarChart from './orderBarChart'
 
 import { checkObject } from '../../../util/checkSame'
@@ -47,7 +47,7 @@ class OrderStatView extends React.Component {
     }
     props = props || this.props
 
-    let { page, schoolId, deviceType, day, order, orderBy, buildingIds } = props
+    let { page, schoolId, deviceType, day, order, orderBy } = props
     const body = {
       page: page,
       size: SIZE,
@@ -56,9 +56,9 @@ class OrderStatView extends React.Component {
     if (day === 'all') {
       body.day = ORDER_STAT_DAY_UNLIMITED
     }
-    if (buildingIds !== 'all') {
-      body.buildingIds = buildingIds
-    }
+    // if (buildingIds !== 'all') {
+    //   body.buildingIds = buildingIds
+    // }
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
     }
@@ -249,8 +249,8 @@ class OrderStatView extends React.Component {
         'page',
         'order',
         'orderBy',
-        'schools',
-        'buildingIds'
+        'schools'
+        // 'buildingIds'
       ])
     ) {
       return
@@ -274,22 +274,22 @@ class OrderStatView extends React.Component {
       showBuildingSelect: true
     })
   }
-  closeBuildingSelect = () => {
-    this.setState({
-      showBuildingSelect: false
-    })
-  }
-  confirmBuildings = ({ all, dataSource }) => {
-    this.setState({
-      showBuildingSelect: false
-    })
-    let buildingIds = all
-      ? 'all'
-      : dataSource.filter(d => d.selected === true).map(d => d.id)
-    this.props.changeOrder(subModule, {
-      stat_buildingIds: buildingIds
-    })
-  }
+  // closeBuildingSelect = () => {
+  //   this.setState({
+  //     showBuildingSelect: false
+  //   })
+  // }
+  // confirmBuildings = ({ all, dataSource }) => {
+  //   this.setState({
+  //     showBuildingSelect: false
+  //   })
+  //   let buildingIds = all
+  //     ? 'all'
+  //     : dataSource.filter(d => d.selected === true).map(d => d.id)
+  //   this.props.changeOrder(subModule, {
+  //     stat_buildingIds: buildingIds
+  //   })
+  // }
   changeDevice = value => {
     let { deviceType } = this.props
     if (value === deviceType) {
@@ -327,30 +327,30 @@ class OrderStatView extends React.Component {
     const {
       page,
       deviceType,
-      day,
-      buildingIds,
-      schoolId,
-      buildingsOfSchoolId
+      day
+      // buildingIds,
+      // schoolId,
+      // buildingsOfSchoolId
     } = this.props
     const {
       dataSource,
       total,
       loading,
       barData,
-      isFushikang,
-      showBuildingSelect
+      isFushikang
+      // showBuildingSelect
     } = this.state
-    const buildingNames =
-      buildingIds === 'all'
-        ? '全部楼栋'
-        : buildingIds
-            .map(
-              b =>
-                buildingsOfSchoolId[+schoolId] &&
-                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
-                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
-            )
-            .join('、')
+    // const buildingNames =
+    //   buildingIds === 'all'
+    //     ? '全部楼栋'
+    //     : buildingIds
+    //         .map(
+    //           b =>
+    //             buildingsOfSchoolId[+schoolId] &&
+    //             buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
+    //             buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
+    //         )
+    //         .join('、')
     return (
       <div className="orderStat">
         <QueryPanel>
@@ -366,19 +366,18 @@ class OrderStatView extends React.Component {
               />
             </QueryBlock>
           </QueryLine>
-          {isFushikang ? (
-            <div className="queryLine">
-              <div className="block">
-                <span>楼栋筛选:</span>
-                <span className="customized_select_option">
-                  {buildingNames}
-                </span>
-                <Button type="primary" onClick={this.showBuildingSelect}>
-                  点击选择
-                </Button>
-              </div>
-            </div>
-          ) : (
+          {isFushikang ? null : (
+            // <div className="queryLine">
+            //   <div className="block">
+            //     <span>楼栋筛选:</span>
+            //     <span className="customized_select_option">
+            //       {buildingNames}
+            //     </span>
+            //     <Button type="primary" onClick={this.showBuildingSelect}>
+            //       点击选择
+            //     </Button>
+            //   </div>
+            // </div>
             <QueryLine>
               <QueryBlock>
                 <span>设备类型:</span>
@@ -414,7 +413,7 @@ class OrderStatView extends React.Component {
 
           <OrderBarChart data={barData} />
         </div>
-        {showBuildingSelect ? (
+        {/* {showBuildingSelect ? (
           <BuildingMultiSelectModal
             all={buildingIds === 'all'}
             selectedItems={buildingIds !== 'all' ? buildingIds : []}
@@ -422,7 +421,7 @@ class OrderStatView extends React.Component {
             closeModal={this.closeBuildingSelect}
             confirmBuildings={this.confirmBuildings}
           />
-        ) : null}
+        ) : null} */}
       </div>
     )
   }
