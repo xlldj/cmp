@@ -31,6 +31,8 @@ class RateLimitTable extends React.Component {
       loading: false,
       total: 0
     }
+    const { forbiddenStatus } = this.props
+    const { ADD_RATELIMITE } = forbiddenStatus
     this.columns = [
       {
         title: '学校',
@@ -56,21 +58,25 @@ class RateLimitTable extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/device/rateLimit/editRateLimit/:${record.id}`}>
-                编辑
-              </Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                onCancel={this.cancelDelete}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
+              {ADD_RATELIMITE ? null : (
+                <span>
+                  <Link to={`/device/rateLimit/editRateLimit/:${record.id}`}>
+                    编辑
+                  </Link>
+                  <span className="ant-divider" />
+                  <Popconfirm
+                    title="确定要删除么?"
+                    onConfirm={e => {
+                      this.delete(e, record.id)
+                    }}
+                    onCancel={this.cancelDelete}
+                    okText="确认"
+                    cancelText="取消"
+                  >
+                    <a href="">删除</a>
+                  </Popconfirm>
+                </span>
+              )}
             </span>
           </div>
         )
@@ -166,13 +172,13 @@ class RateLimitTable extends React.Component {
 
   render() {
     let { loading, total } = this.state
-    let { page, schoolId } = this.props
-
+    let { page, schoolId, forbiddenStatus } = this.props
+    const { ADD_RATELIMITE } = forbiddenStatus
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加扣费速率"
-          addLink="/device/rateLimit/addRateLimit"
+          addTitle={ADD_RATELIMITE ? null : '添加扣费速率'}
+          addLink={ADD_RATELIMITE ? null : '/device/rateLimit/addRateLimit'}
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}

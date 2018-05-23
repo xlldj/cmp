@@ -463,8 +463,51 @@ const BASIC = {
     版本更新: 'version'
   },
   DESC2STATUS: {
-    '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
+    // 学校部分的权限
+    '学校列表/搜索/查询': 'SCHOOL_LIST_GET',
+    楼栋列表: 'BUILDING_LIST', // 查看楼栋列表
+    '添加/编辑学校信息': 'SCHOOL_ADD_OR_EDIT',
+    '添加/编辑楼栋': 'BUILDING_ADD_OR_EDIT',
+    功能入口管理: 'SCHOOL_BUSINESS_MANAGE',
+    禁用学校: 'DEACTIVATE_SCHOOL',
+    上线设置: 'SCHOOL_SETONLINE',
+    删除楼栋: 'DELETE_BUILDING',
+    账号迁移: 'ACCOUNT_TRANSFER',
+    '信息总览列表/搜索/查询': 'SCHOOL_INFO_OVERVIEW',
+
+    // 订单部分的权限
+    '设备订单列表/搜索/查询': 'ORDER_LIST_GET',
+    设备消费统计查看: 'ORDER_CONSUME_ANALYZE_GET',
+    消费预警查看: 'ORDER_CONSUME_WARN_GET',
+    '订单详情（处理退单）': 'ORDER_DETAIL_AND_CHARGEBACK',
+    根据设备消费统计创建工单: 'BUILD_TASK_BY_DEVICE_CONSUMPTION',
+    '异常订单列表/搜索/查询': 'ABNORMAL_ORDER_GET',
+    '异常订单详情（处理退单）': 'ABNORMAL_ORDER_DETAIL_AND_CHARGEBACK',
+
+    // 充值提现
+    '充值提现列表/搜索/查询': 'FUND_LIST_GET',
+    '充值提现详情（提现审核）': 'FUND_RECHARGE_DETAIL',
+    '提现时间列表/搜索/查询': 'FUND_WITHDRAW_TIMESET_GET',
+    '添加/编辑提现时间': 'FUND_WITHDRAW_TIMESET_EDIT',
+    删除提现时间: 'FUND_WITHDRAW_TIMESET_DELETE',
+    '充值面额列表/搜索/查询': 'FUND_WITHDRAW_DENO_GET',
+    '添加/编辑充值面额': 'FUND_DENO_ADD_AND_EDIT',
+    '充值活动列表/搜索/查询': 'FUND_WITHDRAW_ACT_LIST_GET',
+    '添加/编辑充值活动': 'FUND_WITHDRAW_ACT_ADD_AND_EDIT',
+    删除充值活动: 'FUND_WITHDRAW_ACT_DELETE',
+    '异常充值提现列表/搜索/查询': 'FUND_ABNORMAL_LIST_GET', // 此处的异常指的是不符合我们平台规则的订单
+    '增加/减少用户账户余额': 'CHANGE_USER_ACCOUNT_BALANCE',
+    '提现列表/搜索/查询': 'FUND_CASH_LIST_GET',
+    '提现详情/审核': 'FUND_CASH_DETAIL',
+    '赠送规则新增/编辑': 'FUND_GIVING_RULE_ADD_AND_EDIT',
+    '赠送规则列表/查询': 'FUND_GIVING_RULE_LIST_GET',
+    处理对账: 'FUND_HANDLE_ACCOUNT_CHECK',
+    查看异常订单: 'FUND_ACCOUNT_CHECK_LIST_GET', // 查看异常订单列表，此处的异常订单指平台与第三方对不上的订单
+
     屏蔽失物招领: 'SHIELD_LOST_INFO',
+    //用户管理
+    '用户列表/搜索/查询': 'USER_LIST_GET',
+    用户详情: 'USER_INFO_DETILE',
     拉黑用户: 'DEACTIVE_USER',
     删除评论: 'DELETE_COMMENT',
     失物招领详情: 'LOST_DETAIL',
@@ -475,20 +518,71 @@ const BASIC = {
     '用户消费分析列表/查询': 'USER_CONSUME_ANALYZE',
     指派客服任务: 'ASSIGN_CUSTOM_TASK',
     '电话/消息回复': 'REPLY_COMPLAINT',
-    删除员工: 'DELETE_EMPLOYEE',
+
+    // 公告管理
+    '公告列表/搜索/查询': 'NOTIFY_LIST_GET',
     '发布/编辑紧急公告': 'EDIT_EMERGENCY_NOTIFY',
     '发布/编辑系统公告': 'EDIT_SYSTEM_NOTIFY',
     '发布/编辑客服公告': 'EDIT_CUSTOM_NOTIFY',
+    '公告审核列表/详情': 'CENSOR_GET_LIST',
     删除公告: 'DELETE_NOTIFY',
     审核: 'CENSOR_NOTIFY',
+    //版本更新模块
+    '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
+    版本更新列表: 'VERSON_LIST_GET',
+    //统计分析模块
+    统计分析图表: 'STATISTICS_GET',
+    //员工管理模块
+    '员工列表搜索/查询': 'EMPLOYEE_LIST_GET',
+    维修员权限: 'MAINTENANCE_MAN_AUTH',
+    '添加/编辑员工': 'EMPLOYEE_AND_OR_EDIT',
+    删除员工: 'DELETE_EMPLOYEE',
+    身份列表: 'ROLE_LIST_GET',
+    创建身份: 'ROLE_ADD',
+    删除身份: 'ROLE_DELETE',
+    权限列表: 'AUTH_LIST_GET',
+    '添加/编辑/删除权限点': 'AUTH_ADD_EDIT_DELETE',
+    //客服工单
+    '工单列表查询/搜索/详情': 'TASK_LIST_GET',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
-    人工处理: 'HANDLE_FUND_CHECK'
+    人工处理: 'HANDLE_FUND_CHECK',
+    工作报表查看: 'REPORT_LIST_GET',
+    //红包管理
+    '红包列表/搜索/查询': 'GIFT_LIST_GET',
+    '添加/编辑红包': 'GIFT_ADD_OR_EDIT',
+    '红包活动列表/搜索/查询': 'GIFT_ACT_LIST_GET',
+    '添加/编辑红包活动': 'GIFT_ACT_ADD_EDIT',
+    删除红包活动: 'DELETE_GIFT_ACT',
+    积分兑换列表: 'GIFT_CREDITS_LIST',
+    编辑积分兑换: 'GIFT_CREDITS_EDIT',
+    //设备管理
+    设备详情: 'DEVICE_DETILE',
+    '配件类型管理/添加配件/编辑配件': 'COMPONENTS_ADD_EDIT',
+    删除配件: 'DELETE_COMPONENTS',
+    '添加/编辑预付选项': 'REPLY_EDIT_ADD',
+    '添加/编辑供水时段': 'TIMESET_ADD_EDIT',
+    删除供水时段: 'DELETE_TIMESET',
+    '添加/编辑供应商': 'SUPPLIERS_ADD_EDIT',
+    删除供应商: 'DELETE_SUPPLIERS',
+    '添加/编辑设备费率': 'RATE_ADD_EDIT',
+    删除设备费率: 'DELETE_RATE',
+    '添加/编辑扣费速率': 'ADD_RATELIMITE',
+    报修常见问题列表: 'REPAIR_PROBLEMS_LIST',
+    维修员评价列表: 'REPAIRMEN_COMMENT_LIST',
+    '报修详情(处理报修任务)': 'REPAIR_DETAIL',
+    '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
+    删除报修常见问题: 'DELETE_REPAIR_PROBLEM',
+    归寝时间列表: 'BACK_TIME_LIST_GET',
+    归寝记录查询: 'BACK_RECORD_GET',
+    归寝报表查询: 'BACK_REPORT_GET',
+    归寝时间设置: 'BACK_TIME_SETTING',
+    修改归寝异常: 'CHANGE_BACK_ERROR',
+    门禁解绑: 'DOOR_FORBID_UNBUNDLING'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],
-    楼栋列表: ['/school/list/blockManage'],
     上线设置: ['school/infoSet'],
     '添加/编辑学校信息': ['/school/list/add', '/school/list/edit'],
     '添加/编辑楼栋': [

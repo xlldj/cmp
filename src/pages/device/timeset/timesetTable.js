@@ -37,6 +37,8 @@ class TimesetTable extends React.Component {
       loading: false,
       total: 0
     }
+    const { forbiddenStatus } = this.props
+    const { TIMESET_ADD_EDIT, DELETE_TIMESET } = forbiddenStatus
     this.columns = [
       {
         title: '学校',
@@ -74,18 +76,26 @@ class TimesetTable extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/device/timeset/editTimeset/:${record.id}`}>编辑</Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要删除此么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">删除</a>
-              </Popconfirm>
+              {TIMESET_ADD_EDIT ? null : (
+                <Link to={`/device/timeset/editTimeset/:${record.id}`}>
+                  编辑
+                </Link>
+              )}
+              {DELETE_TIMESET || TIMESET_ADD_EDIT ? null : (
+                <span className="ant-divider" />
+              )}
+              {DELETE_TIMESET ? null : (
+                <Popconfirm
+                  title="确定要删除此么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )
@@ -190,13 +200,13 @@ class TimesetTable extends React.Component {
   }
   render() {
     let { loading, total } = this.state
-    let { page, schoolId } = this.props
-
+    let { page, schoolId, forbiddenStatus } = this.props
+    const { TIMESET_ADD_EDIT } = forbiddenStatus
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加供水时段"
-          addLink="/device/timeset/addTimeset"
+          addTitle={TIMESET_ADD_EDIT ? null : '添加供水时段'}
+          addLink={TIMESET_ADD_EDIT ? null : '/device/timeset/addTimeset'}
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}

@@ -55,6 +55,14 @@ class UserDisp extends React.Component {
   }
 
   render() {
+    const { forbiddenStatus } = this.props
+    const {
+      FOX_USER_LIST,
+      USER_LIST_GET,
+      USER_CONSUME_ANALYZE,
+      USER_INFO_DETILE,
+      IMPORT_USERS
+    } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -68,27 +76,38 @@ class UserDisp extends React.Component {
         </div>
 
         <div className="disp">
-          <Route
-            path="/user/userInfo/:id"
-            render={props => <UserInfo hide={this.props.hide} {...props} />}
-          />
-          <Route
-            path="/user/foxconn"
-            render={props => <UserFoxconn hide={this.props.hide} {...props} />}
-          />
-          <Route
-            exact
-            path="/user"
-            render={props => <UserList hide={this.props.hide} {...props} />}
-          />
+          {USER_INFO_DETILE ? null : (
+            <Route
+              path="/user/userInfo/:id"
+              render={props => <UserInfo hide={this.props.hide} {...props} />}
+            />
+          )}
+          {IMPORT_USERS ? null : (
+            <Route
+              path="/user/foxconn"
+              render={props => (
+                <UserFoxconn hide={this.props.hide} {...props} />
+              )}
+            />
+          )}
+
+          {FOX_USER_LIST && USER_LIST_GET && USER_CONSUME_ANALYZE ? null : (
+            <Route
+              exact
+              path="/user"
+              render={props => <UserList hide={this.props.hide} {...props} />}
+            />
+          )}
         </div>
       </div>
     )
   }
 }
-
+const mapStateToTableProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToTableProps, {
     changeUser
   })(UserDisp)
 )

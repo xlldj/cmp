@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { Table, Popconfirm, Badge } from 'antd'
 import AjaxHandler from '../../../util/ajax'
@@ -39,7 +39,11 @@ class SchoolList extends React.Component {
     let loading = false,
       total = 0
     this.state = { searchingText, dataSource, loading, total }
-    this.columns = [
+  }
+  getColumns = () => {
+    const { forbiddenStatus } = this.props
+    const { SCHOOL_SETONLINE } = forbiddenStatus
+    const columns = [
       {
         title: <p className="firstCol">学校名称</p>,
         dataIndex: 'name',
@@ -64,8 +68,7 @@ class SchoolList extends React.Component {
           return (
             <div className="infoSetLink">
               <span>信息完善度{percent}</span>
-              {
-                /* <Link to={`/school/infoSet/:${record.id}`}>前往设置</Link> */
+              {SCHOOL_SETONLINE ? null : (
                 <Link
                   to={{
                     pathname: `/school/infoSet/:${record.id}`,
@@ -77,7 +80,7 @@ class SchoolList extends React.Component {
                 >
                   前往设置
                 </Link>
-              }
+              )}
             </div>
           )
         }
@@ -105,32 +108,49 @@ class SchoolList extends React.Component {
         render: (text, record, index) => (
           <div className="lastCol">
             <span>
-              <Link to={`/school/list/edit/:${record.id}`}>编辑学校信息</Link>
-              <span className="ant-divider" />
-              <Link to={`/school/list/blockManage/:${record.id}`}>
-                楼栋管理
-              </Link>
-              <span className="ant-divider" />
-              <Link to={`/school/list/business/:${record.id}`}>
-                功能入口管理
-              </Link>
-              <span className="ant-divider" />
-              <Popconfirm
-                title="确定要禁用此学校么?"
-                onConfirm={e => {
-                  this.delete(e, record.id)
-                }}
-                onCancel={this.cancelDelete}
-                okText="确认"
-                cancelText="取消"
-              >
-                <a href="">禁用</a>
-              </Popconfirm>
+              {forbiddenStatus.SCHOOL_ADD_OR_EDIT ? null : (
+                <Fragment>
+                  <Link to={`/school/list/edit/:${record.id}`}>
+                    编辑学校信息
+                  </Link>
+                  <span className="ant-divider" />
+                </Fragment>
+              )}
+              {forbiddenStatus.BUILDING_LIST ? null : (
+                <Fragment>
+                  <Link to={`/school/list/blockManage/:${record.id}`}>
+                    楼栋管理
+                  </Link>
+                  <span className="ant-divider" />
+                </Fragment>
+              )}
+              {forbiddenStatus.SCHOOL_BUSINESS_MANAGE ? null : (
+                <Fragment>
+                  <Link to={`/school/list/business/:${record.id}`}>
+                    功能入口管理
+                  </Link>
+                  <span className="ant-divider" />
+                </Fragment>
+              )}
+              {forbiddenStatus.DEACTIVATE_SCHOOL ? null : (
+                <Popconfirm
+                  title="确定要禁用此学校么?"
+                  onConfirm={e => {
+                    this.delete(e, record.id)
+                  }}
+                  onCancel={this.cancelDelete}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">禁用</a>
+                </Popconfirm>
+              )}
             </span>
           </div>
         )
       }
     ]
+    return columns
   }
   fetchData = body => {
     this.setState({
@@ -246,12 +266,14 @@ class SchoolList extends React.Component {
   }
   render() {
     const { dataSource, total, loading } = this.state
-    const { page, schoolId } = this.props
+    const { page, schoolId, forbiddenStatus } = this.props
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加学校"
-          addLink="/school/list/add"
+          addTitle={forbiddenStatus.SCHOOL_ADD_OR_EDIT ? false : '添加学校'}
+          addLink={
+            forbiddenStatus.SCHOOL_ADD_OR_EDIT ? false : '/school/list/add'
+          }
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}
@@ -267,7 +289,7 @@ class SchoolList extends React.Component {
             pagination={{ total: total, pageSize: SIZE, current: page }}
             rowClassName={() => 'schoolRow'}
             dataSource={dataSource}
-            columns={this.columns}
+            columns={this.getColumns()}
             onChange={this.changeTable}
           />
         </div>
@@ -280,7 +302,8 @@ class SchoolList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => ({
   schoolId: state.schoolModule.schoolList.schoolId,
-  page: state.schoolModule.schoolList.page
+  page: state.schoolModule.schoolList.page,
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 
 export default withRouter(

@@ -62,6 +62,8 @@ class EmployeeDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
+    const { EMPLOYEE_LIST_GET, ROLE_LIST_GET, AUTH_LIST_GET } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -76,24 +78,43 @@ class EmployeeDisp extends React.Component {
         </div>
 
         <div className="disp">
-          <Route
-            path="/employee/list"
-            render={props => (
-              <EmployeeContainer hide={this.props.hide} {...props} />
-            )}
-          />
-          <Route
-            path="/employee/authen"
-            render={props => (
-              <AuthenContainer hide={this.props.hide} {...props} />
-            )}
-          />
-          <Route
-            path="/employee/role"
-            render={props => (
-              <RoleContainer hide={this.props.hide} {...props} />
-            )}
-          />
+          {EMPLOYEE_LIST_GET ? null : (
+            <Route
+              path="/employee/list"
+              render={props => (
+                <EmployeeContainer
+                  forbiddenStatus={forbiddenStatus}
+                  hide={this.props.hide}
+                  {...props}
+                />
+              )}
+            />
+          )}
+          {ROLE_LIST_GET ? null : (
+            <Route
+              path="/employee/role"
+              render={props => (
+                <RoleContainer
+                  forbiddenStatus={forbiddenStatus}
+                  hide={this.props.hide}
+                  {...props}
+                />
+              )}
+            />
+          )}
+          {AUTH_LIST_GET ? null : (
+            <Route
+              path="/employee/authen"
+              render={props => (
+                <AuthenContainer
+                  forbiddenStatus={forbiddenStatus}
+                  hide={this.props.hide}
+                  {...props}
+                />
+              )}
+            />
+          )}
+
           <Route
             exact
             path="/employee"
@@ -104,9 +125,11 @@ class EmployeeDisp extends React.Component {
     )
   }
 }
-
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToProps, {
     changeEmployee
   })(EmployeeDisp)
 )

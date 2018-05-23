@@ -11,6 +11,7 @@ const GiftInfo = asyncComponent(() =>
 
 class GiftContainer extends React.Component {
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <Switch>
@@ -24,7 +25,14 @@ class GiftContainer extends React.Component {
           />
           <Route
             path="/gift/list"
-            render={props => <GiftTable hide={this.props.hide} {...props} />}
+            render={props => (
+              <GiftTable
+                hide={this.props.hide}
+                {...props}
+                {...this.props}
+                forbiddenStatus={forbiddenStatus}
+              />
+            )}
           />
         </Switch>
       </div>

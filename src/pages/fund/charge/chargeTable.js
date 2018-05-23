@@ -31,6 +31,7 @@ class ChargeTable extends React.Component {
       loading: false,
       total: 0
     }
+    const { forbiddenStatus } = this.props
     this.columns = [
       {
         title: '学校',
@@ -56,11 +57,13 @@ class ChargeTable extends React.Component {
         className: 'lastCol',
         render: (text, record, index) => (
           <div key={`operation${index}`} className="editable-row-operations">
-            <Link
-              to={{ pathname: `/fund/charge/editCharge/:${record.schoolId}` }}
-            >
-              编辑
-            </Link>
+            {forbiddenStatus.FUND_DENO_ADD_AND_EDIT ? null : (
+              <Link
+                to={{ pathname: `/fund/charge/editCharge/:${record.schoolId}` }}
+              >
+                编辑
+              </Link>
+            )}
           </div>
         )
       }
@@ -135,11 +138,13 @@ class ChargeTable extends React.Component {
   }
   render() {
     let { total, loading, dataSource } = this.state
-    let { page, schoolId } = this.props
+    let { page, schoolId, forbiddenStatus } = this.props
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加充值面额"
+          addTitle={
+            forbiddenStatus.FUND_DENO_ADD_AND_EDIT ? null : '添加充值面额'
+          }
           addLink="/fund/charge/addCharge"
           selector1={
             <SchoolSelector

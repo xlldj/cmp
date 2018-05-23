@@ -188,7 +188,7 @@ class FundInfo extends React.Component {
     } = this.state.data
     let { failedReason, showCensor, reasonError } = this.state
     let dStr = Time.getTimeStr(createTime)
-
+    const { forbiddenStatus } = this.props
     const censorBtn = (
       <div className="btnArea">
         <Button onClick={this.censorFail}>审核未通过</Button>
@@ -293,7 +293,11 @@ class FundInfo extends React.Component {
           ) : null}
         </ul>
 
-        {operationType === 2 && status === 1 ? censorBtn : backBtn}
+        {operationType === 2 &&
+        status === 1 &&
+        !forbiddenStatus.FUND_CASH_DETAIL
+          ? censorBtn
+          : backBtn}
 
         <Modal
           wrapClassName="censorModal"

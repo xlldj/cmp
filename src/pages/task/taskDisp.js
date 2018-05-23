@@ -95,6 +95,8 @@ class TaskDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
+    const { REPORT_LIST_GET, TASK_LIST_GET } = forbiddenStatus
     return (
       <div>
         <div className="breadc">
@@ -110,14 +112,31 @@ class TaskDisp extends React.Component {
 
         <div className="disp">
           <Switch>
-            <Route
-              path="/task/list"
-              render={props => <TaskList hide={this.props.hide} {...props} />}
-            />
-            <Route
-              path="/task/report"
-              render={props => <TaskReport hide={this.props.hide} {...props} />}
-            />
+            {TASK_LIST_GET ? null : (
+              <Route
+                path="/task/list"
+                render={props => (
+                  <TaskList
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+            {REPORT_LIST_GET ? null : (
+              <Route
+                path="/task/report"
+                render={props => (
+                  <TaskReport
+                    hide={this.props.hide}
+                    {...props}
+                    forbiddenStatus={forbiddenStatus}
+                  />
+                )}
+              />
+            )}
+
             <Route
               exact
               path="/task"
@@ -131,7 +150,8 @@ class TaskDisp extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  tagInfo: state.setTagList
+  tagInfo: state.setTagList,
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
 // export default TaskDisp
 export default withRouter(

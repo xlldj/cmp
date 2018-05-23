@@ -22,10 +22,15 @@ const {
   USER_LSIT_TAB_FOXCONN,
   USER_LIST_PAGE_TAB_USERS,
   USER_LIST_PAGE_TAB_FOXCONN,
-  USER_LIST_PAGE_TAB_ANALYZE
+  USER_LIST_PAGE_TAB_ANALYZE,
+  USER_LIST_FOX,
+  USER_LIST_ANALYZE
 } = CONSTANTS
 
 class UserListView extends React.Component {
+  componentDidMount() {
+    this.resetTabIndexIfNeeded()
+  }
   componentWillReceiveProps(nextProps) {
     // 如果切换到消费分析页，且学校为全部，更改为第一个学校。
     let { tabIndex, schoolId, schools } = nextProps
@@ -38,6 +43,36 @@ class UserListView extends React.Component {
       this.props.changeUser(subModule, {
         schoolId: newSchoolId
       })
+    }
+  }
+  resetTabIndexIfNeeded = () => {
+    const { forbiddenStatus, tabIndex } = this.props
+    const {
+      USER_LIST_GET,
+      FOX_USER_LIST,
+      USER_CONSUME_ANALYZE
+    } = forbiddenStatus
+    const hasRight2SeeOrderList = !(
+      USER_LIST_GET &&
+      FOX_USER_LIST &&
+      USER_CONSUME_ANALYZE
+    )
+    if (hasRight2SeeOrderList) {
+      // 有查看订单列表的权限，如果当前tabIndex不一致，更改之
+      if (!USER_LIST_GET && tabIndex !== USER_LIST_TAB_TABLE) {
+        this.props.changeUser(subModule, {
+          tabIndex: USER_LIST_TAB_TABLE
+        })
+        return
+      } else if (!FOX_USER_LIST) {
+        this.props.changeUser(subModule, {
+          tabIndex: USER_LIST_FOX
+        })
+      } else if (!USER_CONSUME_ANALYZE) {
+        this.props.changeUser(subModule, {
+          tabIndex: USER_LIST_ANALYZE
+        })
+      }
     }
   }
 
@@ -100,8 +135,10 @@ class UserListView extends React.Component {
   }
   render() {
     const { tabIndex, forbiddenStatus } = this.props
-    const tabs = [USER_LIST_PAGE_TAB_USERS]
-
+    const tabs = []
+    if (!forbiddenStatus.USER_LIST_GET) {
+      tabs.push(USER_LIST_PAGE_TAB_USERS)
+    }
     if (!forbiddenStatus.FOX_USER_LIST) {
       tabs.push(USER_LIST_PAGE_TAB_FOXCONN)
     }
@@ -119,7 +156,8 @@ class UserListView extends React.Component {
           selectors={[selector1]}
           changePhase={this.changePhase}
         >
-          {tabIndex === USER_LSIT_TAB_FOXCONN ? (
+          {tabIndex === USER_LSIT_TAB_FOXCONN &&
+          !forbiddenStatus.IMPORT_USERS ? (
             <Button
               type="primary"
               onClick={this.toFoxconnUserImport}

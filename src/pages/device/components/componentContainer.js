@@ -15,6 +15,7 @@ const ComponentType = asyncComponent(() =>
 
 class ComponentContainer extends React.Component {
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <Switch>
@@ -40,7 +41,11 @@ class ComponentContainer extends React.Component {
             exact
             path="/device/components"
             render={props => (
-              <ComponentTable hide={this.props.hide} {...props} />
+              <ComponentTable
+                hide={this.props.hide}
+                forbiddenStatus={forbiddenStatus}
+                {...props}
+              />
             )}
           />
         </Switch>

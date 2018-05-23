@@ -33,6 +33,7 @@ class DoorForbidDisp extends React.Component {
   }
 
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <div className="breadc">
@@ -49,12 +50,22 @@ class DoorForbidDisp extends React.Component {
           <Switch>
             <Route
               path="/doorForbid/record"
-              render={props => <DoorForbidRecordContainer {...props} />}
+              render={props => (
+                <DoorForbidRecordContainer
+                  {...props}
+                  forbiddenStatus={forbiddenStatus}
+                />
+              )}
             />
             <Route
               exact
               path="/doorForbid"
-              render={props => <Redirect to="/doorForbid/record" />}
+              render={props => (
+                <Redirect
+                  to="/doorForbid/record"
+                  forbiddenStatus={forbiddenStatus}
+                />
+              )}
             />
           </Switch>
         </div>
@@ -62,9 +73,11 @@ class DoorForbidDisp extends React.Component {
     )
   }
 }
-
+const mapStateToTableProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToTableProps, {
     changeDoorForbid
   })(DoorForbidDisp)
 )

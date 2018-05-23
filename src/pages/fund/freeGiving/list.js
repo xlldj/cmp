@@ -36,6 +36,7 @@ class FreeGivingTable extends React.Component {
       loading: false,
       total: 0
     }
+    const { forbiddenStatus } = this.props
     this.columns = [
       {
         title: '学校名称',
@@ -78,19 +79,26 @@ class FreeGivingTable extends React.Component {
         className: 'lastCol',
         render: (text, record, index) => (
           <div className="editable-row-operations">
-            <Link to={`/fund/freeGiving/info/:${record.id}`}>编辑</Link>
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要删除此活动么?"
-              onConfirm={e => {
-                this.delete(e, record.id)
-              }}
-              onCancel={this.cancelDelete}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">删除</a>
-            </Popconfirm>
+            {forbiddenStatus.FUND_GIVING_RULE_ADD_AND_EDIT ? null : (
+              <Link to={`/fund/freeGiving/info/:${record.id}`}>编辑</Link>
+            )}
+            {forbiddenStatus.FUND_GIVING_RULE_ADD_AND_EDIT ||
+            forbiddenStatus.FUND_WITHDRAW_ACT_DELETE ? null : (
+              <span className="ant-divider" />
+            )}
+            {forbiddenStatus.FUND_WITHDRAW_ACT_DELETE ? null : (
+              <Popconfirm
+                title="确定要删除此活动么?"
+                onConfirm={e => {
+                  this.delete(e, record.id)
+                }}
+                onCancel={this.cancelDelete}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            )}
           </div>
         )
       }
@@ -170,13 +178,21 @@ class FreeGivingTable extends React.Component {
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page, schoolId } = this.props
+    const { page, schoolId, forbiddenStatus } = this.props
 
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="新建赠送规则"
-          addLink="/fund/freeGiving/add"
+          addTitle={
+            forbiddenStatus.FUND_GIVING_RULE_ADD_AND_EDIT
+              ? null
+              : '新建赠送规则'
+          }
+          addLink={
+            forbiddenStatus.FUND_GIVING_RULE_ADD_AND_EDIT
+              ? null
+              : '/fund/freeGiving/add'
+          }
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}

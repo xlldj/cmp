@@ -15,12 +15,12 @@ class DoorForbidRecordContainer extends React.Component {
           /> */}
           <Route
             path="/doorForbid/record/setting"
-            render={props => <BackDormSettingInfo {...props} />}
+            render={props => <BackDormSettingInfo {...props} {...this.props} />}
           />
           <Route
             exact
             path="/doorForbid/record"
-            render={props => <BackDormTable {...props} />}
+            render={props => <BackDormTable {...props} {...this.props} />}
           />
         </Switch>
       </div>
