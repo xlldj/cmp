@@ -485,8 +485,8 @@ const BASIC = {
     '异常订单详情（处理退单）': 'ABNORMAL_ORDER_DETAIL_AND_CHARGEBACK',
 
     // 充值提现
-    '充值提现列表/搜索/查询': 'FUND_LIST_GET',
-    '充值提现详情（提现审核）': 'FUND_RECHARGE_DETAIL',
+    '充值列表/搜索/查询': 'FUND_LIST_GET',
+    充值详情: 'FUND_RECHARGE_DETAIL',
     '提现时间列表/搜索/查询': 'FUND_WITHDRAW_TIMESET_GET',
     '添加/编辑提现时间': 'FUND_WITHDRAW_TIMESET_EDIT',
     删除提现时间: 'FUND_WITHDRAW_TIMESET_DELETE',
@@ -504,7 +504,6 @@ const BASIC = {
     处理对账: 'FUND_HANDLE_ACCOUNT_CHECK',
     查看异常订单: 'FUND_ACCOUNT_CHECK_LIST_GET', // 查看异常订单列表，此处的异常订单指平台与第三方对不上的订单
 
-    '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
     //用户管理
     '用户列表/搜索/查询': 'USER_LIST_GET',
@@ -549,7 +548,38 @@ const BASIC = {
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
     人工处理: 'HANDLE_FUND_CHECK',
-    工作报表查看: 'REPORT_LIST_GET'
+    工作报表查看: 'REPORT_LIST_GET',
+    //红包管理
+    '红包列表/搜索/查询': 'GIFT_LIST_GET',
+    '添加/编辑红包': 'GIFT_ADD_OR_EDIT',
+    '红包活动列表/搜索/查询': 'GIFT_ACT_LIST_GET',
+    '添加/编辑红包活动': 'GIFT_ACT_ADD_EDIT',
+    删除红包活动: 'DELETE_GIFT_ACT',
+    积分兑换列表: 'GIFT_CREDITS_LIST',
+    编辑积分兑换: 'GIFT_CREDITS_EDIT',
+    //设备管理
+    设备详情: 'DEVICE_DETILE',
+    '配件类型管理/添加配件/编辑配件': 'COMPONENTS_ADD_EDIT',
+    删除配件: 'DELETE_COMPONENTS',
+    '添加/编辑预付选项': 'REPLY_EDIT_ADD',
+    '添加/编辑供水时段': 'TIMESET_ADD_EDIT',
+    删除供水时段: 'DELETE_TIMESET',
+    '添加/编辑供应商': 'SUPPLIERS_ADD_EDIT',
+    删除供应商: 'DELETE_SUPPLIERS',
+    '添加/编辑设备费率': 'RATE_ADD_EDIT',
+    删除设备费率: 'DELETE_RATE',
+    '添加/编辑扣费速率': 'ADD_RATELIMITE',
+    报修常见问题列表: 'REPAIR_PROBLEMS_LIST',
+    维修员评价列表: 'REPAIRMEN_COMMENT_LIST',
+    '报修详情(处理报修任务)': 'REPAIR_DETAIL',
+    '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
+    删除报修常见问题: 'DELETE_REPAIR_PROBLEM',
+    归寝时间列表: 'BACK_TIME_LIST_GET',
+    归寝记录查询: 'BACK_RECORD_GET',
+    归寝报表查询: 'BACK_REPORT_GET',
+    归寝时间设置: 'BACK_TIME_SETTING',
+    修改归寝异常: 'CHANGE_BACK_ERROR',
+    门禁解绑: 'DOOR_FORBID_UNBUNDLING'
   },
   PRIVILEGE2URL: {
     '学校列表/搜索/查询': ['/school'],

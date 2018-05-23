@@ -68,7 +68,7 @@ class DevicesTable extends React.Component {
       total,
       schools
     } = this.props
-
+    const { forbiddenStatus } = this.props
     const columns = [
       {
         title: '学校',
@@ -112,9 +112,11 @@ class DevicesTable extends React.Component {
           }
           return (
             <div className="editable-row-operations lastCol">
-              <span>
-                <Link to={addr}>详情</Link>
-              </span>
+              {forbiddenStatus.DEVICE_DETILE ? null : (
+                <span>
+                  <Link to={addr}>详情</Link>
+                </span>
+              )}
             </div>
           )
         }

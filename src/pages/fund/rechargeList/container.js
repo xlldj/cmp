@@ -6,6 +6,7 @@ import RechargeInfo from './info.js'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeFund } from '../../../actions'
+import FundInfo from './info.js'
 const subModule = 'fundList'
 
 const mapStateToProps = (state, ownProps) => ({
@@ -27,7 +28,7 @@ const FundTable = withRouter(
 class FundListContainer extends React.Component {
   render() {
     const { forbiddenStatus } = this.props
-    const { FUND_LIST_GET } = forbiddenStatus
+    const { FUND_LIST_GET, FUND_RECHARGE_DETAIL } = forbiddenStatus
     return (
       <div>
         <Switch>
@@ -39,6 +40,18 @@ class FundListContainer extends React.Component {
                 <FundTable
                   hide={this.props.hide}
                   {...props}
+                  forbiddenStatus={forbiddenStatus}
+                />
+              )}
+            />
+          )}
+          {FUND_RECHARGE_DETAIL ? null : (
+            <Route
+              path="/fund/list/info/:id"
+              render={props => (
+                <FundInfo
+                  {...props}
+                  hide={this.props.hide}
                   forbiddenStatus={forbiddenStatus}
                 />
               )}

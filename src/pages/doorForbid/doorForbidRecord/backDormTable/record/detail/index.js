@@ -99,6 +99,8 @@ class BackDormRecordDetail extends React.Component {
   }
 
   componentDidMount() {
+    const { forbiddenStatus } = this.props
+    const { CHANGE_BACK_ERROR, DOOR_FORBID_UNBUNDLING } = forbiddenStatus
     this.signInColumns = [
       {
         title: '时间',
@@ -128,15 +130,17 @@ class BackDormRecordDetail extends React.Component {
               <ul>
                 <li>
                   <a className="exceptionTipColor">异常</a>
-                  <Button
-                    className="cancelExceptionBtn"
-                    type="primary"
-                    onClick={event => {
-                      this.fixUnExceptionButtonClicked(event, record, index)
-                    }}
-                  >
-                    取消异常
-                  </Button>
+                  {CHANGE_BACK_ERROR ? null : (
+                    <Button
+                      className="cancelExceptionBtn"
+                      type="primary"
+                      onClick={event => {
+                        this.fixUnExceptionButtonClicked(event, record, index)
+                      }}
+                    >
+                      取消异常
+                    </Button>
+                  )}
                 </li>
               </ul>
             </div>
@@ -163,7 +167,7 @@ class BackDormRecordDetail extends React.Component {
         title: '操作',
         width: '25%',
         render: (text, record, index) => {
-          return record.status === 1 ? null : (
+          return record.status === 1 || CHANGE_BACK_ERROR ? null : (
             <Button
               className="leftBtn"
               type="primary"
@@ -335,7 +339,8 @@ class BackDormRecordDetail extends React.Component {
       detail_timeType,
       detail_startTime,
       detail_endTime,
-      detail_formType
+      detail_formType,
+      forbiddenStatus
     } = this.props
 
     const {
@@ -350,7 +355,7 @@ class BackDormRecordDetail extends React.Component {
       status,
       bindStatus
     } = detail_recordInfo
-
+    const { DOOR_FORBID_UNBUNDLING } = forbiddenStatus
     return (
       <div
         className={
@@ -421,7 +426,7 @@ class BackDormRecordDetail extends React.Component {
                 />
               </li>
             </ul>
-            {bindStatus === 2 ? (
+            {bindStatus === 2 && !DOOR_FORBID_UNBUNDLING ? (
               <Popconfirm
                 title="确定要解除绑定该用户吗?"
                 onConfirm={this.unbindButtonClicked}

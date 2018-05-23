@@ -31,6 +31,8 @@ class PrepayTable extends React.Component {
       loading: false,
       total: 0
     }
+    const { forbiddenStatus } = this.props
+    const { REPLY_EDIT_ADD } = forbiddenStatus
     this.columns = [
       {
         title: '学校',
@@ -61,9 +63,11 @@ class PrepayTable extends React.Component {
         width: '20%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
-            <span>
-              <Link to={`/device/prepay/editPrepay/:${record.id}`}>编辑</Link>
-            </span>
+            {REPLY_EDIT_ADD ? null : (
+              <span>
+                <Link to={`/device/prepay/editPrepay/:${record.id}`}>编辑</Link>
+              </span>
+            )}
           </div>
         )
       }
@@ -156,13 +160,13 @@ class PrepayTable extends React.Component {
   }
   render() {
     let { loading, total } = this.state
-    const { page, schoolId } = this.props
-
+    const { page, schoolId, forbiddenStatus } = this.props
+    const { REPLY_EDIT_ADD } = forbiddenStatus
     return (
       <div className="contentArea">
         <SearchLine
-          addTitle="添加预付选项"
-          addLink="/device/prepay/addPrepay"
+          addTitle={REPLY_EDIT_ADD ? null : '添加预付选项'}
+          addLink={REPLY_EDIT_ADD ? null : '/device/prepay/addPrepay'}
           selector1={
             <SchoolSelector
               selectedSchool={schoolId}

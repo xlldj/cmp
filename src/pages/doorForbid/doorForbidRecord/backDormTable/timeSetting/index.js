@@ -19,7 +19,8 @@ class BackDormTimeTable extends React.Component {
     super(props)
 
     this.state = {}
-
+    const { forbiddenStatus } = this.props
+    const { BACK_TIME_SETTING } = forbiddenStatus
     this.columns = [
       {
         title: '学校',
@@ -49,14 +50,16 @@ class BackDormTimeTable extends React.Component {
         className: 'lastCol',
         render: (text, record, index) => (
           <div key={`operation${index}`} className="editable-row-operations">
-            <Link
-              to={{
-                pathname: '/doorForbid/record/setting',
-                state: { editItem: record }
-              }}
-            >
-              编辑
-            </Link>
+            {BACK_TIME_SETTING ? null : (
+              <Link
+                to={{
+                  pathname: '/doorForbid/record/setting',
+                  state: { editItem: record }
+                }}
+              >
+                编辑
+              </Link>
+            )}
           </div>
         )
       }

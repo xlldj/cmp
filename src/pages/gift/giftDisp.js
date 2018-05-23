@@ -56,6 +56,7 @@ class GiftDisp extends React.Component {
     }
   }
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <div className="breadc">
@@ -74,19 +75,31 @@ class GiftDisp extends React.Component {
             <Route
               path="/gift/act"
               render={props => (
-                <ActContainer hide={this.props.hide} {...props} />
+                <ActContainer
+                  hide={this.props.hide}
+                  {...props}
+                  forbiddenStatus={forbiddenStatus}
+                />
               )}
             />
             <Route
               path="/gift/list"
               render={props => (
-                <GiftContainer hide={this.props.hide} {...props} />
+                <GiftContainer
+                  hide={this.props.hide}
+                  {...props}
+                  forbiddenStatus={forbiddenStatus}
+                />
               )}
             />
             <Route
               path="/gift/credits"
               render={props => (
-                <CreditExchange hide={this.props.hide} {...props} />
+                <CreditExchange
+                  hide={this.props.hide}
+                  {...props}
+                  forbiddenStatus={forbiddenStatus}
+                />
               )}
             />
             <Route
@@ -100,9 +113,11 @@ class GiftDisp extends React.Component {
     )
   }
 }
-
+const mapStateToProps = (state, ownProps) => ({
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
+})
 export default withRouter(
-  connect(null, {
+  connect(mapStateToProps, {
     changeGift
   })(GiftDisp)
 )

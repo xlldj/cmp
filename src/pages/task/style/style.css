@@ -184,7 +184,8 @@
   padding: 10px 0px;
   min-height: 180px;
 }
-.taskDetail-panelWrapper .task-detailList {
+.taskDetail-panelWrapper .task-detailList,
+.taskDetail-panelWrapper .detailList {
   padding: 15px 20px;
   background-color: #f5f5f5;
 }

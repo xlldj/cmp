@@ -1,18 +1,39 @@
 import React from 'react'
-import {  Route, Switch} from 'react-router-dom'
-import {asyncComponent} from '../../component/asyncComponent'
+import { Route, Switch } from 'react-router-dom'
+import { asyncComponent } from '../../component/asyncComponent'
 
-const RateInfo = asyncComponent(() => import(/* webpackChunkName: "rateInfo" */ "./rateInfo"))
-const RateList = asyncComponent(() => import(/* webpackChunkName: "rateList" */ "./rateList"))
+const RateInfo = asyncComponent(() =>
+  import(/* webpackChunkName: "rateInfo" */ './rateInfo')
+)
+const RateList = asyncComponent(() =>
+  import(/* webpackChunkName: "rateList" */ './rateList')
+)
 
-class RateSet extends React.Component{
-  render(){
-    return(
+class RateSet extends React.Component {
+  render() {
+    const { forbiddenStatus } = this.props
+    return (
       <div>
         <Switch>
-          <Route path='/device/rateSet/rateInfo/:id' render={(props) => (<RateInfo hide={this.props.hide} {...props} />)} />
-          <Route path='/device/rateSet/addRate' render={(props) => (<RateInfo hide={this.props.hide} {...props} />)} />
-          <Route exact path='/device/rateSet' render={(props) => (<RateList hide={this.props.hide} {...props} />)} />
+          <Route
+            path="/device/rateSet/rateInfo/:id"
+            render={props => <RateInfo hide={this.props.hide} {...props} />}
+          />
+          <Route
+            path="/device/rateSet/addRate"
+            render={props => <RateInfo hide={this.props.hide} {...props} />}
+          />
+          <Route
+            exact
+            path="/device/rateSet"
+            render={props => (
+              <RateList
+                hide={this.props.hide}
+                forbiddenStatus={forbiddenStatus}
+                {...props}
+              />
+            )}
+          />
         </Switch>
       </div>
     )
@@ -20,4 +41,3 @@ class RateSet extends React.Component{
 }
 
 export default RateSet
-
