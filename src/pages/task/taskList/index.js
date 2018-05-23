@@ -1,26 +1,24 @@
 import React from 'react'
-import { Table, Button } from 'antd'
+import { Button } from 'antd'
 
 import PendingList from './pendingList'
 import HandlingList from './handlingList'
 import FinishedList from './finishedList'
 
 import PhaseLine from '../../component/phaseLine'
-import AjaxHandler from '../../../util/ajax'
 import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { checkObject } from '../../../util/checkSame'
 import TaskDetail from './taskDetail'
 import BuildTask from './buildTask'
-import Noti from '../../../util/noti'
 import notworking from '../../assets/notworking.jpg'
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, setUserInfo, changeOnline } from '../../../actions'
-const moduleName = 'taskModule'
+import { taskListPropsController } from './controller.js'
 const moduleName = 'taskListContainer'
 const subModule = 'taskList'
 
@@ -67,58 +65,10 @@ class TaskList extends React.Component {
       showBuild: false
     }
   }
-  fetchData = body => {
-    let resource = '/api/work/sheet/list'
-    const cb = json => {
-      /* set a timer of 5 minutes, fetch the data again when timer fires */
-      if (this.ti) {
-        clearTimeout(this.ti)
-        this.ti = null
-      }
-      this.ti = setTimeout(this.refetch, 5 * 60 * 1000)
 
-      let nextState = {}
-      if (json.error) {
-        throw new Error(json.error)
-      } else {
-        let workSheets = json.data.workSheets
-        nextState.dataSource = workSheets
-        nextState.total = json.data.total
-      }
-      this.setState(nextState)
-    }
-    AjaxHandler.ajax(resource, body, cb)
-  }
-  refetch = () => {
-    let { all, assigned, sourceType, pending, page, schoolId } = this.props
-    const body = {
-      page: page,
-      size: SIZE,
-      assigned: assigned
-    }
-    if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10)
-    }
-    if (all === '1') {
-      body.all = false
-    } else {
-      body.all = true
-    }
-    if (pending !== 'all') {
-      body.pending = parseInt(pending, 10)
-    }
-    if (sourceType !== 'all') {
-      body.sourceType = parseInt(sourceType, 10)
-    }
-    this.fetchData(body)
-  }
   componentDidMount() {
     this.props.hide(false)
     this.syncStateToProps()
-
-    // add click event
-    let root = document.getElementById('root')
-    root.addEventListener('click', this.closeDetail, false)
 
     const { user, showDetail } = this.props
     const { isCs, csOnline } = user || {}
@@ -134,14 +84,7 @@ class TaskList extends React.Component {
   }
   sendTaskListFetch = props => {
     props = props || this.props
-    let {
-      tabIndex,
-      schoolId,
-      mine,
-      pendingList,
-      handlingList,
-      finishedList
-    } = props
+    let { tabIndex, schoolId, mine } = props
     const reduxStateName = TAB_TO_REDUX_NAME[tabIndex]
     const currentReduxState = props[reduxStateName]
     const { type, day, startTime, endTime, selectKey, page } = currentReduxState
@@ -169,33 +112,6 @@ class TaskList extends React.Component {
       body.type = type
     }
     this.fetchTasks(body)
-  }
-  closeDetail = e => {
-    // e.preventDefault()
-    // e.stopPropagation()
-    if (!this.props.taskList.showDetail) {
-      return
-    }
-    console.log('happen')
-    let target = e.target
-    let detailWrapper = this.refs.detailWrapper
-    if (detailWrapper.contains(target)) {
-      console.log('contain')
-      return
-    }
-    if (this.props.taskList.showDetail) {
-      this.props.changeTask(subModule, {
-        showDetail: false,
-        selectedRowIndex: -1,
-        selectedDetailId: -1,
-        details: {}
-      })
-    }
-  }
-  componentWillUnmount() {
-    this.props.hide(true)
-    let root = document.getElementById('root')
-    root.removeEventListener('click', this.closeDetail, false)
   }
   componentWillReceiveProps(nextProps) {
     try {
