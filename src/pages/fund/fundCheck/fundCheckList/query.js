@@ -93,8 +93,6 @@ class FundCheckQuery extends React.Component {
           <QueryBlock>
             <span>处理状态:</span>
             <CheckSelect
-              allOptValue="all"
-              allOptTitle="不限"
               options={FUND_MISTAKE_STATUS}
               value={status}
               onClick={v =>

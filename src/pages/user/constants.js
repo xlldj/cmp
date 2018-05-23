@@ -8,6 +8,8 @@ const USER = {
   },
   Import_Method_Batch: 1,
   Import_Method_Manual: 2,
+  USER_LIST_FOX: 2,
+  USER_LIST_ANALYZE: 3,
   USER_LIST_PAGE_TAB_USERS: {
     value: 1,
     text: '用户列表'

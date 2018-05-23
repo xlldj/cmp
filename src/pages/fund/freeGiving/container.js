@@ -18,6 +18,7 @@ const FreeGivingInfo = withRouter(
 
 class Container extends React.Component {
   render() {
+    const { forbiddenStatus } = this.props
     return (
       <div>
         <Switch>
@@ -37,7 +38,11 @@ class Container extends React.Component {
             exact
             path="/fund/freeGiving"
             render={props => (
-              <FreeGivingList hide={this.props.hide} {...props} />
+              <FreeGivingList
+                hide={this.props.hide}
+                {...props}
+                forbiddenStatus={forbiddenStatus}
+              />
             )}
           />
         </Switch>

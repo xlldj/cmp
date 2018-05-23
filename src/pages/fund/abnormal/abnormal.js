@@ -34,6 +34,7 @@ class AbnormalOrder extends React.Component {
       total: 0,
       settling: false
     }
+    const { forbiddenStatus } = this.props
     this.columns = [
       {
         title: '账单类型',
@@ -90,16 +91,20 @@ class AbnormalOrder extends React.Component {
               {this.state.settling ? (
                 <a href="">{operation}余额</a>
               ) : (
-                <Popconfirm
-                  title={title}
-                  onConfirm={e => {
-                    this.settleAmount(e, record.id, record.operationType)
-                  }}
-                  okText="确认"
-                  cancelText="取消"
-                >
-                  <a href="">{operation}余额</a>
-                </Popconfirm>
+                <span>
+                  {forbiddenStatus.CHANGE_USER_ACCOUNT_BALANCE ? null : (
+                    <Popconfirm
+                      title={title}
+                      onConfirm={e => {
+                        this.settleAmount(e, record.id, record.operationType)
+                      }}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                      <a href="">{operation}余额</a>
+                    </Popconfirm>
+                  )}
+                </span>
               )}
             </div>
           )

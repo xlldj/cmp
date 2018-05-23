@@ -400,7 +400,7 @@ class OrderAnalyzeView extends React.Component {
     })
   }
   getColumns = () => {
-    let { day, deviceType } = this.props
+    let { day, deviceType, forbiddenStatus } = this.props
     let { startTime, endTime, allRowsOfOrderTableSelected } = this.state
     const dayStr = day
       ? ORDER_ANALYZE_DAY_SELECT[day]
@@ -422,7 +422,10 @@ class OrderAnalyzeView extends React.Component {
         dataIndex: 'selected',
         className: 'center',
         render: (text, record) => {
-          if (record.warningTaskHandling) {
+          if (
+            record.warningTaskHandling ||
+            forbiddenStatus.BUILD_TASK_BY_DEVICE_CONSUMPTION
+          ) {
             return ''
           } else {
             return (

@@ -5,6 +5,8 @@ import orderConsumptionHandler from './orderConsumption'
 import userAuthHandler from './userAuth'
 import lostHandler from './lost'
 import fundCheckHandler from './fundCheck'
+import fundCheckHandler from './fundCheck'
+import userAuthHandler from './userAuth'
 
 const AjaxHandler = {
   showingError: false
@@ -63,6 +65,8 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     )
   ) {
     return fundCheckHandler(resource, body)
+  } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
+    return userAuthHandler(resource, body)
   }
 }
 

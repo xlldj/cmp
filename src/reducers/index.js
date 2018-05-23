@@ -221,6 +221,60 @@ const deviceModule = (state = initialDeviceState, action) => {
   return state
 }
 
+// // 资金管理
+// const initialFundState = {
+//   fundList: {
+//     page: 1,
+//     schoolId: selectedSchool,
+//     type: 'all',
+//     status: 'all',
+//     selectKey: '',
+//     startTime: Time.get7DaysAgoStart(),
+//     endTime: Time.getTodayEnd(),
+//     userType: 'all'
+//   },
+//   withdrawList: {
+//     page: 1,
+//     schoolId: selectedSchool,
+//     status: 'all',
+//     selectKey: '',
+//     startTime: Time.get7DaysAgoStart(),
+//     endTime: Time.getTodayEnd(),
+//     userType: 'all'
+//   },
+//   cashtime: {
+//     page: 1,
+//     schoolId: selectedSchool
+//   },
+//   charge: {
+//     schoolId: selectedSchool,
+//     page: 1
+//   },
+//   deposit: {
+//     page: 1,
+//     schoolId: selectedSchool
+//   },
+//   abnormal: {
+//     schoolId: selectedSchool,
+//     page: 1,
+//     selectKey: '',
+//     userType: 'all'
+//   },
+//   freeGiving: {
+//     schoolId: selectedSchool,
+//     page: 1
+//   }
+// }
+// const fundModule = (state = initialFundState, action) => {
+//   const { type } = action
+
+//   if (type === ActionTypes.CHANGE_FUND) {
+//     const { subModule, keyValuePair } = action
+//     return merge({}, state, { [subModule]: keyValuePair })
+//   }
+//   return state
+// }
+
 // 红包管理
 const initialGiftState = {
   giftList: {

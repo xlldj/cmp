@@ -28,6 +28,7 @@ class VersionTable extends React.Component {
       loading: false,
       total: 0
     }
+    let { forbiddenStatus } = props
     this.columns = [
       {
         title: '版本号',
@@ -74,9 +75,11 @@ class VersionTable extends React.Component {
         width: '8%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
-            <span>
-              <Link to={`/version/detail/:${record.id}`}>编辑</Link>
-            </span>
+            {forbiddenStatus.VERSON_ADD_OR_EDIT ? null : (
+              <span>
+                <Link to={`/version/detail/:${record.id}`}>编辑</Link>
+              </span>
+            )}
           </div>
         )
       }
@@ -144,11 +147,13 @@ class VersionTable extends React.Component {
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page } = this.props
+    const { page, forbiddenStatus } = this.props
 
     return (
       <div className="contentArea">
-        <SearchLine addTitle="添加新版本" addLink="/version/add" />
+        {forbiddenStatus.VERSON_ADD_OR_EDIT ? null : (
+          <SearchLine addTitle="添加新版本" addLink="/version/add" />
+        )}
 
         <div className="tableList">
           <Table
@@ -167,9 +172,9 @@ class VersionTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  page: state.versionModule[subModule].page
+  page: state.versionModule[subModule].page,
+  forbiddenStatus: state.setAuthenData.forbiddenStatus
 })
-
 export default withRouter(
   connect(mapStateToProps, {
     changeVersion

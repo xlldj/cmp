@@ -38,6 +38,8 @@ class RoleTable extends React.Component {
       deletingId: '',
       hintDeleteModal: false
     }
+    const { forbiddenStatus } = props
+    const { ROLE_ADD, ROLE_DELETE } = forbiddenStatus
     this.columns = [
       {
         title: '身份',
@@ -56,18 +58,23 @@ class RoleTable extends React.Component {
             key={index}
             className="editable-row-operations"
           >
-            <Link to={`/employee/role/detail/:${record.id}`}>编辑</Link>
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要删除此角色?"
-              onConfirm={e => {
-                this.delete(e, record.id)
-              }}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">删除</a>
-            </Popconfirm>
+            {ROLE_ADD ? null : (
+              <Link to={`/employee/role/detail/:${record.id}`}>编辑</Link>
+            )}
+            {ROLE_ADD || ROLE_DELETE ? null : <span className="ant-divider" />}
+
+            {ROLE_DELETE ? null : (
+              <Popconfirm
+                title="确定要删除此角色?"
+                onConfirm={e => {
+                  this.delete(e, record.id)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <a href="">删除</a>
+              </Popconfirm>
+            )}
           </div>
         )
       }
@@ -178,11 +185,13 @@ class RoleTable extends React.Component {
 
   render() {
     const { dataSource, total, loading } = this.state
-    const { page } = this.props
-
+    const { page, forbiddenStatus } = this.props
+    const { ROLE_ADD } = forbiddenStatus
     return (
       <div className="contentArea">
-        <SearchLine addTitle="添加身份" addLink="/employee/role/add" />
+        {ROLE_ADD ? null : (
+          <SearchLine addTitle="添加身份" addLink="/employee/role/add" />
+        )}
 
         <div className="tableList">
           <Table

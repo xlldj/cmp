@@ -49,6 +49,7 @@ class TableUi extends React.Component {
       subStartTime: this.props.startTime,
       subEndTime: this.props.endTime
     }
+    const { forbiddenStatus } = props
     this.columns = [
       {
         title: '流水号',
@@ -125,9 +126,11 @@ class TableUi extends React.Component {
         width: '10%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
-            <span>
-              <Link to={`/fund/withdrawList/info/:${record.id}`}>详情</Link>
-            </span>
+            {forbiddenStatus.FUND_CASH_DETAIL ? null : (
+              <span>
+                <Link to={`/fund/withdrawList/info/:${record.id}`}>详情</Link>
+              </span>
+            )}
           </div>
         )
       }

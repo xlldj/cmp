@@ -343,6 +343,11 @@ class OrderTableView extends React.Component {
     })
   }
   selectRow = (record, index, event) => {
+    const { forbiddenStatus } = this.props
+    const { ORDER_DETAIL_AND_CHARGEBACK } = forbiddenStatus
+    if (ORDER_DETAIL_AND_CHARGEBACK) {
+      return
+    }
     let { dataSource } = this.state
     // let page = panel_page[main_phase]
     let id = dataSource[index] && dataSource[index].id

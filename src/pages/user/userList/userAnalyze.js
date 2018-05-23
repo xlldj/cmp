@@ -212,7 +212,8 @@ class UserTableView extends React.Component {
     })
   }
   getColumns = () => {
-    const { analyze_deviceType: deviceType } = this.props
+    const { analyze_deviceType: deviceType, forbiddenStatus } = this.props
+    const { USER_INFO_DETILE, ORDER_DETAIL_AND_CHARGEBACK } = forbiddenStatus
     let columns = [
       {
         title: '学校名称',
@@ -280,11 +281,19 @@ class UserTableView extends React.Component {
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
             <span>
-              <Link to={`/user/userInfo/:${record.userId}`}>查看用户详情</Link>
-              <span className="ant-divider" />
-              <a onClick={e => this.toOrderOfUser(e, record.userId)}>
-                查看订单记录
-              </a>
+              {USER_INFO_DETILE ? null : (
+                <Link to={`/user/userInfo/:${record.userId}`}>
+                  查看用户详情
+                </Link>
+              )}
+              {USER_ANALYZE_DAY_SELECT || USER_INFO_DETILE ? null : (
+                <span className="ant-divider" />
+              )}
+              {USER_ANALYZE_DAY_SELECT ? null : (
+                <a onClick={e => this.toOrderOfUser(e, record.userId)}>
+                  查看订单记录
+                </a>
+              )}
             </span>
           </div>
         )

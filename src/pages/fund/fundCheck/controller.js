@@ -10,7 +10,7 @@ import {
 } from '../../../public/dispatcher'
 import * as ActionTypes from '../../../actions'
 import store from '../../../index.js'
-import { fetchFundCheckInfo } from '../action'
+import { fetchFundCheckInfo, fetchFundCheckList } from '../action'
 import Noti from '../../../util/noti'
 const subModule = 'fundCheck'
 
@@ -47,6 +47,16 @@ export const settleOrder = body => {
       const data = { id: body.id }
       Noti.hintOk('处理成功', '处理该账单成功')
       store.dispatch(fetchFundCheckInfo(data))
+      needfetchFundList()
+    }
+  })
+}
+export const needfetchFundList = () => {
+  store.dispatch({
+    type: ActionTypes.CHANGE_FUND,
+    subModule,
+    keyValuePair: {
+      status: 2
     }
   })
 }
