@@ -1,9 +1,8 @@
 import React from 'react'
 import { Button } from 'antd'
 
-import PendingList from './pendingList'
-import HandlingList from './handlingList'
-import FinishedList from './finishedList'
+import TaskListQuery from './query'
+import TaskTable from './table'
 
 import PhaseLine from '../../component/phaseLine'
 import CONSTANTS from '../../../constants'
@@ -14,13 +13,13 @@ import TaskDetail from './taskDetail'
 import BuildTask from './buildTask'
 import notworking from '../../assets/notworking.jpg'
 
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, setUserInfo, changeOnline } from '../../../actions'
-import { taskListPropsController } from './controller.js'
-const moduleName = 'taskListContainer'
-const subModule = 'taskList'
+import { taskListContainerPropsController } from './controller.js'
+const moduleName = 'taskModule'
+const subModule = 'taskListContainer'
+const modalName = 'taskModal'
 
 const TARGETS = {
   1: '我的任务',
@@ -55,10 +54,6 @@ const SIZE = CONSTANTS.PAGINATION
 /*------sourcetype不传表示所有，我用0代替，1为体现，2为维修-------------------*/
 
 class TaskList extends React.Component {
-  static propTypes = {
-    taskList: PropTypes.object.isRequired,
-    forbiddenStatus: PropTypes.object.isRequired
-  }
   constructor(props) {
     super(props)
     this.state = {
@@ -66,18 +61,29 @@ class TaskList extends React.Component {
     }
   }
 
+  setProps = event => {
+    const { listLoading, detailLoading } = this.props
+    if (listLoading || detailLoading) {
+      return
+    }
+    const value = taskListContainerPropsController(
+      this.state,
+      this.props,
+      event
+    )
+    if (value) {
+      this.props.changeTask(subModule, value)
+    }
+  }
   componentDidMount() {
     this.props.hide(false)
-    this.syncStateToProps()
 
     const { user, showDetail } = this.props
     const { isCs, csOnline } = user || {}
     if (isCs && !csOnline) {
-      // if jumped from order/warn, and customer is offline, hide detail.
+      // 如果从订单预警跳过来，而且当前为客服，且未上线，则关掉详情。
       if (showDetail) {
-        this.props.changeTask(subModule, {
-          showDetail: false
-        })
+        this.setProps({ type: 'toggleDetail', value: { showDetail: false } })
       }
       return
     }
@@ -139,7 +145,7 @@ class TaskList extends React.Component {
   changePhase = v => {
     const { tabIndex } = this.props
     if (tabIndex !== v) {
-      this.props.changeTask(subModule, { tabIndex: v })
+      this.setProps({ type: 'tabIndex', value: { tabIndex: +v } })
     }
   }
   changeSchool = v => {
@@ -147,9 +153,7 @@ class TaskList extends React.Component {
     if (v === schoolId) {
       return
     }
-    this.props.changeTask(subModule, {
-      schoolId: v
-    })
+    this.setProps({ type: 'schoolId', value: { schoolId: v } })
     this.props.changeTask(TAB_TO_REDUX_NAME[tabIndex], {
       page: 1
     })
@@ -179,17 +183,7 @@ class TaskList extends React.Component {
   changeOnline = e => {
     this.props.changeOnline()
   }
-  getContents = () => {
-    const { tabIndex, forbiddenStatus } = this.props
-    if (tabIndex === TASK_LIST_TAB_PENDING) {
-      return <PendingList forbiddenStatus={forbiddenStatus} />
-    } else if (tabIndex === TASK_LIST_TAB_HANDLING) {
-      return <HandlingList forbiddenStatus={forbiddenStatus} />
-    } else if (tabIndex === TASK_LIST_TAB_FINISHED) {
-      return <FinishedList forbiddenStatus={forbiddenStatus} />
-    }
-    return
-  }
+
   render() {
     const {
       tabIndex,
@@ -250,15 +244,14 @@ class TaskList extends React.Component {
             )}
           </div>
         </PhaseLine>
-        {this.getContents()}
+        <TaskListQuery {...this.props} />
+        <TaskTable {...this.props} />
         {showDetail ? <TaskDetail /> : null}
         {showBuild ? <BuildTask /> : null}
       </div>
     )
   }
 }
-
-// export default TaskList
 
 const mapStateToProps = (state, ownProps) => ({
   tabIndex: state[moduleName][subModule].tabIndex,
@@ -268,6 +261,9 @@ const mapStateToProps = (state, ownProps) => ({
   handlingList: state[moduleName].handlingList,
   finishedList: state[moduleName].finishedList,
   showDetail: state[moduleName][subModule].showDetail,
+  listLoading: state[modalName].listLoading,
+  total: state[modalName].total,
+  detailLoading: state[modalName].detailLoading,
   forbiddenStatus: state.setAuthenData.forbiddenStatus,
   user: state.setUserInfo
 })

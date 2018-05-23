@@ -28,6 +28,20 @@ export const dayController = (
     return value
   }
 }
+export const selectKeyController = (
+  state,
+  props,
+  event,
+  { selectKeyName } = { selectKeyName: 'selectKey' }
+) => {
+  const { type, value } = event
+  if (type === 'selectKey') {
+    if (props[selectKeyName] === value[selectKeyName]) {
+      return
+    }
+    return value
+  }
+}
 export const statusController = (
   state,
   props,

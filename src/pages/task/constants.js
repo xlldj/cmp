@@ -2,6 +2,40 @@ const TASK = {
   TASK_LIST_TAB_PENDING: 1,
   TASK_LIST_TAB_HANDLING: 2,
   TASK_LIST_TAB_FINISHED: 3,
+  TIMELABEL: {
+    1: '等待时间',
+    2: '等待时间',
+    3: '完结时间'
+  },
+  TIMERANGESELECTS: {
+    1: {
+      1: '今日',
+      3: '近7天',
+      6: '超过1天',
+      7: '超过2天',
+      8: '超过5天'
+    },
+    2: {
+      1: '今日',
+      3: '近7天',
+      6: '超过1天',
+      7: '超过2天',
+      8: '超过5天'
+    },
+    3: {
+      1: '今日',
+      2: '近3天',
+      3: '近7天',
+      4: '近14天',
+      5: '近30天'
+    }
+  },
+  TASKTYPES: {
+    1: '报修',
+    2: '账单投诉',
+    3: '意见反馈',
+    4: '消费预警'
+  },
   TAB_TO_REDUX_NAME: {
     1: 'pendingList',
     2: 'handlingList',
@@ -10,15 +44,15 @@ const TASK = {
   /* TASK */
   TASK_LIST_PAGE_TABS: [
     {
-      value: 0,
+      value: 1,
       text: '待处理'
     },
     {
-      value: 1,
+      value: 2,
       text: '处理中'
     },
     {
-      value: 2,
+      value: 3,
       text: '已完结'
     }
   ],

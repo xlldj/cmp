@@ -1,7 +1,7 @@
-import { stopBeat } from '../tasks/heartBeat'
-import AjaxHandler from '../util/ajax'
-import { buildAuthenData } from '../util/authenDataHandle'
-import { getStore, setStore, removeStore } from '../util/storage'
+import { stopBeat } from '../../tasks/heartBeat'
+import AjaxHandler from '../../util/ajax'
+import { buildAuthenData } from '../../util/authenDataHandle'
+import { getStore, setStore, removeStore } from '../../util/storage'
 
 export const fetchTaskDetail = body => {
   let resource = '/work/order/one'

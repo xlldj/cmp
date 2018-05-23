@@ -8,7 +8,7 @@ import heaterModule from '../pages/heater/reducer'
 import orderModule from '../pages/order/reducer'
 import buildingsSet from './building'
 import userModule from '../pages/user/reducer.js'
-import { taskModule } from '../pages/task/reducer.js'
+import { taskModule, taskModal } from '../pages/task/reducer.js'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -423,6 +423,7 @@ const rootReducer = combineReducers({
   lostModule,
   userModule,
   taskModule,
+  taskModal,
   employeeModule,
   notifyModule,
   versionModule,
