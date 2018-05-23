@@ -485,8 +485,8 @@ const BASIC = {
     '异常订单详情（处理退单）': 'ABNORMAL_ORDER_DETAIL_AND_CHARGEBACK',
 
     // 充值提现
-    '充值提现列表/搜索/查询': 'FUND_LIST_GET',
-    '充值提现详情（提现审核）': 'FUND_RECHARGE_DETAIL',
+    '充值列表/搜索/查询': 'FUND_LIST_GET',
+    充值详情: 'FUND_RECHARGE_DETAIL',
     '提现时间列表/搜索/查询': 'FUND_WITHDRAW_TIMESET_GET',
     '添加/编辑提现时间': 'FUND_WITHDRAW_TIMESET_EDIT',
     删除提现时间: 'FUND_WITHDRAW_TIMESET_DELETE',

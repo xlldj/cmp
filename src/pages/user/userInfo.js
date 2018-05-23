@@ -4,7 +4,7 @@ import Time from '../../util/time'
 import Noti from '../../util/noti'
 import CONSTANTS from '../../constants'
 import AjaxHandler from '../../util/ajax'
-import { trueWhen0 } from '../../util/types'
+import { notEmpty } from '../../util/types'
 
 import PropTypes from 'prop-types'
 
@@ -334,19 +334,19 @@ class UserInfoView extends React.Component {
           <li>
             <p>账户余额:</p>
 
-            {trueWhen0(data.balance) ? (
+            {notEmpty(data.balance) ? (
               <span className="shalowRed">{'¥' + data.balance}</span>
             ) : (
               '未知'
             )}
           </li>
-          {trueWhen0(data.givingBalance) ? (
+          {notEmpty(data.givingBalance) ? (
             <li>
               <p>赠送金额:</p>
               {`¥${data.givingBalance}`}
             </li>
           ) : null}
-          {trueWhen0(data.credits) ? (
+          {notEmpty(data.credits) ? (
             <li>
               <p>用户积分:</p>
               {data.credits}
