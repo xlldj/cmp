@@ -67,6 +67,6 @@ function hasOwn(o, key) {
   return false
 }
 
-export const trueWhen0 = v => {
-  return v || v === 0
+export const notEmpty = v => {
+  return v !== null && v !== undefined
 }
