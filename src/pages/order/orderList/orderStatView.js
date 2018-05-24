@@ -225,12 +225,12 @@ class OrderStatView extends React.Component {
         2,
         0,
         {
-          title: '总用水量',
+          title: '总用水量(升)',
           dataIndex: 'totalWaterUsage'
         },
         {
-          title: '人均用水量',
-          dataIndex: 'verageWaterUsage)'
+          title: '人均用水量(升)',
+          dataIndex: 'averageWaterUsage'
         }
       )
       columns.splice(0, 1, {
