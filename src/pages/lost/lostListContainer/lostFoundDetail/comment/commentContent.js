@@ -76,12 +76,14 @@ class CommentContent extends React.Component {
                 {comment.replyToUserId ? (
                   <span>
                     {comment.replyToUserInBlackList ? (
-                      <span>(已被拉黑)</span>
+                      <span className="greyFont">(已被拉黑)</span>
                     ) : null}
                   </span>
                 ) : (
                   <span>
-                    {commentUserInBlack ? <span>(已被拉黑)</span> : null}
+                    {commentUserInBlack ? (
+                      <span className="greyFont">(已被拉黑)</span>
+                    ) : null}
                   </span>
                 )}
               </Link>
