@@ -50,15 +50,20 @@ class CommentContent extends React.Component {
     return (
       <div className="commentItem">
         <span>
-          <Link className="softLink" to={`/user/userInfo/:${comment.userId}`}>
+          <Link
+            className="softLink greyFont"
+            to={`/user/userInfo/:${comment.userId}`}
+          >
             {comment.userMobile}({comment.userNickname})
-            {comment.userInBlackList ? <span>(已被拉黑)</span> : null}
+            {comment.userInBlackList ? (
+              <span className="greyFont">(已被拉黑)</span>
+            ) : null}
           </Link>
           {type === LOST_REPLY ? (
-            <span>
+            <span className="greyColor">
               <span className="balckFont">回复</span>
               <Link
-                className="softLink"
+                className="softLink greyFont"
                 to={`/user/userInfo/:${
                   comment.replyToUserId ? comment.replyToUserId : commentUserId
                 }`}
@@ -84,7 +89,7 @@ class CommentContent extends React.Component {
           ) : null}
           :
         </span>
-        <span>{comment.content}</span>
+        <span className="balckFont">{comment.content}</span>
         <span>
           {notEmpty(comment.createTime)
             ? Time.getTimeStr(comment.createTime)

@@ -28,12 +28,13 @@ const authModule = 'setAuthenData'
 
 class LostListContainer extends React.Component {
   tabs = []
-  componentDidMount() {
+  componentWillMount() {
     this.setTabs()
+  }
+  componentDidMount() {
     this.resetTabIndex()
   }
   setTabs = () => {
-    debugger
     const { forbiddenStatus } = this.props
     const {
       LOST_FOUND_LIST,
@@ -66,19 +67,26 @@ class LostListContainer extends React.Component {
     )
     if (hasRight2SeeLostList) {
       // 有查看订单列表的权限，无需进一步操作
-      if (!LOST_FOUND_LIST && tabIndex !== LOST_LIST_PAGE_TAB_LOSTFOUND) {
-        this.setProps({
-          type: 'tabIndex',
-          value: { tabIndex: LOST_LIST_PAGE_TAB_LOSTFOUND }
-        })
-      } else if (!LOST_BLACKED_USER_LIST) {
-        this.props.changeLost(subModule, {
-          tabIndex: LOST_LIST_PAGE_TAB_BLACKEDLIST
-        })
-      } else if (!LOST_COMMENT_ENABLE_LIST) {
-        this.props.changeLost(subModule, {
-          tabIndex: LOST_LIST_PAGE_TAB_ENABLECOMMENT
-        })
+      if (
+        (LOST_FOUND_LIST && tabIndex === LOST_LIST_PAGE_TAB_LOSTFOUND) ||
+        (LOST_BLACKED_USER_LIST &&
+          tabIndex === LOST_LIST_PAGE_TAB_BLACKEDLIST) ||
+        (LOST_COMMENT_ENABLE_LIST &&
+          tabIndex === LOST_LIST_PAGE_TAB_ENABLECOMMENT)
+      ) {
+        if (!LOST_FOUND_LIST) {
+          this.props.changeLost(subModule, {
+            tabIndex: LOST_LIST_PAGE_TAB_LOSTFOUND
+          })
+        } else if (!LOST_BLACKED_USER_LIST) {
+          this.props.changeLost(subModule, {
+            tabIndex: LOST_LIST_PAGE_TAB_BLACKEDLIST
+          })
+        } else if (!LOST_COMMENT_ENABLE_LIST) {
+          this.props.changeLost(subModule, {
+            tabIndex: LOST_LIST_PAGE_TAB_ENABLECOMMENT
+          })
+        }
       }
     }
   }

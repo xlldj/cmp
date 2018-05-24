@@ -42,12 +42,21 @@
 .commentWrapper .commentItem span:first-child {
   margin: 0px;
 }
+.commentWrapper .commentItem .greyFont {
+  color: #999;
+}
 .commentWrapper .commentItem .blue_font {
   color: #108ee9;
   cursor: pointer;
 }
+.commentWrapper .commentItem .balckFont {
+  color: #000000;
+}
 .commentWrapper .commentItem .blueFont {
   color: #108ee9;
+}
+.commentWrapper .commentItem .softLink:hover {
+  color: #108ee9 !important;
 }
 .commentsContent {
   margin-top: 20px;
