@@ -1,5 +1,5 @@
 import BASIC from './basic'
-import SCHOOL from './school'
+import SCHOOL from '../pages/school/constants.js'
 import DEVICE from './device'
 import EMPLOYEE from './employee'
 import FUND from '../pages/fund/constants.js'

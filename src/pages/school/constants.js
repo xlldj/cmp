@@ -11,7 +11,19 @@ const SCHOOL = {
     2: '测试学校',
     3: '工厂'
   },
-  WXCERTSIZE: 65534 // cert file should not exceed 64k bytes.
+  WXCERTSIZE: 65534, // cert file should not exceed 64k bytes.
+  ACCOUNT_ENVS: [
+    {
+      label: '笑联用户端',
+      value: 1
+    },
+    {
+      label: '笑联运维端',
+      value: 4
+    }
+  ],
+  ACCOUNT_ENV_ALI_USER: 1,
+  ACCOUNT_ENV_ALI_YUNWEI: 4
 }
 
 export default SCHOOL
