@@ -33,7 +33,6 @@ class LostListContainer extends React.Component {
     this.resetTabIndex()
   }
   setTabs = () => {
-    debugger
     const { forbiddenStatus } = this.props
     const {
       LOST_FOUND_LIST,
