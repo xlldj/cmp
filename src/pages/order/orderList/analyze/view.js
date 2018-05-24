@@ -450,10 +450,7 @@ class OrderAnalyzeView extends React.Component {
         dataIndex: 'selected',
         className: 'center',
         render: (text, record) => {
-          if (
-            record.warningTaskHandling ||
-            forbiddenStatus.BUILD_TASK_BY_DEVICE_CONSUMPTION
-          ) {
+          if (record.warningTaskHandling) {
             return ''
           } else {
             return (
@@ -493,6 +490,10 @@ class OrderAnalyzeView extends React.Component {
         sorter: true
       }
     ]
+    // 如果没有权限，删掉第一列
+    if (forbiddenStatus.BUILD_TASK_BY_DEVICE_CONSUMPTION) {
+      columns.splice(0, 1)
+    }
     if (deviceType === DEVICE_TYPE_BLOWER) {
       columns.push({
         title: `${dayStr}使用时长(秒)`,
@@ -679,8 +680,10 @@ class OrderAnalyzeView extends React.Component {
       roomType,
       warnTaskStatus,
       schoolId,
-      buildingsOfSchoolId
+      buildingsOfSchoolId,
+      forbiddenStatus
     } = this.props
+    const { BUILD_TASK_BY_DEVICE_CONSUMPTION } = forbiddenStatus
     const {
       threshold,
       thresholdType,
@@ -837,7 +840,7 @@ class OrderAnalyzeView extends React.Component {
                 onChange={this.changeTable}
                 onRowClick={this.selectRow}
               />
-              {showBuildTaskBtn ? (
+              {showBuildTaskBtn && !BUILD_TASK_BY_DEVICE_CONSUMPTION ? (
                 <div className="buildTaskWrapper">
                   <Button type="primary" onClick={this.showRepairmanSelect}>
                     批量生成工单

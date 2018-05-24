@@ -19,6 +19,13 @@ import {
   fetchDoorForbidList,
   fetchDetailRecordList
 } from '../pages/doorForbid/action'
+import {
+  CHANGE_FUND,
+  changeFund,
+  CHANGE_MODAL_FUNDCHECK,
+  fetchFundCheckList,
+  fetchFundCheckInfo
+} from '../pages/fund/action.js'
 
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
@@ -185,15 +192,6 @@ export const changeSchool = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_FUND = 'CHANGE_FUND'
-export const changeFund = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_FUND,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_GIFT = 'CHANGE_GIFT'
 export const changeGift = (subModule, keyValuePair) => {
   return {
@@ -272,6 +270,11 @@ export {
   fetchDetailRecordList,
   SET_BUILDING_LIST,
   fetchBuildings,
+  CHANGE_FUND,
+  changeFund,
+  fetchFundCheckList,
+  fetchFundCheckInfo,
+  CHANGE_MODAL_FUNDCHECK,
   CHANGE_USER,
   changeUser
 }

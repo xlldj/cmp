@@ -163,6 +163,11 @@ const BASIC = {
           name: '异常资金',
           path: 'abnormal',
           key: 4
+        },
+        {
+          name: '资金对账',
+          path: 'fundCheck',
+          key: 7
         }
       ]
     },
@@ -480,8 +485,8 @@ const BASIC = {
     '异常订单详情（处理退单）': 'ABNORMAL_ORDER_DETAIL_AND_CHARGEBACK',
 
     // 充值提现
-    '充值提现列表/搜索/查询': 'FUND_LIST_GET',
-    '充值提现详情（提现审核）': 'FUND_RECHARGE_DETAIL',
+    '充值列表/搜索/查询': 'FUND_LIST_GET',
+    充值详情: 'FUND_RECHARGE_DETAIL',
     '提现时间列表/搜索/查询': 'FUND_WITHDRAW_TIMESET_GET',
     '添加/编辑提现时间': 'FUND_WITHDRAW_TIMESET_EDIT',
     删除提现时间: 'FUND_WITHDRAW_TIMESET_DELETE',
@@ -539,8 +544,9 @@ const BASIC = {
     '工单列表查询/搜索/详情': 'TASK_LIST_GET',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
-    工作报表查看: 'REPORT_LIST_GET',
     添加标签: 'BUILD_COMPLAINT_TAG',
+    人工处理: 'HANDLE_FUND_CHECK',
+    工作报表查看: 'REPORT_LIST_GET',
     //红包管理
     '红包列表/搜索/查询': 'GIFT_LIST_GET',
     '添加/编辑红包': 'GIFT_ADD_OR_EDIT',

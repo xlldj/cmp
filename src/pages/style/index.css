@@ -56,6 +56,12 @@ a:active {
 .outLink:hover {
   color: #108ee9;
 }
+.softLink {
+  color: #222;
+}
+.softLink:hover {
+  color: #108ee9;
+}
 input,
 textarea {
   border-radius: 4px;
@@ -183,6 +189,17 @@ shortSeperator {
 }
 .rightSeperator {
   margin-right: 10px;
+}
+.topSeperator {
+  margin-top: 20px;
+}
+/* 详情表单中文字换行的容器和span元素 */
+.wrapBlock {
+  white-space: nowrap;
+}
+.wrapBlock .wrapText {
+  white-space: pre-line;
+  vertical-align: top;
 }
 /* for time picker in gift/act and notify */
 .timePicker {
@@ -1160,6 +1177,14 @@ shortSeperator {
   padding: 20px 30px;
   overflow-y: scroll;
 }
+.detailPanelWrapper .detailPanel-content .detailPanel-contentBlock {
+  border-bottom: 1px solid #ddd;
+  margin: -20px -30px;
+  padding: 20px 30px;
+}
+.detailPanelWrapper .detailPanel-content .detailPanel-contentBlock:last-child {
+  border-bottom: none;
+}
 .detailPanelWrapper .detailPanel-content .detailPanel-sidebar {
   display: inline-block;
   padding: 20px 30px;
@@ -1208,7 +1233,7 @@ shortSeperator {
   background: #ebf4fd;
 }
 .detailList li {
-  height: 22px;
+  min-height: 22px;
   line-height: 22px;
 }
 .detailList li label {
