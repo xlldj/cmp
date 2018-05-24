@@ -285,12 +285,19 @@ class UserTableView extends React.Component {
           width: '10%',
           className: 'shalowRed',
           render: (text, record, index) =>
-            record.consume || record.consume === 0 ? `¥${record.consume}` : ''
+            record.rechargeConsume || record.rechargeConsume === 0
+              ? `¥${record.rechargeConsume}`
+              : ''
         },
         {
           title: '赠送金额消费',
           dataIndex: 'givingConsume',
-          width: '10%'
+          width: '10%',
+          className: 'shalowRed',
+          render: (text, record, index) =>
+            record.givingConsume || record.givingConsume === 0
+              ? `¥${record.givingConsume}`
+              : ''
         }
       ])
       columns.splice(0, 1, {

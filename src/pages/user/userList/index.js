@@ -59,19 +59,24 @@ class UserListView extends React.Component {
     )
     if (hasRight2SeeOrderList) {
       // 有查看订单列表的权限，如果当前tabIndex不一致，更改之
-      if (!USER_LIST_GET && tabIndex !== USER_LIST_TAB_TABLE) {
-        this.props.changeUser(subModule, {
-          tabIndex: USER_LIST_TAB_TABLE
-        })
-        return
-      } else if (!FOX_USER_LIST) {
-        this.props.changeUser(subModule, {
-          tabIndex: USER_LIST_FOX
-        })
-      } else if (!USER_CONSUME_ANALYZE) {
-        this.props.changeUser(subModule, {
-          tabIndex: USER_LIST_ANALYZE
-        })
+      if (
+        (USER_LIST_GET && tabIndex === USER_LIST_TAB_TABLE) ||
+        (FOX_USER_LIST && tabIndex === USER_LIST_FOX) ||
+        (USER_CONSUME_ANALYZE && tabIndex === USER_LIST_ANALYZE)
+      ) {
+        if (!USER_LIST_GET) {
+          this.props.changeUser(subModule, {
+            tabIndex: USER_LIST_TAB_TABLE
+          })
+        } else if (!FOX_USER_LIST) {
+          this.props.changeUser(subModule, {
+            tabIndex: USER_LIST_FOX
+          })
+        } else if (!USER_CONSUME_ANALYZE) {
+          this.props.changeUser(subModule, {
+            tabIndex: USER_LIST_ANALYZE
+          })
+        }
       }
     }
   }
