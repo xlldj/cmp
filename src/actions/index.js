@@ -5,7 +5,7 @@ import { getStore, setStore, removeStore } from '../util/storage'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
 import { CHANGE_USER, changeUser } from '../pages/user/action'
-
+import { changeNotify, CHANGE_NOTIFY } from '../pages/notify/action'
 import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
 import {
   CHANGE_HEATER,
@@ -228,15 +228,6 @@ export const changeEmployee = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_NOTIFY = 'CHANGE_NOTIFY'
-export const changeNotify = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_NOTIFY,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_VERSION = 'CHANGE_VERSION'
 export const changeVersion = (subModule, keyValuePair) => {
   return {
@@ -276,5 +267,7 @@ export {
   fetchFundCheckInfo,
   CHANGE_MODAL_FUNDCHECK,
   CHANGE_USER,
-  changeUser
+  changeUser,
+  changeNotify,
+  CHANGE_NOTIFY
 }

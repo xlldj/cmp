@@ -9,7 +9,7 @@ import orderModule from '../pages/order/reducer'
 import { fundModule, fundCheckModal } from '../pages/fund/reducer'
 import buildingsSet from './building'
 import userModule from '../pages/user/reducer.js'
-
+import { notifyModule, beingsModal } from '../pages/notify/reducer'
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
@@ -397,26 +397,6 @@ const employeeModule = (state = initialEmployeeState, action) => {
   return state
 }
 
-// 公告管理
-const initialNotifyState = {
-  notify: {
-    page: 1,
-    type: 'all'
-  },
-  censor: {
-    page: 1
-  }
-}
-const notifyModule = (state = initialNotifyState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_NOTIFY) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
 // 版本管理
 const initialVersionState = {
   version: {
@@ -481,6 +461,7 @@ const rootReducer = combineReducers({
   taskModule,
   employeeModule,
   notifyModule,
+  beingsModal,
   versionModule,
   doorForbidModule,
   setSchoolList,

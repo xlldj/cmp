@@ -268,6 +268,11 @@ const BASIC = {
           name: '公告审核',
           path: 'censor',
           key: 1
+        },
+        {
+          name: '消息推送',
+          path: 'beings',
+          key: 2
         }
       ]
     },
