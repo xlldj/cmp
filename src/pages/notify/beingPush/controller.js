@@ -3,6 +3,7 @@ import {
   pageController,
   statusController,
   methodController,
+  schoolIdController,
   combineControllers
 } from '../../../public/dispatcher'
 export const beingsListPropsController = (state, props, event) => {
@@ -10,6 +11,7 @@ export const beingsListPropsController = (state, props, event) => {
     typeController,
     pageController,
     statusController,
-    methodController
+    methodController,
+    schoolIdController
   ])(state, props, event)
 }

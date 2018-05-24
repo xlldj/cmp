@@ -4,7 +4,7 @@ import orderStatHandler from './order.js'
 import orderConsumptionHandler from './orderConsumption'
 import fundCheckHandler from './fundCheck'
 import userAuthHandler from './userAuth'
-
+import beingPushHandler from './beingPush'
 const AjaxHandler = {
   showingError: false
 }
@@ -58,8 +58,8 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return fundCheckHandler(resource, body)
   } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
     return userAuthHandler(resource, body)
-  } else if (contain(resource, 'beings/list', 'beings/detail')) {
-    return userAuthHandler(resource, body)
+  } else if (contain(resource, 'beings/list', 'beings/info')) {
+    return beingPushHandler(resource, body)
   }
 }
 

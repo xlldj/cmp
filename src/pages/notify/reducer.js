@@ -1,5 +1,5 @@
 import * as ActionTypes from '../../actions'
-// import Time from '../../util/time'
+import moment from 'moment'
 import getDefaultSchool from '../../util/defaultSchool'
 // 公告管理
 const initialNotifyState = {
@@ -12,7 +12,7 @@ const initialNotifyState = {
   },
   beings: {
     schoolId: getDefaultSchool(),
-    type: 'all',
+    type: 1,
     status: 'all',
     method: 'all',
     page: 1
@@ -33,7 +33,17 @@ export const notifyModule = (state = initialNotifyState, action) => {
 const initialBeingState = {
   list: [],
   total: 0,
-  listLoading: false
+  listLoading: false,
+  detail: {
+    schoolId: 'all',
+    pushMethon: '',
+    pushEqument: '',
+    pushObj: '',
+    pushTime: moment(),
+    pushContent: '',
+    pushStatus: 2
+  },
+  detailLoading: false
 }
 export const beingsModal = (state = initialBeingState, action) => {
   const { type } = action

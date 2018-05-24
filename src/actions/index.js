@@ -5,7 +5,12 @@ import { getStore, setStore, removeStore } from '../util/storage'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
 import { CHANGE_USER, changeUser } from '../pages/user/action'
-import { changeNotify, CHANGE_NOTIFY } from '../pages/notify/action'
+import {
+  changeNotify,
+  CHANGE_NOTIFY,
+  fetchBeingPushList,
+  CHANGE_MODAL_BEING
+} from '../pages/notify/action'
 import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
 import {
   CHANGE_HEATER,
@@ -261,6 +266,8 @@ export {
   fetchDetailRecordList,
   SET_BUILDING_LIST,
   fetchBuildings,
+  fetchBeingPushList,
+  CHANGE_MODAL_BEING,
   CHANGE_FUND,
   changeFund,
   fetchFundCheckList,

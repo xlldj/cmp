@@ -11,10 +11,20 @@ const NOTIFY = {
   NOTIFY_STATUS_OUTDATED: 2,
   NOTIFY_STATUS_PENDING: 3,
   NOTIFY_STATUS_REFUSED: 4,
+  BEING_PUSH_METHON: {
+    1: '制定时间推送',
+    2: '立即推送'
+  },
+  BEING_PUSH_METNON_WAITE: 1,
   BEINGS_PUSH_TYPE: {
     1: '自动推送',
     2: '人工推送'
   },
+  BEINGS_PUSH_PERSON: {
+    1: '全部用户',
+    2: '指定用户'
+  },
+  BEINGS_PUSH_TARGET_PERSON: 2,
   BEINGS_PUSH_EQUMENT: {
     1: '笑联用户端',
     2: '笑联运维端',
@@ -25,6 +35,16 @@ const NOTIFY = {
     2: '失败',
     3: '取消',
     4: '待推送'
-  }
+  },
+  BEING_STATUSTEXT: {
+    1: 'success',
+    2: 'error',
+    3: 'default',
+    4: 'warning'
+  },
+  PUSH_SUCCESS_STATUS: 1,
+  PUSH_ERROR_STATUS: 2,
+  PUSH_CANCEL_STATUS: 3,
+  PUSH_WAITE_STATUS: 4
 }
 export default NOTIFY

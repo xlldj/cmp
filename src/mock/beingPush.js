@@ -4,56 +4,69 @@ const beings_list = {
     list: [
       {
         id: 1,
+        content: '内容',
+        creatorName: '操作人',
+        env: 1,
+        planPushTime: '2018-05-25T06:11:38.357Z',
         schoolName: '富士康',
-        pushtype: 1,
-        pushEqument: 2,
-        pushObj: '管理员',
-        pushTime: 1525607978000,
-        pushContent: '内容',
-        createPerson: 'ren1',
-        createTime: 1525607978000,
-        pushStatus: 2
+        target: 2,
+        type: 2,
+        status: 3,
+        mobile: [],
+        methon: 1,
+        schoolId: 1,
+        updateTime: '2018-05-25T06:11:38.357Z'
       },
       {
         id: 2,
+        content: '内容',
+        creatorName: '操作人',
+        env: 2,
+        mobile: [],
+        methon: 1,
+        schoolId: 1,
+        planPushTime: '2018-05-25T06:11:38.357Z',
         schoolName: '富士康',
-        pushtype: 1,
-        pushEqument: 2,
-        pushObj: '管理员',
-        pushTime: 1525607978000,
-        pushContent: '内容',
-        createPerson: 'ren1',
-        createTime: 1525607978000,
-        pushStatus: 2
+        target: 1,
+        type: 2,
+        status: 3,
+        updateTime: '2018-05-25T06:11:38.357Z'
       },
       {
         id: 3,
+        content: '内容',
+        creatorName: '操作人',
+        env: 1,
+        mobile: [],
+        methon: 2,
+        schoolId: 2,
+        planPushTime: '2018-05-25T06:11:38.357Z',
         schoolName: '富士康',
-        pushtype: 1,
-        pushEqument: 2,
-        pushObj: '管理员',
-        pushTime: 1525607978000,
-        pushContent: '内容',
-        createPerson: 'ren1',
-        createTime: 1525607978000,
-        pushStatus: 2
+        target: 2,
+        type: 1,
+        status: 4,
+        updateTime: '2018-05-25T06:11:38.357Z'
       }
     ],
-    total: 0
+    total: 3
   }
 }
-const userAuthHandler = (resource, body) => {
+const beingPushHandler = (resource, body) => {
   if (resource === 'beings/list') {
     let json = beings_list
     return Promise.resolve(json)
-  } else if (resource === 'beings/detail') {
+  } else if (resource === 'beings/info') {
     const index = beings_list.data.list.findIndex(a => a.id === body.id)
     if (index !== -1) {
-      beings_list.data.list.splice(index, 1)
-      return Promise.resolve(delete_ok)
+      let result = {
+        data: {
+          detail: beings_list.data.list[index]
+        }
+      }
+      return Promise.resolve(result)
     }
     return Promise.resolve(delete_error)
   }
 }
 
-export default userAuthHandler
+export default beingPushHandler
