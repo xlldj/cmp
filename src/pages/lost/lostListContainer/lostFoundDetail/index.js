@@ -73,7 +73,13 @@ class LostFoundDetail extends React.Component {
     }
   }
   render() {
-    let { detail: data, detailLoading, selectedDetailId } = this.props
+    let {
+      detail: data,
+      detailLoading,
+      selectedDetailId,
+      forbiddenStatus
+    } = this.props
+    const { LOST_COMMENTS_LIST } = forbiddenStatus
 
     return (
       <div className="detailPanelWrapper lostFoundDetail" ref="detailWrapper">
@@ -81,7 +87,9 @@ class LostFoundDetail extends React.Component {
         <DetailHeader close={e => this.closeDetail(e, true)} />
         <div className="detailPanel-content">
           <LostContent data={data} {...this.props} />
-          <Comment selectedDetailId={selectedDetailId} {...this.props} />
+          {LOST_COMMENTS_LIST ? null : (
+            <Comment selectedDetailId={selectedDetailId} {...this.props} />
+          )}
         </div>
       </div>
     )
@@ -93,7 +101,8 @@ const mapStateToProps = (state, ownProps) => {
     selectedDetailId: state[moduleName][subModule].selectedDetailId,
     detail: state[modalName].detail,
     detailLoading: state[modalName].detailLoading,
-    showDetail: state[moduleName][subModule].showDetail
+    showDetail: state[moduleName][subModule].showDetail,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 

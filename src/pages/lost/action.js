@@ -5,10 +5,16 @@ import { moduleActionFactory } from '../../actions/moduleActions.js'
 import { deepCopy } from '../../util/copy'
 import CONSTANTS from '../../constants'
 import { nextTick } from '../../public/ayncs'
-const { COMMENT_SIZE_THRESHOLD, LOST_FOUND_STATUS_SHADOWED } = CONSTANTS
+import Noti from '../../util/noti'
+const {
+  COMMENT_SIZE_THRESHOLD,
+  LOST_FOUND_STATUS_SHADOWED,
+  PAGINATION: SIZE
+} = CONSTANTS
 export const CHANGE_LOST = 'CHANGE_LOST'
 export const CHANGE_MODAL_LOST = 'CHANGE_MODAL_LOST'
 export const CHANGE_MODAL_BLACK = 'CHANGE_MODAL_BLACK'
+export const CHANGE_MODAL_ENABLECOMMENT = 'CHANGE_MODAL_ENABLECOMMENT'
 /**
  * 更改reducer@lostModule 的通用action
  * @param {string} subModule      :reducer@lostModule中对应的根状态名
@@ -209,7 +215,64 @@ export const fetchBlackPeopleList = body => {
     })
   }
 }
+/**
+ * 获取评论设置的列表
+ * @param {*} body
+ */
+export const fetchEnableCommentList = body => {
+  const { enableCommentModal } = store.getState()
+  const { listLoading } = enableCommentModal
+  return dispatch => {
+    if (listLoading) {
+      return
+    }
+    dispatch({
+      type: CHANGE_MODAL_ENABLECOMMENT,
+      value: {
+        listLoading: true
+      }
+    })
+    let resource = '/api/lost/switch'
+    return AjaxHandler.fetch(resource, body).then(json => {
+      let value = {
+        listLoading: false
+      }
+      if (json && json.data) {
+        const { total, switchList } = json.data
+        value = {
+          ...value,
+          ...{
+            list: switchList,
+            total
+          }
+        }
+      }
+      dispatch({
+        type: CHANGE_MODAL_ENABLECOMMENT,
+        value: value
+      })
+    })
+  }
+}
 
+export const updateCommentSwitch = (body, props) => {
+  return dispatch => {
+    let resource = '/api/lost/switch/update'
+    return AjaxHandler.fetch(resource, body).then(json => {
+      if (json && json.data) {
+        Noti.hintOk('操作成功', '更改设置成功')
+        props.changeLost('enableComment', {
+          showEnableCommentModal: false,
+          selectedDetailId: -1
+        })
+        props.fetchEnableCommentList({
+          page: props.page,
+          size: SIZE
+        })
+      }
+    })
+  }
+}
 export const deleteLostInfo = id => {
   const { lostModal, setUserInfo } = store.getState()
   const { detailLoading } = lostModal

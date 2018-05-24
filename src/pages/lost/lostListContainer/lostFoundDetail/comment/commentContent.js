@@ -109,7 +109,7 @@ class CommentContent extends React.Component {
         <span className="noRightMargin">
           {comment.status === LOST_FOUND_STATUS_SHADOWED ? (
             `(该评论已被${comment.delUserNickname}删除)`
-          ) : forbiddenStatus.DELETE_COMMENT ? null : (
+          ) : forbiddenStatus.DELETE_LOST_COMMENT ? null : (
             <Popconfirm
               title="确认删除此条信息吗?"
               onConfirm={e => this.deleteComment(comment.id)}

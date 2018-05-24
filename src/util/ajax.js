@@ -33,9 +33,13 @@ const domains = {
   pre: {
     manager: 'http://47.106.62.186/m',
     user: 'http://47.106.62.186/c'
+  },
+  zdc: {
+    manager: 'http://10.195.90.143:8080',
+    user: 'http://10.195.90.143:8081'
   }
 }
-const currentDomain = domains.online
+const currentDomain = domains.qa2
 const AjaxHandler = {
   showingError: false
 }

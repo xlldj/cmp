@@ -32,6 +32,7 @@ import {
   CHANGE_LOST,
   CHANGE_MODAL_LOST,
   CHANGE_MODAL_BLACK,
+  CHANGE_MODAL_ENABLECOMMENT,
   fetchBlackPeopleList,
   fetchLostFoundList,
   changeLost
@@ -279,6 +280,7 @@ export {
   CHANGE_LOST,
   CHANGE_MODAL_BLACK,
   CHANGE_MODAL_LOST,
+  CHANGE_MODAL_ENABLECOMMENT,
   fetchLostFoundList,
   CHANGE_FUND,
   changeFund,

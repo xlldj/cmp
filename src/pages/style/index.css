@@ -401,6 +401,39 @@ shortSeperator {
 .multiSelectModalHeader .hint {
   line-height: 40px;
 }
+.infoModal .modalDetails_wrapper li {
+  width: 100%;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+}
+.infoModal .modalDetails_wrapper li label {
+  width: 40%;
+  text-align: right;
+  padding-right: 20px;
+}
+.infoModal .modalDetails_wrapper li .contentValue {
+  display: inline-flex;
+  align-items: center;
+  width: 60%;
+}
+.infoModal .modalDetails_wrapper li .contentValue > div {
+  width: 50%;
+}
+.infoModal .modalDetails_wrapper li .contentValue > span {
+  width: auto;
+}
+.infoModal .modalDetails_wrapper li .contentValue > input {
+  width: 150px;
+  height: 28px;
+  margin-right: 6px;
+}
+.infoModal .contentWrapper:first-child {
+  margin-bottom: 20px;
+}
+.infoModal .btnArea {
+  background-color: #ffffff;
+}
 /* for form style */
 .formContent {
   width: 100%;

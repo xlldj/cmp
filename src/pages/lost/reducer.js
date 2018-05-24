@@ -19,6 +19,15 @@ const initialLostState = {
     selectedDetailId: -1,
     showDetail: false,
     order: 0 // 默认无排序，
+  },
+  blackedList: {
+    page: 1,
+    selectKey: ''
+  },
+  enableComment: {
+    page: 1,
+    showEnableCommentModal: false,
+    selectedDetailId: -1
   }
 }
 export const lostModule = (state = initialLostState, action) => {
@@ -61,12 +70,25 @@ const initialBlackModal = {
   listLoading: false,
   comments: [],
   commentsLoading: false,
-  commentsSize: 0,
-  page: 1
+  commentsSize: 0
 }
 export const blackModal = (state = initialBlackModal, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_MODAL_BLACK) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}
+
+const initialEnableComment = {
+  list: [],
+  total: 0,
+  listLoading: false
+}
+export const enableCommentModal = (state = initialEnableComment, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_MODAL_ENABLECOMMENT) {
     const { value } = action
     return { ...state, ...value }
   }

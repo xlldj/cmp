@@ -9,7 +9,12 @@ import orderModule from '../pages/order/reducer'
 import { fundModule, fundCheckModal } from '../pages/fund/reducer'
 import buildingsSet from './building'
 import userModule from '../pages/user/reducer.js'
-import { lostModule, lostModal, blackModal } from '../pages/lost/reducer.js'
+import {
+  lostModule,
+  lostModal,
+  blackModal,
+  enableCommentModal
+} from '../pages/lost/reducer.js'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -462,6 +467,7 @@ const rootReducer = combineReducers({
   lostModule,
   lostModal,
   blackModal,
+  enableCommentModal,
   userModule,
   taskModule,
   employeeModule,

@@ -4,6 +4,7 @@ import {
   syncTimeController,
   dayController,
   typeController,
+  selectKeyController,
   statusController,
   pageController,
   combineControllers,
@@ -31,7 +32,8 @@ export const lostFoundListPropsController = (state, props, event) => {
     dayController,
     statusController,
     pageController,
-    orderController
+    orderController,
+    selectKeyController
   ])(state, props, event)
 }
 

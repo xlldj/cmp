@@ -11,61 +11,18 @@ import { lostFoundListPropsController } from '../controller'
 import { QueryPanel, QueryLine, QueryBlock } from '../../../component/query'
 import SearchInput from '../../../component/searchInput'
 const moduleName = 'lostModule'
+const subModule = 'blackedList'
 const modalName = 'blackModal'
-const { PAGINATION: SIZE, LOSTTYPE } = CONSTANTS
-class LostListContainer extends React.Component {
+const { PAGINATION: SIZE } = CONSTANTS
+
+class BlackPeople extends React.Component {
   constructor(props) {
     super(props)
     let searchingText = ''
     this.state = {
       searchingText
     }
-  }
-  clearSearch = () => {
-    this.setState(
-      {
-        searchingText: ''
-      },
-      this.pressEnter
-    )
-  }
-  changeSearch = e => {
-    this.setState({
-      searchingText: e.target.value
-    })
-  }
-  pressEnter = () => {
-    let v = this.state.searchingText.trim()
-    this.setState({
-      searchingText: v
-    })
-    let selectKey = this.props.list_selectKey
-    if (v === selectKey) {
-      return
-    }
-    this.sendFetch()
-  }
-  setProps = event => {
-    const value = lostFoundListPropsController(this.state, this.props, event)
-    if (value) {
-      this.props.changeLost(modalName, value)
-    }
-  }
-  changePage = pageObj => {
-    let page = pageObj.current
-    this.setProps({ type: 'page', value: { page } })
-  }
-  componentDidMount() {
-    this.sendFetch()
-  }
-  componentWillReceiveProps(nextProps) {
-    if (checkObject(this.props, nextProps, ['schoolId', 'page'])) {
-      return
-    }
-    this.sendFetch(nextProps)
-  }
-  getColumns = () => {
-    return [
+    this.columns = [
       {
         title: '学校名称',
         dataIndex: 'schoolName',
@@ -107,10 +64,63 @@ class LostListContainer extends React.Component {
       }
     ]
   }
+  componentDidMount() {
+    this.sendFetch()
+    console.log('black list mount')
+    this.syncStateWithProps()
+  }
+  componentWillReceiveProps(nextProps) {
+    if (checkObject(this.props, nextProps, ['schoolId', 'page', 'selectKey'])) {
+      return
+    }
+    this.sendFetch(nextProps)
+  }
+  syncStateWithProps = () => {
+    const { selectKey } = this.props
+    if (selectKey !== this.state.searchingText) {
+      this.setState({
+        searchingText: selectKey
+      })
+    }
+  }
+  clearSearch = () => {
+    this.setState(
+      {
+        searchingText: ''
+      },
+      this.pressEnter
+    )
+  }
+  changeSearch = e => {
+    this.setState({
+      searchingText: e.target.value
+    })
+  }
+  pressEnter = () => {
+    let v = this.state.searchingText.trim()
+    this.setState({
+      searchingText: v
+    })
+    this.setProps({
+      type: 'selectKey',
+      value: {
+        selectKey: v
+      }
+    })
+  }
+  setProps = event => {
+    const value = lostFoundListPropsController(this.state, this.props, event)
+    if (value) {
+      this.props.changeLost(subModule, value)
+    }
+  }
+  changePage = pageObj => {
+    let page = pageObj.current
+    this.setProps({ type: 'page', value: { page } })
+  }
   sendFetch(props) {
     props = props || this.props
-    const { page, schoolId } = this.props
-    const { searchingText } = this.state
+    const { page, schoolId, selectKey } = props
     const body = {
       page: page,
       size: SIZE
@@ -118,8 +128,8 @@ class LostListContainer extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = +schoolId
     }
-    if (searchingText) {
-      body.selectKey = searchingText
+    if (selectKey) {
+      body.selectKey = selectKey
     }
     this.props.fetchBlackPeopleList(body)
   }
@@ -127,13 +137,12 @@ class LostListContainer extends React.Component {
     const { dataSource, total, loading, page } = this.props
     const { searchingText } = this.state
     const showClearBtn = !!searchingText
-    const columns = this.getColumns()
     return (
-      <div className="tableList blackTable">
+      <div>
         <QueryPanel>
           <QueryLine>
             <QueryBlock>
-              <p className="profitBanner">当前拉黑人数: {total}人</p>
+              <p>当前拉黑人数: {total}人</p>
             </QueryBlock>
             <QueryBlock>
               {showClearBtn ? (
@@ -154,32 +163,32 @@ class LostListContainer extends React.Component {
             </QueryBlock>
           </QueryLine>
         </QueryPanel>
-        <Table
-          bordered
-          showQuickJumper
-          loading={loading}
-          pagination={{
-            pageSize: SIZE,
-            current: page,
-            total: total,
-            showQuickJumper: true
-          }}
-          dataSource={dataSource}
-          rowKey={record => record.id}
-          columns={columns}
-          onChange={this.changePage}
-          rowClassName={this.setRowClass}
-        />
+        <div className="tableList">
+          <Table
+            bordered
+            showQuickJumper
+            loading={loading}
+            pagination={{
+              pageSize: SIZE,
+              current: page,
+              total: total,
+              showQuickJumper: true
+            }}
+            dataSource={dataSource}
+            rowKey={record => record.id}
+            columns={this.columns}
+            onChange={this.changePage}
+          />
+        </div>
       </div>
     )
   }
 }
 const mapStateToProps = (state, ownProps) => {
   return {
+    page: state[moduleName][subModule].page,
+    selectKey: state[moduleName][subModule].selectKey,
     schoolId: state[moduleName].lostListContainer.schoolId,
-    page: state[modalName].page,
-    totalNormal: state[modalName].totalNormal,
-    listLoading: state[modalName].listLoading,
     total: state[modalName].total,
     dataSource: state[modalName].list,
     loading: state[modalName].listLoading
@@ -187,7 +196,5 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 export default withRouter(
-  connect(mapStateToProps, { changeLost, fetchBlackPeopleList })(
-    LostListContainer
-  )
+  connect(mapStateToProps, { changeLost, fetchBlackPeopleList })(BlackPeople)
 )

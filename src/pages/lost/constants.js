@@ -17,10 +17,27 @@ const LOST = {
     {
       value: 2,
       text: '拉黑用户列表'
+    },
+    {
+      value: 3,
+      text: '评论设置列表'
     }
   ],
+  LOST_LIST_TAB_LOSTFOUND: {
+    value: 1,
+    text: '失物招领列表'
+  },
+  LOST_LIST_TAB_BLACKLIST: {
+    value: 2,
+    text: '拉黑用户列表'
+  },
+  LOST_LIST_TAB_ENABLECOMMENT: {
+    value: 3,
+    text: '评论设置列表'
+  },
   LOST_LIST_PAGE_TAB_LOSTFOUND: 1,
   LOST_LIST_PAGE_TAB_BLACKEDLIST: 2,
+  LOST_LIST_PAGE_TAB_ENABLECOMMENT: 3,
   // 失物招领的时间枚举与其他的是不一样的。lidongjie@2018/5/16
   LOST_FOUND_LIST_DAY_SELECT: [
     { key: 1, value: '今日' },

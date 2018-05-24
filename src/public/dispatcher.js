@@ -151,6 +151,22 @@ export const closeDetailController = (
   }
 }
 
+export const selectKeyController = (
+  state,
+  props,
+  event,
+  { selecteKeyName } = {
+    selecteKeyName: 'selectKey'
+  }
+) => {
+  const { type, value } = event
+  if (type === 'selectKey') {
+    if (props[selecteKeyName] === value[selecteKeyName]) {
+      return
+    }
+    return value
+  }
+}
 export const syncTimeController = (
   state,
   props,

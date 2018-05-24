@@ -14,7 +14,6 @@ class Reply extends React.Component {
       isShowAll: true
     }
   }
-  componentWillReceiveProps(nextProps) {}
   showMoreComment = () => {
     const { comment } = this.props
     const body = {
