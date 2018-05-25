@@ -42,6 +42,10 @@ const initialFundState = {
     selectKey: '',
     userType: 'all'
   },
+  freeGiving: {
+    schoolId: selectedSchool,
+    page: 1
+  },
   fundCheck: {
     schoolId: selectedSchool,
     page: 1,

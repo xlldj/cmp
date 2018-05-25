@@ -51,10 +51,10 @@ const breadcrumbNameMap = {
   '/deposit/depositInfo': '编辑充值活动',
   '/deposit/addDeposit': '创建充值活动',
   '/abnormal': '异常资金',
-  '/fundCheck': '资金对账',
   '/freeGiving': '赠送金额',
   '/freeGiving/add': '新建赠送规则',
-  '/freeGiving/info': '详情'
+  '/freeGiving/info': '详情',
+  '/fundCheck': '资金对账'
 }
 
 class FundDisp extends React.Component {

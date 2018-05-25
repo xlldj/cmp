@@ -155,7 +155,7 @@ class UserInfoView extends React.Component {
     })
     let resource = '/lost/defriend/cancel'
     const body = {
-      userId: this.state.data.id
+      id: this.state.data.id
     }
     const cb = json => {
       this.setState({
