@@ -400,7 +400,7 @@ class Main extends React.Component {
       // loading , need to show the loading div
       loading && loading.classList.remove('hide')
       // if wait for more than 5s, refresh the web
-      // this.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
+      this.ti = setTimeout(this.refresh, REFRESHTIMEOUT)
     } else {
       // add 'hide' to not display loading
       loading && loading.classList.add('hide')
