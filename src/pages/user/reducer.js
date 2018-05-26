@@ -26,7 +26,7 @@ const initialUserState = {
     buildingIds: 'all'
   }
 }
-const userModule = (state = initialUserState, action) => {
+export const userModule = (state = initialUserState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_USER) {
@@ -38,4 +38,15 @@ const userModule = (state = initialUserState, action) => {
   return state
 }
 
-export default userModule
+export const initialUserInfoModal = {
+  detailLoading: false,
+  detail: {}
+}
+export const userInfoModal = (state = initialUserInfoModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_MODAL_USERINFO) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}

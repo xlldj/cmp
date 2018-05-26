@@ -2,76 +2,75 @@ import { stopBeat } from '../../tasks/heartBeat'
 import AjaxHandler from '../../util/ajax'
 import { buildAuthenData } from '../../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../../util/storage'
+import store from '../../index.js'
+export const CHANGE_MODAL_TASK = 'CHANGE_MODAL_TASK'
+export const CHANGE_MODAL_TASKDETAIL = 'CHANGE_MODAL_TASKDETAIL'
 
 export const fetchTaskDetail = body => {
-  let resource = '/work/order/one'
-  const cb = json => {
-    // only handle data here
-    let data = {
-      [body.id]: json.data
+  const { taskDetailModal } = store.getState()
+  const { detailLoading } = taskDetailModal
+  return dispatch => {
+    if (detailLoading) {
+      return
     }
-    let { details } = this.props.taskList
-    let newDetails = Object.assign({}, details, data)
-    let value = {
-      details: newDetails,
-      detailLoading: false
-    }
-    console.log(newDetails)
-    // set data into store
-  }
-  // console.log(resource)
-  AjaxHandler.ajax(resource, body, cb)
-}
-// fetch task/list
-export const fetchTasks = body => {
-  let resource = '/work/order/list'
-
-  const cb = json => {
-    this.setState({
-      loading: false
-    })
-    let {
-      main_phase,
-      panel_total,
-      showDetail,
-      selectedDetailId,
-      selectedRowIndex
-    } = this.props.taskList
-    let panel_dataSource = JSON.parse(
-      JSON.stringify(this.props.taskList.panel_dataSource)
-    )
-    let newTotal = Array.from(panel_total)
-    // console.log(json.data)
-    // console.log(json.data[jsonKeyName])
-    panel_dataSource[main_phase] = json.data.workOrders
-    newTotal[main_phase] = json.data.total
-
-    /* update 'selectedDetailId' if neccesary */
-    let newProps = {
-      panel_dataSource: panel_dataSource,
-      panel_total: newTotal
-    }
-    if (showDetail && selectedRowIndex === -1 && selectedDetailId !== -1) {
-      let index = -1
-      console.log(selectedDetailId)
-      json.data.workOrders.forEach((r, i) => {
-        if (r.id === selectedDetailId) {
-          index = i
-        }
-      })
-      if (index !== -1) {
-        newProps.selectedRowIndex = index
+    dispatch({
+      type: CHANGE_MODAL_TASKDETAIL,
+      value: {
+        detailLoading: true
       }
-      console.log(index)
-    }
+    })
+    let resource = '/api/work/order/one'
+    return AjaxHandler.fetch(resource, body).then(json => {
+      const value = {
+        detailLoading: false
+      }
+      if (json && json.data) {
+        value.detail = json.data
+        // store.dispatch(fetchCommentsList(commentsBody))
+      }
+      dispatch({
+        type: CHANGE_MODAL_TASKDETAIL,
+        value
+      })
+    })
   }
-  this.setState({
-    loading: true
-  })
-  AjaxHandler.ajax(resource, body, cb, null, {
-    clearLoading: true,
-    thisObj: this
-  })
+}
+
+// fetch task/list
+export const fetchTaskList = body => {
+  const { taskModal } = store.getState()
+  const { listLoading } = taskModal
+  return dispatch => {
+    if (listLoading) {
+      return
+    }
+    dispatch({
+      type: CHANGE_MODAL_TASK,
+      value: {
+        listLoading: true
+      }
+    })
+    let resource = '/api/work/order/list'
+    return AjaxHandler.fetch(resource, body).then(json => {
+      let value = {
+        listLoading: false
+      }
+      if (json && json.data) {
+        const { total, workOrders } = json.data
+        value = {
+          ...value,
+          ...{
+            list: workOrders,
+            total
+          }
+        }
+      }
+      dispatch({
+        type: CHANGE_MODAL_TASK,
+        value: value
+      })
+    })
+  }
 }
 
 export const changeOffline = (forceOffline, stillHasTaskCallback) => {

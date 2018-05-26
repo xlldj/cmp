@@ -152,6 +152,55 @@ const TASK = {
   NORMAL_DAY_30: 5,
   NORMAL_DAY_BEYOND_1: 6,
   NORMAL_DAY_BEYOND_2: 7,
-  NORMAL_DAY_BEYOND_5: 8
+  NORMAL_DAY_BEYOND_5: 8,
+
+  // 重写taskdetail
+  DETAILTAB2NAME: {
+    1: 'committer',
+    2: 'committerOrder',
+    3: 'committerRepair',
+    4: 'deviceInfo',
+    5: 'deviceOrder',
+    6: 'deviceRepair',
+    7: 'userFundRecord',
+    8: 'userComplaints',
+    9: 'userFeedbacks'
+  },
+  TABINDEX2RES: {
+    1: '/user/one',
+    2: '/order/list',
+    3: '/work/order/list',
+    4: '/device/one',
+    5: '/order/list',
+    6: '/work/order/list',
+    7: '/funds/list',
+    8: '/work/order/list',
+    9: '/work/order/list'
+  },
+  DETAILTAB2JSONNAME: {
+    2: 'orders',
+    3: 'workOrders',
+    5: 'orders',
+    6: 'workOrders',
+    7: 'funds',
+    8: 'workOrders',
+    9: 'workOrders'
+  },
+
+  TAB2HINT: {
+    2: '用户近五笔订单',
+    3: '用户近五次报修记录',
+    5: '设备近五笔订单',
+    6: '设备近五次维修记录',
+    7: '用户近五次充值提现',
+    8: '用户近五次投诉',
+    9: '用户近五次反馈'
+  },
+
+  roleModalName: {
+    1: 'showCustomerModal',
+    2: 'showRepairmanModal',
+    3: 'showDeveloperModal'
+  }
 }
 export default TASK

@@ -4,11 +4,22 @@ import { combineReducers } from 'redux'
 import { getLocal, getStore } from '../util/storage'
 import Time from '../util/time'
 
+import {
+  deviceModule,
+  repairListModal,
+  deviceInfoModal
+} from '../pages/device/reducer'
+
 import heaterModule from '../pages/heater/reducer'
-import orderModule from '../pages/order/reducer'
+import { orderModule, orderListModal } from '../pages/order/reducer'
+import { fundModule, fundListModal } from '../pages/fund/reducer'
 import buildingsSet from './building'
-import userModule from '../pages/user/reducer.js'
-import { taskModule, taskModal } from '../pages/task/reducer.js'
+import { userModule, userInfoModal } from '../pages/user/reducer.js'
+import {
+  taskModule,
+  taskModal,
+  taskDetailModal
+} from '../pages/task/reducer.js'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -165,115 +176,6 @@ const heaterModule = (state = initialHeaterState, action) => {
 }
 */
 
-const initialDeviceState = {
-  deviceList: {
-    page: 1,
-    schoolId: selectedSchool,
-    deviceType: 'all',
-    selectKey: '',
-    loading: true,
-    dataSource: [],
-    total: ''
-  },
-  components: {
-    page: 1,
-    dataSource: [],
-    total: 0,
-    loading: false
-  },
-  prepay: {
-    page: 1,
-    schoolId: selectedSchool
-  },
-  timeset: {
-    schoolId: selectedSchool,
-    page: 1
-  },
-  suppliers: {
-    page: 1
-  },
-  rateSet: {
-    schoolId: selectedSchool,
-    page: 1
-  },
-  repair: {
-    page: 1,
-    deviceType: 'all',
-    schoolId: selectedSchool,
-    status: 'all'
-  },
-  rateLimit: {
-    schoolId: selectedSchool,
-    page: 1
-  }
-}
-const deviceModule = (state = initialDeviceState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_DEVICE) {
-    const { subModule, keyValuePair } = action
-    const newSubState = {}
-    newSubState[subModule] = { ...state[subModule], ...keyValuePair }
-    return { ...state, ...newSubState }
-    // return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
-// 资金管理
-const initialFundState = {
-  fundList: {
-    page: 1,
-    schoolId: selectedSchool,
-    type: 'all',
-    status: 'all',
-    selectKey: '',
-    startTime: Time.get7DaysAgoStart(),
-    endTime: Time.getTodayEnd(),
-    userType: 'all'
-  },
-  withdrawList: {
-    page: 1,
-    schoolId: selectedSchool,
-    status: 'all',
-    selectKey: '',
-    startTime: Time.get7DaysAgoStart(),
-    endTime: Time.getTodayEnd(),
-    userType: 'all'
-  },
-  cashtime: {
-    page: 1,
-    schoolId: selectedSchool
-  },
-  charge: {
-    schoolId: selectedSchool,
-    page: 1
-  },
-  deposit: {
-    page: 1,
-    schoolId: selectedSchool
-  },
-  abnormal: {
-    schoolId: selectedSchool,
-    page: 1,
-    selectKey: '',
-    userType: 'all'
-  },
-  freeGiving: {
-    schoolId: selectedSchool,
-    page: 1
-  }
-}
-const fundModule = (state = initialFundState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_FUND) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
 // 红包管理
 const initialGiftState = {
   giftList: {
@@ -417,13 +319,19 @@ const rootReducer = combineReducers({
   schoolModule,
   heaterModule,
   deviceModule,
+  deviceInfoModal,
+  repairListModal,
   orderModule,
+  orderListModal,
   fundModule,
+  fundListModal,
   giftModule,
   lostModule,
   userModule,
+  userInfoModal,
   taskModule,
   taskModal,
+  taskDetailModal,
   employeeModule,
   notifyModule,
   versionModule,

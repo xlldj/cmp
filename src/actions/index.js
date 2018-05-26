@@ -4,20 +4,48 @@ import { setStore } from '../util/storage'
 import {
   changeOffline,
   fetchPrivileges,
+  fetchTaskList,
+  fetchTaskDetail,
   changeTask,
-  CHANGE_TASK
+  CHANGE_TASK,
+  CHANGE_MODAL_TASK,
+  CHANGE_MODAL_TASKDETAIL
 } from '../pages/task/action.js'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
-import { CHANGE_USER, changeUser } from '../pages/user/action'
+import {
+  CHANGE_USER,
+  changeUser,
+  CHANGE_MODAL_USERINFO,
+  fetchUserInfo
+} from '../pages/user/action'
 
-import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
+import {
+  CHANGE_FUND,
+  CHANGE_MODAL_FUNDLIST,
+  fetchFundList
+} from '../pages/fund/action'
+
+import {
+  CHANGE_DEVICE,
+  changeDevice,
+  fetchDeviceList,
+  fetchRepairList,
+  CHANGE_MODAL_REPAIRLIST,
+  fetchDeviceInfo,
+  CHANGE_MODAL_DEVICEINFO
+} from '../pages/device/action'
 import {
   CHANGE_HEATER,
   changeHeater,
   fetchHeaterList
 } from '../pages/heater/action'
-import { CHANGE_ORDER, changeOrder } from '../pages/order/action'
+import {
+  CHANGE_ORDER,
+  changeOrder,
+  CHANGE_MODAL_ORDERLIST,
+  fetchOrderList
+} from '../pages/order/action'
 import {
   CHANGE_DOORFORBID,
   changeDoorForbid,
@@ -129,15 +157,6 @@ export const changeSchool = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_FUND = 'CHANGE_FUND'
-export const changeFund = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_FUND,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_GIFT = 'CHANGE_GIFT'
 export const changeGift = (subModule, keyValuePair) => {
   return {
@@ -193,13 +212,22 @@ export const changeStat = (subModule, keyValuePair) => {
 
 export {
   CHANGE_DEVICE,
+  CHANGE_MODAL_REPAIRLIST,
   changeDevice,
   fetchDeviceList,
+  fetchRepairList,
+  CHANGE_MODAL_DEVICEINFO,
+  fetchDeviceInfo,
+  CHANGE_FUND,
+  CHANGE_MODAL_FUNDLIST,
+  fetchFundList,
   CHANGE_HEATER,
   changeHeater,
   fetchHeaterList,
   CHANGE_ORDER,
   changeOrder,
+  fetchOrderList,
+  CHANGE_MODAL_ORDERLIST,
   CHANGE_DOORFORBID,
   changeDoorForbid,
   fetchDoorForbidList,
@@ -208,8 +236,14 @@ export {
   fetchBuildings,
   CHANGE_USER,
   changeUser,
+  CHANGE_MODAL_USERINFO,
+  fetchUserInfo,
   changeOffline,
   fetchPrivileges,
   changeTask,
-  CHANGE_TASK
+  CHANGE_TASK,
+  CHANGE_MODAL_TASK,
+  CHANGE_MODAL_TASKDETAIL,
+  fetchTaskList,
+  fetchTaskDetail
 }

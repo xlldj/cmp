@@ -9,13 +9,18 @@ import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { checkObject } from '../../../util/checkSame'
-import TaskDetail from './taskDetail'
+import TaskDetail from './taskDetail/index.js'
 import BuildTask from './buildTask'
 import notworking from '../../assets/notworking.jpg'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeTask, setUserInfo, changeOnline } from '../../../actions'
+import {
+  changeTask,
+  setUserInfo,
+  changeOnline,
+  fetchTaskList
+} from '../../../actions'
 import { taskListContainerPropsController } from './controller.js'
 const moduleName = 'taskModule'
 const subModule = 'taskListContainer'
@@ -30,9 +35,6 @@ const ALLTAG = {
   2: true
 }
 const {
-  TASK_LIST_TAB_PENDING,
-  TASK_LIST_TAB_HANDLING,
-  TASK_LIST_TAB_FINISHED,
   TAB_TO_REDUX_NAME,
   TASK_PENDING,
   TASK_ASSIGNED,
@@ -87,6 +89,7 @@ class TaskList extends React.Component {
       }
       return
     }
+    this.sendTaskListFetch()
   }
   sendTaskListFetch = props => {
     props = props || this.props
@@ -114,10 +117,10 @@ class TaskList extends React.Component {
       body.selectKey = selectKey
     }
     // console.log(type)
-    if (type) {
+    if (type !== 'all') {
       body.type = type
     }
-    this.fetchTasks(body)
+    props.fetchTaskList(body)
   }
   componentWillReceiveProps(nextProps) {
     try {
@@ -272,6 +275,7 @@ export default withRouter(
   connect(mapStateToProps, {
     changeTask,
     setUserInfo,
-    changeOnline
+    changeOnline,
+    fetchTaskList
   })(TaskList)
 )

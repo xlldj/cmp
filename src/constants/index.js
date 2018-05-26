@@ -1,6 +1,6 @@
 import BASIC from './basic'
 import SCHOOL from './school'
-import DEVICE from './device'
+import DEVICE from '../pages/device/constants.js'
 import EMPLOYEE from './employee'
 import FUND from './fund'
 import GIFT from './gift'

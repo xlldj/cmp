@@ -51,7 +51,7 @@ const initialOrderState = {
     userType: 'all'
   }
 }
-const orderModule = (state = initialOrderState, action) => {
+export const orderModule = (state = initialOrderState, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_ORDER) {
     const { subModule, keyValuePair } = action
@@ -62,4 +62,15 @@ const orderModule = (state = initialOrderState, action) => {
   return state
 }
 
-export default orderModule
+export const initialOrderListModal = {
+  loading: false,
+  list: []
+}
+export const orderListModal = (state = initialOrderListModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_MODAL_ORDERLIST) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}

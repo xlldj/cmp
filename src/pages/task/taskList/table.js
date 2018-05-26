@@ -172,8 +172,18 @@ class TaskListTable extends React.Component {
       return ''
     }
   }
+  selectRow = (record, index, event) => {
+    let { dataSource } = this.props
+    // let page = panel_page[main_phase]
+    let id = dataSource && dataSource[index] && dataSource[index].id
+    this.props.changeTask(subModule, {
+      selectedRowIndex: index,
+      showDetail: true,
+      selectedDetailId: id
+    })
+  }
   render() {
-    const { listLoading, tabIndex, total, list } = this.props
+    const { listLoading, tabIndex, total, dataSource } = this.props
     const reduxStateName = TAB_TO_REDUX_NAME[tabIndex]
     const currentReduxState = this.props[reduxStateName]
     const { page } = currentReduxState
@@ -189,7 +199,7 @@ class TaskListTable extends React.Component {
             total: total
           }}
           // dataSource={panel_dataSource[main_phase]}
-          dataSource={list}
+          dataSource={dataSource}
           columns={this.getColumns()}
           onChange={this.changePage}
           onRowClick={this.selectRow}
@@ -201,7 +211,8 @@ class TaskListTable extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  selectedRowIndex: state[moduleName][subModule].selectedRowIndex
+  selectedRowIndex: state[moduleName][subModule].selectedRowIndex,
+  dataSource: state[modalName].list
 })
 
 export default withRouter(

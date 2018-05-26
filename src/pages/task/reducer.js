@@ -37,7 +37,11 @@ const initialTaskState = {
     page: 1
   },
   taskDetail: {
-    tabIndex: 1 // index for detail tab. Abstracted to be independent on data of detail.
+    tabIndex: 1, // index for detail tab. Abstracted to be independent on data of detail.
+    showFinishModal: false,
+    currentTab: 1,
+    complaintPage: 1,
+    feedbackPage: 1
   },
   report: {
     mainCate: 0, // 0: '工作情况', 1: '投诉分析', 2: '绩效考核'
@@ -70,14 +74,24 @@ const initialTaskModal = {
   list: [],
   total: 0,
   countOfUnviewed: 0, // count of data need to check again(status changed since last time check)
-  listLoading: false,
-  detail: {},
-  detailLoading: false
+  listLoading: false
 }
 export const taskModal = (state = initialTaskModal, action) => {
   const { type } = action
-  if (type === ActionTypes.CHANGE_MODAL_LOST) {
-    console.log(action)
+  if (type === ActionTypes.CHANGE_MODAL_TASK) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}
+
+const initialTaskDetailModal = {
+  detailLoading: false,
+  detail: {}
+}
+export const taskDetailModal = (state = initialTaskDetailModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_MODAL_TASKDETAIL) {
     const { value } = action
     return { ...state, ...value }
   }
