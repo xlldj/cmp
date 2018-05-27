@@ -67,7 +67,7 @@ class TaskInfoWrapper extends Component {
     )
     return (
       <Fragment>
-        <h3>
+        <h3 className="detailPanel-content-title">
           {type ? TASKTYPE[type] : ''} {schoolName ? schoolName : ''}
         </h3>
         {type === 1 ? (

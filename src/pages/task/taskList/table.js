@@ -8,7 +8,6 @@ import CONSTANTS from '../../../constants'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, setUserInfo, changeOnline } from '../../../actions'
-import { taskListContainerPropsController } from './controller.js'
 const moduleName = 'taskModule'
 const subModule = 'taskListContainer'
 const modalName = 'taskModal'
@@ -180,6 +179,10 @@ class TaskListTable extends React.Component {
       selectedRowIndex: index,
       showDetail: true,
       selectedDetailId: id
+    })
+    // 将详情中的tab页置为1
+    this.props.changeTask('taskDetail', {
+      currentTab: 1
     })
   }
   render() {

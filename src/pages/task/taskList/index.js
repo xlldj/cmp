@@ -22,6 +22,7 @@ import {
   fetchTaskList
 } from '../../../actions'
 import { taskListContainerPropsController } from './controller.js'
+import { safeGet } from '../../../util/types'
 const moduleName = 'taskModule'
 const subModule = 'taskListContainer'
 const modalName = 'taskModal'
@@ -97,6 +98,8 @@ class TaskList extends React.Component {
     const reduxStateName = TAB_TO_REDUX_NAME[tabIndex]
     const currentReduxState = props[reduxStateName]
     const { type, day, startTime, endTime, selectKey, page } = currentReduxState
+    // 从订单预警的工单跳转过来
+    const queryId = safeGet(props, 'location.state.id')
     const body = {
       page: page,
       size: SIZE,
@@ -106,7 +109,7 @@ class TaskList extends React.Component {
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    if (day !== 0) {
+    if (day !== 'all') {
       body.day = day
     }
     if (startTime && endTime) {
@@ -119,6 +122,10 @@ class TaskList extends React.Component {
     // console.log(type)
     if (type !== 'all') {
       body.type = type
+    }
+    // 从指定工单跳转过来
+    if (queryId) {
+      body.idList = [queryId]
     }
     props.fetchTaskList(body)
   }

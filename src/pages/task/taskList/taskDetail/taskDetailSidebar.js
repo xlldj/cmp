@@ -1,9 +1,10 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { Button } from 'antd'
 import Time from '../../../../util/time'
 import Noti from '../../../../util/noti'
 import AjaxHandler from '../../../../util/ajax'
 import CONSTANTS from '../../../../constants'
+import { safeGet } from '../../../../util/types'
 
 class TaskDetailSidebar extends Component {
   state = {
@@ -17,8 +18,6 @@ class TaskDetailSidebar extends Component {
     })
   }
   confirmPostMessage = (id, userMobile) => {
-    console.log('posting message')
-    // debugger
     let { message, posting } = this.state
     if (posting) {
       return
@@ -44,7 +43,7 @@ class TaskDetailSidebar extends Component {
         Noti.hintOk('操作成功', '已成功发送消息')
       }
       // keep detail and check if need to fetch list
-      this.keepAndUpdate(id)
+      this.props.keepAndUpdate(id)
     }
     this.setState({
       posting: true
@@ -54,28 +53,21 @@ class TaskDetailSidebar extends Component {
       thisObj: this
     })
   }
+  back = () => {
+    this.props.history.go(-1)
+  }
   render() {
     const { message, messageError } = this.state
-    const {
-      data,
-      queryId,
-      selectedDetailId,
-      handleLimit,
-      forbiddenStatus
-    } = this.props
-    const {
-      id,
-      createTime,
-      status,
-      userMobile,
-      type,
-      creatorName,
-      assignName
-    } =
+    const { data, selectedDetailId, forbiddenStatus } = this.props
+    const queryId = safeGet(this.props, 'location.state.id')
+    const { id, createTime, status, userMobile, creatorName, assignName } =
       data || {}
+    const handleLimit = false
     const statusClass = status === CONSTANTS.TASK_FINISHED ? '' : 'shalowRed'
+    // const shouldMessage = type === TASK_TYPE_COMPLAINT || type === TASK_TYPE_FEEDBACK
+    const shouldMessage = true
     return (
-      <div className="taskDetail-sidebar">
+      <div className="detailPanelWrapperWithSiderbar-sidebar">
         <h3>工单信息</h3>
         <ul className="detailList">
           <li>
@@ -120,7 +112,7 @@ class TaskDetailSidebar extends Component {
         </ul>
 
         {/* if not 'repair' type, not finished, has right to send message, show send message block. */}
-        {type !== CONSTANTS.TASK_TYPE_REPAIR &&
+        {shouldMessage &&
         status !== CONSTANTS.TASK_FINISHED &&
         handleLimit !== true &&
         !forbiddenStatus.HANDLE_TASK ? (

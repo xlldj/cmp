@@ -1,13 +1,13 @@
-import React, { Component, Fragment } from 'react'
-import { Button, Dropdown, Pagination, Menu, Modal, Carousel } from 'antd'
+import React, { Component } from 'react'
 import UserInfo from './userInfo'
 import UserOrderInfo from './userOrderInfo'
 import UserRepairInfo from './userRepairInfo'
 import DeviceInfo from './deviceInfo'
 import DeviceOrderInfo from './deviceOrderInfo'
 import DeviceRepairInfo from './deviceRepairInfo'
-import CONSTANTS from '../../../../../constants'
-const { TAB2HINT } = CONSTANTS
+import UserFundInfo from './userFundInfo'
+import UserComplaintInfo from './userComplaintInfo'
+import UserFeedBackInfo from './userFeedBackInfo'
 
 class DetailTabWrapper extends Component {
   render() {
@@ -52,6 +52,24 @@ class DetailTabWrapper extends Component {
             deviceType={deviceType}
             residenceId={residenceId}
             deviceId={deviceId}
+            selectedDetailId={selectedDetailId}
+          />
+        ) : null}
+        {currentTab === 7 ? (
+          <UserFundInfo
+            creatorId={creatorId}
+            selectedDetailId={selectedDetailId}
+          />
+        ) : null}
+        {currentTab === 8 ? (
+          <UserComplaintInfo
+            creatorId={creatorId}
+            selectedDetailId={selectedDetailId}
+          />
+        ) : null}
+        {currentTab === 9 ? (
+          <UserFeedBackInfo
+            creatorId={creatorId}
             selectedDetailId={selectedDetailId}
           />
         ) : null}

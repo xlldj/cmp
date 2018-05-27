@@ -22,8 +22,9 @@ import {
 
 import {
   CHANGE_FUND,
-  CHANGE_MODAL_FUNDLIST,
-  fetchFundList
+  changeFund,
+  fetchFundList,
+  CHANGE_MODAL_FUNDLIST
 } from '../pages/fund/action'
 
 import {
@@ -219,6 +220,7 @@ export {
   CHANGE_MODAL_DEVICEINFO,
   fetchDeviceInfo,
   CHANGE_FUND,
+  changeFund,
   CHANGE_MODAL_FUNDLIST,
   fetchFundList,
   CHANGE_HEATER,

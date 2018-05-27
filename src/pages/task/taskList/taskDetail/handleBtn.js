@@ -1,7 +1,16 @@
 import React from 'react'
 import { Button, Dropdown, Pagination, Menu } from 'antd'
 import CONSTANTS from '../../../../constants'
-const { TAB2HINT } = CONSTANTS
+import { connect } from 'react-redux'
+import {
+  changeTask,
+  changeOrder,
+  changeDevice,
+  changeFund
+} from '../../../../actions'
+import Time from '../../../../util/time'
+const { TAB2HINT, NORMAL_DAY_7, roleModalName } = CONSTANTS
+const subModule = 'taskDetail'
 
 class HandleBtn extends React.Component {
   constructor(props) {
@@ -33,21 +42,133 @@ class HandleBtn extends React.Component {
       </Menu>
     )
   }
+
+  reassign = m => {
+    try {
+      const { key } = m
+      // open different modal according to role
+      const modalStateName = roleModalName[key]
+      const value = {}
+      value[modalStateName] = true
+      this.props.changeTask(subModule, value)
+    } catch (e) {
+      console.log(e)
+    }
+  }
   finishTask = () => {
     this.props.changeTask('taskDetail', { showFinishModal: true })
   }
+  changeComplaintPage = page => {
+    this.props.changeTask('taskDetail', { complaintPage: page })
+  }
+  changeFeedbackPage = page => {
+    this.props.changeTask('taskDetail', { feedbackPage: page })
+  }
+  goToMore = e => {
+    e.preventDefault()
+    try {
+      const { data: detail, currentTab } = this.props
+      const { deviceType, creatorId, residenceId, userMobile } = detail
+      if (currentTab === 2) {
+        this.props.changeOrder('orderList', {
+          tabIndex: 1,
+          page: 1,
+          day: NORMAL_DAY_7, // last 7 days
+          userType: 'all',
+          startTime: '',
+          endTime: '',
+          schoolId: 'all',
+          deviceType: 'all',
+          status: 'all',
+          selectKey: '',
+          selectedRowIndex: -1,
+          selectedDetailId: -1,
+          showDetail: false
+        })
+        this.props.history.push({
+          pathname: '/order/list',
+          state: { path: 'fromTask', userId: creatorId }
+        })
+      } else if (currentTab === 3) {
+        this.props.changeDevice('repair', {
+          page: 1,
+          schoolId: 'all',
+          deviceType: 'all',
+          status: 'all'
+        })
+        this.props.history.push({
+          pathname: '/device/repair',
+          state: { path: 'fromTask', userId: creatorId }
+        })
+      } else if (currentTab === 5) {
+        this.props.changeOrder('orderList', {
+          tabIndex: 1,
+          page: 1,
+          day: NORMAL_DAY_7, // last 7 days
+          userType: 'all',
+          startTime: '',
+          endTime: '',
+          schoolId: 'all',
+          status: 'all',
+          selectKey: '',
+          selectedRowIndex: -1,
+          selectedDetailId: -1,
+          showDetail: false,
+          deviceType: deviceType ? deviceType.toString() : 'all'
+        })
+        this.props.history.push({
+          pathname: '/order/list',
+          state: {
+            path: 'fromTask',
+            deviceType: deviceType,
+            residenceId: residenceId
+          }
+        })
+      } else if (currentTab === 6) {
+        this.props.changeDevice('repair', {
+          page: 1,
+          schoolId: 'all',
+          deviceType: 'all',
+          status: 'all'
+        })
+        this.props.history.push({
+          pathname: '/device/repair',
+          state: {
+            path: 'fromTask',
+            deviceType: deviceType,
+            residenceId: residenceId
+          }
+        })
+      } else if (currentTab === 7) {
+        this.props.changeFund('fundList', {
+          page: 1,
+          selectKey: userMobile ? userMobile.toString() : '',
+          // type: 'all', // deprecated @2018/4/10
+          status: 'all',
+          schoolId: 'all',
+          startTime: Time.get7DaysAgoStart(),
+          endTime: Time.getTodayEnd()
+        })
+        this.props.history.push({
+          pathname: '/fund/list',
+          state: { path: 'fromTask', mobile: userMobile }
+        })
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
   render() {
     const {
-      status,
+      data,
       forbiddenStatus,
-      handleLimit,
-      type,
       currentTab,
       complaintPage,
       feedbackPage,
       complaintTotal,
       feedbackTotal
     } = this.props
+    const { status, type, handleLimit } = data
     return (
       <div className="handleBtn">
         {/* only show when 'status' is not finished and has right to handle. */}
@@ -103,4 +224,15 @@ class HandleBtn extends React.Component {
     )
   }
 }
-export default HandleBtn
+const mapStateToProps = (state, ownProps) => ({
+  complaintPage: state.taskModule.taskDetail.complaintPage,
+  feedbackPage: state.taskModule.taskDetail.feedbackPage,
+  complaintTotal: state.taskModule.taskDetail.complaintTotal,
+  feedbackTotal: state.taskModule.taskDetail.feedbackTotal
+})
+export default connect(mapStateToProps, {
+  changeTask,
+  changeFund,
+  changeOrder,
+  changeDevice
+})(HandleBtn)

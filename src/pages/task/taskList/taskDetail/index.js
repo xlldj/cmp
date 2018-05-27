@@ -15,6 +15,7 @@ import EmployeeChoose from '../../../component/employeeChoose'
 import DepartmentChoose from '../../../component/departmentChoose'
 import { checkObject } from '../../../../util/checkSame'
 import closeBtn from '../../../assets/close.png'
+import Noti from '../../../../util/noti'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -25,10 +26,9 @@ import {
   changeFund,
   fetchTaskDetail
 } from '../../../../actions'
-const { TASKTYPE } = CONSTANTS
+const { TASK_LIST_TAB_HANDLING } = CONSTANTS
 const moduleName = 'taskModule'
 const subModule = 'taskDetail'
-const modalName = 'taskDetailModal'
 
 class TaskDetail extends React.Component {
   state = {
@@ -84,17 +84,91 @@ class TaskDetail extends React.Component {
       selectedDetailId: -1
     })
   }
+  updateAndClose = id => {
+    let newProps = {
+      showDetail: false,
+      selectedRowIndex: -1,
+      selectedDetailId: -1
+    }
+    this.props.changeTask(subModule, newProps)
+  }
+  confirmChooseRepairman = () => {
+    // reassign to repairman success
+    let { id } = this.state
+    this.setState({
+      showRepairmanModal: false
+    })
+    Noti.hintOk('转发成功', '已成功转发给该维修员')
+    this.updateAndClose(id)
+  }
+  cancelChooseRepairman = () => {
+    this.props.changeTask(subModule, {
+      showRepairmanModal: false
+    })
+  }
+  confirmChooseCustomer = () => {
+    // reassign to repairman success
+    let { id } = this.state
+    this.setState({
+      showCustomerModal: false
+    })
+    Noti.hintOk('转发成功', '已成功转发给该客服')
+    this.updateAndClose(id)
+  }
+  cancelChooseCustomer = () => {
+    this.props.changeTask(subModule, {
+      showCustomerModal: false
+    })
+  }
+  reassign2DeveloperSuccess = () => {
+    Noti.hintOk('操作成功', '当前工单已被转接')
+    this.setState({
+      showDeveloperModal: false
+    })
+    this.updateAndClose(this.state.id)
+  }
+  cancelChooseDeveloper = () => {
+    this.props.changeTask(subModule, {
+      showDeveloperModal: false
+    })
+  }
+  keepAndUpdate = id => {
+    // this is handle process after sending message.
+    // 1. update detail.
+    // 2. if main_phase === 1, nothing to do with list.
+    // 3. if main_phase === 0, set 'selectedRowIndex' to -1,  clear list, set 'main_phase' to 1
+    this.sendFetch()
+    /* no matter ajax success or fail, check if fetch list again */
+    // Note to keep 'selectedDetailId'.
+    // only clear 'pending' and 'handing', because it won't be in 'finished' when sending message.
+    let { tabIndex } = this.props
+    if (tabIndex === TASK_LIST_TAB_HANDLING) {
+      // if in 'handing' module
+      return
+    } else {
+      const { pengdingList } = this.props
+      this.props.changeTask('taskListContainer', {
+        tabIndex: TASK_LIST_TAB_HANDLING,
+        showDetail: true,
+        selectedDetailId: id
+      })
+      // 因为是从'待处理'跳转到'处理中'，为保证能找到工单，将待处理中的设置直接传给处理中
+      this.props.changeTask('handlingList', pengdingList)
+    }
+  }
   render() {
     let {
       data,
       loading,
       selectedDetailId,
       showFinishModal,
-      currentTab,
-      forbiddenStatus
+      forbiddenStatus,
+      showRepairmanModal,
+      showCustomerModal,
+      showDeveloperModal
     } = this.props
     let id = selectedDetailId
-    let { schoolId, schoolName, images, logs, type, level } = data
+    let { schoolId, schoolName, images, logs, level } = data
     const carouselItems =
       images &&
       images.map((r, i) => {
@@ -121,37 +195,32 @@ class TaskDetail extends React.Component {
     )
 
     const { state } = this.props.location
-    const {
-      id: queryId,
-      showDetailImgs,
-      showRepairmanModal,
-      showCustomerModal,
-      showDeveloperModal
-    } =
-      state || {}
-    console.log(queryId, selectedDetailId)
+    const { showDetailImgs } = state || {}
 
     return (
-      <div className="taskDetailWrapper slideLeft" ref="detailWrapper">
+      <div
+        className="detailPanelWrapperWithSiderbar taskDetailWrapper slideLeft"
+        ref="detailWrapper"
+      >
         {loading ? (
           <div className="task-loadWrapper">
             <LoadingMask />
           </div>
         ) : null}
-        <div className="taskDetail-header">
+        <div className="detailPanelWrapperWithSiderbar-header">
           <h3>工单详情</h3>
           <button className="closeBtn" onClick={this.close}>
             <img src={closeBtn} alt="X" />
           </button>
         </div>
 
-        <div className="taskDetail-content">
+        <div className="detailPanelWrapperWithSiderbar-content">
           <TaskInfoWrapper data={data} />
           <DetailTabWrapper {...this.props} forbiddenStatus={forbiddenStatus} />
           <HandleBtn {...this.props} />
           <ProcessLogs logs={logs} />
         </div>
-        <TaskDetailSidebar {...this.props} />
+        <TaskDetailSidebar keepAndUpdate={this.keepAndUpdate} {...this.props} />
 
         {/* images in task detail */}
         {showDetailImgs ? (
@@ -219,8 +288,13 @@ const mapStateToProps = (state, ownProps) => ({
   loading: state.taskDetailModal.detailLoading,
   selectedDetailId: state.taskModule.taskListContainer.selectedDetailId,
   showFinishModal: state[moduleName][subModule].showFinishModal,
+  showRepairmanModal: state[moduleName][subModule].showRepairmanModal,
+  showCustomerModal: state[moduleName][subModule].showCustomerModal,
+  showDeveloperModal: state[moduleName][subModule].showDeveloperModal,
   currentTab: state[moduleName][subModule].currentTab,
-  showDetail: state.taskModule.taskListContainer.showDetail
+  showDetail: state.taskModule.taskListContainer.showDetail,
+  tabIndex: state[moduleName].taskListContainer.tabIndex,
+  pengdingList: state[moduleName].pengdingList
 })
 
 export default withRouter(

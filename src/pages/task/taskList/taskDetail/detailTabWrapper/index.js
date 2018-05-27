@@ -1,10 +1,6 @@
-import React, { Component, Fragment } from 'react'
-import { Button, Dropdown, Pagination, Menu } from 'antd'
-import { connect } from 'react-redux'
+import React, { Fragment } from 'react'
 import DetailTabHeader from './detailTabHeader'
 import DetailTabs from './detailTabs'
-import CONSTANTS from '../../../../../constants'
-const { TAB2HINT } = CONSTANTS
 
 class DetailTabWrapper extends React.Component {
   constructor(props) {
