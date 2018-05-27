@@ -1,1 +1,65 @@
-.defriendWrapper{margin-left:20px}.defriendWrapper .selectWrapper>*{margin-left:15px}
+.lostFoundDetail {
+  width: 50%;
+}
+.lostFoundDetail .detailList li {
+  height: auto;
+  display: flex;
+}
+.lostFoundDetail .detailList li img {
+  height: 50px;
+  width: 50px;
+}
+.defriendWrapper {
+  margin-left: 20px;
+}
+.defriendWrapper .selectWrapper > * {
+  margin-left: 15px;
+}
+.blackTable {
+  margin: 20px 10px 10px 10px;
+}
+.commentWrapper .replyWrapper {
+  padding: 10px;
+  background: #f7f7f7;
+}
+.commentWrapper .replyWrapper .commentItem .blueFont {
+  color: #999;
+}
+.commentWrapper .replyWrapper .commentItem .blueFont .balckFont {
+  color: #000000;
+  margin: 0px 5px;
+}
+.commentWrapper .replyWrapper .commentItem .blueFont:hover {
+  color: #108ee9;
+}
+.commentWrapper .commentItem {
+  line-height: 30px;
+}
+.commentWrapper .commentItem span {
+  margin: 0px 10px;
+}
+.commentWrapper .commentItem .noRightMargin,
+.commentWrapper .commentItem span:first-child {
+  margin: 0px;
+}
+.commentWrapper .commentItem .greyFont {
+  color: #999;
+}
+.commentWrapper .commentItem .blue_font {
+  color: #108ee9;
+  cursor: pointer;
+}
+.commentWrapper .commentItem .balckFont {
+  color: #000000;
+}
+.commentWrapper .commentItem .blueFont {
+  color: #108ee9;
+}
+.commentWrapper .commentItem .softLink:hover {
+  color: #108ee9 !important;
+}
+.commentsContent {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #e6e6e6;
+}

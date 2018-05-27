@@ -21,7 +21,10 @@ const mapStateToProps1 = (state, ownProps) => {
     deviceType: state.orderModule[subModule].stat_dt,
     page: state.orderModule[subModule].stat_page,
     orderBy: state.orderModule[subModule].stat_orderBy,
-    order: state.orderModule[subModule].stat_order
+    order: state.orderModule[subModule].stat_order,
+    buildingIds: state.orderModule[subModule].stat_buildingIds,
+    schools: state.setSchoolList.schools,
+    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId
   }
 }
 
@@ -121,13 +124,13 @@ class OrderList extends React.Component {
   getContent = tabIndex => {
     switch (tabIndex) {
       case ORDER_LIST_TABLE:
-        return <OrderTable />
+        return <OrderTable {...this.props} />
       case ORDER_LIST_STAT:
         return <OrderStat />
       case ORDER_LIST_ANALYZE:
-        return <OrderAnalyze />
+        return <OrderAnalyze {...this.props} />
       default:
-        return <OrderTable />
+        return <OrderTable {...this.props} />
     }
   }
   getTabs = () => {

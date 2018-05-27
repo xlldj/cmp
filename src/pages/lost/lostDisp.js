@@ -1,47 +1,32 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
-import { asyncComponent } from '../component/asyncComponent'
 import './style/style.css'
 
-//import LostInfo from './lostInfo'
-//import LostTable from './lostTable'
 import Bread from '../component/bread'
-import { getLocal } from '../../util/storage'
+import LostListContainer from './lostListContainer'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeLost } from '../../actions'
 
-const LostTable = asyncComponent(() =>
-  import(/* webpackChunkName: "lostTable" */ './lostTable')
-)
-const LostInfo = asyncComponent(() =>
-  import(/* webpackChunkName: "lostInfo" */ './lostInfo')
-)
+import getDefaultSchool from '../../util/defaultSchool'
+
+const subModule = 'lostListContainer'
 
 const breadcrumbNameMap = {
   '/lostInfo': '详情'
 }
 
 class LostDisp extends React.Component {
-  setStatusForlost = () => {
-    this.getDefaultSchool()
-    this.props.changeLost('lostList', { page: 1, type: 'all' })
+  componentDidMount() {
+    this.props.hide(false)
   }
-  getDefaultSchool = () => {
-    const recentSchools = getLocal('recentSchools'),
-      defaultSchool = getLocal('defaultSchool')
-    var selectedSchool = 'all'
-    if (recentSchools) {
-      let recent = recentSchools.split(',')
-      let schoolId = recent[0]
-      selectedSchool = schoolId
-    } else if (defaultSchool) {
-      selectedSchool = defaultSchool
-    }
-    if (selectedSchool !== 'all') {
-      this.props.changeLost('lostList', { schoolId: selectedSchool })
-    }
+  componentWillUnmount() {
+    this.props.hide(true)
+  }
+  setStatusForlost = () => {
+    const schoolId = getDefaultSchool()
+    this.props.changeLost(subModule, { schoolId })
   }
   render() {
     return (
@@ -57,14 +42,11 @@ class LostDisp extends React.Component {
         </div>
 
         <div className="disp">
-          <Route
-            path="/lost/lostInfo/:id"
-            render={props => <LostInfo hide={this.props.hide} {...props} />}
-          />
+          {/* 当前只有一个子导航，此设置只是为了以后扩展方便，同时保持与其他模块的一致 */}
           <Route
             exact
             path="/lost"
-            render={props => <LostTable hide={this.props.hide} {...props} />}
+            render={props => <LostListContainer {...props} />}
           />
         </div>
       </div>

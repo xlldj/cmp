@@ -163,6 +163,11 @@ const BASIC = {
           name: '异常资金',
           path: 'abnormal',
           key: 4
+        },
+        {
+          name: '资金对账',
+          path: 'fundCheck',
+          key: 7
         }
       ]
     },
@@ -216,6 +221,11 @@ const BASIC = {
           name: '工作报表',
           path: 'report',
           key: 1
+        },
+        {
+          name: '快捷消息',
+          path: 'quick',
+          key: 2
         }
       ]
     },
@@ -498,12 +508,21 @@ const BASIC = {
     '赠送规则列表/查询': 'FUND_GIVING_RULE_LIST_GET',
     处理对账: 'FUND_HANDLE_ACCOUNT_CHECK',
     查看异常订单: 'FUND_ACCOUNT_CHECK_LIST_GET', // 查看异常订单列表，此处的异常订单指平台与第三方对不上的订单
+    人工处理: 'HANDLE_FUND_CHECK',
 
+    // 失物招领
+    失物招领列表: 'LOST_FOUND_LIST',
+    失物招领详情: 'LOST_DETAIL',
+    '评论/回复列表': 'LOST_COMMENTS_LIST',
+    拉黑用户列表: 'LOST_BLACKED_USER_LIST',
+    评论设置列表: 'LOST_COMMENT_ENABLE_LIST',
     屏蔽失物招领: 'SHIELD_LOST_INFO',
+    拉黑用户: 'DEACTIVE_USER',
+    '删除评论/回复': 'DELETE_LOST_COMMENT',
+
     //用户管理
     '用户列表/搜索/查询': 'USER_LIST_GET',
     用户详情: 'USER_INFO_DETILE',
-    拉黑用户: 'DEACTIVE_USER',
     重置用户密码: 'RESET_USER_PWD',
     '富士康用户列表/查询': 'FOX_USER_LIST', // 用户列表中是否可以查看富士康员工列表
     导入富士康员工: 'IMPORT_USERS', // 用户列表中'导入富士康员工'的按钮，以及相关接口的权限控制
@@ -520,11 +539,14 @@ const BASIC = {
     '公告审核列表/详情': 'CENSOR_GET_LIST',
     删除公告: 'DELETE_NOTIFY',
     审核: 'CENSOR_NOTIFY',
+
     //版本更新模块
     '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
     版本更新列表: 'VERSON_LIST_GET',
+
     //统计分析模块
     统计分析图表: 'STATISTICS_GET',
+
     //员工管理模块
     '员工列表搜索/查询': 'EMPLOYEE_LIST_GET',
     维修员权限: 'MAINTENANCE_MAN_AUTH',
@@ -535,12 +557,13 @@ const BASIC = {
     删除身份: 'ROLE_DELETE',
     权限列表: 'AUTH_LIST_GET',
     '添加/编辑/删除权限点': 'AUTH_ADD_EDIT_DELETE',
+
     //客服工单
     '工单列表查询/搜索/详情': 'TASK_LIST_GET',
     '转接/完结/发送客服消息': 'HANDLE_TASK',
     创建工单: 'BUILD_TASK',
-    工作报表查看: 'REPORT_LIST_GET',
     添加标签: 'BUILD_COMPLAINT_TAG',
+    工作报表查看: 'REPORT_LIST_GET',
     //红包管理
     '红包列表/搜索/查询': 'GIFT_LIST_GET',
     '添加/编辑红包': 'GIFT_ADD_OR_EDIT',
@@ -549,6 +572,7 @@ const BASIC = {
     删除红包活动: 'DELETE_GIFT_ACT',
     积分兑换列表: 'GIFT_CREDITS_LIST',
     编辑积分兑换: 'GIFT_CREDITS_EDIT',
+
     //设备管理
     设备详情: 'DEVICE_DETILE',
     '配件类型管理/添加配件/编辑配件': 'COMPONENTS_ADD_EDIT',
@@ -566,6 +590,8 @@ const BASIC = {
     '报修详情(处理报修任务)': 'REPAIR_DETAIL',
     '添加/编辑报修常见问题': 'EDIT_REPAIR_PROBLEM',
     删除报修常见问题: 'DELETE_REPAIR_PROBLEM',
+
+    // 门禁
     归寝时间列表: 'BACK_TIME_LIST_GET',
     归寝记录查询: 'BACK_RECORD_GET',
     归寝报表查询: 'BACK_REPORT_GET',

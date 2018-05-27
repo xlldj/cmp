@@ -14,7 +14,8 @@ import TaskReportContainer from './report/taskReport'
 
 const breadcrumbNameMap = {
   '/list': '工单列表',
-  '/report': '工作报表'
+  '/report': '工作报表',
+  '/quick': '快捷消息'
 }
 
 class TaskDisp extends React.Component {
@@ -130,7 +131,16 @@ class TaskDisp extends React.Component {
                 )}
               />
             )}
-
+            <Route
+              path="/task"
+              render={props => (
+                <TaskReportContainer
+                  hide={this.props.hide}
+                  {...props}
+                  forbiddenStatus={forbiddenStatus}
+                />
+              )}
+            />
             <Route
               exact
               path="/task"

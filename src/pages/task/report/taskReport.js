@@ -1195,7 +1195,7 @@ class TaskReport extends React.Component {
             </div>
             <div className="task-select">
               <SchoolSelector
-                className="select-item"
+                className="select-item customSelect"
                 selectedSchool={schoolId}
                 changeSchool={this.changeSchool}
               />

@@ -23,11 +23,117 @@ class UserTableView extends React.Component {
       dataSource,
       searchingText,
       loading: false,
-      total: 0
+      total: 0,
+      isFushikang: false
     }
-    const { forbiddenStatus } = props
+  }
+
+  fetchData = props => {
+    if (this.state.loading) {
+      return
+    }
+    this.setState({
+      loading: true
+    })
+    const resource = '/api/user/list'
+    const {
+      list_page: page,
+      schoolId,
+      list_selectKey: selectKey,
+      list_userTransfer: userTransfer
+    } =
+      props || this.props
+    const body = {
+      page: page,
+      size: SIZE
+    }
+    if (schoolId !== 'all') {
+      body.schoolId = parseInt(schoolId, 10)
+    }
+    if (userTransfer !== 'all') {
+      body.userTransfer = parseInt(userTransfer, 10)
+    }
+    if (selectKey) {
+      body.selectKey = selectKey
+    }
+    AjaxHandler.fetch(resource, body).then(json => {
+      let nextState = { loading: false }
+      if (json && json.data) {
+        nextState.dataSource = json.data.users
+        nextState.total = json.data.total
+      }
+      this.setState(nextState)
+    })
+  }
+
+  componentDidMount() {
+    this.fetchData()
+    this.syncStateWithProps()
+    this.checkSchoolFsk()
+  }
+  syncStateWithProps = props => {
+    let { list_selectKey: selectKey } = props || this.props
+    const nextState = {}
+    if (selectKey !== this.state.searchingText) {
+      nextState.searchingText = selectKey
+    }
+    this.setState(nextState)
+  }
+  componentWillReceiveProps(nextProps) {
+    if (
+      checkObject(this.props, nextProps, [
+        'list_page',
+        'schoolId',
+        'schools',
+        'list_selectKey',
+        'list_userTransfer'
+      ])
+    ) {
+      return
+    }
+    this.fetchData(nextProps)
+    this.syncStateWithProps(nextProps)
+    this.checkSchoolFsk(nextProps)
+  }
+  changeSchool = value => {
+    let { schoolId, tabIndex } = this.props
+    if (schoolId === value) {
+      return
+    }
+    const data = { schoolId }
+    if (tabIndex === USER_LIST_TAB_TABLE) {
+      data.list_page = 1
+    } else {
+      data.analyze_page = 1
+    }
+    this.props.changeUser(subModule, data)
+  }
+  //检查选择学校是否为富士康
+  checkSchoolFsk = props => {
+    const { schools, schoolId } = props || this.props
+    const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
+    if (fox_index !== -1) {
+      const school = schools[fox_index]
+      if (school.name === '富士康' || school.name === '富士康工厂') {
+        this.setState({
+          isFushikang: true
+        })
+        return true
+      }
+    }
+    this.setState({
+      isFushikang: false
+    })
+  }
+  changeSearch = e => {
+    this.setState({
+      searchingText: e.target.value
+    })
+  }
+  getColumns = () => {
+    const { forbiddenStatus } = this.props
     const { USER_INFO_DETILE } = forbiddenStatus
-    this.columns = [
+    const columns = [
       {
         title: '学校名称',
         dataIndex: 'schoolName',
@@ -73,89 +179,21 @@ class UserTableView extends React.Component {
         )
       }
     ]
-  }
-
-  fetchData = props => {
-    if (this.state.loading) {
-      return
+    const { isFushikang } = this.state
+    if (isFushikang) {
+      columns.unshift(
+        {
+          title: '工号',
+          dataIndex: 'userNo',
+          className: 'firstCol'
+        },
+        {
+          title: '姓名',
+          dataIndex: 'userName'
+        }
+      )
     }
-    this.setState({
-      loading: true
-    })
-    const resource = '/api/user/list'
-    const {
-      list_page: page,
-      schoolId,
-      list_selectKey: selectKey,
-      list_userTransfer: userTransfer
-    } =
-      props || this.props
-    const body = {
-      page: page,
-      size: SIZE
-    }
-    if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10)
-    }
-    if (userTransfer !== 'all') {
-      body.userTransfer = parseInt(userTransfer, 10)
-    }
-    if (selectKey) {
-      body.selectKey = selectKey
-    }
-    AjaxHandler.fetch(resource, body).then(json => {
-      let nextState = { loading: false }
-      if (json && json.data) {
-        nextState.dataSource = json.data.users
-        nextState.total = json.data.total
-      }
-      this.setState(nextState)
-    })
-  }
-
-  componentDidMount() {
-    this.fetchData()
-    this.syncStateWithProps()
-  }
-  syncStateWithProps = props => {
-    let { list_selectKey: selectKey } = props || this.props
-    const nextState = {}
-    if (selectKey !== this.state.searchingText) {
-      nextState.searchingText = selectKey
-    }
-    this.setState(nextState)
-  }
-  componentWillReceiveProps(nextProps) {
-    if (
-      checkObject(this.props, nextProps, [
-        'list_page',
-        'schoolId',
-        'list_selectKey',
-        'list_userTransfer'
-      ])
-    ) {
-      return
-    }
-    this.fetchData(nextProps)
-    this.syncStateWithProps(nextProps)
-  }
-  changeSchool = value => {
-    let { schoolId, tabIndex } = this.props
-    if (schoolId === value) {
-      return
-    }
-    const data = { schoolId }
-    if (tabIndex === USER_LIST_TAB_TABLE) {
-      data.list_page = 1
-    } else {
-      data.analyze_page = 1
-    }
-    this.props.changeUser(subModule, data)
-  }
-  changeSearch = e => {
-    this.setState({
-      searchingText: e.target.value
-    })
+    return columns
   }
   pressEnter = () => {
     let v = this.state.searchingText.trim()
@@ -192,7 +230,7 @@ class UserTableView extends React.Component {
     const { dataSource, total, loading, searchingText } = this.state
     const { list_page: page, list_userTransfer: userTransfer } = this.props
     const showClearBtn = !!searchingText
-
+    const columns = this.getColumns()
     return (
       <div className="">
         <QueryPanel>
@@ -247,7 +285,7 @@ class UserTableView extends React.Component {
             }}
             dataSource={dataSource}
             rowKey={record => record.id}
-            columns={this.columns}
+            columns={columns}
             onChange={this.changePage}
             onRowClick={this.selectRow}
             rowClassName={this.setRowClass}
