@@ -92,6 +92,7 @@
     "start": "node scripts/start.js",
     "dll": "webpack --config config/webpack.dll.config.js",
     "build": "node scripts/build.js",
+    "buildQa": "node scripts/buildQa.js",
     "test": "node scripts/test.js --env=jsdom",
     "coverage": "node scripts/test.js --env=jsdom --coverage",
     "precommit": "lint-staged"

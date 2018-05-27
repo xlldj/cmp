@@ -131,9 +131,20 @@ class FreeGivingInfo extends React.Component {
   }
   setSchoolOpts = props => {
     const fox_index = props.schools.findIndex(s => s.name === '富士康')
+    const schoolOpts = {}
     if (fox_index !== -1) {
       const school = props.schools[fox_index]
-      const schoolOpts = {}
+      schoolOpts[school.id] = school.name
+      this.setState({
+        schoolOpts,
+        schoolId: school.id
+      })
+    }
+    const foxComapny_index = props.schools.findIndex(
+      s => s.name === '富士康工厂'
+    )
+    if (foxComapny_index !== -1) {
+      const school = props.schools[foxComapny_index]
       schoolOpts[school.id] = school.name
       this.setState({
         schoolOpts,

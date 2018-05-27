@@ -22,17 +22,21 @@ const domains = {
     manager: 'https://api.xiaolian365.com/m',
     user: 'https://api.xiaolian365.com/c'
   },
+  dxy: {
+    manager: 'http://10.195.90.187:8080',
+    user: 'http://10.195.90.187:8080'
+  },
   wq: {
     manager: 'http://10.195.90.172:5080',
     user: 'http://10.195.90.172:5081'
   },
-  dxy: {
-    manager: 'http://10.195.90.188:5080',
-    user: 'http://10.195.90.188:5081'
-  },
   pre: {
     manager: 'http://47.106.62.186/m',
     user: 'http://47.106.62.186/c'
+  },
+  zdc: {
+    manager: 'http://10.195.90.143:8080',
+    user: 'http://10.195.90.143:8081'
   }
 }
 const currentDomain = domains.qa2

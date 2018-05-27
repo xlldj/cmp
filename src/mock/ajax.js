@@ -3,6 +3,10 @@ import creditsHandler from './credits'
 import orderStatHandler from './order.js'
 import orderConsumptionHandler from './orderConsumption'
 import userAuthHandler from './userAuth'
+import lostHandler from './lost'
+import fundCheckHandler from './fundCheck'
+import fundCheckHandler from './fundCheck'
+import userAuthHandler from './userAuth'
 
 const AjaxHandler = {
   showingError: false
@@ -46,6 +50,21 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return creditsHandler(resource, body)
   } else if (resource.indexOf('order/consumption/device') !== -1) {
     return orderConsumptionHandler(resource, body)
+  } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
+    return userAuthHandler(resource, body)
+  } else if (
+    contain(resource, 'lost/list', 'lost/details', 'lost/comments/list')
+  ) {
+    return lostHandler(resource, body)
+  } else if (
+    contain(
+      resource,
+      'fundsCheck/mistake/list',
+      'fundsCheck/mistake/detail',
+      'fundsCheck/mistake/settle'
+    )
+  ) {
+    return fundCheckHandler(resource, body)
   } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
     return userAuthHandler(resource, body)
   }

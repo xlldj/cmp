@@ -2,8 +2,7 @@ import { merge } from 'lodash'
 import getDefaultSchool from '../../util/defaultSchool'
 import Time from '../../util/time'
 import * as ActionTypes from '../../actions'
-let selectedSchool = getDefaultSchool()
-
+const selectedSchool = getDefaultSchool()
 // 资金管理
 const initialFundState = {
   fundList: {
@@ -46,6 +45,21 @@ const initialFundState = {
   freeGiving: {
     schoolId: selectedSchool,
     page: 1
+  },
+  fundCheck: {
+    schoolId: selectedSchool,
+    page: 1,
+    type: 'all', // 异常类型
+    status: 1, // 处理状态
+    method: 'all', // 处理方式
+    showDetail: false,
+    showHandleModal: false,
+    selectedRowIndex: -1,
+    selectedDetailId: -1
+  },
+  freeGiving: {
+    schoolId: selectedSchool,
+    page: 1
   }
 }
 export const fundModule = (state = initialFundState, action) => {
@@ -65,6 +79,21 @@ export const initialFundListModal = {
 export const fundListModal = (state = initialFundListModal, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_MODAL_FUNDLIST) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}
+const initialFundCheckModal = {
+  list: [],
+  listLoading: false,
+  total: 0,
+  detail: {},
+  detailLoading: false
+}
+export const fundCheckModal = (state = initialFundCheckModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_MODAL_FUNDCHECK) {
     const { value } = action
     return { ...state, ...value }
   }

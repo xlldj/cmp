@@ -28,15 +28,15 @@ export const dayController = (
     return value
   }
 }
-export const selectKeyController = (
+export const methodController = (
   state,
   props,
   event,
-  { selectKeyName } = { selectKeyName: 'selectKey' }
+  { methodName } = { methodName: 'method' }
 ) => {
   const { type, value } = event
-  if (type === 'selectKey') {
-    if (props[selectKeyName] === value[selectKeyName]) {
+  if (type === 'method') {
+    if (props[methodName] === value[methodName]) {
       return
     }
     return value
@@ -151,6 +151,22 @@ export const closeDetailController = (
   }
 }
 
+export const selectKeyController = (
+  state,
+  props,
+  event,
+  { selecteKeyName } = {
+    selecteKeyName: 'selectKey'
+  }
+) => {
+  const { type, value } = event
+  if (type === 'selectKey') {
+    if (props[selecteKeyName] === value[selecteKeyName]) {
+      return
+    }
+    return value
+  }
+}
 export const syncTimeController = (
   state,
   props,

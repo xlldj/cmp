@@ -19,13 +19,7 @@ import {
   CHANGE_MODAL_USERINFO,
   fetchUserInfo
 } from '../pages/user/action'
-
-import {
-  CHANGE_FUND,
-  changeFund,
-  fetchFundList,
-  CHANGE_MODAL_FUNDLIST
-} from '../pages/fund/action'
+import { moduleActionFactory } from './moduleActions'
 
 import {
   CHANGE_DEVICE,
@@ -53,6 +47,25 @@ import {
   fetchDoorForbidList,
   fetchDetailRecordList
 } from '../pages/doorForbid/action'
+import {
+  CHANGE_FUND,
+  changeFund,
+  CHANGE_MODAL_FUNDCHECK,
+  fetchFundCheckList,
+  fetchFundCheckInfo,
+  CHANGE_MODAL_FUNDLIST,
+  fetchFundList
+} from '../pages/fund/action.js'
+
+import {
+  CHANGE_LOST,
+  CHANGE_MODAL_LOST,
+  CHANGE_MODAL_BLACK,
+  CHANGE_MODAL_ENABLECOMMENT,
+  fetchBlackPeopleList,
+  fetchLostFoundList,
+  changeLost
+} from '../pages/lost/action'
 
 export const SET_USERINFO = 'SET_USERINFO'
 export const setUserInfo = value => {
@@ -167,14 +180,6 @@ export const changeGift = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_LOST = 'CHANGE_LOST'
-export const changeLost = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_LOST,
-    subModule,
-    keyValuePair
-  }
-}
 export const CHANGE_EMPLOYEE = 'CHANGE_EMPLOYEE'
 export const changeEmployee = (subModule, keyValuePair) => {
   return {
@@ -221,6 +226,9 @@ export {
   fetchDeviceInfo,
   CHANGE_FUND,
   changeFund,
+  fetchFundCheckList,
+  fetchFundCheckInfo,
+  CHANGE_MODAL_FUNDCHECK,
   CHANGE_MODAL_FUNDLIST,
   fetchFundList,
   CHANGE_HEATER,
@@ -234,18 +242,26 @@ export {
   changeDoorForbid,
   fetchDoorForbidList,
   fetchDetailRecordList,
+  fetchBlackPeopleList,
   SET_BUILDING_LIST,
   fetchBuildings,
   CHANGE_USER,
   changeUser,
   CHANGE_MODAL_USERINFO,
   fetchUserInfo,
+  moduleActionFactory,
+  changeLost,
+  CHANGE_LOST,
+  CHANGE_MODAL_BLACK,
+  CHANGE_MODAL_LOST,
+  CHANGE_MODAL_ENABLECOMMENT,
+  fetchLostFoundList,
   changeOffline,
   fetchPrivileges,
+  fetchTaskList,
+  fetchTaskDetail,
   changeTask,
   CHANGE_TASK,
   CHANGE_MODAL_TASK,
-  CHANGE_MODAL_TASKDETAIL,
-  fetchTaskList,
-  fetchTaskDetail
+  CHANGE_MODAL_TASKDETAIL
 }

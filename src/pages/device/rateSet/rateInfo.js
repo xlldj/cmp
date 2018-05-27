@@ -382,6 +382,7 @@ class RateInfo extends React.Component {
     this.setState(nextState)
   }
   checkInput = () => {
+    debugger
     const {
       rateGroups,
       deviceType,

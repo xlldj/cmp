@@ -12,7 +12,11 @@ import {
 
 import heaterModule from '../pages/heater/reducer'
 import { orderModule, orderListModal } from '../pages/order/reducer'
-import { fundModule, fundListModal } from '../pages/fund/reducer'
+import {
+  fundModule,
+  fundListModal,
+  fundCheckModal
+} from '../pages/fund/reducer'
 import buildingsSet from './building'
 import { userModule, userInfoModal } from '../pages/user/reducer.js'
 import {
@@ -20,6 +24,12 @@ import {
   taskModal,
   taskDetailModal
 } from '../pages/task/reducer.js'
+import {
+  lostModule,
+  lostModal,
+  blackModal,
+  enableCommentModal
+} from '../pages/lost/reducer.js'
 
 import doorForbidModule from '../pages/doorForbid/reducer'
 const recentSchools = getLocal('recentSchools')
@@ -56,7 +66,7 @@ const initialAuthenData = {
   authenSet: false,
   mainNavs: [],
   subNavs: {},
-  schoolLimit: getStore('schoolLimit') ? true : false // if employee has rights to check all schools, this is true; or else is false
+  schoolLimit: !!getStore('schoolLimit') // if employee has rights to check all schools, this is true; or else is false
 }
 const setAuthenData = (state = initialAuthenData, action) => {
   const { type } = action
@@ -201,24 +211,6 @@ const giftModule = (state = initialGiftState, action) => {
   return state
 }
 
-// 失物招领
-const initialLostState = {
-  lostList: {
-    page: 1,
-    schoolId: selectedSchool,
-    type: 'all'
-  }
-}
-const lostModule = (state = initialLostState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_LOST) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
 // 员工管理
 const initialEmployeeState = {
   employeeList: {
@@ -327,6 +319,9 @@ const rootReducer = combineReducers({
   fundListModal,
   giftModule,
   lostModule,
+  lostModal,
+  blackModal,
+  enableCommentModal,
   userModule,
   userInfoModal,
   taskModule,
@@ -343,7 +338,8 @@ const rootReducer = combineReducers({
   setTagList,
   setUserInfo,
   setGifts,
-  buildingsSet
+  buildingsSet,
+  fundCheckModal
 })
 
 export default rootReducer
