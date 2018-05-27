@@ -5,6 +5,7 @@ import Noti from '../../../../util/noti'
 import AjaxHandler from '../../../../util/ajax'
 import CONSTANTS from '../../../../constants'
 import { safeGet } from '../../../../util/types'
+const { TASK_TYPE_COMPLAINT, TASK_TYPE_FEEDBACK } = CONSTANTS
 
 class TaskDetailSidebar extends Component {
   state = {
@@ -60,12 +61,20 @@ class TaskDetailSidebar extends Component {
     const { message, messageError } = this.state
     const { data, selectedDetailId, forbiddenStatus } = this.props
     const queryId = safeGet(this.props, 'location.state.id')
-    const { id, createTime, status, userMobile, creatorName, assignName } =
+    const {
+      id,
+      createTime,
+      status,
+      userMobile,
+      creatorName,
+      assignName,
+      type
+    } =
       data || {}
     const handleLimit = false
     const statusClass = status === CONSTANTS.TASK_FINISHED ? '' : 'shalowRed'
-    // const shouldMessage = type === TASK_TYPE_COMPLAINT || type === TASK_TYPE_FEEDBACK
-    const shouldMessage = true
+    const shouldMessage =
+      type === TASK_TYPE_COMPLAINT || type === TASK_TYPE_FEEDBACK
     return (
       <div className="detailPanelWrapperWithSiderbar-sidebar">
         <h3>工单信息</h3>

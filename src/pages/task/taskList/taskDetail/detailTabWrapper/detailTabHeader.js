@@ -11,6 +11,9 @@ const DetailTabHeader = props => {
           <li data-key={1} className={currentTab === 1 ? 'active' : ''}>
             用户详情
           </li>
+          <li data-key={10} className={currentTab === 10 ? 'active' : ''}>
+            学校详情
+          </li>
           <li data-key={2} className={currentTab === 2 ? 'active' : ''}>
             用户订单记录
           </li>
@@ -33,6 +36,9 @@ const DetailTabHeader = props => {
           <li data-key={1} className={currentTab === 1 ? 'active' : ''}>
             用户详情
           </li>
+          <li data-key={10} className={currentTab === 10 ? 'active' : ''}>
+            学校详情
+          </li>
           <li data-key={7} className={currentTab === 7 ? 'active' : ''}>
             用户充值提现记录
           </li>
@@ -48,6 +54,9 @@ const DetailTabHeader = props => {
         <ul className="panelSelect" onClick={props.changeTabIndex}>
           <li data-key={1} className={currentTab === 1 ? 'active' : ''}>
             用户详情
+          </li>
+          <li data-key={10} className={currentTab === 10 ? 'active' : ''}>
+            学校详情
           </li>
           <li data-key={7} className={currentTab === 7 ? 'active' : ''}>
             用户充值提现记录

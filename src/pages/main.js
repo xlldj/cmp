@@ -356,7 +356,9 @@ class Main extends React.Component {
           this.props.changeFund('deposit', { schoolId: selectedSchool })
           this.props.changeFund('abnormal', { schoolId: selectedSchool })
           this.props.changeGift('act', { schoolId: selectedSchool })
-          this.props.changeLost('lostList', { schoolId: selectedSchool })
+          this.props.changeLost('lostListContainer', {
+            schoolId: selectedSchool
+          })
           this.props.changeUser('userList', { schoolId: selectedSchool })
           /*
           this.props.changeTask('taskList', {schoolId: selectedSchool}) 

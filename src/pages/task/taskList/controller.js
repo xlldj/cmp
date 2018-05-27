@@ -9,7 +9,8 @@ import {
   pageController,
   combineControllers
 } from '../../../public/dispatcher'
-
+import { taskService } from '../../service/index'
+import store from '../../../index'
 export const taskDetailPropsController = (state, props, event) => {
   return combineControllers([closeDetailController])(state, props, event)
 }
@@ -30,4 +31,11 @@ export const taskListQueryPropsController = (state, props, event) => {
     syncTimeController,
     tabIndexController
   ])(state, props, event)
+}
+
+export const relateTask = body => {
+  taskService.relateTask(body).then(json => {
+    if (json.data) {
+    }
+  })
 }

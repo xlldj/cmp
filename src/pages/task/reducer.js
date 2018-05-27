@@ -5,7 +5,7 @@ const initialTaskState = {
   taskListContainer: {
     hintRoot: false, // if show the red point in root nav
     countOfUnviewed: 0, // count of all tasks status changed. 目前前两个字段无用，本来是作为未完结工单的提示存在的。
-    tabIndex: 2, // '待处理'
+    tabIndex: 1, // '待处理'
     schoolId: 'all',
     mine: '2', // 1: '我的工单', 2: '全部'
     selectedRowIndex: -1, // the row whose detail is being watching

@@ -17,6 +17,7 @@ const {
   TEST_SCHOOL,
   COMPANY_SCHOOL,
   SCHOOL_TYPES,
+  ENTERPRISE_SCHOOL,
   // DEVICE_AGREEMENT_B,
   DOORFORBID_WEEK
 } = CONSTANTS
@@ -809,6 +810,7 @@ class InfoSet extends React.Component {
                   <Radio value={REAL_SCHOOL}>真实学校</Radio>
                   <Radio value={TEST_SCHOOL}>测试学校</Radio>
                   <Radio value={COMPANY_SCHOOL}>工厂</Radio>
+                  <Radio value={ENTERPRISE_SCHOOL}>企业</Radio>
                 </RadioGroup>
               )}
               {typeError ? (

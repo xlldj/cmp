@@ -2,7 +2,9 @@ import { stopBeat } from '../../tasks/heartBeat'
 import AjaxHandler from '../../util/ajax'
 import { buildAuthenData } from '../../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../../util/storage'
+import { taskService } from '../service/index'
 import store from '../../index.js'
+import { deepCopy } from '../../util/copy'
 export const CHANGE_MODAL_TASK = 'CHANGE_MODAL_TASK'
 export const CHANGE_MODAL_TASKDETAIL = 'CHANGE_MODAL_TASKDETAIL'
 
@@ -32,6 +34,27 @@ export const fetchTaskDetail = body => {
         type: CHANGE_MODAL_TASKDETAIL,
         value
       })
+    })
+  }
+}
+/**
+ * 关联工单
+ * @param {*} body
+ */
+export const relateTask = body => {
+  return dispatch => {
+    taskService.relateTask(body).then(json => {
+      if (json.data) {
+        const { taskDetailModal } = store.getState()
+        const detail = deepCopy(taskDetailModal.detail)
+        detail.related = true
+        store.dispatch({
+          type: CHANGE_MODAL_TASKDETAIL,
+          value: {
+            detail: detail
+          }
+        })
+      }
     })
   }
 }

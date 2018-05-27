@@ -1,12 +1,13 @@
 import React from 'react'
-import { Button, Dropdown, Pagination, Menu } from 'antd'
+import { Button, Dropdown, Pagination, Menu, Popconfirm } from 'antd'
 import CONSTANTS from '../../../../constants'
 import { connect } from 'react-redux'
 import {
   changeTask,
   changeOrder,
   changeDevice,
-  changeFund
+  changeFund,
+  relateTask
 } from '../../../../actions'
 import Time from '../../../../util/time'
 const { TAB2HINT, NORMAL_DAY_7, roleModalName } = CONSTANTS
@@ -158,6 +159,17 @@ class HandleBtn extends React.Component {
       console.log(e)
     }
   }
+  relateTarget = id => {
+    const body = {
+      id: id
+    }
+    this.props.relateTask(body)
+  }
+  goToTask = id => {
+    this.props.changeTask('taskListContainer', {
+      selectedDetailId: id
+    })
+  }
   render() {
     const {
       data,
@@ -168,7 +180,14 @@ class HandleBtn extends React.Component {
       complaintTotal,
       feedbackTotal
     } = this.props
-    const { status, type, handleLimit } = data
+    const {
+      status,
+      type,
+      handleLimit,
+      relateTargetId = '22',
+      relatable = true,
+      related
+    } = data
     return (
       <div className="handleBtn">
         {/* only show when 'status' is not finished and has right to handle. */}
@@ -189,6 +208,46 @@ class HandleBtn extends React.Component {
               <Button type="primary" onClick={this.finishTask}>
                 完结
               </Button>
+            ) : null}
+            {handleLimit === true && relatable && !related ? (
+              <Popconfirm
+                title={
+                  <span>
+                    确定要关联到<a
+                      onClick={() => this.goToTask(relateTargetId)}
+                    >
+                      工单{relateTargetId}
+                    </a>
+                  </span>
+                }
+                onConfirm={e => {
+                  this.relateTarget(relateTargetId)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button type="primary">关联</Button>
+              </Popconfirm>
+            ) : null}
+            {handleLimit === true && relatable && related ? (
+              <Popconfirm
+                title={
+                  <span>
+                    确定要取消关联<a
+                      onClick={() => this.goToTask(relateTargetId)}
+                    >
+                      工单{relateTargetId}
+                    </a>
+                  </span>
+                }
+                onConfirm={e => {
+                  this.relateTarget(relateTargetId)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button type="primary">取消关联</Button>
+              </Popconfirm>
             ) : null}
           </div>
         ) : (
@@ -234,5 +293,6 @@ export default connect(mapStateToProps, {
   changeTask,
   changeFund,
   changeOrder,
-  changeDevice
+  changeDevice,
+  relateTask
 })(HandleBtn)

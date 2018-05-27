@@ -57,9 +57,20 @@ class FoxImportView extends React.Component {
   }
   setSchoolOpts = props => {
     const fox_index = props.schools.findIndex(s => s.name === '富士康')
+    const schoolOpts = {}
     if (fox_index !== -1) {
       const school = props.schools[fox_index]
-      const schoolOpts = {}
+      schoolOpts[school.id] = school.name
+      this.setState({
+        schoolOpts,
+        schoolId: school.id
+      })
+    }
+    const foxCompany_index = props.schools.findIndex(
+      s => s.name === '富士康工厂'
+    )
+    if (foxCompany_index !== -1) {
+      const school = props.schools[foxCompany_index]
       schoolOpts[school.id] = school.name
       this.setState({
         schoolOpts,

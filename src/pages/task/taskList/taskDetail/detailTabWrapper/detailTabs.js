@@ -73,6 +73,12 @@ class DetailTabWrapper extends Component {
             selectedDetailId={selectedDetailId}
           />
         ) : null}
+        {currentTab === 10 ? (
+          <UserFeedBackInfo
+            creatorId={creatorId}
+            selectedDetailId={selectedDetailId}
+          />
+        ) : null}
       </div>
     )
   }
