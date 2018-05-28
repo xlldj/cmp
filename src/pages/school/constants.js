@@ -19,7 +19,7 @@ const SCHOOL = {
     },
     {
       label: '笑联运维端',
-      value: 4
+      value: 2
     }
   ],
   ACCOUNT_ENV_ALI_USER: 1,
