@@ -1,6 +1,7 @@
 import { moduleActionFactory } from '../../actions/moduleActions.js'
 import store from '../../index'
 import AjaxHandler from '../../mock/ajax'
+// import AjaxHandler from '../../util/ajax'
 const modalName = 'beingsModal'
 export const CHANGE_NOTIFY = 'CHANGE_NOTIFY'
 
@@ -41,7 +42,7 @@ export const fetchBeingPushList = body => {
         listLoading: true
       }
     })
-    let resource = 'beings/list'
+    let resource = '/push/list'
     return AjaxHandler.fetch(resource, body).then(json => {
       let value = {
         listLoading: false
@@ -64,7 +65,7 @@ export const fetchBeingPushList = body => {
   }
 }
 /**
- * 获取消息推送详情
+ * 获取消息推送详情 （已经废弃）
  */
 export const fetchBeingInfo = body => {
   const { detailLoading } = store.getState()[modalName]

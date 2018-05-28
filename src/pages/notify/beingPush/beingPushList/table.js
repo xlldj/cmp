@@ -3,10 +3,13 @@ import { Table, Badge, Popconfirm } from 'antd'
 import { Link } from 'react-router-dom'
 import CONSTANTS from '../../../../constants'
 import { beingsListPropsController } from '../controller'
-
+import Time from '../../../../util/time'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeNotify } from '../../action'
+import { noticService } from '../../../service/index'
+import { rePushList } from '../controller'
+import Noti from '../../../../util/noti'
 const moduleName = 'notifyModule'
 const subModule = 'beings'
 const modalName = 'beingsModal'
@@ -32,15 +35,35 @@ class BeingsTable extends React.Component {
     let page = pageObj.current
     this.setProps({ type: 'page', value: { page } })
   }
-  cancel = (e, id) => {
+  cancelPush = id => {
     const body = {
       id: id
     }
+    noticService.cancelPush(body).then(json => {
+      if (json.data) {
+        if (json.data.result) {
+          Noti.hintOk('操作成功', '取消发送成功')
+          rePushList()
+        } else {
+          Noti.hintLock('操作失败', json.data.failReason)
+        }
+      }
+    })
   }
   delete = (e, id) => {
     const body = {
       id: id
     }
+    noticService.delPush(body).then(json => {
+      if (json.data) {
+        if (json.data.result) {
+          Noti.hintOk('操作成功', '删除成功')
+          rePushList()
+        } else {
+          Noti.hintLock('操作失败', json.data.failReason)
+        }
+      }
+    })
   }
   getColumns = () => {
     return [
@@ -69,7 +92,8 @@ class BeingsTable extends React.Component {
       },
       {
         title: '推送时间',
-        dataIndex: 'planPushTime'
+        dataIndex: 'planPushTime',
+        render: (text, record) => Time.getTimeStr(text)
       },
       {
         title: '推送内容',
@@ -82,7 +106,8 @@ class BeingsTable extends React.Component {
       },
       {
         title: '更新时间',
-        dataIndex: 'updateTime'
+        dataIndex: 'updateTime',
+        render: (text, record) => Time.getTimeStr(text)
       },
       {
         title: '推送状态',
@@ -102,11 +127,12 @@ class BeingsTable extends React.Component {
         render: (text, record, index) => {
           const isEdit =
             record.status === PUSH_CANCEL_STATUS ||
-            record.status === PUSH_WAITE_STATUS
+            record.status === PUSH_WAITE_STATUS ||
+            PUSH_ERROR_STATUS
           const isDelete =
             record.status === PUSH_ERROR_STATUS ||
             record.status === PUSH_CANCEL_STATUS
-          const isRePush = record.status === PUSH_WAITE_STATUS
+          const isCancelPush = record.status === PUSH_WAITE_STATUS
           return (
             <div className="editable-row-operations lastCol">
               {isEdit ? (
@@ -125,14 +151,14 @@ class BeingsTable extends React.Component {
                   <a href="">删除</a>
                 </Popconfirm>
               ) : null}
-              {(isRePush && isEdit) || (isDelete && isRePush) ? (
+              {(isCancelPush && isEdit) || (isDelete && isCancelPush) ? (
                 <span className="ant-divider" />
               ) : null}
-              {isRePush ? (
+              {isCancelPush ? (
                 <Popconfirm
                   title="确定要取消推送此么?"
-                  onConfirm={e => {
-                    this.cancel(e, record.id)
+                  onConfirm={() => {
+                    this.cancelPush(record.id)
                   }}
                   okText="确认"
                   cancelText="取消"

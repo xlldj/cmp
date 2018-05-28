@@ -21,8 +21,8 @@ const NOTIFY = {
     2: '人工推送'
   },
   BEINGS_PUSH_PERSON: {
-    1: '全部用户',
-    2: '指定用户'
+    1: '全部用户'
+    // 2: '指定用户'
   },
   BEINGS_PUSH_TARGET_PERSON: 2,
   BEINGS_PUSH_EQUMENT: {
@@ -31,10 +31,11 @@ const NOTIFY = {
     3: '笑联企业版'
   },
   BEINGS_PUSH_STATUS: {
-    1: '成功',
-    2: '失败',
-    3: '取消',
-    4: '待推送'
+    1: '待推送',
+    2: '推送成功',
+    3: '推送失败',
+    4: '取消推送',
+    5: '已删除'
   },
   BEING_STATUSTEXT: {
     1: 'success',

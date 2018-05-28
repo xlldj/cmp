@@ -8,6 +8,9 @@ import SchoolSelector from '../../../component/schoolSelector'
 import BasicSelectorWithoutAll from '../../../component/basicSelectorWithoutAll'
 import AjaxHandler from '../../../../mock/ajax'
 import AddPlusAbs from '../../../component/addPlusAbs'
+import { noticService } from '../../../service/index'
+import { rePushList } from '../controller'
+import Noti from '../../../../util/noti'
 // import { connect } from 'react-redux'
 // import { withRouter } from 'react-router-dom'
 const {
@@ -26,7 +29,7 @@ class BeingInfo extends React.Component {
       mobile: [''],
       env: '',
       target: '',
-      planPushTime: moment(),
+      planPushTime: moment(moment().add(5, 'minute')),
       content: '',
       status: 2
     }
@@ -49,7 +52,7 @@ class BeingInfo extends React.Component {
     this.props.hide(true)
   }
   fetchData(body) {
-    const resource = 'beings/info'
+    const resource = '/push/one'
     AjaxHandler.fetch(resource, body).then(json => {
       if (json.error) {
         throw new Error(json.error.displayMessage || json.error)
@@ -125,14 +128,6 @@ class BeingInfo extends React.Component {
     })
   }
   comleteEdit = () => {
-    let { id } = this.state
-    if (id) {
-      this.postEditData()
-    } else {
-      this.addBeingInfo()
-    }
-  }
-  addBeingInfo = () => {
     const {
       schoolId,
       methon,
@@ -155,12 +150,53 @@ class BeingInfo extends React.Component {
     if (parseInt(methon, 10) === BEING_PUSH_METNON_WAITE) {
       body.planPushTime = planPushTime
     }
-    console.log(body)
+    this.addBeingInfo(body)
+  }
+  addBeingInfo = body => {
+    const { id } = this.state
+    if (id) {
+      body.id = id
+      noticService.upDatePush(body).then(json => {
+        if (json.data) {
+          if (json.data.result) {
+            Noti.hintOk('操作成功', '编辑成功')
+            rePushList()
+          } else {
+            Noti.hintLock('操作失败', json.data.failReason)
+          }
+        }
+      })
+    } else {
+      noticService.addPush(body).then(json => {
+        if (json.data) {
+          if (json.data.result) {
+            Noti.hintOk('操作成功', '创建成功')
+            rePushList()
+          } else {
+            Noti.hintLock('操作失败', json.data.failReason)
+          }
+        }
+      })
+    }
   }
   changeContent = event => {
     this.setState({
       content: event.target.value
     })
+  }
+  checkContent = event => {
+    const value = event.target.value
+    if (!value || value.length > 50) {
+      this.setState({
+        contentError: true,
+        content: value
+      })
+    } else {
+      this.setState({
+        contentError: false,
+        content: value
+      })
+    }
   }
   postEditData = () => {
     const {
@@ -189,6 +225,45 @@ class BeingInfo extends React.Component {
     }
     console.log(body, 'edit')
   }
+  /**
+   * 返回一个范围内的数组
+   * @param {数组开始数字} start
+   * @param {数组结束数字} end
+   */
+  range(start, end) {
+    const result = []
+    for (let i = start; i < end; i++) {
+      result.push(i)
+    }
+    return result
+  }
+  //只能选择当前时间五分钟以后的日期
+  disabledDate(current) {
+    const fiveMinute = moment().add(5, 'minute')
+    var sBDay = moment(fiveMinute).subtract(1, 'days')
+    return current < moment(sBDay).endOf('day')
+  }
+  //只能选择当前时间五分钟以后的时间
+  disabledDateTime = current => {
+    const fiveMinute = moment().add(5, 'minute')
+    if (current.date() === moment(fiveMinute).date()) {
+      const disableTime = {}
+      disableTime.disabledHours = () => {
+        return this.range(0, moment(fiveMinute).hours())
+      }
+      if (current.hours() === moment(fiveMinute).hours()) {
+        disableTime.disabledMinutes = () => {
+          return this.range(0, moment(fiveMinute).minutes())
+        }
+      }
+      return disableTime
+    }
+  }
+  changeTime = value => {
+    this.setState({
+      planPushTime: value
+    })
+  }
   render() {
     let {
       schoolId,
@@ -197,7 +272,8 @@ class BeingInfo extends React.Component {
       env,
       target,
       planPushTime,
-      content
+      content,
+      contentError
     } = this.state
     const mobileItems =
       mobile &&
@@ -241,10 +317,14 @@ class BeingInfo extends React.Component {
           <li className="itemsWrapper high">
             <p>推送内容:</p>
             <div>
-              <textarea value={content} onChange={this.changeContent} />
-              {/* {contentError ? (
-                <span className="checkInvalid">公告内容不能为空！</span>
-              ) : null} */}
+              <textarea
+                value={content}
+                onBlur={this.checkContent}
+                onChange={this.changeContent}
+              />
+              {contentError ? (
+                <span className="checkInvalid">公告内容为0～50字！</span>
+              ) : null}
             </div>
           </li>
           <li>
@@ -263,10 +343,14 @@ class BeingInfo extends React.Component {
               <DatePicker
                 className="datePicker"
                 style={{ height: '30px', width: 'auto' }}
+                disabledDate={this.disabledDate}
+                disabledTime={this.disabledDateTime}
+                // showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
                 showTime
                 allowClear={false}
                 value={moment(planPushTime)}
-                format="YYYY-MM-DD HH:mm"
+                onChange={this.changeTime}
+                format="YYYY-MM-DD HH:mm:ss"
               />
             </li>
           ) : null}

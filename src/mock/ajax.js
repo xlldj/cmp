@@ -58,7 +58,7 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return fundCheckHandler(resource, body)
   } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
     return userAuthHandler(resource, body)
-  } else if (contain(resource, 'beings/list', 'beings/info')) {
+  } else if (contain(resource, '/push/list', '/push/one', 'push/delete')) {
     return beingPushHandler(resource, body)
   }
 }

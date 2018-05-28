@@ -37,13 +37,13 @@ class BeingsQuery extends React.Component {
       body.schoolId = +schoolId
     }
     if (type !== 'all') {
-      body.type = +type
+      body.mode = +type
     }
     if (status !== 'all') {
       body.status = +status
     }
     if (method !== 'all') {
-      body.method = +method
+      body.env = +method
     }
     props.fetchBeingPushList(body)
   }
