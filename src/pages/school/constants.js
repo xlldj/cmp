@@ -23,7 +23,7 @@ const SCHOOL = {
     }
   ],
   ACCOUNT_ENV_ALI_USER: 1,
-  ACCOUNT_ENV_ALI_YUNWEI: 4
+  ACCOUNT_ENV_ALI_YUNWEI: 2
 }
 
 export default SCHOOL
