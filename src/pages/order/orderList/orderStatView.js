@@ -7,6 +7,7 @@ import CONSTANTS from '../../../constants'
 
 import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 import CheckSelect from '../../component/checkSelect'
+// import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import OrderBarChart from './orderBarChart'
 
 import { checkObject } from '../../../util/checkSame'
@@ -19,7 +20,8 @@ const {
   X_AXIS_NAME,
   ORDER_STAT_ORDERBYS,
   ORDER,
-  PAGINATION: SIZE
+  PAGINATION: SIZE,
+  DEVICE_TYPE_HEATER
 } = CONSTANTS
 
 class OrderStatView extends React.Component {
@@ -32,51 +34,10 @@ class OrderStatView extends React.Component {
       listLoading: false,
       histogramLoading: false,
       loading: false,
-      total: 0
+      total: 0,
+      isFushikang: false,
+      showBuildingSelect: false
     }
-
-    this.columns = [
-      {
-        title: '学校',
-        dataIndex: 'schoolName'
-      },
-      {
-        title: '设备类型',
-        dataIndex: 'deviceType',
-        width: '15%',
-        render: (text, record, index) => DEVICETYPE[record.deviceType]
-      },
-      {
-        title: '使用人数',
-        dataIndex: 'userCount',
-        width: '12%',
-        sorter: true
-      },
-      {
-        title: '人均消费(元)',
-        dataIndex: 'userAverage',
-        width: '15%',
-        sorter: true
-      },
-      {
-        title: '使用次数',
-        dataIndex: 'orderCount',
-        width: '15%',
-        sorter: true
-      },
-      {
-        title: '次均消费',
-        dataIndex: 'orderAverage',
-        width: '12%',
-        sorter: true
-      },
-      {
-        title: '总收益(元)',
-        dataIndex: 'totalIncome',
-        width: '15%',
-        sorter: true
-      }
-    ]
   }
   fetchList = props => {
     if (!this.state.loading) {
@@ -95,6 +56,9 @@ class OrderStatView extends React.Component {
     if (day === 'all') {
       body.day = ORDER_STAT_DAY_UNLIMITED
     }
+    // if (buildingIds !== 'all') {
+    //   body.buildingIds = buildingIds
+    // }
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
     }
@@ -186,6 +150,95 @@ class OrderStatView extends React.Component {
   componentDidMount() {
     this.fetchList()
     this.fetchHistogram()
+    this.checkSchoolFsk()
+  }
+  //检查选择学校是否为富士康
+  checkSchoolFsk = props => {
+    const { schools, schoolId } = props || this.props
+    const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
+    if (fox_index !== -1) {
+      const school = schools[fox_index]
+      if (school.name === '富士康' || school.name === '富士康工厂') {
+        this.setState({
+          isFushikang: true
+        })
+        let { deviceType } = this.props
+        if (deviceType === DEVICE_TYPE_HEATER) {
+          return
+        }
+        this.props.changeOrder(subModule, {
+          stat_dt: DEVICE_TYPE_HEATER,
+          page: 1
+        })
+        return true
+      }
+    }
+    this.setState({
+      isFushikang: false
+    })
+  }
+  getColumns = () => {
+    const columns = [
+      {
+        title: '学校',
+        dataIndex: 'schoolName'
+      },
+      {
+        title: '设备类型',
+        dataIndex: 'deviceType',
+        render: (text, record, index) => DEVICETYPE[record.deviceType]
+      },
+      {
+        title: '使用人数',
+        dataIndex: 'userCount',
+        width: '12%',
+        sorter: true
+      },
+      {
+        title: '人均消费(元)',
+        dataIndex: 'userAverage',
+        width: '15%',
+        sorter: true
+      },
+      {
+        title: '使用次数',
+        dataIndex: 'orderCount',
+        width: '15%',
+        sorter: true
+      },
+      {
+        title: '次均消费',
+        dataIndex: 'orderAverage',
+        width: '12%',
+        sorter: true
+      },
+      {
+        title: '总收益(元)',
+        dataIndex: 'totalIncome',
+        width: '15%',
+        sorter: true
+      }
+    ]
+    const { isFushikang } = this.state
+    if (isFushikang) {
+      columns.splice(
+        2,
+        0,
+        {
+          title: '总用水量(升)',
+          dataIndex: 'totalWaterUsage'
+        },
+        {
+          title: '人均用水量(升)',
+          dataIndex: 'averageWaterUsage'
+        }
+      )
+      columns.splice(0, 1, {
+        title: '公寓',
+        dataIndex: 'schoolName'
+      })
+    }
+    return columns
   }
   componentWillReceiveProps(nextProps) {
     if (
@@ -195,7 +248,9 @@ class OrderStatView extends React.Component {
         'deviceType',
         'page',
         'order',
-        'orderBy'
+        'orderBy',
+        'schools'
+        // 'buildingIds'
       ])
     ) {
       return
@@ -207,12 +262,34 @@ class OrderStatView extends React.Component {
       return
     }
     this.fetchHistogram(nextProps)
+    this.checkSchoolFsk(nextProps)
   }
   changeRange = key => {
     this.props.changeOrder(subModule, {
       stat_day: key === 'all' ? 'all' : +key
     })
   }
+  showBuildingSelect = () => {
+    this.setState({
+      showBuildingSelect: true
+    })
+  }
+  // closeBuildingSelect = () => {
+  //   this.setState({
+  //     showBuildingSelect: false
+  //   })
+  // }
+  // confirmBuildings = ({ all, dataSource }) => {
+  //   this.setState({
+  //     showBuildingSelect: false
+  //   })
+  //   let buildingIds = all
+  //     ? 'all'
+  //     : dataSource.filter(d => d.selected === true).map(d => d.id)
+  //   this.props.changeOrder(subModule, {
+  //     stat_buildingIds: buildingIds
+  //   })
+  // }
   changeDevice = value => {
     let { deviceType } = this.props
     if (value === deviceType) {
@@ -247,9 +324,33 @@ class OrderStatView extends React.Component {
     })
   }
   render() {
-    const { page, deviceType, day } = this.props
-    const { dataSource, total, loading, barData } = this.state
-
+    const {
+      page,
+      deviceType,
+      day
+      // buildingIds,
+      // schoolId,
+      // buildingsOfSchoolId
+    } = this.props
+    const {
+      dataSource,
+      total,
+      loading,
+      barData,
+      isFushikang
+      // showBuildingSelect
+    } = this.state
+    // const buildingNames =
+    //   buildingIds === 'all'
+    //     ? '全部楼栋'
+    //     : buildingIds
+    //         .map(
+    //           b =>
+    //             buildingsOfSchoolId[+schoolId] &&
+    //             buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
+    //             buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
+    //         )
+    //         .join('、')
     return (
       <div className="orderStat">
         <QueryPanel>
@@ -265,16 +366,29 @@ class OrderStatView extends React.Component {
               />
             </QueryBlock>
           </QueryLine>
-          <QueryLine>
-            <QueryBlock>
-              <span>设备类型:</span>
-              <CheckSelect
-                options={DEVICETYPE}
-                value={deviceType}
-                onClick={this.changeDevice}
-              />
-            </QueryBlock>
-          </QueryLine>
+          {isFushikang ? null : (
+            // <div className="queryLine">
+            //   <div className="block">
+            //     <span>楼栋筛选:</span>
+            //     <span className="customized_select_option">
+            //       {buildingNames}
+            //     </span>
+            //     <Button type="primary" onClick={this.showBuildingSelect}>
+            //       点击选择
+            //     </Button>
+            //   </div>
+            // </div>
+            <QueryLine>
+              <QueryBlock>
+                <span>设备类型:</span>
+                <CheckSelect
+                  options={DEVICETYPE}
+                  value={deviceType}
+                  onClick={this.changeDevice}
+                />
+              </QueryBlock>
+            </QueryLine>
+          )}
         </QueryPanel>
 
         <div className="statWrapper">
@@ -290,7 +404,7 @@ class OrderStatView extends React.Component {
               }}
               dataSource={dataSource}
               rowKey={record => record.schoolName}
-              columns={this.columns}
+              columns={this.getColumns()}
               onChange={this.changeTable}
               onRowClick={this.selectRow}
               rowClassName={this.setRowClass}
@@ -299,6 +413,15 @@ class OrderStatView extends React.Component {
 
           <OrderBarChart data={barData} />
         </div>
+        {/* {showBuildingSelect ? (
+          <BuildingMultiSelectModal
+            all={buildingIds === 'all'}
+            selectedItems={buildingIds !== 'all' ? buildingIds : []}
+            schoolId={schoolId}
+            closeModal={this.closeBuildingSelect}
+            confirmBuildings={this.confirmBuildings}
+          />
+        ) : null} */}
       </div>
     )
   }

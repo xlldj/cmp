@@ -1,6 +1,70 @@
+.lostFoundDetail{
+	width: 50%;
+	.detailList{
+		li{
+			height: auto;
+			display: flex;
+			img{
+				height: 50px;
+				width: 50px;
+			}
+		}
+	}
+}
 .defriendWrapper{
 	margin-left: 20px;
 	.selectWrapper>*{
 		margin-left: 15px;
 	}
+}
+.blackTable{
+	margin: 20px 10px 10px 10px;
+}
+.commentWrapper{
+	.replyWrapper{
+		padding: 10px;
+		background: #f7f7f7;
+		.commentItem{
+			.blueFont{
+				color: #999;
+				.balckFont{
+					color: #000000;
+					margin: 0px 5px;
+				}
+			}
+			.blueFont:hover{
+				color: #108EE9
+			}
+		}
+	}
+	.commentItem{
+		line-height: 30px;
+		span{
+			margin: 0px 10px;
+		}
+		.noRightMargin, span:first-child{
+			margin: 0px
+		}
+		.greyFont{
+			color: #999;
+		}
+		.blue_font{
+			color: #108ee9;
+			cursor: pointer;
+		}
+		.balckFont{
+			color: #000000;
+		}
+		.blueFont{
+			color: #108ee9;
+		}
+		.softLink:hover{
+			color:  #108ee9 !important;
+		}
+	}
+}
+.commentsContent{
+	margin-top: 20px;
+	padding-top: 10px;
+	border-top: 1px solid #e6e6e6
 }

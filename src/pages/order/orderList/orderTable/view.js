@@ -20,7 +20,8 @@ const {
   DEVICETYPE,
   ORDER_DAY_SELECT,
   ORDERUSERTYPES,
-  ORDERSTATUS
+  ORDERSTATUS,
+  DEVICE_TYPE_HEATER
 } = CONSTANTS
 
 const BACKTITLE = {
@@ -45,7 +46,8 @@ class OrderTableView extends React.Component {
       searchingText: '',
       subStartTime: this.props.startTime,
       subEndTime: this.props.endTime,
-      showBuildingSelect: false
+      showBuildingSelect: false,
+      isFushikang: false
     }
   }
   fetchList = props => {
@@ -181,6 +183,7 @@ class OrderTableView extends React.Component {
     this.root = root
     root.addEventListener('click', this.closeDetail, false)
     this.syncStateWithProps()
+    this.checkSchoolFsk()
   }
   componentWillUnmount() {
     this.root.removeEventListener('click', this.closeDetail)
@@ -204,17 +207,44 @@ class OrderTableView extends React.Component {
         'startTime',
         'endTime',
         'userType',
-        'buildingIds'
+        'buildingIds',
+        'schools'
       ])
     ) {
       return
     }
+    this.checkSchoolFsk(nextProps)
     this.syncStateWithProps(nextProps)
     if (this.onlyPageChanged(this.props, nextProps)) {
       this.fetchList(nextProps)
     } else {
       this.fetchAllData(nextProps)
     }
+  }
+  //检查选择学校是否为富士康
+  checkSchoolFsk = props => {
+    const { schools, schoolId } = props || this.props
+    const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
+    if (fox_index !== -1) {
+      const school = schools[fox_index]
+      if (school.name === '富士康' || school.name === '富士康工厂') {
+        this.setState({
+          isFushikang: true
+        })
+        let { deviceType } = this.props
+        if (deviceType === DEVICE_TYPE_HEATER) {
+          return
+        }
+        this.props.changeOrder(subModule, {
+          deviceType: DEVICE_TYPE_HEATER,
+          page: 1
+        })
+        return true
+      }
+    }
+    this.setState({
+      isFushikang: false
+    })
   }
   onlyPageChanged = (prev, cur) => {
     if (
@@ -412,7 +442,8 @@ class OrderTableView extends React.Component {
       loading,
       startTime,
       endTime,
-      searchingText
+      searchingText,
+      isFushikang
     } = this.state
     const showClearBtn = !!searchingText
     const { state } = this.props.location
@@ -553,36 +584,57 @@ class OrderTableView extends React.Component {
                 onClick={this.changeUserType}
               />
             </div>
+            {isFushikang ? (
+              <div className="block">
+                {showClearBtn ? (
+                  <Button
+                    onClick={this.clearMobile}
+                    className="rightSeperator"
+                    type="primary"
+                  >
+                    清空
+                  </Button>
+                ) : null}
+                <SearchInput
+                  placeholder="宿舍/订单号/手机号"
+                  searchingText={searchingText}
+                  pressEnter={this.pressEnter}
+                  changeSearch={this.changeSearch}
+                />
+              </div>
+            ) : null}
           </div>
-          <div className="queryLine">
-            <div className="block">
-              <span>设备类型:</span>
-              <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
-                options={DEVICETYPE}
-                value={deviceType}
-                onClick={this.changeDevice}
-              />
+          {isFushikang ? null : (
+            <div className="queryLine">
+              <div className="block">
+                <span>设备类型:</span>
+                <CheckSelect
+                  allOptTitle="不限"
+                  allOptValue="all"
+                  options={DEVICETYPE}
+                  value={deviceType}
+                  onClick={this.changeDevice}
+                />
+              </div>
+              <div className="block">
+                {showClearBtn ? (
+                  <Button
+                    onClick={this.clearMobile}
+                    className="rightSeperator"
+                    type="primary"
+                  >
+                    清空
+                  </Button>
+                ) : null}
+                <SearchInput
+                  placeholder="宿舍/订单号/手机号"
+                  searchingText={searchingText}
+                  pressEnter={this.pressEnter}
+                  changeSearch={this.changeSearch}
+                />
+              </div>
             </div>
-            <div className="block">
-              {showClearBtn ? (
-                <Button
-                  onClick={this.clearMobile}
-                  className="rightSeperator"
-                  type="primary"
-                >
-                  清空
-                </Button>
-              ) : null}
-              <SearchInput
-                placeholder="宿舍/订单号/手机号"
-                searchingText={searchingText}
-                pressEnter={this.pressEnter}
-                changeSearch={this.changeSearch}
-              />
-            </div>
-          </div>
+          )}
           <div className="queryLine">
             <div className="block">
               <span>使用状态:</span>
