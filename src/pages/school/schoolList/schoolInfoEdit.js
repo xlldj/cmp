@@ -302,7 +302,7 @@ class SchoolInfoEdit extends React.Component {
       has2Accounts: false, // editing, and has both accounts, this will be true
       deletedOneAccountInTow: false, // when editing, and original has both alipay and wx, and deleted one of them, this will be true.
 
-      accountEnv: [4] // 账户环境，默认运维端必须选择支付宝
+      accountEnv: [ACCOUNT_ENV_ALI_YUNWEI] // 账户环境，默认运维端必须选择支付宝
     }
   }
   fetchData = body => {
