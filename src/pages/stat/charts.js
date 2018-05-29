@@ -304,76 +304,7 @@ class Charts extends Component {
   }
 
   componentDidMount() {
-    let {
-      schoolId,
-      target,
-      timeSpan,
-      currentChart,
-      currentMonth,
-      monthStr,
-      compare
-    } = this.props
-
-    /* if click repair/time chart, fetch the repair/time areaData */
-    if (currentChart === 6) {
-      if (currentMonth) {
-        let areaStartTime = Time.getFirstWeekStart(Time.getMonthStart(NOW))
-        let areaEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(NOW))
-        const body = {
-          endTime: areaEndTime,
-          startTime: areaStartTime,
-          timeUnit: AREATIMEUNIT
-        }
-        if (schoolId !== 'all') {
-          body.schoolId = parseInt(schoolId, 10)
-        }
-        this.fetchAreaData(body)
-      } else {
-        let newStartTime = Time.getFirstWeekStart(
-            Time.getMonthStart(monthStr + '-1')
-          ),
-          newEndTime = Time.getTheLastWeekEnd(Time.getMonthEnd(monthStr + '-1'))
-        const body = {
-          timeUnit: AREATIMEUNIT,
-          startTime: newStartTime,
-          endTime: newEndTime
-        }
-        if (schoolId !== 'all') {
-          body.schoolId = parseInt(schoolId, 10)
-        }
-        this.fetchAreaData(body)
-      }
-      return
-    }
-
-    /* else fetch the line data */
-    let timeUnit = 2
-    let newStartTime,
-      newEndTime,
-      body = {}
-
-    if (timeSpan === 1) {
-      //today
-      newStartTime = Time.getDayStart(NOW)
-      newEndTime = Time.getDayEnd(NOW)
-      timeUnit = 1
-    } else if (timeSpan === 2) {
-      newStartTime = Time.getWeekStart(NOW)
-      newEndTime = Time.getWeekEnd(NOW)
-    } else {
-      newStartTime = Time.getMonthStart(NOW)
-      newEndTime = Time.getMonthEnd(NOW)
-    }
-
-    body.startTime = newStartTime
-    body.endTime = newEndTime
-    body.timeUnit = timeUnit
-    body.target = target
-
-    if (schoolId !== 'all') {
-      body.schoolId = parseInt(schoolId, 10)
-    }
-    this.fetchData(body, { currentChart: currentChart, compare: compare })
+    this.sendFetch(this.props)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -392,7 +323,10 @@ class Charts extends Component {
     ) {
       return
     }
-    let {
+    this.sendFetch(nextProps)
+  }
+  sendFetch(props) {
+    const {
       schoolId,
       target,
       timeSpan,
@@ -402,7 +336,7 @@ class Charts extends Component {
       compare,
       startTime,
       endTime
-    } = nextProps
+    } = props
 
     /* if click repair/time chart, fetch the repair/time areaData */
     if (currentChart === 6) {
@@ -437,7 +371,7 @@ class Charts extends Component {
     }
 
     /* if remove compare, only remove compare data */
-    if (this.props.compare === true && compare === false) {
+    if (props.compare === true && compare === false) {
       this.removeCompareData()
     }
 
@@ -449,10 +383,10 @@ class Charts extends Component {
 
     if (startTime && endTime) {
       // 根据开始和结束时间的间隔大小来确定timeUnit的值，如果大于3天则为天()，否则为小时()
-      body.startTime = startTime
-      body.endTime = endTime
+      newStartTime = startTime
+      newEndTime = endTime
       if (Time.intervalLessThanDayThreshold(startTime, endTime)) {
-        body.timeUnit = STAT_TIMEUNIT_HOUR
+        timeUnit = STAT_TIMEUNIT_HOUR
       }
     } else {
       if (timeSpan === 1) {
@@ -467,18 +401,15 @@ class Charts extends Component {
         newStartTime = Time.getMonthStart(NOW)
         newEndTime = Time.getMonthEnd(NOW)
       }
-
-      body.startTime = newStartTime
-      body.endTime = newEndTime
-      body.timeUnit = timeUnit
     }
-
+    body.startTime = newStartTime
+    body.endTime = newEndTime
+    body.timeUnit = timeUnit
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
     }
-    this.fetchData(body, { currentChart: currentChart, compare: compare })
+    this.fetchData(body, { currentChart, compare })
   }
-
   changeTarget = e => {
     e.preventDefault()
     let v = parseInt(e.target.getAttribute('data-value'), 10)
