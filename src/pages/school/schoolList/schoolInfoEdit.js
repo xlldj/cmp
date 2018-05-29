@@ -5,7 +5,7 @@ import { Map, Marker } from 'react-amap'
 import Noti from '../../../util/noti'
 import PicturesWall from '../../component/picturesWall'
 
-import { Cascader, Button, Upload, Icon, Popconfirm } from 'antd'
+import { Cascader, Button, Upload, Icon, Popconfirm, Checkbox } from 'antd'
 import CONSTANTS from '../../../constants'
 
 import PropTypes from 'prop-types'
@@ -13,7 +13,15 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { setSchoolList } from '../../../actions'
 
-const { FILEADDR, WXCERTSIZE } = CONSTANTS
+const CheckboxGroup = Checkbox.Group
+const {
+  FILEADDR,
+  WXCERTSIZE,
+  ACCOUNT_ENVS,
+  ACCOUNT_ENV_ALI_YUNWEI,
+  ACCOUNT_ENV_ALI_USER_RECHARGE,
+  ACCOUNT_ENV_ALI_USER_CASH
+} = CONSTANTS
 const options = [
   {
     value: '浙江',
@@ -293,7 +301,9 @@ class SchoolInfoEdit extends React.Component {
       wxValidateFailure: false,
 
       has2Accounts: false, // editing, and has both accounts, this will be true
-      deletedOneAccountInTow: false // when editing, and original has both alipay and wx, and deleted one of them, this will be true.
+      deletedOneAccountInTow: false, // when editing, and original has both alipay and wx, and deleted one of them, this will be true.
+
+      accountEnv: [ACCOUNT_ENV_ALI_YUNWEI] // 账户环境，默认运维端必须选择支付宝
     }
   }
   fetchData = body => {
@@ -310,7 +320,8 @@ class SchoolInfoEdit extends React.Component {
           lat,
           logo,
           accountName,
-          wxpayAccountName
+          wxpayAccountName,
+          accountEnv
         } = json.data
         let nextState = {
           name: name,
@@ -318,6 +329,9 @@ class SchoolInfoEdit extends React.Component {
           location: location,
           lnglat: { longitude: lon, latitude: lat },
           initialName: name
+        }
+        if (accountEnv) {
+          nextState.accountEnv = accountEnv
         }
         if (logo) {
           nextState.fileList = [
@@ -403,7 +417,8 @@ class SchoolInfoEdit extends React.Component {
       wxpayApiKey,
       wxpayMchId,
       wxpayCertId,
-      wxValidateSuccess
+      wxValidateSuccess,
+      accountEnv
     } = this.state
     if (posting) {
       return
@@ -418,7 +433,8 @@ class SchoolInfoEdit extends React.Component {
       city: city.join('-'),
       lat: lnglat.latitude,
       lon: lnglat.longitude,
-      location: location
+      location: location,
+      accountEnv
     }
     if (validateSuccess && accountName) {
       body.accountName = accountName
@@ -578,7 +594,8 @@ class SchoolInfoEdit extends React.Component {
         city,
         location,
         validateSuccess,
-        wxValidateSuccess
+        wxValidateSuccess,
+        accountEnv
       } = this.state,
       nextState = {}
     if (!name) {
@@ -594,9 +611,15 @@ class SchoolInfoEdit extends React.Component {
       nextState.locationError = true
       return this.setState(nextState)
     }
-    // if both alipay and wx are not validated, and this is creating new school, return
-    if (!validateSuccess && !wxValidateSuccess && id) {
-      return Noti.hintWarning('', '请输入并验证至少一个收款账号！')
+    // 支付宝必填
+    if (!validateSuccess) {
+      return Noti.hintWarning('', '支付宝账号必填！')
+    }
+    // 如果用户端没选支付宝充值，则微信账户必填
+    const aliForUserRecharge =
+      accountEnv && accountEnv.indexOf(ACCOUNT_ENV_ALI_USER_RECHARGE) !== -1
+    if (!aliForUserRecharge && !wxValidateSuccess) {
+      return Noti.hintWarning('', '用户端支付宝充值和微信请至少选中一个！')
     }
 
     if (id && initialName === name) {
@@ -1208,6 +1231,19 @@ class SchoolInfoEdit extends React.Component {
       }
     })
   }
+  hasAliAtYunwei = arr => {
+    return arr.indexOf(ACCOUNT_ENV_ALI_YUNWEI) !== -1
+  }
+  changeAccountEnv = v => {
+    // 如果取消了运维端的支付宝，不响应
+    const { accountEnv } = this.state
+    if (this.hasAliAtYunwei(accountEnv) && !this.hasAliAtYunwei(v)) {
+      return
+    }
+    this.setState({
+      accountEnv: v
+    })
+  }
   render() {
     const {
       id,
@@ -1266,7 +1302,9 @@ class SchoolInfoEdit extends React.Component {
 
       wxpayCertFile,
       wxpayCertId,
-      deletedOneAccountInTow
+      deletedOneAccountInTow,
+
+      accountEnv
     } = this.state
 
     const alipayAccount = (
@@ -1374,6 +1412,14 @@ class SchoolInfoEdit extends React.Component {
           {validateFailure ? (
             <span className="checkInvalid">验证失败，该支付宝账号不可用</span>
           ) : null}
+        </li>
+        <li>
+          <p>选择支付环境:</p>
+          <CheckboxGroup
+            options={ACCOUNT_ENVS}
+            value={accountEnv}
+            onChange={this.changeAccountEnv}
+          />
         </li>
       </Fragment>
     )
@@ -1598,7 +1644,13 @@ class SchoolInfoEdit extends React.Component {
           <li>
             <p />
             <span className="hintText">
-              *支付宝和微信支付至少验证通过一个，未验证或验证未通过的用户端不显示
+              *支付宝必须验证通过，且选中笑联运维端
+            </span>
+          </li>
+          <li>
+            <p />
+            <span className="hintText">
+              *微信支付选填，当前仅支持用户端使用
             </span>
           </li>
         </ul>
@@ -1625,8 +1677,6 @@ class SchoolInfoEdit extends React.Component {
     )
   }
 }
-
-// export default SchoolInfoEdit
 
 const mapStateToProps = (state, ownProps) => {
   return {
