@@ -20,7 +20,8 @@ class QuickInfo extends React.Component {
       const { content, msgTypeId } = selectRecord
       this.setState({
         content: content,
-        msgTypeId: msgTypeId
+        msgTypeId: msgTypeId,
+        id: selectedMsg
       })
       return
     }
