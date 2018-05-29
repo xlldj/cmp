@@ -76,7 +76,7 @@ export const deleteQuickMsg = body => {
       Noti.hintOk('操作成功', '删除成功')
       const body = {
         page: page,
-        type: type,
+        msgType: type,
         size: SIZE
       }
       store.dispatch(fetchQuickList(body))
@@ -103,7 +103,7 @@ export const saveQuickMsg = (body, callback) => {
       }
       const body = {
         page: page,
-        type: type,
+        msgType: type,
         size: SIZE
       }
       store.dispatch(fetchQuickList(body))
