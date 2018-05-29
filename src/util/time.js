@@ -444,4 +444,12 @@ Time.getTodayEnd = () => {
   t.setHours(23, 59, 59)
   return Date.parse(t)
 }
+/**
+ * 时间间隔是否小于3天
+ * @param {*} startTime : 开始时间，timestamp, 毫秒为单位
+ * @param {*} endTime : 毫秒为单位
+ */
+Time.intervalLessThanDayThreshold = (startTime, endTime) => {
+  return Math.abs(endTime - startTime) < 3 * 24 * 3600 * 1000
+}
 export default Time

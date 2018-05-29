@@ -58,7 +58,7 @@ const CLASSNAMES = [
     3: 'on'
   }
 ]
-const CHARTTYPES = CONSTANTS.CHARTTYPES
+const { CHARTTYPES, STAT_TIMEUNIT_HOUR, STAT_TIMEUNIT_DAY } = CONSTANTS
 const data1Name = {
   1: 'showerPoints',
   2: 'newlyPoints',
@@ -447,10 +447,13 @@ class Charts extends Component {
       newEndTime,
       body = { target: target }
 
-    if (startTime) {
+    if (startTime && endTime) {
+      // 根据开始和结束时间的间隔大小来确定timeUnit的值，如果大于3天则为天()，否则为小时()
       body.startTime = startTime
       body.endTime = endTime
-      body.timeUnit = timeUnit
+      if (Time.intervalLessThanDayThreshold(startTime, endTime)) {
+        body.timeUnit = STAT_TIMEUNIT_HOUR
+      }
     } else {
       if (timeSpan === 1) {
         //today
@@ -1282,7 +1285,7 @@ class CustomizedXAxisTick extends React.Component {
           dy={12}
           textAnchor="end"
           fill="#999"
-          transform="rotate(-35)"
+          transform="rotate(-10)"
         >
           {timeUnit === 2
             ? Format.dayLabel(payload.value)
