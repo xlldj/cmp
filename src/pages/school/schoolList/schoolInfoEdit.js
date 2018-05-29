@@ -19,7 +19,8 @@ const {
   WXCERTSIZE,
   ACCOUNT_ENVS,
   ACCOUNT_ENV_ALI_YUNWEI,
-  ACCOUNT_ENV_ALI_USER
+  ACCOUNT_ENV_ALI_USER_RECHARGE,
+  ACCOUNT_ENV_ALI_USER_CASH
 } = CONSTANTS
 const options = [
   {
@@ -614,11 +615,11 @@ class SchoolInfoEdit extends React.Component {
     if (!validateSuccess) {
       return Noti.hintWarning('', '支付宝账号必填！')
     }
-    // 如果用户端没选支付宝，则微信账户必填
-    const aliForUser =
-      accountEnv && accountEnv.indexOf(ACCOUNT_ENV_ALI_USER) !== -1
-    if (!aliForUser && !wxValidateSuccess) {
-      return Noti.hintWarning('', '用户端支付宝和微信请至少选中一个！')
+    // 如果用户端没选支付宝充值，则微信账户必填
+    const aliForUserRecharge =
+      accountEnv && accountEnv.indexOf(ACCOUNT_ENV_ALI_USER_RECHARGE) !== -1
+    if (!aliForUserRecharge && !wxValidateSuccess) {
+      return Noti.hintWarning('', '用户端支付宝充值和微信请至少选中一个！')
     }
 
     if (id && initialName === name) {

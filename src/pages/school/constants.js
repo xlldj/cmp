@@ -16,16 +16,21 @@ const SCHOOL = {
   WXCERTSIZE: 65534, // cert file should not exceed 64k bytes.
   ACCOUNT_ENVS: [
     {
-      label: '笑联用户端',
+      label: '笑联用户端充值',
       value: 1
     },
     {
-      label: '笑联运维端',
+      label: '笑联用户端提现',
       value: 2
+    },
+    {
+      label: '笑联运维端充值',
+      value: 4
     }
   ],
-  ACCOUNT_ENV_ALI_USER: 1,
-  ACCOUNT_ENV_ALI_YUNWEI: 2
+  ACCOUNT_ENV_ALI_USER_RECHARGE: 1,
+  ACCOUNT_ENV_ALI_USER_CASH: 2,
+  ACCOUNT_ENV_ALI_YUNWEI: 4
 }
 
 export default SCHOOL
