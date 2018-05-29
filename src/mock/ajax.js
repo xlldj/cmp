@@ -5,9 +5,7 @@ import orderConsumptionHandler from './orderConsumption'
 import userAuthHandler from './userAuth'
 import lostHandler from './lost'
 import fundCheckHandler from './fundCheck'
-import fundCheckHandler from './fundCheck'
-import userAuthHandler from './userAuth'
-
+import quickListHandler from './quickList'
 const AjaxHandler = {
   showingError: false
 }
@@ -67,6 +65,20 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return fundCheckHandler(resource, body)
   } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
     return userAuthHandler(resource, body)
+  } else if (
+    contain(
+      resource,
+      '/work/order/quick_msg/list',
+      '/work/order/quick_msg/type/list',
+      '/work/order/quick_msg/type/one',
+      '/work/order/quick_msg/type/delete',
+      '/work/order/quick_msg/type/save',
+      '/work/order/quick_msg/delete',
+      '/work/order/quick_msg/one',
+      '/work/order/quick_msg/save'
+    )
+  ) {
+    return quickListHandler(resource, body)
   }
 }
 

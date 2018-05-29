@@ -1,5 +1,6 @@
 import { stopBeat } from '../../tasks/heartBeat'
 import AjaxHandler from '../../util/ajax'
+// import AjaxHandler from '../../mock/ajax'
 import { buildAuthenData } from '../../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../../util/storage'
 import store from '../../index.js'
@@ -140,5 +141,64 @@ export const changeTask = (subModule, keyValuePair) => {
     type: CHANGE_TASK,
     subModule,
     keyValuePair
+  }
+}
+
+//获取快捷消息列表
+export const CHANGE_QUICK_LIST = 'CHANGE_QUICK_LIST'
+export const fetchQuickList = body => {
+  const { quickModal } = store.getState()
+  const { listLoading } = quickModal
+  return dispatch => {
+    if (listLoading) {
+      return
+    }
+    dispatch({
+      type: CHANGE_QUICK_LIST,
+      value: {
+        listLoading: true
+      }
+    })
+    let resource = '/work/order/quickMsg/list'
+    return AjaxHandler.fetch(resource, body).then(json => {
+      const value = { listLoading: false }
+      if (json && json.data) {
+        value.list = json.data.msgs
+        value.total = json.data.total
+      }
+      dispatch({
+        type: CHANGE_QUICK_LIST,
+        value
+      })
+    })
+  }
+}
+//获取快捷消息类型列表
+export const CHANGE_QUICK_TYPE_LIST = 'CHANGE_QUICK_TYPE'
+export const fetchQuickTypeList = body => {
+  const { quickTypeModal } = store.getState()
+  const { listLoading } = quickTypeModal
+  return dispatch => {
+    if (listLoading) {
+      return
+    }
+    dispatch({
+      type: CHANGE_QUICK_TYPE_LIST,
+      value: {
+        listLoading: true
+      }
+    })
+    let resource = '/work/order/quickMsg/type/list'
+    return AjaxHandler.fetch(resource, body).then(json => {
+      const value = { listLoading: false }
+      if (json && json.data) {
+        value.list = json.data.msgTypes
+        value.total = json.data.total
+      }
+      dispatch({
+        type: CHANGE_QUICK_TYPE_LIST,
+        value
+      })
+    })
   }
 }
