@@ -98,6 +98,9 @@ class TaskDetail extends React.Component {
     this.setState({
       showRepairmanModal: false
     })
+    this.props.changeTask(subModule, {
+      showRepairmanModal: false
+    })
     Noti.hintOk('转发成功', '已成功转发给该维修员')
     this.updateAndClose(id)
   }
@@ -110,6 +113,9 @@ class TaskDetail extends React.Component {
     // reassign to repairman success
     let { id } = this.state
     this.setState({
+      showCustomerModal: false
+    })
+    this.props.changeTask(subModule, {
       showCustomerModal: false
     })
     Noti.hintOk('转发成功', '已成功转发给该客服')

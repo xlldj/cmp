@@ -7,7 +7,9 @@ import {
   changeOrder,
   changeDevice,
   changeFund,
-  relateTask
+  relateTask,
+  csRemind,
+  cancelRelate
 } from '../../../../actions'
 import Time from '../../../../util/time'
 const { TAB2HINT, NORMAL_DAY_7, roleModalName } = CONSTANTS
@@ -159,11 +161,24 @@ class HandleBtn extends React.Component {
       console.log(e)
     }
   }
-  relateTarget = id => {
+  relateTarget = (id, targeId) => {
+    const body = {
+      sourceId: id,
+      targeId: targeId
+    }
+    this.props.relateTask(body)
+  }
+  cancelRelate = id => {
     const body = {
       id: id
     }
-    this.props.relateTask(body)
+    this.props.cancelRelate(body)
+  }
+  csRemind = id => {
+    const body = {
+      id: id
+    }
+    this.props.csRemind(body)
   }
   goToTask = id => {
     this.props.changeTask('taskListContainer', {
@@ -184,9 +199,11 @@ class HandleBtn extends React.Component {
       status,
       type,
       handleLimit,
-      relateTargetId = '22',
-      relatable = true,
-      related
+      relateTargetId,
+      relatable,
+      related,
+      csRemindAble,
+      id
     } = data
     return (
       <div className="handleBtn">
@@ -209,7 +226,7 @@ class HandleBtn extends React.Component {
                 完结
               </Button>
             ) : null}
-            {handleLimit === true && relatable && !related ? (
+            {handleLimit !== true && relatable && !related ? (
               <Popconfirm
                 title={
                   <span>
@@ -221,7 +238,7 @@ class HandleBtn extends React.Component {
                   </span>
                 }
                 onConfirm={e => {
-                  this.relateTarget(relateTargetId)
+                  this.relateTarget(id, relateTargetId)
                 }}
                 okText="确认"
                 cancelText="取消"
@@ -229,7 +246,7 @@ class HandleBtn extends React.Component {
                 <Button type="primary">关联</Button>
               </Popconfirm>
             ) : null}
-            {handleLimit === true && relatable && related ? (
+            {handleLimit !== true && relatable && related ? (
               <Popconfirm
                 title={
                   <span>
@@ -241,12 +258,24 @@ class HandleBtn extends React.Component {
                   </span>
                 }
                 onConfirm={e => {
-                  this.relateTarget(relateTargetId)
+                  this.cancelRelate(relateTargetId)
                 }}
                 okText="确认"
                 cancelText="取消"
               >
                 <Button type="primary">取消关联</Button>
+              </Popconfirm>
+            ) : null}
+            {handleLimit === true && csRemindAble ? (
+              <Popconfirm
+                title={'确定要催单吗？'}
+                onConfirm={e => {
+                  this.csRemind(relateTargetId)
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button type="primary">催单</Button>
               </Popconfirm>
             ) : null}
           </div>
@@ -294,5 +323,7 @@ export default connect(mapStateToProps, {
   changeFund,
   changeOrder,
   changeDevice,
-  relateTask
+  relateTask,
+  cancelRelate,
+  csRemind
 })(HandleBtn)

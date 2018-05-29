@@ -5,6 +5,7 @@ import { getStore, setStore, removeStore } from '../../util/storage'
 import { taskService } from '../service/index'
 import store from '../../index.js'
 import { deepCopy } from '../../util/copy'
+import Noti from '../../util/noti'
 export const CHANGE_MODAL_TASK = 'CHANGE_MODAL_TASK'
 export const CHANGE_MODAL_TASKDETAIL = 'CHANGE_MODAL_TASKDETAIL'
 
@@ -58,7 +59,49 @@ export const relateTask = body => {
     })
   }
 }
-
+/**
+ * 取消关联
+ * @param {*} body
+ */
+export const cancelRelate = body => {
+  return dispatch => {
+    taskService.cancelRelate(body).then(json => {
+      if (json.data) {
+        const { taskDetailModal } = store.getState()
+        const detail = deepCopy(taskDetailModal.detail)
+        detail.related = false
+        store.dispatch({
+          type: CHANGE_MODAL_TASKDETAIL,
+          value: {
+            detail: detail
+          }
+        })
+      }
+    })
+  }
+}
+/**
+ * 催单
+ * @param {} body
+ */
+export const csRemind = body => {
+  return dispatch => {
+    taskService.csRemind(body).then(json => {
+      if (json.data) {
+        Noti.hintOk('操作成功', '催单成功')
+        const { taskDetailModal } = store.getState()
+        const detail = deepCopy(taskDetailModal.detail)
+        detail.csRemindAble = false
+        store.dispatch({
+          type: CHANGE_MODAL_TASKDETAIL,
+          value: {
+            detail: detail
+          }
+        })
+      }
+    })
+  }
+}
 // fetch task/list
 export const fetchTaskList = body => {
   const { taskModal } = store.getState()

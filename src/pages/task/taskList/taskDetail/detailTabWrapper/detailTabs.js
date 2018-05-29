@@ -8,11 +8,11 @@ import DeviceRepairInfo from './deviceRepairInfo'
 import UserFundInfo from './userFundInfo'
 import UserComplaintInfo from './userComplaintInfo'
 import UserFeedBackInfo from './userFeedBackInfo'
-
+import SchoolDetail from './schoolDetail'
 class DetailTabWrapper extends Component {
   render() {
     const { currentTab, data, selectedDetailId } = this.props
-    const { creatorId, deviceType, deviceId, residenceId } = data
+    const { creatorId, deviceType, deviceId, residenceId, schoolId } = data
 
     return (
       <div className="taskDetail-panelWrapper">
@@ -73,12 +73,7 @@ class DetailTabWrapper extends Component {
             selectedDetailId={selectedDetailId}
           />
         ) : null}
-        {currentTab === 10 ? (
-          <UserFeedBackInfo
-            creatorId={creatorId}
-            selectedDetailId={selectedDetailId}
-          />
-        ) : null}
+        {currentTab === 10 ? <SchoolDetail schoolId={schoolId} /> : null}
       </div>
     )
   }

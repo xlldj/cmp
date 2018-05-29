@@ -10,7 +10,9 @@ import {
   CHANGE_TASK,
   CHANGE_MODAL_TASK,
   CHANGE_MODAL_TASKDETAIL,
-  relateTask
+  relateTask,
+  csRemind,
+  cancelRelate
 } from '../pages/task/action.js'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
@@ -265,5 +267,7 @@ export {
   CHANGE_SCHOOL,
   CHANGE_OVERVIEW,
   fetchOverviewData,
-  relateTask
+  relateTask,
+  csRemind,
+  cancelRelate
 }

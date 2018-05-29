@@ -66,7 +66,7 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return fundCheckHandler(resource, body)
   } else if (contain(resource, 'user/auth/list', 'user/deauth')) {
     return userAuthHandler(resource, body)
-  } else if (contain(resource, '/work/order/relate')) {
+  } else if (contain(resource, '/work/order/relate', '/device/location')) {
     return taskHandler(resource, body)
   }
 }

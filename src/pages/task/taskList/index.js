@@ -257,7 +257,7 @@ class TaskList extends React.Component {
         <TaskListQuery {...this.props} />
         <TaskTable {...this.props} />
         {showDetail ? <TaskDetail /> : null}
-        {showBuild ? <BuildTask /> : null}
+        {showBuild ? <BuildTask cancel={this.cancelBuildTask} /> : null}
       </div>
     )
   }

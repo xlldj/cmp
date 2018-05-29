@@ -1,3 +1,3 @@
 import taskService from './taskService'
-
-export { taskService }
+import schoolService from './schoolService'
+export { taskService, schoolService }

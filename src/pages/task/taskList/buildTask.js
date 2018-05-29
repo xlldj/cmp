@@ -1,10 +1,11 @@
 import React from 'react'
-import { Button, Radio, Modal } from 'antd'
+import { Button, Radio, Modal, Cascader } from 'antd'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
 import DeviceSelector from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../../constants'
 import AjaxHandler from '../../../util/ajax'
+import { taskService } from '../../service/index'
 // import { locale } from 'moment'
 const { EMPLOYEE_REPAIRMAN } = CONSTANTS
 
@@ -17,7 +18,7 @@ class BuildTask extends React.Component {
       schoolId: '',
       schoolError: false,
       type: CONSTANTS.TASK_TYPE_REPAIR,
-      location: '',
+      location: [],
       locationError: false,
       desc: '',
       descError: false,
@@ -79,8 +80,18 @@ class BuildTask extends React.Component {
           department: EMPLOYEE_REPAIRMAN
         }
         this.fetchData(body)
+        this.fetchLocation({
+          schoolId: schoolId
+        })
       }
     }
+  }
+  fetchLocation = body => {
+    taskService.getLocatonById(body).then(json => {
+      if (json.data) {
+        this.setState({ location: json.data.locations })
+      }
+    })
   }
   changeType = value => {
     this.setState({
@@ -103,11 +114,8 @@ class BuildTask extends React.Component {
       })
     }
   }
-  changeLocation = e => {
-    let v = e.target.value
-    this.setState({
-      location: v
-    })
+  changeLocation = value => {
+    console.log(value)
   }
   checkLocation = e => {
     let v = e.target.value.trim()
@@ -357,11 +365,17 @@ class BuildTask extends React.Component {
             </li>
             <li>
               <p>设备位置:</p>
-              <input
+              <Cascader
+                options={location}
+                onChange={this.changeLocation}
+                changeOnSelect
+                placeholder="请选择设备所在位置"
+              />
+              {/* <input
                 value={location}
                 onChange={this.changeLocation}
                 onBlur={this.checkLocation}
-              />
+              /> */}
               {locationError && (
                 <span className="checkInvalid">位置不能为空</span>
               )}

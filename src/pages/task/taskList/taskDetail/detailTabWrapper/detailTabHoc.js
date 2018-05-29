@@ -10,7 +10,6 @@ function detailTabHoc(WrappedComponent, fetchData) {
     }
     componentWillReceiveProps(nextProps) {
       if (!checkObject(this.props, nextProps, ['selectedDetailId'])) {
-        debugger
         fetchData(nextProps)
       }
     }
