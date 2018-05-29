@@ -1,0 +1,94 @@
+import React from 'react'
+import { Modal, Button } from 'antd'
+import AjaxHandler from '../../../../mock/ajax'
+import { saveQuickType } from '../controller'
+class QuickTypeInfo extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      description: ''
+    }
+  }
+  componentDidMount() {
+    const { editTypeInfo, selectedType } = this.props
+    if (editTypeInfo && selectedType) {
+      const body = {
+        id: selectedType
+      }
+      this.setState({
+        id: selectedType
+      })
+      this.fetchData(body)
+      return
+    }
+  }
+  fetchData(body) {
+    const resource = '/work/order/quick_msg/type/one'
+    AjaxHandler.fetch(resource, body).then(json => {
+      if (json.data) {
+        const { description } = json.data
+        this.setState({
+          description: description
+        })
+      }
+    })
+  }
+  changeContent = event => {
+    const value = event.target.value
+    const { description } = this.state
+    if (value !== description) {
+      this.setState({
+        description: value
+      })
+    }
+  }
+  confirmQuick = () => {
+    const { description, id } = this.state
+    const body = {
+      description
+    }
+    if (id) {
+      body.id = id
+    }
+    const { closeQuickTypeInfo } = this.props
+    saveQuickType(body, closeQuickTypeInfo)
+  }
+  render() {
+    const {
+      isShowQuickTypeInfo,
+      closeQuickTypeInfo,
+      quickTypeInfoTitle: title
+    } = this.props
+    const { description } = this.state
+    return (
+      <Modal
+        wrapClassName="modal"
+        width={450}
+        title={title}
+        visible={isShowQuickTypeInfo}
+        onCancel={closeQuickTypeInfo}
+        footer={null}
+      >
+        <div className="info buildTask">
+          <ul>
+            <li>
+              <input
+                style={{ width: '100%' }}
+                value={description}
+                placeholder="不超过6个字"
+                onChange={event => this.changeContent(event)}
+              />
+            </li>
+          </ul>
+          <div className="btnArea">
+            <Button onClick={this.confirmQuick} type="primary">
+              确认
+            </Button>
+            <Button onClick={closeQuickTypeInfo}>返回</Button>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+}
+export default QuickTypeInfo

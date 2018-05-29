@@ -9,7 +9,11 @@ import {
   changeTask,
   CHANGE_TASK,
   CHANGE_MODAL_TASK,
-  CHANGE_MODAL_TASKDETAIL
+  CHANGE_MODAL_TASKDETAIL,
+  CHANGE_QUICK_LIST,
+  fetchQuickList,
+  CHANGE_QUICK_TYPE_LIST,
+  fetchQuickTypeList
 } from '../pages/task/action.js'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
@@ -263,5 +267,9 @@ export {
   changeTask,
   CHANGE_TASK,
   CHANGE_MODAL_TASK,
-  CHANGE_MODAL_TASKDETAIL
+  CHANGE_MODAL_TASKDETAIL,
+  CHANGE_QUICK_LIST,
+  fetchQuickList,
+  CHANGE_QUICK_TYPE_LIST,
+  fetchQuickTypeList
 }
