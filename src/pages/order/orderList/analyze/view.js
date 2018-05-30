@@ -716,8 +716,7 @@ class OrderAnalyzeView extends React.Component {
             )
             .join('、')
 
-    const showBuildTaskBtn =
-      selectedRowLengthsOfOrderTable > 0 || allRowsOfOrderTableSelected
+    const showBuildTaskBtn = selectedRowLengthsOfOrderTable > 0
     return (
       <div className="orderWarnListWrapper">
         <div className="queryPanel">
