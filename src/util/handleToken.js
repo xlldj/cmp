@@ -1,7 +1,7 @@
 export function setToken(token) {
-  localStorage.token = token
+  sessionStorage.token = token
 }
 
 export function getToken() {
-  return localStorage.token
+  return sessionStorage.token
 }
