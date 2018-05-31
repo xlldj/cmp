@@ -11,7 +11,7 @@ import { changeTask, setTagList } from '../../actions'
 import { getLocal } from '../../util/storage'
 import TaskListContainer from './taskList'
 import TaskReportContainer from './report/taskReport'
-
+import QuickMsgContainer from './quickMsg/index'
 const breadcrumbNameMap = {
   '/list': '工单列表',
   '/report': '工作报表',
@@ -132,9 +132,9 @@ class TaskDisp extends React.Component {
               />
             )}
             <Route
-              path="/task"
+              path="/task/quick"
               render={props => (
-                <TaskReportContainer
+                <QuickMsgContainer
                   hide={this.props.hide}
                   {...props}
                   forbiddenStatus={forbiddenStatus}
