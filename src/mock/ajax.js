@@ -7,6 +7,7 @@ import lostHandler from './lost'
 import fundCheckHandler from './fundCheck'
 import taskHandler from './task'
 
+import quickListHandler from './quickList'
 const AjaxHandler = {
   showingError: false
 }
@@ -68,6 +69,20 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return userAuthHandler(resource, body)
   } else if (contain(resource, '/work/order/relate', '/device/location')) {
     return taskHandler(resource, body)
+  } else if (
+    contain(
+      resource,
+      '/work/order/quick_msg/list',
+      '/work/order/quick_msg/type/list',
+      '/work/order/quick_msg/type/one',
+      '/work/order/quick_msg/type/delete',
+      '/work/order/quick_msg/type/save',
+      '/work/order/quick_msg/delete',
+      '/work/order/quick_msg/one',
+      '/work/order/quick_msg/save'
+    )
+  ) {
+    return quickListHandler(resource, body)
   }
 }
 

@@ -5,6 +5,10 @@ import Noti from '../../../../util/noti'
 import AjaxHandler from '../../../../util/ajax'
 import CONSTANTS from '../../../../constants'
 import { safeGet } from '../../../../util/types'
+import { changeTask } from '../../../../actions/index'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import InsertMsgContainer from '../../quickMsg/insertMsg/index'
 const { TASK_TYPE_COMPLAINT, TASK_TYPE_FEEDBACK } = CONSTANTS
 
 class TaskDetailSidebar extends Component {
@@ -57,6 +61,27 @@ class TaskDetailSidebar extends Component {
   back = () => {
     this.props.history.go(-1)
   }
+  insertMsg = () => {
+    this.props.changeTask('taskDetail', {
+      isShowSideInsert: true
+    })
+  }
+  closeInsertModal = () => {
+    this.props.changeTask('taskDetail', {
+      isShowSideInsert: false
+    })
+  }
+  chooseMsg = content => {
+    this.props.changeTask('taskDetail', {
+      isShowSideInsert: false
+    })
+    let { message } = this.state
+    message = message + content
+    this.setState({
+      message: message
+    })
+  }
+
   render() {
     const { message, messageError } = this.state
     const {
@@ -64,7 +89,8 @@ class TaskDetailSidebar extends Component {
       selectedDetailId,
       forbiddenStatus,
       isHaveBackTask,
-      backTaskId
+      backTaskId,
+      isShowSideInsert
     } = this.props
     const queryId = safeGet(this.props, 'location.state.id')
     const {
@@ -142,11 +168,14 @@ class TaskDetailSidebar extends Component {
         !forbiddenStatus.HANDLE_TASK ? (
           <div className="taskMessage">
             <h3>客服消息</h3>
-            <textarea
-              value={message}
-              onChange={this.changeMessage}
-              placeholder="可在此处发送客服消息给用户, 不超过200字"
-            />
+            <div className="insertMsg">
+              <textarea
+                value={message}
+                onChange={this.changeMessage}
+                placeholder="可在此处发送客服消息给用户, 不超过200字"
+              />
+              <a onClick={this.insertMsg}>插入快捷消息</a>
+            </div>
             <Button
               onClick={() => {
                 this.confirmPostMessage(id, userMobile)
@@ -160,9 +189,21 @@ class TaskDetailSidebar extends Component {
             ) : null}
           </div>
         ) : null}
+        {isShowSideInsert ? (
+          <InsertMsgContainer
+            closeInsertModal={this.closeInsertModal}
+            chooseMsg={this.chooseMsg}
+          />
+        ) : null}
       </div>
     )
   }
 }
-
-export default TaskDetailSidebar
+const mapStateToProps = (state, ownProps) => {
+  return {
+    isShowSideInsert: state.taskModule.taskDetail.isShowSideInsert
+  }
+}
+export default withRouter(
+  connect(mapStateToProps, { changeTask })(TaskDetailSidebar)
+)

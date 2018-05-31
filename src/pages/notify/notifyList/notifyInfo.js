@@ -574,12 +574,13 @@ class NotifyInfo extends React.Component {
     const contentInput = (
       <li className="itemsWrapper high">
         <p>公告内容:</p>
-        <div>
+        <div className="insertMsg">
           <textarea
             value={content}
             onChange={this.changeContent}
             onBlur={this.checkContent}
           />
+          <a>插入快捷消息</a>
           {contentError ? (
             <span className="checkInvalid">公告内容不能为空！</span>
           ) : null}

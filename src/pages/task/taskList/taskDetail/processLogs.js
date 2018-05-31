@@ -5,10 +5,29 @@ const { TASK_HANDLE_BUILD } = CONSTANTS
 
 const ProcessLogs = props => {
   const { logs } = props
+  const goToTask = id => {
+    props.changeTask('taskListContainer', {
+      selectedDetailId: id
+    })
+    const { data } = props
+    const { id: BackTaskId } = data
+    props.changeTask('taskDetail', {
+      isHaveBackTask: true,
+      backTaskId: BackTaskId
+    })
+  }
   const processLogs =
     logs &&
     logs.map((l, i) => {
-      let { id, createTime, assignName, processorName, content, type } = l
+      let {
+        id,
+        createTime,
+        assignName,
+        processorName,
+        content,
+        type,
+        assignId
+      } = l
       let message = ''
       switch (type) {
         case TASK_HANDLE_BUILD:
@@ -33,11 +52,20 @@ const ProcessLogs = props => {
         case CONSTANTS.TASK_HANDLE_FINISH:
           message = '完结工单' + (content ? ` 备注信息: ${content}` : '')
           break
-        case CONSTANTS.TASK_HANDLE_RELATE:
-          message = '关联工单' + (content ? ` 备注信息: ${content}` : '')
+        case CONSTANTS.TASK_HANDLE_RELATE: {
+          let goTask = ''
+          if (assignId) {
+            goTask = <a onClick={() => goToTask(assignId)}>: 编号{assignId} </a>
+          }
+          message = <span>关联工单{goTask}</span>
           break
+        }
         case CONSTANTS.TASK_HANDLE_CANCELRELATE:
-          message = '取消关联工单' + (content ? ` 备注信息: ${content}` : '')
+          let goTask = ''
+          if (assignId) {
+            goTask = <a onClick={() => goToTask(assignId)}>: 编号{assignId} </a>
+          }
+          message = <span>取消关联工单{goTask}</span>
           break
         case CONSTANTS.TASK_HANDLE_AUTOMATIC:
           message = '自动分配' + (content ? ` 备注信息: ${content}` : '')
@@ -46,7 +74,7 @@ const ProcessLogs = props => {
           message = '催单' + (content ? ` 备注信息: ${content}` : '')
           break
         case CONSTANTS.TASK_HANDLE_SETTARGET:
-          message = '设置标签' + (content ? ` 备注信息: ${content}` : '')
+          message = '设置标签' + (content ? ` : ${content}` : '')
           break
         default:
           message = ''

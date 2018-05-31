@@ -139,10 +139,14 @@ class TaskDetail extends React.Component {
     })
   }
   backTask = () => {
+    const { backTaskId } = this.props
     this.props.changeTask('taskDetail', {
       currentTab: 1,
       isHaveBackTask: false,
       backTaskId: null
+    })
+    this.props.changeTask('taskListContainer', {
+      selectedDetailId: backTaskId
     })
   }
   keepAndUpdate = id => {
@@ -230,8 +234,8 @@ class TaskDetail extends React.Component {
         <div className="detailPanelWrapperWithSiderbar-content">
           <TaskInfoWrapper data={data} />
           <DetailTabWrapper {...this.props} forbiddenStatus={forbiddenStatus} />
-          <HandleBtn {...this.props} />
-          <ProcessLogs logs={logs} />
+          <HandleBtn {...this.props} sendFetch={this.sendFetch} />
+          <ProcessLogs logs={logs} {...this.props} />
         </div>
         <TaskDetailSidebar
           backTask={this.backTask}

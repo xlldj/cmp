@@ -63,6 +63,31 @@ const initialTaskState = {
     orderBy: [0, 0, 0], // the param to sort the data with. 0 will be empty.
 
     assess_dim: 1 // 考核维度，1: '学校', 2: '客服', 3: '维修员'
+  },
+  quickMsg: {
+    tabIndex: 1
+  },
+  quickMsgList: {
+    type: 'all',
+    page: 1,
+    isShowQuickInfo: false,
+    quickInfoTitle: '添加快捷消息',
+    selectedMsg: null,
+    editMsg: false,
+    selectRecord: null
+  },
+  quickType: {
+    page: 1,
+    isShowQuickTypeInfo: false,
+    quickTypeInfoTitle: '添加消息类型',
+    editTypeInfo: false,
+    selectedType: null,
+    selectRecord: null
+  },
+  insertMsgList: {
+    page: 1,
+    type: '1',
+    isShowInsert: false
   }
 }
 export const taskModule = (state = initialTaskState, action) => {
@@ -100,6 +125,36 @@ const initialTaskDetailModal = {
 export const taskDetailModal = (state = initialTaskDetailModal, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_MODAL_TASKDETAIL) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}
+//快捷消息列表modal
+const initialQuickModal = {
+  list: [],
+  total: 0,
+  listLoading: false,
+  detail: null
+}
+export const quickModal = (state = initialQuickModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_QUICK_LIST) {
+    const { value } = action
+    return { ...state, ...value }
+  }
+  return state
+}
+
+//快捷消息类型modal
+const initialQuickTypeModal = {
+  list: [],
+  total: 0,
+  listLoading: false
+}
+export const quickTypeModal = (state = initialQuickTypeModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_QUICK_TYPE_LIST) {
     const { value } = action
     return { ...state, ...value }
   }

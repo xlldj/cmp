@@ -22,7 +22,9 @@ import { userModule, userInfoModal } from '../pages/user/reducer.js'
 import {
   taskModule,
   taskModal,
-  taskDetailModal
+  taskDetailModal,
+  quickModal,
+  quickTypeModal
 } from '../pages/task/reducer.js'
 import {
   lostModule,
@@ -321,7 +323,9 @@ const rootReducer = combineReducers({
   setGifts,
   buildingsSet,
   fundCheckModal,
-  overviewModal
+  overviewModal,
+  quickModal,
+  quickTypeModal
 })
 
 export default rootReducer

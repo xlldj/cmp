@@ -13,7 +13,6 @@ import Noti from '../../../util/noti'
 import TaskDetail from './taskDetail/index.js'
 import BuildTask from './buildTask'
 import notworking from '../../assets/notworking.jpg'
-
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import {
@@ -221,7 +220,8 @@ class TaskList extends React.Component {
       mine,
       showDetail,
       user,
-      forbiddenStatus
+      forbiddenStatus,
+      isShowInsert
     } = this.props
     const { isCs, csOnline } = user
     const { showBuild } = this.state

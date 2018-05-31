@@ -7,13 +7,14 @@ import CONSTANTS from '../../../constants'
 import AjaxHandler from '../../../util/ajax'
 import { taskService } from '../../service/index'
 import { debug } from 'util'
+import InsertMsgContainer from '../quickMsg/insertMsg/index'
 import Noti from '../../../util/noti'
-
+import { changeTask } from '../../../actions/index'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 // import { locale } from 'moment'
 const { EMPLOYEE_REPAIRMAN } = CONSTANTS
-
+const Fragment = React.Fragment
 const RadioGroup = Radio.Group
 
 class BuildTask extends React.Component {
@@ -409,7 +410,28 @@ class BuildTask extends React.Component {
     })
     AjaxHandler.ajax(resource, body, cb)
   }
+  insertMsg = () => {
+    this.props.changeTask('taskDetail', {
+      isShowInsert: true
+    })
+  }
+  closeInsertModal = () => {
+    this.props.changeTask('taskDetail', {
+      isShowInsert: false
+    })
+  }
+  chooseMsg = content => {
+    this.props.changeTask('taskDetail', {
+      isShowInsert: false
+    })
+    let { desc } = this.state
+    desc = desc + content
+    this.setState({
+      desc: desc
+    })
+  }
   render() {
+    const { isShowInsert } = this.props
     const {
       schoolError,
       schoolId,
@@ -436,133 +458,147 @@ class BuildTask extends React.Component {
       schoolId && maintainers[schoolId] ? maintainers[schoolId] : {}
 
     return (
-      <Modal
-        wrapClassName="modal"
-        width={400}
-        title="创建工单"
-        visible
-        onCancel={this.cancelSubmit}
-        footer={null}
-        okText=""
-      >
-        <div className="info buildTask">
-          <ul>
-            <li>
-              <p>选择学校:</p>
-              <SchoolSelector
-                width={CONSTANTS.SELECTWIDTH}
-                disabled={disabled}
-                invalidTitle="选择学校"
-                selectedSchool={schoolId}
-                changeSchool={this.changeSchool}
-              />
-              {schoolError && (
-                <span className="checkInvalid">学校不能为空！</span>
-              )}
-            </li>
-            <li>
-              <p>工单类型:</p>
-              <BasicSelector
-                disabled={disabled}
-                width={CONSTANTS.SELECTWIDTH}
-                staticOpts={this.taskTypes}
-                selectedOpt={type}
-                changeOpt={this.changeType}
-              />
-            </li>
-            <li>
-              <p>设备类型:</p>
-              <DeviceSelector
-                selectedDevice={deviceType}
-                changeDevice={this.changeDevice}
-                checkDevice={this.checkDevice}
-              />
-              {deviceTypeError && (
-                <span className="checkInvalid">请选择设备类型！</span>
-              )}
-            </li>
-            <li>
-              <p>设备位置:</p>
-              <Cascader
-                options={location}
-                loadData={this.loadLocationData}
-                onChange={this.changeLocation}
-                value={selectedLocation}
-                changeOnSelect
-                placeholder="选择设备所在位置"
-              />
-              {locationError && (
-                <span className="checkInvalid">位置请选择房间</span>
-              )}
-            </li>
-            <li className="itemsWrapper">
-              <p>问题描述:</p>
-              <textarea
-                value={desc}
-                onChange={this.changeDesc}
-                onBlur={this.checkDesc}
-                placeholder="200字以内"
-              />
-              {descError && <span className="checkInvalid">描述不能为空</span>}
-            </li>
-            <li>
-              <p>用户手机:</p>
-              <input
-                value={userMobile}
-                onChange={this.changeMobile}
-                onBlur={this.checkMobile}
-              />
-              {mobileFormatError && (
-                <span className="checkInvalid">手机号格式不正确!</span>
-              )}
-            </li>
-            <li>
-              <p>紧急程度:</p>
-              <RadioGroup value={urgency} onChange={this.changeUrgency}>
-                <Radio value={CONSTANTS.PRIORITY_NORMAL}>普通</Radio>
-                <Radio value={CONSTANTS.PRIORITY_PRIOR}>优先</Radio>
-                <Radio value={CONSTANTS.PRIORITY_URGENT}>紧急</Radio>
-              </RadioGroup>
-              {urgencyError && (
-                <span className="checkInvalid">紧急程度不能为空！</span>
-              )}
-            </li>
-            <li>
-              <p>受理人:</p>
-              <BasicSelector
-                staticOpts={this.employeeTypes}
-                selectedOpt={maintainerType}
-                changeOpt={this.changeMaintainerType}
-              />
-            </li>
-            <li>
-              <p />
-              <BasicSelector
-                staticOpts={maintainerItems}
-                selectedOpt={maintainerId}
-                changeOpt={this.changeMaintainer}
-              />
-              {maintainerIdError && (
-                <span className="checkInvalid">请选择维修员</span>
-              )}
-            </li>
-          </ul>
-          <div className="btnArea">
-            <Button onClick={this.confirm} type="primary">
-              确认
-            </Button>
-            <Button onClick={this.cancelSubmit}>返回</Button>
+      <Fragment>
+        <Modal
+          wrapClassName="modal"
+          width={400}
+          title="创建工单"
+          visible
+          onCancel={this.cancelSubmit}
+          footer={null}
+          okText=""
+        >
+          <div className="info buildTask">
+            <ul>
+              <li>
+                <p>选择学校:</p>
+                <SchoolSelector
+                  width={CONSTANTS.SELECTWIDTH}
+                  disabled={disabled}
+                  invalidTitle="选择学校"
+                  selectedSchool={schoolId}
+                  changeSchool={this.changeSchool}
+                />
+                {schoolError && (
+                  <span className="checkInvalid">学校不能为空！</span>
+                )}
+              </li>
+              <li>
+                <p>工单类型:</p>
+                <BasicSelector
+                  disabled={disabled}
+                  width={CONSTANTS.SELECTWIDTH}
+                  staticOpts={this.taskTypes}
+                  selectedOpt={type}
+                  changeOpt={this.changeType}
+                />
+              </li>
+              <li>
+                <p>设备类型:</p>
+                <DeviceSelector
+                  selectedDevice={deviceType}
+                  changeDevice={this.changeDevice}
+                  checkDevice={this.checkDevice}
+                />
+                {deviceTypeError && (
+                  <span className="checkInvalid">请选择设备类型！</span>
+                )}
+              </li>
+              <li>
+                <p>设备位置:</p>
+                <Cascader
+                  options={location}
+                  loadData={this.loadLocationData}
+                  onChange={this.changeLocation}
+                  value={selectedLocation}
+                  changeOnSelect
+                  placeholder="选择设备所在位置"
+                />
+                {locationError && (
+                  <span className="checkInvalid">位置请选择房间</span>
+                )}
+              </li>
+              <li className="itemsWrapper">
+                <p>问题描述:</p>
+                <div className="insertMsg">
+                  <textarea
+                    value={desc}
+                    onChange={this.changeDesc}
+                    onBlur={this.checkDesc}
+                    placeholder="200字以内"
+                  />
+                  <a onClick={this.insertMsg}>插入快捷消息</a>
+                </div>
+                {descError && (
+                  <span className="checkInvalid">描述不能为空</span>
+                )}
+              </li>
+              <li>
+                <p>用户手机:</p>
+                <input
+                  value={userMobile}
+                  onChange={this.changeMobile}
+                  onBlur={this.checkMobile}
+                />
+                {mobileFormatError && (
+                  <span className="checkInvalid">手机号格式不正确!</span>
+                )}
+              </li>
+              <li>
+                <p>紧急程度:</p>
+                <RadioGroup value={urgency} onChange={this.changeUrgency}>
+                  <Radio value={CONSTANTS.PRIORITY_NORMAL}>普通</Radio>
+                  <Radio value={CONSTANTS.PRIORITY_PRIOR}>优先</Radio>
+                  <Radio value={CONSTANTS.PRIORITY_URGENT}>紧急</Radio>
+                </RadioGroup>
+                {urgencyError && (
+                  <span className="checkInvalid">紧急程度不能为空！</span>
+                )}
+              </li>
+              <li>
+                <p>受理人:</p>
+                <BasicSelector
+                  staticOpts={this.employeeTypes}
+                  selectedOpt={maintainerType}
+                  changeOpt={this.changeMaintainerType}
+                />
+              </li>
+              <li>
+                <p />
+                <BasicSelector
+                  staticOpts={maintainerItems}
+                  selectedOpt={maintainerId}
+                  changeOpt={this.changeMaintainer}
+                />
+                {maintainerIdError && (
+                  <span className="checkInvalid">请选择维修员</span>
+                )}
+              </li>
+            </ul>
+            <div className="btnArea">
+              <Button onClick={this.confirm} type="primary">
+                确认
+              </Button>
+              <Button onClick={this.cancelSubmit}>返回</Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+        {isShowInsert ? (
+          <InsertMsgContainer
+            closeInsertModal={this.closeInsertModal}
+            chooseMsg={this.chooseMsg}
+          />
+        ) : null}
+      </Fragment>
     )
   }
 }
 const mapStateToProps = (state, ownProps) => {
   return {
     isChangeRepair: state.taskModule.taskDetail.isChangeRepair,
-    taskDetailData: state.taskDetailModal.detail
+    taskDetailData: state.taskDetailModal.detail,
+    isShowInsert: state.taskModule.taskDetail.isShowInsert
   }
 }
 
-export default withRouter(connect(mapStateToProps, {})(BuildTask))
+export default withRouter(connect(mapStateToProps, { changeTask })(BuildTask))

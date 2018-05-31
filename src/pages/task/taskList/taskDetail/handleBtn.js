@@ -166,13 +166,13 @@ class HandleBtn extends React.Component {
       sourceId: id,
       targeId: targeId
     }
-    this.props.relateTask(body)
+    this.props.relateTask(body, this.props.sendFetch)
   }
   cancelRelate = id => {
     const body = {
       id: id
     }
-    this.props.cancelRelate(body)
+    this.props.cancelRelate(body, this.props.sendFetch)
   }
   csRemind = id => {
     const body = {
@@ -238,7 +238,7 @@ class HandleBtn extends React.Component {
                 完结
               </Button>
             ) : null}
-            {handleLimit !== true && relatable ? (
+            {relatable ? (
               <Popconfirm
                 title={
                   <span>
@@ -271,7 +271,7 @@ class HandleBtn extends React.Component {
                 <Button type="primary">转保修工单</Button>
               </Popconfirm>
             ) : null}
-            {handleLimit !== true && related ? (
+            {related ? (
               <Popconfirm
                 title={
                   <span>
@@ -283,7 +283,7 @@ class HandleBtn extends React.Component {
                   </span>
                 }
                 onConfirm={e => {
-                  this.cancelRelate(relateTargetId)
+                  this.cancelRelate(id)
                 }}
                 okText="确认"
                 cancelText="取消"
@@ -295,7 +295,7 @@ class HandleBtn extends React.Component {
               <Popconfirm
                 title={'确定要催单吗？'}
                 onConfirm={e => {
-                  this.csRemind(relateTargetId)
+                  this.csRemind(id)
                 }}
                 okText="确认"
                 cancelText="取消"

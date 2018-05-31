@@ -168,11 +168,34 @@
 .reassign .info ul li p {
   width: 83px !important;
 }
+.msgInfo {
+  margin-bottom: 10px;
+}
+.msgInfo .msgListDiv {
+  width: 100%;
+  min-height: 100px;
+  text-align: center;
+}
+.msgInfo .msgListDiv div {
+  text-align: left;
+}
+.msgInfo li.msgItem {
+  line-height: 30px;
+  height: auto;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #e6e6e6;
+}
+.msgInfo .msgItem:hover {
+  background: #ecf6fd;
+}
 .taskMessage {
   width: 100%;
 }
-.taskMessage textarea {
+.taskMessage .insertMsg {
   margin: 15px 0 8px;
+}
+.taskMessage textarea {
   width: 100%;
   height: 150px;
 }

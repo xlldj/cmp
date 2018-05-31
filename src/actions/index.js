@@ -12,7 +12,11 @@ import {
   CHANGE_MODAL_TASKDETAIL,
   relateTask,
   csRemind,
-  cancelRelate
+  cancelRelate,
+  CHANGE_QUICK_LIST,
+  fetchQuickList,
+  CHANGE_QUICK_TYPE_LIST,
+  fetchQuickTypeList
 } from '../pages/task/action.js'
 
 import { SET_BUILDING_LIST, fetchBuildings } from './building'
@@ -29,6 +33,7 @@ import {
   CHANGE_OVERVIEW,
   fetchOverviewData
 } from '../pages/school/action'
+
 import {
   CHANGE_DEVICE,
   changeDevice,
@@ -269,5 +274,9 @@ export {
   fetchOverviewData,
   relateTask,
   csRemind,
-  cancelRelate
+  cancelRelate,
+  CHANGE_QUICK_LIST,
+  fetchQuickList,
+  CHANGE_QUICK_TYPE_LIST,
+  fetchQuickTypeList
 }

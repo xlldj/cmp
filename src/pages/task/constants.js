@@ -206,6 +206,25 @@ const TASK = {
     1: 'showCustomerModal',
     2: 'showRepairmanModal',
     3: 'showDeveloperModal'
+  },
+
+  QUICK_MSG_TABS: [
+    {
+      value: 1,
+      text: '快捷消息列表'
+    },
+    {
+      value: 2,
+      text: '消息类型列表'
+    }
+  ],
+
+  QUICK_MSG_TAB_LIST: 1,
+  QUICK_MSG_TAB_TYPE: 2,
+  QUICK_MSGLIST_TYPE: {
+    1: '水温不热',
+    2: '功能建议',
+    3: '设备连接异常'
   }
 }
 export default TASK
