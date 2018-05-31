@@ -237,7 +237,7 @@ class OrderStatView extends React.Component {
         sorter: true
       },
       {
-        title: '次均消费',
+        title: '次均消费(元)',
         dataIndex: 'orderAverage',
         sorter: true
       },
@@ -249,6 +249,15 @@ class OrderStatView extends React.Component {
     ]
     const { isFushikang } = this.state
     if (isFushikang) {
+      columns.splice(5, 1, {
+        title: '次均消费',
+        dataIndex: 'orderAverage',
+        render: (text, record) => (
+          <span>
+            {record.orderWaterUsageAverage}L({record.orderAverage}元)
+          </span>
+        )
+      })
       columns.splice(3, 1)
       columns.splice(
         2,
@@ -285,7 +294,7 @@ class OrderStatView extends React.Component {
           dataIndex: 'averageWaterUsage',
           render: (text, record) => (
             <span>
-              {record.averageWaterUsage}L({record.userAverage么}元)
+              {record.averageWaterUsage}L({record.userAverage}元)
             </span>
           )
         }

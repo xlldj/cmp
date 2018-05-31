@@ -248,8 +248,7 @@ class UserTableView extends React.Component {
       {
         title: '学校名称',
         dataIndex: 'schoolName',
-        className: 'firstCol',
-        width: '10%'
+        className: 'firstCol'
       },
       {
         title: '用户',
@@ -281,7 +280,6 @@ class UserTableView extends React.Component {
         {
           title: '充值金额消费(元)',
           dataIndex: 'rechargeConsume',
-          width: '10%',
           className: 'shalowRed',
           render: (text, record, index) =>
             record.rechargeConsume || record.rechargeConsume === 0
@@ -291,7 +289,6 @@ class UserTableView extends React.Component {
         {
           title: '赠送金额消费(元)',
           dataIndex: 'givingConsume',
-          width: '10%',
           className: 'shalowRed',
           render: (text, record, index) =>
             record.givingConsume || record.givingConsume === 0
@@ -302,11 +299,10 @@ class UserTableView extends React.Component {
       columns.splice(0, 1, {
         title: '公寓',
         dataIndex: 'schoolName',
-        className: 'firstCol',
-        width: '10%'
+        className: 'firstCol'
       })
       columns.splice(
-        3,
+        2,
         0,
         {
           title: '员工姓名',
