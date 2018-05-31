@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import CONSTANTS from '../../../../constants'
 import { changeTask } from '../../action'
+import Time from '../../../../util/time'
 import { quickMsgPropsController, deleteQuickMsg } from '../controller'
 const { PAGINATION: SIZE } = CONSTANTS
 const moduleName = 'taskModule'
@@ -32,7 +33,8 @@ class QuickMsgListTable extends React.Component {
       {
         title: '更新时间',
         dataIndex: 'updateTime',
-        className: 'firstCol'
+        className: 'firstCol',
+        render: (text, record) => Time.getTimeStr(text)
       },
       {
         title: <p className="lastCol">操作</p>,

@@ -4,6 +4,7 @@ import { checkObject } from '../../../../util/checkSame'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import CONSTANTS from '../../../../constants'
+import Time from '../../../../util/time'
 import { changeTask, fetchQuickTypeList } from '../../action'
 import { quickMsgPropsController, deleteQuickType } from '../controller'
 const { PAGINATION: SIZE } = CONSTANTS
@@ -26,7 +27,8 @@ class QuickMsgListTable extends React.Component {
       },
       {
         title: '更新时间',
-        dataIndex: 'updateTime'
+        dataIndex: 'updateTime',
+        render: (text, record) => Time.getTimeStr(text)
       },
       {
         title: <p className="lastCol">操作</p>,
