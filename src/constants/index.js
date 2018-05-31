@@ -1,5 +1,6 @@
 import BASIC from './basic'
 import DEVICE from '../pages/device/constants.js'
+import SCHOOL from '../pages/school/constants.js'
 import EMPLOYEE from './employee'
 import FUND from '../pages/fund/constants.js'
 import GIFT from './gift'
@@ -12,7 +13,6 @@ import VERSION from './version'
 import HEATER from './heater'
 import DOORFORBID from './doorForbid'
 import LOST from '../pages/lost/constants'
-import SCHOOL from '../pages/school/constants'
 const CONSTANTS = {
   ...BASIC,
   ...SCHOOL,
