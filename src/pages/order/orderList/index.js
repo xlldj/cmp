@@ -24,7 +24,9 @@ const mapStateToProps1 = (state, ownProps) => {
     order: state.orderModule[subModule].stat_order,
     buildingIds: state.orderModule[subModule].stat_buildingIds,
     schools: state.setSchoolList.schools,
-    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId
+    buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
+    startTime: state.orderModule[subModule].stat_startTime,
+    endTime: state.orderModule[subModule].stat_endTime
   }
 }
 

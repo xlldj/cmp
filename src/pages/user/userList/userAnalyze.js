@@ -241,8 +241,9 @@ class UserTableView extends React.Component {
     })
   }
   getColumns = () => {
+    const { isFushikang } = this.state
     const { analyze_deviceType: deviceType, forbiddenStatus } = this.props
-    const { USER_INFO_DETILE, ORDER_DETAIL_AND_CHARGEBACK } = forbiddenStatus
+    const { USER_INFO_DETILE } = forbiddenStatus
     let columns = [
       {
         title: '学校名称',
@@ -276,7 +277,6 @@ class UserTableView extends React.Component {
           record.timeDuration ? `${Format.ms2s(record.timeDuration)}秒` : 0
       })
     }
-    const { isFushikang } = this.state
     if (isFushikang) {
       columns = columns.concat([
         {
@@ -306,6 +306,18 @@ class UserTableView extends React.Component {
         className: 'firstCol',
         width: '10%'
       })
+      columns.splice(
+        3,
+        0,
+        {
+          title: '员工姓名',
+          dataIndex: 'userName'
+        },
+        {
+          title: '工号',
+          dataIndex: 'userNo'
+        }
+      )
     }
     columns = columns.concat([
       {

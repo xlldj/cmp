@@ -12,7 +12,7 @@ import Format from '../../../../util/format'
 import CheckSelect from '../../../component/checkSelect'
 import ThresholdSelector from '../../../component/thresholdSelector'
 import SetRuleHint from './setRuleHint.js'
-import RangeSelect from './rangeSelectDisableMonth.js'
+import RangeSelect from '../rangeSelectDisableMonth.js'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
 import RepairmanTable from '../../../component/repairmanChooseClean.js'
 

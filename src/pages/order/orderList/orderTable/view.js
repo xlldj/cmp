@@ -6,7 +6,7 @@ import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import selectedImg from '../../../assets/selected.png'
 
-import RangeSelect from '../../../component/rangeSelect'
+import RangeSelect from '../rangeSelectDisableMonth'
 import SearchInput from '../../../component/searchInput'
 import CheckSelect from '../../../component/checkSelect'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'

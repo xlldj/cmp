@@ -28,6 +28,8 @@ const initialOrderState = {
     stat_orderBy: -1, // for order of the stat table, default is -1, for none selected
     stat_order: -1, //  ORDER: { descend: 1, ascend: 2 }, -1 is for none selected.
     stat_buildingIds: 'all',
+    stat_startTime: '',
+    stat_endTime: '',
     // below is state for order analyze
     analyze_day: 1, // 1 for 'today', default setting.
     analyze_deviceType: 1,

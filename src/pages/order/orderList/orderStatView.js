@@ -9,6 +9,7 @@ import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 import CheckSelect from '../../component/checkSelect'
 // import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import OrderBarChart from './orderBarChart'
+import RangeSelect from './rangeSelectDisableMonth'
 
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
@@ -151,6 +152,17 @@ class OrderStatView extends React.Component {
     this.fetchList()
     this.fetchHistogram()
     this.checkSchoolFsk()
+    this.syncStateWithProps()
+  }
+  syncStateWithProps = props => {
+    let { stat_startTime, stat_endTime } = props || this.props
+
+    const nextState = {}
+    if (stat_startTime !== this.state.startTime) {
+      nextState.startTime = stat_startTime
+      nextState.endTime = stat_endTime
+    }
+    this.setState(nextState)
   }
   //检查选择学校是否为富士康
   checkSchoolFsk = props => {
@@ -191,13 +203,11 @@ class OrderStatView extends React.Component {
       {
         title: '使用人数',
         dataIndex: 'userCount',
-        width: '12%',
         sorter: true
       },
       {
         title: '人均消费(元)',
         dataIndex: 'userAverage',
-        width: '15%',
         sorter: true
       },
       {
@@ -209,13 +219,11 @@ class OrderStatView extends React.Component {
       {
         title: '次均消费',
         dataIndex: 'orderAverage',
-        width: '12%',
         sorter: true
       },
       {
         title: '总收益(元)',
         dataIndex: 'totalIncome',
-        width: '15%',
         sorter: true
       }
     ]
@@ -229,6 +237,14 @@ class OrderStatView extends React.Component {
           dataIndex: 'totalWaterUsage'
         },
         {
+          title: '赠送用水量(升)',
+          dataIndex: 'givingWaterUsage'
+        },
+        {
+          title: '充值用水量',
+          dataIndex: 'chargeWaterUsage'
+        },
+        {
           title: '人均用水量(升)',
           dataIndex: 'averageWaterUsage'
         }
@@ -236,6 +252,16 @@ class OrderStatView extends React.Component {
       columns.splice(0, 1, {
         title: '公寓',
         dataIndex: 'schoolName'
+      })
+      columns.concat([
+        {
+          title: '充值金额',
+          dataIndex: 'chargeAmount'
+        }
+      ])
+      columns.splice(columns.length - 1, {
+        title: '总消费',
+        dataIndex: 'totalIncome'
       })
     }
     return columns
@@ -256,13 +282,13 @@ class OrderStatView extends React.Component {
       return
     }
 
+    this.checkSchoolFsk(nextProps)
     this.fetchList(nextProps)
     // if these options are same, doesn't need to refetch histogram.
     if (checkObject(this.props, nextProps, ['day', 'schoolId', 'deviceType'])) {
       return
     }
     this.fetchHistogram(nextProps)
-    this.checkSchoolFsk(nextProps)
   }
   changeRange = key => {
     this.props.changeOrder(subModule, {
@@ -323,11 +349,35 @@ class OrderStatView extends React.Component {
       stat_orderBy: ORDER_STAT_ORDERBYS[field]
     })
   }
+  changeStartTime = time => {
+    this.setState({
+      startTime: time
+    })
+  }
+  changeEndTime = time => {
+    this.setState({
+      endTime: time
+    })
+  }
+  confirmTimeRange = () => {
+    let { startTime, endTime } = this.state
+    if (!startTime || !endTime) {
+      return
+    }
+    this.props.changeUser(subModule, {
+      stat_startTime: startTime,
+      stat_endTime: endTime,
+      stat_page: 1,
+      stat_day: 0
+    })
+  }
   render() {
     const {
       page,
       deviceType,
-      day
+      day,
+      startTime,
+      endTime
       // buildingIds,
       // schoolId,
       // buildingsOfSchoolId
@@ -363,6 +413,15 @@ class OrderStatView extends React.Component {
                 options={ORDER_STAT_DAY_SELECT}
                 value={day}
                 onClick={this.changeRange}
+              />
+              <RangeSelect
+                className="seperator"
+                startTime={startTime}
+                endTime={endTime}
+                changeStartTime={this.changeStartTime}
+                changeEndTime={this.changeEndTime}
+                confirm={this.confirmTimeRange}
+                disableRule={this.disableRule}
               />
             </QueryBlock>
           </QueryLine>
