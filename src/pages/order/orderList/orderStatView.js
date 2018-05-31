@@ -281,7 +281,7 @@ class OrderStatView extends React.Component {
           )
         },
         {
-          title: '人均用水量(升)',
+          title: '人均用水量',
           dataIndex: 'averageWaterUsage',
           render: (text, record) => (
             <span>
