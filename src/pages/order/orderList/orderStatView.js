@@ -249,11 +249,12 @@ class OrderStatView extends React.Component {
     ]
     const { isFushikang } = this.state
     if (isFushikang) {
+      columns.splice(3, 1)
       columns.splice(
         2,
         0,
         {
-          title: '总用水量(升)',
+          title: '总用水量',
           dataIndex: 'totalWaterUsage',
           render: (text, record) => (
             <span>
@@ -262,16 +263,31 @@ class OrderStatView extends React.Component {
           )
         },
         {
-          title: '赠送用水量(升)',
-          dataIndex: 'givingWaterUsage'
+          title: '赠送用水量',
+          dataIndex: 'givingWaterUsage',
+          render: (text, record) => (
+            <span>
+              {record.givingWaterUsage}L({record.givingConsume}元)
+            </span>
+          )
         },
         {
           title: '充值用水量',
-          dataIndex: 'chargeWaterUsage'
+          dataIndex: 'chargeWaterUsage',
+          render: (text, record) => (
+            <span>
+              {record.chargeWaterUsage}L({record.chargeConsume}元)
+            </span>
+          )
         },
         {
           title: '人均用水量(升)',
-          dataIndex: 'averageWaterUsage'
+          dataIndex: 'averageWaterUsage',
+          render: (text, record) => (
+            <span>
+              {record.averageWaterUsage}L({record.userAverage么}元)
+            </span>
+          )
         }
       )
       columns.splice(0, 1, {
