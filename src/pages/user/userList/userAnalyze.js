@@ -253,8 +253,7 @@ class UserTableView extends React.Component {
       },
       {
         title: '用户',
-        dataIndex: 'userName',
-        width: '10%'
+        dataIndex: 'userName'
       },
       {
         title: '使用次数',
@@ -280,7 +279,7 @@ class UserTableView extends React.Component {
     if (isFushikang) {
       columns = columns.concat([
         {
-          title: '充值金额消费',
+          title: '充值金额消费(元)',
           dataIndex: 'rechargeConsume',
           width: '10%',
           className: 'shalowRed',
@@ -290,7 +289,7 @@ class UserTableView extends React.Component {
               : ''
         },
         {
-          title: '赠送金额消费',
+          title: '赠送金额消费(元)',
           dataIndex: 'givingConsume',
           width: '10%',
           className: 'shalowRed',
@@ -321,27 +320,23 @@ class UserTableView extends React.Component {
     }
     columns = columns.concat([
       {
-        title: '消费总额',
+        title: '消费总额(元)',
         dataIndex: 'consume',
-        width: '10%',
         className: 'shalowRed',
         render: (text, record, index) =>
           record.consume || record.consume === 0 ? `¥${record.consume}` : ''
       },
       {
-        title: '充值金额',
-        dataIndex: 'rechargeBalance',
-        width: '10%'
+        title: '充值金额(元)',
+        dataIndex: 'rechargeBalance'
       },
       {
         title: '账户总余额(元)',
-        dataIndex: 'totalBalance',
-        width: '10%'
+        dataIndex: 'totalBalance'
       },
       {
         title: '账户赠送余额(元)',
-        dataIndex: 'givingBalance',
-        width: '10%'
+        dataIndex: 'givingBalance'
       },
       {
         title: <p className="lastCol">操作</p>,

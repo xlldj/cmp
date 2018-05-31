@@ -481,7 +481,7 @@ class OrderAnalyzeView extends React.Component {
         width: '18%'
       },
       {
-        title: `${dayStr}消费总额`,
+        title: `${dayStr}消费总额(元)`,
         dataIndex: 'consumption',
         className: 'shalowRed',
         width: '12%',
@@ -508,7 +508,7 @@ class OrderAnalyzeView extends React.Component {
       deviceType === DEVICE_TYPE_DRINGKER
     ) {
       columns.push({
-        title: `${dayStr}用水量`,
+        title: `${dayStr}用水量(升)`,
         dataIndex: 'waterUsage',
         width: '12%',
         render: (text, record, index) => record.waterUsage || 0,
