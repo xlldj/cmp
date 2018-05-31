@@ -9,6 +9,7 @@ import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'
 import BasicSelectorWithoutAll from '../../component/basicSelectorWithoutAll'
 import { checkObject } from '../../../util/checkSame'
+import Noti from '../../../util/noti'
 import TaskDetail from './taskDetail/index.js'
 import BuildTask from './buildTask'
 import notworking from '../../assets/notworking.jpg'
@@ -26,6 +27,7 @@ import { safeGet } from '../../../util/types'
 const moduleName = 'taskModule'
 const subModule = 'taskListContainer'
 const modalName = 'taskModal'
+const detailSubModule = 'taskDetail'
 
 const TARGETS = {
   1: '我的任务',
@@ -179,16 +181,34 @@ class TaskList extends React.Component {
       page: 1
     })
   }
-
+  changeToRepair = () => {
+    this.setState({
+      showBuild: true
+    })
+  }
   buildTask = () => {
     this.setState({
       showBuild: true
+    })
+    this.props.changeTask(detailSubModule, {
+      isChangeRepair: false
     })
   }
   cancelBuildTask = () => {
     this.setState({
       showBuild: false
     })
+    this.props.changeTask('taskDetail', {
+      isHaveBackTask: false,
+      backTaskId: null
+    })
+  }
+  buildTaskSuccess = () => {
+    Noti.hintOk('操作成功', '创建工单成功')
+    this.setState({
+      showBuild: false
+    })
+    this.sendTaskListFetch()
   }
   changeOnline = e => {
     this.props.changeOnline()
@@ -256,8 +276,15 @@ class TaskList extends React.Component {
         </PhaseLine>
         <TaskListQuery {...this.props} />
         <TaskTable {...this.props} />
-        {showDetail ? <TaskDetail /> : null}
-        {showBuild ? <BuildTask cancel={this.cancelBuildTask} /> : null}
+        {showDetail ? (
+          <TaskDetail changeToRepair={this.changeToRepair} />
+        ) : null}
+        {showBuild ? (
+          <BuildTask
+            cancel={this.cancelBuildTask}
+            success={this.buildTaskSuccess}
+          />
+        ) : null}
       </div>
     )
   }

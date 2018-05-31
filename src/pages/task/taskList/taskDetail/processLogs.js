@@ -33,6 +33,21 @@ const ProcessLogs = props => {
         case CONSTANTS.TASK_HANDLE_FINISH:
           message = '完结工单' + (content ? ` 备注信息: ${content}` : '')
           break
+        case CONSTANTS.TASK_HANDLE_RELATE:
+          message = '关联工单' + (content ? ` 备注信息: ${content}` : '')
+          break
+        case CONSTANTS.TASK_HANDLE_CANCELRELATE:
+          message = '取消关联工单' + (content ? ` 备注信息: ${content}` : '')
+          break
+        case CONSTANTS.TASK_HANDLE_AUTOMATIC:
+          message = '自动分配' + (content ? ` 备注信息: ${content}` : '')
+          break
+        case CONSTANTS.TASK_HANDLE_CSREMIND:
+          message = '催单' + (content ? ` 备注信息: ${content}` : '')
+          break
+        case CONSTANTS.TASK_HANDLE_SETTARGET:
+          message = '设置标签' + (content ? ` 备注信息: ${content}` : '')
+          break
         default:
           message = ''
       }

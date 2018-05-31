@@ -182,7 +182,9 @@ class TaskListTable extends React.Component {
     })
     // 将详情中的tab页置为1
     this.props.changeTask('taskDetail', {
-      currentTab: 1
+      currentTab: 1,
+      isHaveBackTask: false,
+      backTaskId: null
     })
   }
   render() {

@@ -184,6 +184,18 @@ class HandleBtn extends React.Component {
     this.props.changeTask('taskListContainer', {
       selectedDetailId: id
     })
+    const { data } = this.props
+    const { id: BackTaskId } = data
+    this.props.changeTask('taskDetail', {
+      isHaveBackTask: true,
+      backTaskId: BackTaskId
+    })
+  }
+  ToRepair = () => {
+    this.props.changeToRepair()
+    this.props.changeTask('taskDetail', {
+      isChangeRepair: true
+    })
   }
   render() {
     const {
@@ -226,7 +238,7 @@ class HandleBtn extends React.Component {
                 完结
               </Button>
             ) : null}
-            {handleLimit !== true && relatable && !related ? (
+            {handleLimit !== true && relatable ? (
               <Popconfirm
                 title={
                   <span>
@@ -246,7 +258,20 @@ class HandleBtn extends React.Component {
                 <Button type="primary">关联</Button>
               </Popconfirm>
             ) : null}
-            {handleLimit !== true && relatable && related ? (
+            {type === CONSTANTS.TASK_TYPE_COMPLAINT ||
+            type === CONSTANTS.TASK_TYPE_FEEDBACK ? (
+              <Popconfirm
+                title="确定要转为报修工单吗"
+                onConfirm={e => {
+                  this.ToRepair()
+                }}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button type="primary">转保修工单</Button>
+              </Popconfirm>
+            ) : null}
+            {handleLimit !== true && related ? (
               <Popconfirm
                 title={
                   <span>
@@ -266,7 +291,7 @@ class HandleBtn extends React.Component {
                 <Button type="primary">取消关联</Button>
               </Popconfirm>
             ) : null}
-            {handleLimit === true && csRemindAble ? (
+            {csRemindAble ? (
               <Popconfirm
                 title={'确定要催单吗？'}
                 onConfirm={e => {

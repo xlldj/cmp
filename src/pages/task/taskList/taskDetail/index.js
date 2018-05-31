@@ -138,6 +138,13 @@ class TaskDetail extends React.Component {
       showDeveloperModal: false
     })
   }
+  backTask = () => {
+    this.props.changeTask('taskDetail', {
+      currentTab: 1,
+      isHaveBackTask: false,
+      backTaskId: null
+    })
+  }
   keepAndUpdate = id => {
     // this is handle process after sending message.
     // 1. update detail.
@@ -226,7 +233,11 @@ class TaskDetail extends React.Component {
           <HandleBtn {...this.props} />
           <ProcessLogs logs={logs} />
         </div>
-        <TaskDetailSidebar keepAndUpdate={this.keepAndUpdate} {...this.props} />
+        <TaskDetailSidebar
+          backTask={this.backTask}
+          keepAndUpdate={this.keepAndUpdate}
+          {...this.props}
+        />
 
         {/* images in task detail */}
         {showDetailImgs ? (
@@ -300,7 +311,9 @@ const mapStateToProps = (state, ownProps) => ({
   currentTab: state[moduleName][subModule].currentTab,
   showDetail: state.taskModule.taskListContainer.showDetail,
   tabIndex: state[moduleName].taskListContainer.tabIndex,
-  pengdingList: state[moduleName].pengdingList
+  pengdingList: state[moduleName].pengdingList,
+  isHaveBackTask: state[moduleName].taskDetail.isHaveBackTask,
+  backTaskId: state[moduleName].taskDetail.backTaskId
 })
 
 export default withRouter(

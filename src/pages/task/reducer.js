@@ -46,7 +46,10 @@ const initialTaskState = {
     complaintPage: 1, // 用户投诉tab页的页码
     feedbackPage: 1, // 用户反馈tab页的页码
     complaintTotal: 0,
-    feedbackTotal: 0
+    feedbackTotal: 0,
+    isChangeRepair: false,
+    isHaveBackTask: false,
+    backTaskId: null
   },
   report: {
     mainCate: 0, // 0: '工作情况', 1: '投诉分析', 2: '绩效考核'

@@ -6,6 +6,11 @@ import DeviceSelector from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../../constants'
 import AjaxHandler from '../../../util/ajax'
 import { taskService } from '../../service/index'
+import { debug } from 'util'
+import Noti from '../../../util/noti'
+
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 // import { locale } from 'moment'
 const { EMPLOYEE_REPAIRMAN } = CONSTANTS
 
@@ -19,6 +24,9 @@ class BuildTask extends React.Component {
       schoolError: false,
       type: CONSTANTS.TASK_TYPE_REPAIR,
       location: [],
+      selectedLocation: [],
+      localionName: '',
+      residenceId: '',
       locationError: false,
       desc: '',
       descError: false,
@@ -32,12 +40,39 @@ class BuildTask extends React.Component {
       maintainers: {},
       posting: false,
       deviceType: '',
-      deviceTypeError: false
+      deviceTypeError: false,
+      disabled: false
     }
     this.employeeTypes = {}
     this.employeeTypes[CONSTANTS.EMPLOYEE_REPAIRMAN] = '维修员'
     this.taskTypes = {}
     this.taskTypes[CONSTANTS.TASK_TYPE_REPAIR] = '报修工单'
+    this.taskTypes[CONSTANTS.TASK_TYPE_COMPLAINT] = '账单投诉'
+    this.taskTypes[CONSTANTS.TASK_TYPE_FEEDBACK] = '意见反馈'
+  }
+  componentWillMount = () => {
+    if (this.props.isChangeRepair) {
+      const { schoolId, description, userMobile } = this.props.taskDetailData
+      this.setState({
+        schoolId: schoolId,
+        disabled: true,
+        desc: description,
+        userMobile,
+        type: CONSTANTS.TASK_TYPE_REPAIR
+      })
+      const { maintainers } = this.state
+      if (schoolId) {
+        if (!maintainers[schoolId]) {
+          const body = {
+            page: 1,
+            size: 10000,
+            schoolId: schoolId,
+            department: EMPLOYEE_REPAIRMAN
+          }
+          this.fetchData(body)
+        }
+      }
+    }
   }
   fetchData = body => {
     let resource = '/api/employee/department/member/list'
@@ -66,7 +101,7 @@ class BuildTask extends React.Component {
     let nextState = {
       schoolId: schoolId
     }
-    let { schoolError, maintainers } = this.state
+    let { schoolError, maintainers, deviceType } = this.state
     if (schoolError) {
       nextState.schoolError = false
     }
@@ -80,16 +115,52 @@ class BuildTask extends React.Component {
           department: EMPLOYEE_REPAIRMAN
         }
         this.fetchData(body)
-        this.fetchLocation({
-          schoolId: schoolId
-        })
+        if (deviceType !== '') {
+          this.fetchLocation({
+            schoolId: schoolId,
+            existDevice: true,
+            deviceType: deviceType,
+            residenceLevel: 1
+          })
+        }
       }
     }
   }
   fetchLocation = body => {
     taskService.getLocatonById(body).then(json => {
       if (json.data) {
-        this.setState({ location: json.data.locations })
+        const locations = json.data.residences
+        locations.forEach((location, index) => {
+          location.label = location.name
+          location.value = location.id
+          location.isLeaf = false
+        })
+        this.setState({ location: locations })
+      }
+    })
+  }
+  loadLocationData = selectedOptions => {
+    const targetOption = selectedOptions[selectedOptions.length - 1]
+    targetOption.loading = true
+    const json = {
+      parentId: targetOption.id,
+      existDevice: true,
+      residenceLevel: parseInt(targetOption.type, 10) + 1,
+      deviceType: this.state.deviceType
+    }
+    taskService.getLocatonById(json).then(json => {
+      if (json.data) {
+        const locations = json.data.residences
+        locations.forEach((location, index) => {
+          location.label = location.name
+          location.value = location.id
+          location.isLeaf = location.type === 3 ? true : false
+        })
+        targetOption.loading = false
+        targetOption.children = locations
+        this.setState({
+          location: [...this.state.location]
+        })
       }
     })
   }
@@ -102,6 +173,15 @@ class BuildTask extends React.Component {
     this.setState({
       deviceType: value
     })
+    const { deviceType, schoolId } = this.state
+    if (schoolId) {
+      this.fetchLocation({
+        schoolId: schoolId,
+        existDevice: true,
+        deviceType: deviceType,
+        residenceLevel: 1
+      })
+    }
   }
   checkDevice = v => {
     if (!v) {
@@ -114,8 +194,22 @@ class BuildTask extends React.Component {
       })
     }
   }
-  changeLocation = value => {
-    console.log(value)
+  changeLocation = (value, selectedOptions) => {
+    if (value.length < 3) {
+      this.setState({
+        locationError: true
+      })
+    } else {
+      this.setState({
+        locationError: false
+      })
+    }
+    this.setState({
+      selectedLocation: value,
+      localionName: selectedOptions.map(value => {
+        return value.name
+      })
+    })
   }
   checkLocation = e => {
     let v = e.target.value.trim()
@@ -210,7 +304,7 @@ class BuildTask extends React.Component {
   confirm = () => {
     let {
       schoolId,
-      location,
+      selectedLocation,
       desc,
       userMobile,
       urgency,
@@ -228,7 +322,7 @@ class BuildTask extends React.Component {
         deviceTypeError: true
       })
     }
-    if (!location) {
+    if (selectedLocation.length !== 3) {
       return this.setState({
         locationError: true
       })
@@ -261,11 +355,13 @@ class BuildTask extends React.Component {
   postData = () => {
     let {
       schoolId,
-      location,
+      selectedLocation,
+      localionName,
       desc,
       userMobile,
       urgency,
       maintainerType,
+      type,
       maintainerId,
       deviceType
     } = this.state
@@ -275,19 +371,37 @@ class BuildTask extends React.Component {
       department: parseInt(maintainerType, 10),
       description: desc,
       level: urgency,
-      location: location,
+      location: localionName.toString(),
+      residenceId: selectedLocation[2],
       schoolId: schoolId,
-      type: maintainerType,
+      type: type,
       deviceType: parseInt(deviceType, 10),
       userMobile: userMobile,
       env: CONSTANTS.TASK_BUILD_CMP
     }
-    const cb = json => {
+
+    let cb = json => {
       this.setState({
         posting: false
       })
       if (json.data) {
         this.props.success()
+      }
+    }
+    if (this.props.isChangeRepair) {
+      resource = '/work/order/parseToRepair'
+      body.id = this.props.taskDetailData.id
+      cb = json => {
+        this.setState({
+          posting: false
+        })
+        if (json.data) {
+          if (json.data.result) {
+            this.props.success()
+          } else {
+            Noti.hintLock('操作失败', json.data.failReason)
+          }
+        }
       }
     }
     this.setState({
@@ -313,7 +427,9 @@ class BuildTask extends React.Component {
       maintainerIdError,
       maintainers,
       deviceType,
-      deviceTypeError
+      deviceTypeError,
+      selectedLocation,
+      disabled
     } = this.state
 
     const maintainerItems =
@@ -335,6 +451,7 @@ class BuildTask extends React.Component {
               <p>选择学校:</p>
               <SchoolSelector
                 width={CONSTANTS.SELECTWIDTH}
+                disabled={disabled}
                 invalidTitle="选择学校"
                 selectedSchool={schoolId}
                 changeSchool={this.changeSchool}
@@ -346,6 +463,7 @@ class BuildTask extends React.Component {
             <li>
               <p>工单类型:</p>
               <BasicSelector
+                disabled={disabled}
                 width={CONSTANTS.SELECTWIDTH}
                 staticOpts={this.taskTypes}
                 selectedOpt={type}
@@ -367,17 +485,14 @@ class BuildTask extends React.Component {
               <p>设备位置:</p>
               <Cascader
                 options={location}
+                loadData={this.loadLocationData}
                 onChange={this.changeLocation}
+                value={selectedLocation}
                 changeOnSelect
-                placeholder="请选择设备所在位置"
+                placeholder="选择设备所在位置"
               />
-              {/* <input
-                value={location}
-                onChange={this.changeLocation}
-                onBlur={this.checkLocation}
-              /> */}
               {locationError && (
-                <span className="checkInvalid">位置不能为空</span>
+                <span className="checkInvalid">位置请选择房间</span>
               )}
             </li>
             <li className="itemsWrapper">
@@ -443,5 +558,11 @@ class BuildTask extends React.Component {
     )
   }
 }
+const mapStateToProps = (state, ownProps) => {
+  return {
+    isChangeRepair: state.taskModule.taskDetail.isChangeRepair,
+    taskDetailData: state.taskDetailModal.detail
+  }
+}
 
-export default BuildTask
+export default withRouter(connect(mapStateToProps, {})(BuildTask))

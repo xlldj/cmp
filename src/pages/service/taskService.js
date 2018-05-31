@@ -4,7 +4,8 @@ import AjaxHandler from '../../util/ajax'
 const relateTaskUrl = '/work/order/relate'
 const cancelRelateUrl = '/work/order/deleteRelate'
 const csRemindUrl = '/work/order/remind'
-const getLocationUrl = '/device/location'
+const getLocationUrl = '/residence/listBySchool'
+const getLocationTreeUrl = '/residence/tree'
 
 const taskService = {
   relateTask: body => {
@@ -17,7 +18,10 @@ const taskService = {
     return AjaxHandler.fetch(csRemindUrl, body)
   },
   getLocatonById: body => {
-    return AjaxHandlerMock.fetch(getLocationUrl, body)
+    return AjaxHandler.fetch(getLocationUrl, body)
+  },
+  getLocationTree: body => {
+    return AjaxHandler.fetch(getLocationTreeUrl, body)
   }
 }
 export default taskService

@@ -59,7 +59,13 @@ class TaskDetailSidebar extends Component {
   }
   render() {
     const { message, messageError } = this.state
-    const { data, selectedDetailId, forbiddenStatus } = this.props
+    const {
+      data,
+      selectedDetailId,
+      forbiddenStatus,
+      isHaveBackTask,
+      backTaskId
+    } = this.props
     const queryId = safeGet(this.props, 'location.state.id')
     const {
       id,
@@ -109,6 +115,15 @@ class TaskDetailSidebar extends Component {
               {status ? CONSTANTS.TASKSTATUS[status] : ''}
             </span>
           </li>
+          {isHaveBackTask ? (
+            <Button
+              style={{ marginTop: '20px' }}
+              type="primary"
+              onClick={this.props.backTask}
+            >
+              返回工单({backTaskId})
+            </Button>
+          ) : null}
           {queryId && +queryId === selectedDetailId ? (
             <Button
               style={{ marginTop: '20px' }}
