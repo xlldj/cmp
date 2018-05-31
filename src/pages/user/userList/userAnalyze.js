@@ -253,7 +253,7 @@ class UserTableView extends React.Component {
       },
       {
         title: '用户',
-        dataIndex: 'userName'
+        dataIndex: 'mobile'
       },
       {
         title: '使用次数',
