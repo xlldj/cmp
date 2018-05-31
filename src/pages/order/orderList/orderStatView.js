@@ -37,7 +37,9 @@ class OrderStatView extends React.Component {
       loading: false,
       total: 0,
       isFushikang: false,
-      showBuildingSelect: false
+      showBuildingSelect: false,
+      startTime: '',
+      endTime: ''
     }
   }
   fetchList = props => {
@@ -48,14 +50,28 @@ class OrderStatView extends React.Component {
     }
     props = props || this.props
 
-    let { page, schoolId, deviceType, day, order, orderBy } = props
+    let {
+      page,
+      schoolId,
+      deviceType,
+      day,
+      order,
+      orderBy,
+      startTime,
+      endTime
+    } = props
     const body = {
       page: page,
-      size: SIZE,
-      day
+      size: SIZE
     }
-    if (day === 'all') {
-      body.day = ORDER_STAT_DAY_UNLIMITED
+    if (startTime && endTime) {
+      body.startTime = startTime
+      body.endTime = endTime
+    } else {
+      body.day = +day
+      if (day === 'all') {
+        body.day = ORDER_STAT_DAY_UNLIMITED
+      }
     }
     // if (buildingIds !== 'all') {
     //   body.buildingIds = buildingIds
@@ -95,14 +111,19 @@ class OrderStatView extends React.Component {
     }
     props = props || this.props
 
-    let { page, schoolId, deviceType, day } = props
+    let { page, schoolId, deviceType, day, startTime, endTime } = props
     const body = {
       page: page,
-      size: SIZE,
-      day
+      size: SIZE
     }
-    if (day === 'all') {
-      body.day = ORDER_STAT_DAY_UNLIMITED
+    if (startTime && endTime) {
+      body.startTime = startTime
+      body.endTime = endTime
+    } else {
+      body.day = +day
+      if (day === 'all') {
+        body.day = ORDER_STAT_DAY_UNLIMITED
+      }
     }
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
@@ -283,6 +304,7 @@ class OrderStatView extends React.Component {
     }
 
     this.checkSchoolFsk(nextProps)
+    this.syncStateWithProps(nextProps)
     this.fetchList(nextProps)
     // if these options are same, doesn't need to refetch histogram.
     if (checkObject(this.props, nextProps, ['day', 'schoolId', 'deviceType'])) {
@@ -364,7 +386,7 @@ class OrderStatView extends React.Component {
     if (!startTime || !endTime) {
       return
     }
-    this.props.changeUser(subModule, {
+    this.props.changeOrder(subModule, {
       stat_startTime: startTime,
       stat_endTime: endTime,
       stat_page: 1,
@@ -375,9 +397,7 @@ class OrderStatView extends React.Component {
     const {
       page,
       deviceType,
-      day,
-      startTime,
-      endTime
+      day
       // buildingIds,
       // schoolId,
       // buildingsOfSchoolId
@@ -387,7 +407,9 @@ class OrderStatView extends React.Component {
       total,
       loading,
       barData,
-      isFushikang
+      isFushikang,
+      startTime,
+      endTime
       // showBuildingSelect
     } = this.state
     // const buildingNames =
