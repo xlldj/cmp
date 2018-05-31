@@ -9,7 +9,7 @@ import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
 import CheckSelect from '../../component/checkSelect'
 // import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import OrderBarChart from './orderBarChart'
-import RangeSelect from './rangeSelectDisableMonth'
+import RangeSelect from '../../component/rangeSelect'
 
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
@@ -176,12 +176,12 @@ class OrderStatView extends React.Component {
     this.syncStateWithProps()
   }
   syncStateWithProps = props => {
-    let { stat_startTime, stat_endTime } = props || this.props
+    let { startTime, endTime } = props || this.props
 
     const nextState = {}
-    if (stat_startTime !== this.state.startTime) {
-      nextState.startTime = stat_startTime
-      nextState.endTime = stat_endTime
+    if (startTime !== this.state.startTime) {
+      nextState.startTime = startTime
+      nextState.endTime = endTime
     }
     this.setState(nextState)
   }
@@ -234,7 +234,6 @@ class OrderStatView extends React.Component {
       {
         title: '使用次数',
         dataIndex: 'orderCount',
-        width: '15%',
         sorter: true
       },
       {
@@ -255,7 +254,12 @@ class OrderStatView extends React.Component {
         0,
         {
           title: '总用水量(升)',
-          dataIndex: 'totalWaterUsage'
+          dataIndex: 'totalWaterUsage',
+          render: (text, record) => (
+            <span>
+              {record.totalWaterUsage}L({record.totalIncome}元)
+            </span>
+          )
         },
         {
           title: '赠送用水量(升)',
@@ -274,15 +278,9 @@ class OrderStatView extends React.Component {
         title: '公寓',
         dataIndex: 'schoolName'
       })
-      columns.concat([
-        {
-          title: '充值金额',
-          dataIndex: 'chargeAmount'
-        }
-      ])
-      columns.splice(columns.length - 1, {
-        title: '总消费',
-        dataIndex: 'totalIncome'
+      columns.splice(columns.length - 1, 1, {
+        title: '充值金额(元)',
+        dataIndex: 'chargeAmount'
       })
     }
     return columns
@@ -296,7 +294,9 @@ class OrderStatView extends React.Component {
         'page',
         'order',
         'orderBy',
-        'schools'
+        'schools',
+        'startTime',
+        'endTime'
         // 'buildingIds'
       ])
     ) {
@@ -307,14 +307,24 @@ class OrderStatView extends React.Component {
     this.syncStateWithProps(nextProps)
     this.fetchList(nextProps)
     // if these options are same, doesn't need to refetch histogram.
-    if (checkObject(this.props, nextProps, ['day', 'schoolId', 'deviceType'])) {
+    if (
+      checkObject(this.props, nextProps, [
+        'day',
+        'schoolId',
+        'deviceType',
+        'startTime',
+        'endTime'
+      ])
+    ) {
       return
     }
     this.fetchHistogram(nextProps)
   }
   changeRange = key => {
     this.props.changeOrder(subModule, {
-      stat_day: key === 'all' ? 'all' : +key
+      stat_day: key === 'all' ? 'all' : +key,
+      stat_startTime: '',
+      stat_endTime: ''
     })
   }
   showBuildingSelect = () => {
@@ -440,6 +450,8 @@ class OrderStatView extends React.Component {
                 className="seperator"
                 startTime={startTime}
                 endTime={endTime}
+                allowHours={true}
+                format="YYYY-MM-DD HH:mm:ss"
                 changeStartTime={this.changeStartTime}
                 changeEndTime={this.changeEndTime}
                 confirm={this.confirmTimeRange}

@@ -7,25 +7,33 @@ class RangeSelector extends React.Component {
     super()
   }
   changeStartTime = data => {
-    // startime alway begins with 0:00
-    let st = parseInt(
-      moment(data)
-        .startOf('day')
-        .valueOf(),
-      10
-    )
+    const { allowHours } = this.props
+    let st = parseInt(moment(data).valueOf(), 10)
+    if (!allowHours) {
+      // set startTime to 0:00
+      st = parseInt(
+        moment(data)
+          .startOf('day')
+          .valueOf(),
+        10
+      )
+    }
     if (this.props.changeStartTime) {
       this.props.changeStartTime(st)
     }
   }
   changeEndTime = data => {
-    // endTime always end with 23:59
-    let et = parseInt(
-      moment(data)
-        .endOf('day')
-        .valueOf(),
-      10
-    )
+    const { allowHours } = this.props
+    let et = parseInt(moment(data).valueOf(), 10)
+    if (!allowHours) {
+      // set endTime to 23:59
+      et = parseInt(
+        moment(data)
+          .endOf('day')
+          .valueOf(),
+        10
+      )
+    }
     if (this.props.changeEndTime) {
       this.props.changeEndTime(et)
     }
@@ -36,7 +44,7 @@ class RangeSelector extends React.Component {
     }
   }
   render() {
-    const { startTime, endTime, className } = this.props
+    const { startTime, endTime, className, format } = this.props
 
     return (
       <div className={className ? `rangeSelect ${className}` : 'rangeSelect '}>
@@ -44,7 +52,7 @@ class RangeSelector extends React.Component {
           className="datePicker"
           showTime
           allowClear={false}
-          format="YYYY-MM-DD HH:mm"
+          format={format || 'YYYY-MM-DD HH:mm'}
           value={startTime ? moment(startTime) : null}
           onChange={this.changeStartTime}
         />
@@ -53,7 +61,7 @@ class RangeSelector extends React.Component {
           className="datePicker"
           showTime
           allowClear={false}
-          format="YYYY-MM-DD HH:mm"
+          format={format || 'YYYY-MM-DD HH:mm'}
           value={endTime ? moment(endTime) : null}
           onChange={this.changeEndTime}
         />
