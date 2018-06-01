@@ -34,12 +34,12 @@ const domains = {
     manager: 'http://47.106.62.186/m',
     user: 'http://47.106.62.186/c'
   },
-  dad: {
-    manager: 'http://10.195.90.167/5080',
-    user: 'http://10.195.90.167/5081'
+  szy: {
+    manager: 'http://10.195.90.167:5080',
+    user: 'http://10.195.90.167:5081'
   }
 }
-const currentDomain = domains.qa2
+const currentDomain = domains.szy
 const AjaxHandler = {
   showingError: false
 }
@@ -498,7 +498,6 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
   const hdrs = {
     'Content-Type': 'application/json',
     Accept: 'application/json' || '*/*',
-    'Access-Control-Allow-Origin': '*',
     token: token
   }
 

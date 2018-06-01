@@ -34,7 +34,7 @@ export const fetchFundCheckList = body => {
         listLoading: true
       }
     })
-    let resource = '/api/fundsCheck/mistake/list'
+    let resource = '/api/push/list'
     return AjaxHandler.fetch(resource, body).then(json => {
       let value = {
         listLoading: false

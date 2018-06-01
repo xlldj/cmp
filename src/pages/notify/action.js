@@ -1,7 +1,7 @@
 import { moduleActionFactory } from '../../actions/moduleActions.js'
 import store from '../../index'
-import AjaxHandler from '../../mock/ajax'
-// import AjaxHandler from '../../util/ajax'
+// import AjaxHandler from '../../mock/ajax'
+import AjaxHandler from '../../util/ajax'
 const modalName = 'beingsModal'
 export const CHANGE_NOTIFY = 'CHANGE_NOTIFY'
 
@@ -42,17 +42,17 @@ export const fetchBeingPushList = body => {
         listLoading: true
       }
     })
-    let resource = '/push/list'
+    let resource = '/api/push/list'
     return AjaxHandler.fetch(resource, body).then(json => {
       let value = {
         listLoading: false
       }
       if (json && json.data) {
-        const { total, list } = json.data
+        const { total, pushList } = json.data
         value = {
           ...value,
           ...{
-            list: list,
+            list: pushList,
             total
           }
         }

@@ -4,9 +4,10 @@ import 'rc-time-picker/assets/index.css'
 import { Button, DatePicker } from 'antd'
 
 import CONSTANTS from '../../../../constants'
-import SchoolSelector from '../../../component/schoolSelector'
+import SchoolSelector from '../../../component/schoolSelectorWithoutAll'
 import BasicSelectorWithoutAll from '../../../component/basicSelectorWithoutAll'
-import AjaxHandler from '../../../../mock/ajax'
+// import AjaxHandler from '../../../../mock/ajax'
+import AjaxHandler from '../../../../util/ajax'
 import AddPlusAbs from '../../../component/addPlusAbs'
 import { noticService } from '../../../service/index'
 import { rePushList } from '../controller'
@@ -25,26 +26,32 @@ class BeingInfo extends React.Component {
     super(props)
     this.state = {
       schoolId: 'all',
+      schoolError: false,
       methon: '',
       mobile: [''],
       env: '',
       target: '',
       planPushTime: moment(moment().add(5, 'minute')),
       content: '',
-      status: 2
+      status: 2,
+      type: 2,
+      emvError: false,
+      contentError: false,
+      methonError: false
     }
   }
 
   componentDidMount() {
     this.props.hide(false)
     if (this.props.match.params.id) {
-      let id = parseInt(this.props.match.params.id.slice(1), 10)
+      var data = this.props.location.state
       const body = {
-        id: id
+        id: data.id,
+        type: data.type
       }
       this.fetchData(body)
       this.setState({
-        id: id
+        id: data.id
       })
     }
   }
@@ -54,32 +61,26 @@ class BeingInfo extends React.Component {
   fetchData(body) {
     const resource = '/push/one'
     AjaxHandler.fetch(resource, body).then(json => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
-        if (json.data) {
-          const {
-            id,
-            schoolId,
-            methon,
-            mobile,
-            env,
-            target,
-            planPushTime,
-            content
-          } = json.data.detail
-          const nextState = {
-            id,
-            schoolId,
-            methon,
-            mobile: mobile.length ? mobile : [''],
-            env,
-            target,
-            planPushTime,
-            content
-          }
-          this.setState(nextState)
+      if (json && json.data) {
+        const {
+          id,
+          schoolId,
+          mode,
+          env,
+          range,
+          planPushTime,
+          content
+        } = json.data
+        const nextState = {
+          id,
+          schoolId,
+          methon: mode,
+          env,
+          target: range,
+          planPushTime,
+          content
         }
+        this.setState(nextState)
       }
     })
   }
@@ -139,11 +140,37 @@ class BeingInfo extends React.Component {
     } = this.state
     const body = {
       schoolId,
-      methon,
+      mode: methon,
       env: env,
-      target,
+      range: target,
       content
     }
+    if (!schoolId || schoolId === 'all') {
+      return this.setState({
+        schoolError: true
+      })
+    }
+    if (!env || env === 'all') {
+      return this.setState({
+        envError: true
+      })
+    }
+    if (!content || content.length > 50) {
+      return this.setState({
+        contentError: true
+      })
+    }
+    if (!methon || methon === 'all') {
+      return this.setState({
+        methonError: true
+      })
+    }
+    if (!target || target === 'all') {
+      return this.setState({
+        targetError: true
+      })
+    }
+
     if (parseInt(target, 10) === BEINGS_PUSH_TARGET_PERSON) {
       body.mobile = mobile
     }
@@ -153,28 +180,19 @@ class BeingInfo extends React.Component {
     this.addBeingInfo(body)
   }
   addBeingInfo = body => {
-    const { id } = this.state
+    const { id, type } = this.state
     if (id) {
       body.id = id
+      body.type = type
       noticService.upDatePush(body).then(json => {
-        if (json.data) {
-          if (json.data.result) {
-            Noti.hintOk('操作成功', '编辑成功')
-            rePushList()
-          } else {
-            Noti.hintLock('操作失败', json.data.failReason)
-          }
+        if (json && json.data) {
+          Noti.hintSuccess(this.props.history, '/notify/beings')
         }
       })
     } else {
       noticService.addPush(body).then(json => {
-        if (json.data) {
-          if (json.data.result) {
-            Noti.hintOk('操作成功', '创建成功')
-            rePushList()
-          } else {
-            Noti.hintLock('操作失败', json.data.failReason)
-          }
+        if (json && json.data) {
+          Noti.hintSuccess(this.props.history, '/notify/beings')
         }
       })
     }
@@ -183,6 +201,50 @@ class BeingInfo extends React.Component {
     this.setState({
       content: event.target.value
     })
+  }
+  checkEnv = v => {
+    if (v && v !== 'all') {
+      this.setState({
+        emvError: false
+      })
+    } else {
+      this.setState({
+        emvError: true
+      })
+    }
+  }
+  checkSchool = v => {
+    if (v && v !== 'all') {
+      this.setState({
+        schoolError: false
+      })
+    } else {
+      this.setState({
+        schoolError: true
+      })
+    }
+  }
+  checkMethon = v => {
+    if (v && v !== 'all') {
+      this.setState({
+        methonError: false
+      })
+    } else {
+      this.setState({
+        methonError: true
+      })
+    }
+  }
+  checkTarget = v => {
+    if (v && v !== 'all') {
+      this.setState({
+        targetError: false
+      })
+    } else {
+      this.setState({
+        targetError: true
+      })
+    }
   }
   checkContent = event => {
     const value = event.target.value
@@ -260,9 +322,17 @@ class BeingInfo extends React.Component {
     }
   }
   changeTime = value => {
-    this.setState({
-      planPushTime: value
-    })
+    const fiveMinute = moment().add(5, 'minute')
+    if (fiveMinute > value) {
+      this.setState({
+        TimeError: true
+      })
+    } else {
+      this.setState({
+        TimeError: false,
+        planPushTime: value
+      })
+    }
   }
   render() {
     let {
@@ -273,7 +343,12 @@ class BeingInfo extends React.Component {
       target,
       planPushTime,
       content,
-      contentError
+      contentError,
+      schoolError,
+      methonError,
+      envError,
+      targetError,
+      TimeError
     } = this.state
     const mobileItems =
       mobile &&
@@ -299,7 +374,11 @@ class BeingInfo extends React.Component {
               width={CONSTANTS.SELECTWIDTH}
               selectedSchool={schoolId}
               changeSchool={this.changeSchool}
+              checkSchool={this.checkSchool}
             />
+            {schoolError ? (
+              <span className="checkInvalid">请选择学校</span>
+            ) : null}
           </li>
           <li>
             <p>推送环境:</p>
@@ -309,10 +388,11 @@ class BeingInfo extends React.Component {
               selectedOpt={env}
               changeOpt={this.changeEqument}
               invalidTitle="选择类型"
+              checkEnv={this.checkEnv}
             />
-            {/* {typeError ? (
-              <span className="checkInvalid">公告类型不能为空！</span>
-            ) : null} */}
+            {envError ? (
+              <span className="checkInvalid">请选择推送环境</span>
+            ) : null}
           </li>
           <li className="itemsWrapper high">
             <p>推送内容:</p>
@@ -334,8 +414,12 @@ class BeingInfo extends React.Component {
               width={150}
               selectedOpt={methon}
               changeOpt={this.changeMethon}
+              checkOpt={this.checkMethon}
               invalidTitle="选择推送方式"
             />
+            {methonError ? (
+              <span className="checkInvalid">请选择推送方式</span>
+            ) : null}
           </li>
           {parseInt(methon, 10) === BEING_PUSH_METNON_WAITE ? (
             <li>
@@ -345,13 +429,17 @@ class BeingInfo extends React.Component {
                 style={{ height: '30px', width: 'auto' }}
                 disabledDate={this.disabledDate}
                 disabledTime={this.disabledDateTime}
-                // showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}
                 showTime
                 allowClear={false}
                 value={moment(planPushTime)}
                 onChange={this.changeTime}
                 format="YYYY-MM-DD HH:mm:ss"
               />
+              {TimeError ? (
+                <span className="checkInvalid">
+                  指定推送时间需晚于当前时间五分钟
+                </span>
+              ) : null}
             </li>
           ) : null}
 
@@ -363,7 +451,11 @@ class BeingInfo extends React.Component {
               selectedOpt={target}
               changeOpt={this.changeObject}
               invalidTitle="选择推送对象"
+              checkOpt={this.checkTarget}
             />
+            {targetError ? (
+              <span className="checkInvalid">请选择推送方式</span>
+            ) : null}
           </li>
           {parseInt(target, 10) === BEINGS_PUSH_TARGET_PERSON ? (
             <li className="itemsWrapper">

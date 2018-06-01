@@ -12,10 +12,10 @@ const NOTIFY = {
   NOTIFY_STATUS_PENDING: 3,
   NOTIFY_STATUS_REFUSED: 4,
   BEING_PUSH_METHON: {
-    1: '制定时间推送',
-    2: '立即推送'
+    2: '制定时间推送',
+    1: '立即推送'
   },
-  BEING_PUSH_METNON_WAITE: 1,
+  BEING_PUSH_METNON_WAITE: 2,
   BEINGS_PUSH_TYPE: {
     1: '自动推送',
     2: '人工推送'
@@ -38,14 +38,14 @@ const NOTIFY = {
     5: '已删除'
   },
   BEING_STATUSTEXT: {
-    1: 'success',
-    2: 'error',
-    3: 'default',
-    4: 'warning'
+    2: 'success',
+    3: 'error',
+    4: 'default',
+    1: 'warning'
   },
-  PUSH_SUCCESS_STATUS: 1,
-  PUSH_ERROR_STATUS: 2,
-  PUSH_CANCEL_STATUS: 3,
-  PUSH_WAITE_STATUS: 4
+  PUSH_SUCCESS_STATUS: 2,
+  PUSH_ERROR_STATUS: 3,
+  PUSH_CANCEL_STATUS: 4,
+  PUSH_WAITE_STATUS: 1
 }
 export default NOTIFY

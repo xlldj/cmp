@@ -20,7 +20,8 @@ const {
   BEING_STATUSTEXT,
   PUSH_ERROR_STATUS,
   PUSH_CANCEL_STATUS,
-  PUSH_WAITE_STATUS
+  PUSH_WAITE_STATUS,
+  BEINGS_PUSH_PERSON
 } = CONSTANTS
 const { PAGINATION: SIZE } = CONSTANTS
 
@@ -40,12 +41,10 @@ class BeingsTable extends React.Component {
       id: id
     }
     noticService.cancelPush(body).then(json => {
-      if (json.data) {
+      if (json && json.data) {
         if (json.data.result) {
           Noti.hintOk('操作成功', '取消发送成功')
           rePushList()
-        } else {
-          Noti.hintLock('操作失败', json.data.failReason)
         }
       }
     })
@@ -70,7 +69,7 @@ class BeingsTable extends React.Component {
       {
         title: '学校',
         dataIndex: 'schoolName',
-        width: '10%'
+        width: '12%'
       },
       {
         title: '推送类型',
@@ -88,7 +87,12 @@ class BeingsTable extends React.Component {
       },
       {
         title: '推送对象',
-        dataIndex: 'target'
+        dataIndex: 'range',
+        render: (text, record) => {
+          return BEINGS_PUSH_PERSON[record.range]
+            ? BEINGS_PUSH_PERSON[record.range]
+            : null
+        }
       },
       {
         title: '推送时间',
@@ -102,7 +106,7 @@ class BeingsTable extends React.Component {
       },
       {
         title: '操作人',
-        dataIndex: 'creatorName'
+        dataIndex: 'lastUpdateUserName'
       },
       {
         title: '更新时间',
@@ -128,7 +132,7 @@ class BeingsTable extends React.Component {
           const isEdit =
             record.status === PUSH_CANCEL_STATUS ||
             record.status === PUSH_WAITE_STATUS ||
-            PUSH_ERROR_STATUS
+            record.status === PUSH_ERROR_STATUS
           const isDelete =
             record.status === PUSH_ERROR_STATUS ||
             record.status === PUSH_CANCEL_STATUS
@@ -136,7 +140,17 @@ class BeingsTable extends React.Component {
           return (
             <div className="editable-row-operations lastCol">
               {isEdit ? (
-                <Link to={`/notify/beings/info/:${record.id}`}>编辑</Link>
+                <Link
+                  to={{
+                    pathname: `/notify/beings/info/:${record.id}`,
+                    state: {
+                      id: record.id,
+                      type: record.type
+                    }
+                  }}
+                >
+                  编辑
+                </Link>
               ) : null}
               {isEdit && isDelete ? <span className="ant-divider" /> : null}
               {isDelete ? (

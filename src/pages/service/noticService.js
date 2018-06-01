@@ -1,5 +1,5 @@
-// import AjaxHandler from '../../util/ajax'
-import AjaxHandler from '../../mock/ajax'
+import AjaxHandler from '../../util/ajax'
+// import AjaxHandler from '../../mock/ajax'
 const addPushUrl = '/push/create'
 const updatePushUrl = '/push/update'
 const cancelPushUrl = '/push/cancel'
