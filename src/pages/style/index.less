@@ -1808,7 +1808,7 @@ shortSeperator{
 .queryPanel{
   padding: 10px 20px;
   .queryLine{
-    height: 40px;
+    height: auto;
   }
   &>li{
     display: inline-block;
@@ -1849,6 +1849,15 @@ shortSeperator{
     height: 100%;
     display: inline-flex;
     align-items: center;
+    span:first-child{
+      min-width: 55px;
+    }
+    li{
+      margin: 5px;
+    }
+    .checkSelect{
+      flex-wrap: wrap
+    }
     .select{
       margin-left: 10px;
       .select-item{

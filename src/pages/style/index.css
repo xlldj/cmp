@@ -1867,7 +1867,7 @@ shortSeperator {
   padding: 10px 20px;
 }
 .queryPanel .queryLine {
-  height: 40px;
+  height: auto;
 }
 .queryPanel > li {
   display: inline-block;
@@ -1909,6 +1909,18 @@ shortSeperator {
   height: 100%;
   display: inline-flex;
   align-items: center;
+}
+.phaseLine .block span:first-child,
+.queryLine .block span:first-child {
+  min-width: 55px;
+}
+.phaseLine .block li,
+.queryLine .block li {
+  margin: 5px;
+}
+.phaseLine .block .checkSelect,
+.queryLine .block .checkSelect {
+  flex-wrap: wrap;
 }
 .phaseLine .block .select,
 .queryLine .block .select {

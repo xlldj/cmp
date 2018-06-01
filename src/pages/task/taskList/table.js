@@ -40,6 +40,7 @@ class TaskListTable extends React.Component {
               <img src={selectedImg} alt="" className="selectedImg" />
             ) : null}
             {text}
+            {record.related ? '(已关联)' : null}
           </span>
         )
       },

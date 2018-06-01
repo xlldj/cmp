@@ -109,6 +109,7 @@ const TASK = {
   TASK_HANDLE_AUTOMATIC: 10,
   TASK_HANDLE_CSREMIND: 11,
   TASK_HANDLE_SETTARGET: 12,
+  TASK_HANDLE_REPAIRPART: 13,
   // constants for task/report
   REPORTCATE: { 1: '工作情况', 2: '投诉分析', 3: '绩效考核' },
   REPORT_CATE_SUM: 1,
@@ -218,7 +219,14 @@ const TASK = {
       text: '消息类型列表'
     }
   ],
-
+  QUICK_MSG_LIST_TAB: {
+    value: 1,
+    text: '快捷消息列表'
+  },
+  QUICK_MSG_TYPE_TAB: {
+    value: 2,
+    text: '消息类型列表'
+  },
   QUICK_MSG_TAB_LIST: 1,
   QUICK_MSG_TAB_TYPE: 2,
   QUICK_MSGLIST_TYPE: {

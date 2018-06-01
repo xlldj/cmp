@@ -14,6 +14,8 @@ class QuickMsgListTable extends React.Component {
   constructor(props) {
     super(props)
     this.state = {}
+    const { forbiddenStatus } = props
+    const { ADD_EDIT_DEL_QUICKMSG } = forbiddenStatus
     this.columns = [
       {
         title: '消息类型',
@@ -42,21 +44,25 @@ class QuickMsgListTable extends React.Component {
         width: '12%',
         render: (text, record, index) => (
           <div className="editable-row-operations lastCol">
-            <span>
-              <a onClick={() => this.editQuickMsg(record)}> 编辑</a>
-            </span>
+            {ADD_EDIT_DEL_QUICKMSG ? null : (
+              <span>
+                <span>
+                  <a onClick={() => this.editQuickMsg(record)}> 编辑</a>
+                </span>
 
-            <span className="ant-divider" />
-            <Popconfirm
-              title="确定要删除此消息类型么?"
-              onConfirm={e => {
-                this.deleteQuickMsg(e, record.id)
-              }}
-              okText="确认"
-              cancelText="取消"
-            >
-              <a href="">删除</a>
-            </Popconfirm>
+                <span className="ant-divider" />
+                <Popconfirm
+                  title="确定要删除此消息类型么?"
+                  onConfirm={e => {
+                    this.deleteQuickMsg(e, record.id)
+                  }}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                  <a href="">删除</a>
+                </Popconfirm>
+              </span>
+            )}
           </div>
         )
       }
@@ -118,7 +124,8 @@ const mapStateToProps = (state, ownProps) => {
     dataSource: state[modalName].list,
     loading: state[modalName].listLoading,
     page: state[moduleName][subModule].page,
-    selectRecord: state[moduleName][subModule].selectRecord
+    selectRecord: state[moduleName][subModule].selectRecord,
+    forbiddenStatus: state.setAuthenData.forbiddenStatus
   }
 }
 

@@ -34,6 +34,18 @@ class QuickInfo extends React.Component {
       })
     }
   }
+  checkContent = v => {
+    const value = v.target.value
+    if (value && value.length < 200) {
+      this.setState({
+        contentError: false
+      })
+    } else {
+      this.setState({
+        contentError: true
+      })
+    }
+  }
   changeContent = event => {
     const value = event.target.value
     const { content } = this.state
@@ -52,6 +64,11 @@ class QuickInfo extends React.Component {
     if (id) {
       body.id = id
     }
+    if (!content || content.length > 200) {
+      return this.setState({
+        contentError: true
+      })
+    }
     const { closeQuickInfo } = this.props
     saveQuickMsg(body, closeQuickInfo)
   }
@@ -69,7 +86,7 @@ class QuickInfo extends React.Component {
       closeQuickInfo,
       quickInfoTitle: title
     } = this.props
-    const { content, msgTypeId } = this.state
+    const { content, msgTypeId, contentError } = this.state
     return (
       <Modal
         wrapClassName="modal"
@@ -89,13 +106,19 @@ class QuickInfo extends React.Component {
                 changeOpt={this.changeOpt}
               />
             </li>
-            <li style={{ height: 'auto', lineHeight: '30px' }}>
+            <li
+              style={{ height: 'auto', lineHeight: '30px', flexWrap: 'wrap' }}
+            >
               <textarea
                 style={{ width: '100%', height: '150px' }}
                 value={content}
                 placeholder="请输入快捷消息"
+                onBlur={this.checkContent}
                 onChange={event => this.changeContent(event)}
               />
+              {contentError ? (
+                <span className="checkInvalid">消息内容在0-200字之间</span>
+              ) : null}
             </li>
           </ul>
           <div className="btnArea">

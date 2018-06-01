@@ -15,7 +15,13 @@ const subModule = 'quickMsg'
 const subModuleMsg = 'quickMsgList'
 const subModuleType = 'quickType'
 const modalName = 'quickTypeModal'
-const { QUICK_MSG_TABS, QUICK_MSG_TAB_LIST, QUICK_MSG_TAB_TYPE } = CONSTANTS
+const {
+  QUICK_MSG_TABS,
+  QUICK_MSG_TAB_LIST,
+  QUICK_MSG_TAB_TYPE,
+  QUICK_MSG_LIST_TAB,
+  QUICK_MSG_TYPE_TAB
+} = CONSTANTS
 class QuickMsgContainer extends React.Component {
   constructor(props) {
     super(props)
@@ -67,18 +73,40 @@ class QuickMsgContainer extends React.Component {
       isShowQuickTypeInfo: false
     })
   }
+  getTabs = () => {
+    const { forbiddenStatus } = this.props
+    const { QUICK_TYPE_LIST_GET, QUICK_MSG_LIST_GET } = forbiddenStatus
+    let tabs = []
+    if (!QUICK_MSG_LIST_GET) {
+      tabs.push(QUICK_MSG_LIST_TAB)
+    } else {
+      this.props.changeTask({
+        tabIndex: QUICK_MSG_TAB_TYPE
+      })
+    }
+    if (!QUICK_TYPE_LIST_GET) {
+      tabs.push(QUICK_MSG_TYPE_TAB)
+    }
+    return tabs
+  }
   render() {
-    const { tabIndex, isShowQuickInfo, isShowQuickTypeInfo } = this.props
+    const {
+      tabIndex,
+      isShowQuickInfo,
+      isShowQuickTypeInfo,
+      forbiddenStatus
+    } = this.props
+    const { ADD_EDIT_DEL_QUICKMSG, ADD_EDIT_DEL_QUICKMSGTYPE } = forbiddenStatus
     return (
       <div className="panelWrapper">
         <PhaseLine
-          staticPhase={QUICK_MSG_TABS}
+          staticPhase={this.getTabs()}
           value={tabIndex}
           changePhase={v =>
             this.setProps({ type: 'tabIndex', value: { tabIndex: v } })
           }
         >
-          {tabIndex === QUICK_MSG_TAB_LIST ? (
+          {tabIndex === QUICK_MSG_TAB_LIST && !ADD_EDIT_DEL_QUICKMSG ? (
             <Button
               type="primary"
               style={{ marginRight: '30px' }}
@@ -87,7 +115,7 @@ class QuickMsgContainer extends React.Component {
               添加快捷消息
             </Button>
           ) : null}
-          {tabIndex === QUICK_MSG_TAB_TYPE ? (
+          {tabIndex === QUICK_MSG_TAB_TYPE && !ADD_EDIT_DEL_QUICKMSGTYPE ? (
             <Button
               type="primary"
               style={{ marginRight: '30px' }}

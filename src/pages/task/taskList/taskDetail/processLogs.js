@@ -76,6 +76,9 @@ const ProcessLogs = props => {
         case CONSTANTS.TASK_HANDLE_SETTARGET:
           message = '设置标签' + (content ? ` : ${content}` : '')
           break
+        case CONSTANTS.TASK_HANDLE_REPAIRPART:
+          message = '选择维修配件' + (content ? ` : ${content}` : '')
+          break
         default:
           message = ''
       }
