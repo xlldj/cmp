@@ -316,6 +316,7 @@ class UserTableView extends React.Component {
       columns.splice(1, 0, {
         title: '宿舍',
         dataIndex: 'location',
+        width: '7%',
         render: text => text || '暂无'
       })
     }
