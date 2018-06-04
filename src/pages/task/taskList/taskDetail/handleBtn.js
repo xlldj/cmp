@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, Dropdown, Pagination, Menu, Popconfirm } from 'antd'
 import CONSTANTS from '../../../../constants'
+import { checkObject } from '../../../../util/checkSame'
 import { connect } from 'react-redux'
 import {
   changeTask,
@@ -12,6 +13,7 @@ import {
   cancelRelate
 } from '../../../../actions'
 import Time from '../../../../util/time'
+import moment from '../../../../util/myMoment'
 const { TAB2HINT, NORMAL_DAY_7, roleModalName } = CONSTANTS
 const subModule = 'taskDetail'
 
@@ -19,7 +21,9 @@ class HandleBtn extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      showFinishModal: false
+      showFinishModal: false,
+      remTime: -1,
+      timer: null
     }
     this.reassignMenu = (
       <Menu selectable={false} onClick={this.reassign}>
@@ -43,6 +47,45 @@ class HandleBtn extends React.Component {
           <span className="menuItem">研发人员</span>
         </Menu.Item>
       </Menu>
+    )
+    this.resetTime = () => {
+      let { remTime } = this.state
+      if (remTime < 0) {
+        return
+      }
+      this.setState({
+        remTime: parseInt(remTime, 10) - 1
+      })
+      console.log(this.state.remTime)
+      this.timer = setTimeout(this.resetTime, 1000 * 60)
+    }
+  }
+  componentDidMount() {
+    this.setTime()
+  }
+  componentWillReceiveProps(nextProps) {
+    if (checkObject(this.props, nextProps, ['data'])) {
+      return
+    }
+    this.setTime(nextProps)
+  }
+  componentWillUnmount() {
+    clearTimeout(this.timer)
+  }
+  setTime = props => {
+    props = props || this.props
+    const { data } = props
+    let { csRemindTime } = data
+    let diffTime = csRemindTime
+      ? moment().diff(moment(csRemindTime), 'minutes')
+      : -1
+    let time =
+      diffTime >= 0 && diffTime <= 30 ? 30 - parseInt(diffTime, 10) : -1
+    this.setState(
+      {
+        remTime: time
+      },
+      this.resetTime
     )
   }
 
@@ -197,6 +240,7 @@ class HandleBtn extends React.Component {
       isChangeRepair: true
     })
   }
+
   render() {
     const {
       data,
@@ -214,9 +258,11 @@ class HandleBtn extends React.Component {
       relateTargetId,
       relatable,
       related,
-      csRemindAble,
+      csRemindAble = true,
       id
     } = data
+    const { remTime } = this.state
+
     return (
       <div className="handleBtn">
         {/* only show when 'status' is not finished and has right to handle. */}
@@ -300,7 +346,13 @@ class HandleBtn extends React.Component {
                 okText="确认"
                 cancelText="取消"
               >
-                <Button type="primary">催单</Button>
+                <Button type="primary" disabled={remTime > 0}>
+                  {remTime > 0 ? (
+                    <span>重新催单(剩余{remTime}分钟)</span>
+                  ) : (
+                    '催单'
+                  )}
+                </Button>
               </Popconfirm>
             ) : null}
           </div>

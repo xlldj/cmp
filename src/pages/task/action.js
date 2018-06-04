@@ -7,6 +7,7 @@ import { taskService } from '../service/index'
 import store from '../../index.js'
 import { deepCopy } from '../../util/copy'
 import Noti from '../../util/noti'
+import {} from './taskList/controller'
 export const CHANGE_MODAL_TASK = 'CHANGE_MODAL_TASK'
 export const CHANGE_MODAL_TASKDETAIL = 'CHANGE_MODAL_TASKDETAIL'
 
@@ -91,20 +92,19 @@ export const cancelRelate = (body, callback) => {
  * 催单
  * @param {} body
  */
-export const csRemind = body => {
+export const csRemind = (body, callback) => {
   return dispatch => {
     taskService.csRemind(body).then(json => {
-      if (json.data) {
+      if (json && json.data && json.data.result) {
         Noti.hintOk('操作成功', '催单成功')
         const { taskDetailModal } = store.getState()
         const detail = deepCopy(taskDetailModal.detail)
-        detail.csRemindAble = false
-        store.dispatch({
-          type: CHANGE_MODAL_TASKDETAIL,
-          value: {
-            detail: detail
-          }
-        })
+        const body = {
+          id: detail.id
+        }
+        store.dispatch(fetchTaskDetail(body))
+      } else if (json && json.data && json.data.failReason) {
+        Noti.hintLock('操作失败', json.data.failReason)
       }
     })
   }

@@ -96,6 +96,7 @@ Time.getTimeStr = t => {
     aMi = a.getMinutes() > 9 ? a.getMinutes() : '0' + a.getMinutes()
   let n = new Date()
   let applyTS = `${ay}-${aM}-${aD} ${aH}:${aMi}`
+  let applyMD = `${aM}-${aD} ${aH}:${aMi}`
   if (
     n.getFullYear() === a.getFullYear() &&
     n.getMonth() === a.getMonth() &&
@@ -108,6 +109,8 @@ Time.getTimeStr = t => {
     n.getDate() === a.getDate() + 1
   ) {
     return `昨天 ${aH}:${aMi}`
+  } else if (n.getFullYear() === a.getFullYear()) {
+    return applyMD
   } else {
     return applyTS
   }
