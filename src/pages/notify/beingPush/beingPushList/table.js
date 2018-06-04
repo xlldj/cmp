@@ -43,6 +43,7 @@ class BeingsTable extends React.Component {
     noticService.cancelPush(body).then(json => {
       if (json && json.data) {
         Noti.hintOk('操作成功', '取消发送成功')
+        rePushList()
       }
     })
   }
@@ -53,6 +54,7 @@ class BeingsTable extends React.Component {
     noticService.delPush(body).then(json => {
       if (json && json.data) {
         Noti.hintOk('操作成功', '删除成功')
+        rePushList()
       }
     })
   }
@@ -125,9 +127,7 @@ class BeingsTable extends React.Component {
             record.status === PUSH_CANCEL_STATUS ||
             record.status === PUSH_WAITE_STATUS ||
             record.status === PUSH_ERROR_STATUS
-          const isDelete =
-            record.status === PUSH_ERROR_STATUS ||
-            record.status === PUSH_CANCEL_STATUS
+          const isDelete = record.status === PUSH_CANCEL_STATUS
           const isCancelPush = record.status === PUSH_WAITE_STATUS
           return (
             <div className="editable-row-operations lastCol">

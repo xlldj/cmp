@@ -66,7 +66,7 @@ class BeingInfo extends React.Component {
           schoolId,
           mode,
           env,
-          range,
+          target,
           planPushTime,
           content
         } = json.data
@@ -75,7 +75,7 @@ class BeingInfo extends React.Component {
           schoolId,
           methon: mode,
           env,
-          target: range,
+          target: target,
           planPushTime,
           content
         }
@@ -245,16 +245,15 @@ class BeingInfo extends React.Component {
     }
   }
   checkContent = event => {
-    const value = event.target.value
+    let value = event.target.value
+    value = value.replace(/^\s+/, '')
     if (!value || value.length > 50) {
       this.setState({
-        contentError: true,
-        content: value
+        contentError: true
       })
     } else {
       this.setState({
-        contentError: false,
-        content: value
+        contentError: false
       })
     }
   }

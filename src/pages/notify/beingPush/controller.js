@@ -35,7 +35,7 @@ export const rePushList = () => {
     body.schoolId = +schoolId
   }
   if (type !== 'all') {
-    body.mode = +type
+    body.type = +type
   }
   if (status !== 'all') {
     body.status = +status
