@@ -42,10 +42,7 @@ class BeingsTable extends React.Component {
     }
     noticService.cancelPush(body).then(json => {
       if (json && json.data) {
-        if (json.data.result) {
-          Noti.hintOk('操作成功', '取消发送成功')
-          rePushList()
-        }
+        Noti.hintOk('操作成功', '取消发送成功')
       }
     })
   }
@@ -54,13 +51,8 @@ class BeingsTable extends React.Component {
       id: id
     }
     noticService.delPush(body).then(json => {
-      if (json.data) {
-        if (json.data.result) {
-          Noti.hintOk('操作成功', '删除成功')
-          rePushList()
-        } else {
-          Noti.hintLock('操作失败', json.data.failReason)
-        }
+      if (json && json.data) {
+        Noti.hintOk('操作成功', '删除成功')
       }
     })
   }

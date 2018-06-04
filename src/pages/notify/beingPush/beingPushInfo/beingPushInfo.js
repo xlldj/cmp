@@ -10,7 +10,6 @@ import BasicSelectorWithoutAll from '../../../component/basicSelectorWithoutAll'
 import AjaxHandler from '../../../../util/ajax'
 import AddPlusAbs from '../../../component/addPlusAbs'
 import { noticService } from '../../../service/index'
-import { rePushList } from '../controller'
 import Noti from '../../../../util/noti'
 // import { connect } from 'react-redux'
 // import { withRouter } from 'react-router-dom'
@@ -180,10 +179,9 @@ class BeingInfo extends React.Component {
     this.addBeingInfo(body)
   }
   addBeingInfo = body => {
-    const { id, type } = this.state
+    const { id } = this.state
     if (id) {
       body.id = id
-      body.type = type
       noticService.upDatePush(body).then(json => {
         if (json && json.data) {
           Noti.hintSuccess(this.props.history, '/notify/beings')
