@@ -31,7 +31,6 @@ export const taskListQueryPropsController = (state, props, event) => {
     tabIndexController
   ])(state, props, event)
 }
-
 export const relateTask = body => {
   taskService.relateTask(body).then(json => {
     if (json.data) {

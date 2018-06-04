@@ -30,6 +30,7 @@ class QuickMsgListQuery extends React.Component {
     }
     this.sendFetch(nextProps)
   }
+  //获取消息列表
   sendFetch(props) {
     props = props || this.props
     const { page, type } = props
@@ -48,6 +49,7 @@ class QuickMsgListQuery extends React.Component {
       this.props.changeTask(subModule, value)
     }
   }
+  //类型筛选数据
   getMsgList() {
     const { quickTypeList } = this.props
     const quickTypes = {}

@@ -1,9 +1,7 @@
 import React from 'react'
 import { Button } from 'antd'
-
 import TaskListQuery from './query'
 import TaskTable from './table'
-
 import PhaseLine from '../../component/phaseLine'
 import CONSTANTS from '../../../constants'
 import SchoolSelector from '../../component/schoolSelector'

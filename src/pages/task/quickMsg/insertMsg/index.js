@@ -15,6 +15,7 @@ class InsertMsgContainer extends React.Component {
     super(props)
     this.state = {}
   }
+  //选择快捷消息
   chooseMsg(content) {
     this.props.chooseMsg(content)
   }
@@ -32,11 +33,13 @@ class InsertMsgContainer extends React.Component {
     }
     this.sendFetch(nextProps)
   }
+  //换页
   changePage = page => {
     this.props.changeTask(subModule, {
       page: page
     })
   }
+  //获取快捷消息列表
   sendFetch(props) {
     props = props || this.props
     const { page, type } = props
@@ -49,6 +52,7 @@ class InsertMsgContainer extends React.Component {
     }
     props.fetchQuickList(body)
   }
+  //获取快捷消息内容
   quickMsgContent() {
     const { dataSource } = this.props
     const content =
@@ -66,6 +70,7 @@ class InsertMsgContainer extends React.Component {
       })
     return content
   }
+  //修改快捷消息类型
   changetype = v => {
     if (v !== 'all') {
       this.props.changeTask(subModule, {
@@ -73,9 +78,11 @@ class InsertMsgContainer extends React.Component {
       })
     }
   }
+  //关闭插入快捷消息弹出框
   closeInsertModal = () => {
     this.props.closeInsertModal()
   }
+  //获取消息类型
   getTypes(types) {
     const typeOptions = {}
     types.forEach((type, index) => {

@@ -68,12 +68,14 @@ class QuickMsgListTable extends React.Component {
       }
     ]
   }
+  //删除快捷消息
   deleteQuickMsg = (event, id) => {
     const body = {
       id: id
     }
     deleteQuickMsg(body)
   }
+  //编辑快捷消息
   editQuickMsg = record => {
     this.props.changeTask(subModule, {
       selectedMsg: record.id,

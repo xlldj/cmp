@@ -74,6 +74,7 @@ class BuildTask extends React.Component {
       }
     }
   }
+  //获取受理人列表
   fetchData = body => {
     let resource = '/api/employee/department/member/list'
     const cb = json => {

@@ -1,11 +1,8 @@
 import React from 'react'
 import { Modal, Button } from 'antd'
 import BasicSelector from '../../../component/basicSelectorWithoutAll'
-// import CONSTANTS from '../../../../constants/index'
-// import AjaxHandler from '../../../../mock/ajax'
-// import AjaxHandler from '../../../../util/ajax'
+
 import { saveQuickMsg } from '../controller'
-// const {} = CONSTANTS
 class QuickInfo extends React.Component {
   constructor(props) {
     super(props)
