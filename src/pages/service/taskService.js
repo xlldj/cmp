@@ -1,4 +1,4 @@
-import { default as AjaxHandlerMock } from '../../mock/ajax'
+// import { default as AjaxHandlerMock } from '../../mock/ajax'
 import AjaxHandler from '../../util/ajax'
 
 const relateTaskUrl = '/work/order/relate'

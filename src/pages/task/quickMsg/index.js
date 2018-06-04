@@ -16,7 +16,6 @@ const subModuleMsg = 'quickMsgList'
 const subModuleType = 'quickType'
 const modalName = 'quickTypeModal'
 const {
-  QUICK_MSG_TABS,
   QUICK_MSG_TAB_LIST,
   QUICK_MSG_TAB_TYPE,
   QUICK_MSG_LIST_TAB,

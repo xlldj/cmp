@@ -220,8 +220,7 @@ class TaskList extends React.Component {
       mine,
       showDetail,
       user,
-      forbiddenStatus,
-      isShowInsert
+      forbiddenStatus
     } = this.props
     const { isCs, csOnline } = user
     const { showBuild } = this.state

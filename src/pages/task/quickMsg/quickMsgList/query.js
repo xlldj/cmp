@@ -10,7 +10,7 @@ import CONSTANTS from '../../../../constants/index'
 const moduleName = 'taskModule'
 const subModule = 'quickMsgList'
 const modalName = 'quickTypeModal'
-const { QUICK_MSGLIST_TYPE, PAGINATION: SIZE } = CONSTANTS
+const { PAGINATION: SIZE } = CONSTANTS
 class QuickMsgListQuery extends React.Component {
   constructor(props) {
     super(props)
@@ -61,8 +61,8 @@ class QuickMsgListQuery extends React.Component {
     return (
       <QueryPanel>
         <QueryLine>
-          <QueryBlock style={{ 'align-items': 'flex-start' }}>
-            <span style={{ 'margin-top': '10px' }}>类型筛选:</span>
+          <QueryBlock style={{ alignItems: 'flex-start' }}>
+            <span style={{ marginTop: '10px' }}>类型筛选:</span>
             <CheckSelector
               allOptValue="all"
               allOptTitle="不限"

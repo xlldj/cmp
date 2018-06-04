@@ -1,4 +1,4 @@
-import { delete_error, delete_ok } from './generalResponse'
+import { delete_ok } from './generalResponse'
 
 const deviceLocation = {
   data: {

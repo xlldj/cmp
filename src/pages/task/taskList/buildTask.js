@@ -6,10 +6,9 @@ import DeviceSelector from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../../constants'
 import AjaxHandler from '../../../util/ajax'
 import { taskService } from '../../service/index'
-import { debug } from 'util'
 import InsertMsgContainer from '../quickMsg/insertMsg/index'
 import Noti from '../../../util/noti'
-import { changeTask } from '../../../actions/index'
+import { changeTask, fetchTaskDetail } from '../../../actions/index'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 // import { locale } from 'moment'
@@ -399,6 +398,7 @@ class BuildTask extends React.Component {
         if (json.data) {
           if (json.data.result) {
             this.props.success()
+            this.props.fetchTaskDetail({ id: this.props.taskDetailData.id })
           } else {
             Noti.hintLock('操作失败', json.data.failReason)
           }
@@ -431,7 +431,7 @@ class BuildTask extends React.Component {
     })
   }
   render() {
-    const { isShowInsert } = this.props
+    const { isShowInsert, isChangeRepair } = this.props
     const {
       schoolError,
       schoolId,
@@ -462,7 +462,7 @@ class BuildTask extends React.Component {
         <Modal
           wrapClassName="modal"
           width={400}
-          title="创建工单"
+          title={isChangeRepair ? '转为保修工单' : '创建工单'}
           visible
           onCancel={this.cancelSubmit}
           footer={null}
@@ -601,4 +601,6 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, { changeTask })(BuildTask))
+export default withRouter(
+  connect(mapStateToProps, { changeTask, fetchTaskDetail })(BuildTask)
+)

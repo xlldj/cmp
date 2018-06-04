@@ -14,7 +14,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeSchool, fetchOverviewData } from '../../../actions'
-import { stat } from 'fs'
+// import { stat } from 'fs'
 
 const SIZE = 4
 const { DEVICE_TYPE_BLOWER, DEVICE_TYPE_WASHER, WASHER_RATE_TYPES } = CONSTANTS

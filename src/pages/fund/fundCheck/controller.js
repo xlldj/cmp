@@ -10,7 +10,7 @@ import {
 } from '../../../public/dispatcher'
 import * as ActionTypes from '../../../actions'
 import store from '../../../index.js'
-import { fetchFundCheckInfo, fetchFundCheckList } from '../action'
+import { fetchFundCheckInfo } from '../action'
 import Noti from '../../../util/noti'
 const subModule = 'fundCheck'
 

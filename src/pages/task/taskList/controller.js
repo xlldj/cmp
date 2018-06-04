@@ -10,7 +10,6 @@ import {
   combineControllers
 } from '../../../public/dispatcher'
 import { taskService } from '../../service/index'
-import store from '../../../index'
 export const taskDetailPropsController = (state, props, event) => {
   return combineControllers([closeDetailController])(state, props, event)
 }

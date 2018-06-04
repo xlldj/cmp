@@ -87,7 +87,6 @@ class InsertMsgContainer extends React.Component {
     let { types, type, page, total, loading } = this.props
     const msgList = this.quickMsgContent()
     types = this.getTypes(types)
-    console.log(types)
     return (
       <Modal
         wrapClassName="modal buildTask"

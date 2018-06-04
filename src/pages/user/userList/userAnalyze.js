@@ -242,7 +242,7 @@ class UserTableView extends React.Component {
   }
   getColumns = () => {
     const { analyze_deviceType: deviceType, forbiddenStatus } = this.props
-    const { USER_INFO_DETILE, ORDER_DETAIL_AND_CHARGEBACK } = forbiddenStatus
+    const { USER_INFO_DETILE } = forbiddenStatus
     let columns = [
       {
         title: '学校名称',

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route, Switch } from 'react-router-dom'
 import RechargeTableUi from './table.js'
-import RechargeInfo from './info.js'
+// import RechargeInfo from './info.js'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'

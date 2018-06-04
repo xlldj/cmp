@@ -61,11 +61,6 @@ const quick_type = {
     total: 0
   }
 }
-const quick_type_info = {
-  data: {
-    description: '消息类型一'
-  }
-}
 const quickListHandler = (resource, body) => {
   if (resource === '/work/order/quick_msg/list') {
     let json = quick_list

@@ -79,6 +79,9 @@ const ProcessLogs = props => {
         case CONSTANTS.TASK_HANDLE_REPAIRPART:
           message = '选择维修配件' + (content ? ` : ${content}` : '')
           break
+        case CONSTANTS.TASK_HANDLE_CHANGETASK:
+          message = '转换工单为报修工单'
+          break
         default:
           message = ''
       }
