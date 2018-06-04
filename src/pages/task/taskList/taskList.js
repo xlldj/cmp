@@ -384,7 +384,7 @@ class TaskList extends React.Component {
           body.day = day
         }
         if (panel_startTime[main_phase] && panel_endTime[main_phase]) {
-          body.startTime = panel_endTime[main_phase]
+          body.startTime = panel_startTime[main_phase]
           body.endTime = panel_endTime[main_phase]
         }
         if (panel_selectKey[main_phase]) {
