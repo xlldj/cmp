@@ -14,8 +14,7 @@ import { checkObject } from '../../../util/checkSame'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeNotify } from '../../../actions'
-
+import { changeNotify } from '../action'
 const SIZE = CONSTANTS.PAGINATION
 const NOTIFYTYPES = CONSTANTS.NOTIFYTYPES
 
@@ -134,7 +133,10 @@ class NotifyTable extends React.Component {
     if (type === v) {
       return
     }
-    this.props.changeNotify('notify', { type: v, page: 1 })
+    this.props.changeNotify('notify', {
+      type: v,
+      page: 1
+    })
   }
   changePage = pageObj => {
     let page = pageObj.current

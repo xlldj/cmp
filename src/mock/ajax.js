@@ -8,6 +8,7 @@ import fundCheckHandler from './fundCheck'
 import taskHandler from './task'
 
 import quickListHandler from './quickList'
+import beingPushHandler from './beingPush'
 const AjaxHandler = {
   showingError: false
 }
@@ -83,6 +84,8 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     )
   ) {
     return quickListHandler(resource, body)
+  } else if (contain(resource, '/push/list', '/push/one', 'push/delete')) {
+    return beingPushHandler(resource, body)
   }
 }
 

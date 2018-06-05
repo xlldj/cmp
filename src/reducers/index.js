@@ -33,6 +33,7 @@ import {
   enableCommentModal
 } from '../pages/lost/reducer.js'
 
+import { notifyModule, beingsModal } from '../pages/notify/reducer'
 import doorForbidModule from '../pages/doorForbid/reducer'
 import { schoolModule, overviewModal } from '../pages/school/reducer'
 
@@ -218,26 +219,6 @@ const employeeModule = (state = initialEmployeeState, action) => {
   return state
 }
 
-// 公告管理
-const initialNotifyState = {
-  notify: {
-    page: 1,
-    type: 'all'
-  },
-  censor: {
-    page: 1
-  }
-}
-const notifyModule = (state = initialNotifyState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_NOTIFY) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
 // 版本管理
 const initialVersionState = {
   version: {
@@ -312,6 +293,7 @@ const rootReducer = combineReducers({
   taskDetailModal,
   employeeModule,
   notifyModule,
+  beingsModal,
   versionModule,
   doorForbidModule,
   setSchoolList,
