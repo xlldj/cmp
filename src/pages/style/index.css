@@ -1652,6 +1652,7 @@ shortSeperator {
   box-sizing: border-box;
   height: 100vh;
   overflow-y: scroll;
+  min-width: 1005px;
 }
 #root .container .content .main .breadc {
   background-color: #fff;

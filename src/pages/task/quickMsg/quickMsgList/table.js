@@ -20,17 +20,20 @@ class QuickMsgListTable extends React.Component {
       {
         title: '消息类型',
         dataIndex: 'msgTypeDesc',
-        className: 'firstCol'
+        className: 'firstCol',
+        width: '10%'
       },
       {
         title: '快捷消息',
         dataIndex: 'content',
-        className: 'firstCol'
+        className: 'firstCol',
+        width: '50%'
       },
       {
         title: '操作人',
         dataIndex: 'operUserNickname',
-        className: 'firstCol'
+        className: 'firstCol',
+        width: '10%'
       },
       {
         title: '更新时间',

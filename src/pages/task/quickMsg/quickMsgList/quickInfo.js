@@ -32,7 +32,7 @@ class QuickInfo extends React.Component {
     }
   }
   checkContent = v => {
-    const value = v.target.value
+    const value = v.target.value.trim()
     if (value && value.length < 200) {
       this.setState({
         contentError: false

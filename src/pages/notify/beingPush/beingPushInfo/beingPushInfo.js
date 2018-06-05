@@ -30,7 +30,7 @@ class BeingInfo extends React.Component {
       schoolError: false,
       methon: '',
       mobile: [''],
-      env: '',
+      env: 'all',
       target: '',
       planPushTime: moment(moment().add(5, 'minute')),
       content: '',
@@ -88,25 +88,20 @@ class BeingInfo extends React.Component {
   cancel = () => {
     this.props.history.goBack()
   }
-  changeSchool = v => {
-    this.setState({
-      schoolId: v
-    })
+  changeState = (v, keyName) => {
+    const nextState = {}
+    nextState[keyName] = v
+    this.setState(nextState)
   }
-  changeEqument = v => {
-    this.setState({
-      env: v
-    })
-  }
-  changeMethon = v => {
-    this.setState({
-      methon: v
-    })
-  }
-  changeObject = v => {
-    this.setState({
-      target: v
-    })
+  checkState = (v, keyName, keyErrorName) => {
+    const nextState = {}
+    nextState[keyName] = v
+    nextState[keyErrorName] = false
+    if (v && v !== 'all') {
+      return this.setState(nextState)
+    }
+    nextState[keyErrorName] = true
+    this.setState(nextState)
   }
   addMobile = e => {
     const mobile = JSON.parse(JSON.stringify(this.state.mobile))
@@ -171,12 +166,18 @@ class BeingInfo extends React.Component {
         targetError: true
       })
     }
+    const fiveMinute = moment().add(5, 'minute')
+    if (fiveMinute > planPushTime) {
+      return this.setState({
+        TimeError: true
+      })
+    }
 
     if (parseInt(target, 10) === BEINGS_PUSH_TARGET_PERSON) {
       body.mobile = mobile
     }
     if (parseInt(methon, 10) === BEING_PUSH_METNON_WAITE) {
-      body.planPushTime = planPushTime
+      body.planPushTime = planPushTime.valueOf()
     }
     this.addBeingInfo(body)
   }
@@ -205,53 +206,8 @@ class BeingInfo extends React.Component {
       content: event.target.value
     })
   }
-  checkEnv = v => {
-    if (v && v !== 'all') {
-      this.setState({
-        emvError: false
-      })
-    } else {
-      this.setState({
-        emvError: true
-      })
-    }
-  }
-  checkSchool = v => {
-    if (v && v !== 'all') {
-      this.setState({
-        schoolError: false
-      })
-    } else {
-      this.setState({
-        schoolError: true
-      })
-    }
-  }
-  checkMethon = v => {
-    if (v && v !== 'all') {
-      this.setState({
-        methonError: false
-      })
-    } else {
-      this.setState({
-        methonError: true
-      })
-    }
-  }
-  checkTarget = v => {
-    if (v && v !== 'all') {
-      this.setState({
-        targetError: false
-      })
-    } else {
-      this.setState({
-        targetError: true
-      })
-    }
-  }
   checkContent = event => {
-    let value = event.target.value
-    value = value.replace(/^\s+/, '')
+    let value = event.target.value.tirm()
     if (!value || value.length > 50) {
       this.setState({
         contentError: true
@@ -319,6 +275,11 @@ class BeingInfo extends React.Component {
         disableTime.disabledMinutes = () => {
           return this.range(0, moment(fiveMinute).minutes())
         }
+        if (current.minutes() === moment(fiveMinute).minutes()) {
+          disableTime.disabledSeconds = () => {
+            return this.range(0, moment(fiveMinute).seconds())
+          }
+        }
       }
       return disableTime
     }
@@ -375,8 +336,12 @@ class BeingInfo extends React.Component {
             <SchoolSelector
               width={CONSTANTS.SELECTWIDTH}
               selectedSchool={schoolId}
-              changeSchool={this.changeSchool}
-              checkSchool={this.checkSchool}
+              changeSchool={v => {
+                this.changeState(v, 'schoolId')
+              }}
+              checkSchool={v => {
+                this.checkState(v, 'schoolId', 'schoolError')
+              }}
             />
             {schoolError ? (
               <span className="checkInvalid">请选择学校</span>
@@ -388,9 +353,13 @@ class BeingInfo extends React.Component {
               staticOpts={BEINGS_PUSH_EQUMENT}
               width={150}
               selectedOpt={env}
-              changeOpt={this.changeEqument}
+              changeOpt={v => {
+                this.changeState(v, 'env')
+              }}
               invalidTitle="选择类型"
-              checkEnv={this.checkEnv}
+              checkOpt={v => {
+                this.checkState(v, 'env', 'envError')
+              }}
             />
             {envError ? (
               <span className="checkInvalid">请选择推送环境</span>
@@ -415,8 +384,12 @@ class BeingInfo extends React.Component {
               staticOpts={BEING_PUSH_METHON}
               width={150}
               selectedOpt={methon}
-              changeOpt={this.changeMethon}
-              checkOpt={this.checkMethon}
+              changeOpt={v => {
+                this.changeState(v, 'methon')
+              }}
+              checkOpt={v => {
+                this.checkState(v, 'methon', 'methonError')
+              }}
               invalidTitle="选择推送方式"
             />
             {methonError ? (
@@ -451,9 +424,13 @@ class BeingInfo extends React.Component {
               staticOpts={BEINGS_PUSH_PERSON}
               width={150}
               selectedOpt={target}
-              changeOpt={this.changeObject}
+              changeOpt={v => {
+                this.changeState(v, 'target')
+              }}
               invalidTitle="选择推送对象"
-              checkOpt={this.checkTarget}
+              checkOpt={v => {
+                this.checkState(v, 'target', 'targetError')
+              }}
             />
             {targetError ? (
               <span className="checkInvalid">请选择推送方式</span>
