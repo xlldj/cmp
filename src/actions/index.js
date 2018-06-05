@@ -44,6 +44,12 @@ import {
   CHANGE_MODAL_DEVICEINFO
 } from '../pages/device/action'
 import {
+  changeNotify,
+  CHANGE_NOTIFY,
+  fetchBeingPushList,
+  CHANGE_MODAL_BEING
+} from '../pages/notify/action'
+import {
   CHANGE_HEATER,
   changeHeater,
   fetchHeaterList
@@ -193,15 +199,6 @@ export const changeEmployee = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_NOTIFY = 'CHANGE_NOTIFY'
-export const changeNotify = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_NOTIFY,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_VERSION = 'CHANGE_VERSION'
 export const changeVersion = (subModule, keyValuePair) => {
   return {
@@ -278,5 +275,9 @@ export {
   CHANGE_QUICK_LIST,
   fetchQuickList,
   CHANGE_QUICK_TYPE_LIST,
-  fetchQuickTypeList
+  fetchQuickTypeList,
+  fetchBeingPushList,
+  CHANGE_MODAL_BEING,
+  changeNotify,
+  CHANGE_NOTIFY
 }

@@ -17,6 +17,9 @@ const NotifyContainer = asyncComponent(() =>
 const CensorContainer = asyncComponent(() =>
   import(/* webpackChunkName: "censorContainer" */ './censor/censorContainer')
 )
+const BeingsContainer = asyncComponent(() =>
+  import(/* webpackChunkName: "beingsContainer" */ './beingPush/index')
+)
 
 const breadcrumbNameMap = {
   '/list': '公告列表',
@@ -24,7 +27,10 @@ const breadcrumbNameMap = {
   '/list/addNotify': '添加公告',
   '/censor': '公告审核',
   '/censor/list': '公告审核',
-  '/censor/info': '详情'
+  '/censor/info': '详情',
+  '/beings': '消息推送',
+  '/beings/info': '推送详情',
+  '/beings/addBeing': '添加推送'
 }
 
 class NotifyDisp extends React.Component {
@@ -74,6 +80,12 @@ class NotifyDisp extends React.Component {
                 )}
               />
             )}
+            <Route
+              path="/notify/beings"
+              render={props => (
+                <BeingsContainer hide={this.props.hide} {...props} />
+              )}
+            />
           </Switch>
         </div>
       </div>

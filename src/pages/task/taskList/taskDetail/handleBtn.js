@@ -95,6 +95,7 @@ class HandleBtn extends React.Component {
       // open different modal according to role
       const modalStateName = roleModalName[key]
       const value = {}
+      debugger
       value[modalStateName] = true
       this.props.changeTask(subModule, value)
     } catch (e) {
@@ -258,7 +259,7 @@ class HandleBtn extends React.Component {
       relateTargetId,
       relatable,
       related,
-      csRemindAble = true,
+      csRemindAble,
       id
     } = data
     const { remTime } = this.state

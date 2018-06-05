@@ -102,7 +102,9 @@ class TaskDetail extends React.Component {
       showRepairmanModal: false
     })
     Noti.hintOk('转发成功', '已成功转发给该维修员')
-    this.updateAndClose(id)
+    this.props.fetchTaskDetail({
+      id: this.state.id
+    })
   }
   cancelChooseRepairman = () => {
     this.props.changeTask(subModule, {
@@ -119,7 +121,9 @@ class TaskDetail extends React.Component {
       showCustomerModal: false
     })
     Noti.hintOk('转发成功', '已成功转发给该客服')
-    this.updateAndClose(id)
+    this.props.fetchTaskDetail({
+      id: this.state.id
+    })
   }
   cancelChooseCustomer = () => {
     this.props.changeTask(subModule, {
@@ -128,10 +132,12 @@ class TaskDetail extends React.Component {
   }
   reassign2DeveloperSuccess = () => {
     Noti.hintOk('操作成功', '当前工单已被转接')
-    this.setState({
+    this.props.changeTask(subModule, {
       showDeveloperModal: false
     })
-    this.updateAndClose(this.state.id)
+    this.props.fetchTaskDetail({
+      id: this.state.id
+    })
   }
   cancelChooseDeveloper = () => {
     this.props.changeTask(subModule, {

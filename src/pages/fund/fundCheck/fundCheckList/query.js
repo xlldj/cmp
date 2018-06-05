@@ -66,6 +66,7 @@ class FundCheckQuery extends React.Component {
     if (listLoading) {
       return
     }
+    debugger
     const value = fundCheckListPropsController(this.state, this.props, event)
     if (value) {
       this.props.changeFund(subModule, value)

@@ -273,6 +273,11 @@ const BASIC = {
           name: '公告审核',
           path: 'censor',
           key: 1
+        },
+        {
+          name: '消息推送',
+          path: 'beings',
+          key: 2
         }
       ]
     },
@@ -539,6 +544,8 @@ const BASIC = {
     '公告审核列表/详情': 'CENSOR_GET_LIST',
     删除公告: 'DELETE_NOTIFY',
     审核: 'CENSOR_NOTIFY',
+    推送列表: 'PUSH_LIST_GET',
+    '创建/编辑推送': 'ADD_EDIT_PUSH',
 
     //版本更新模块
     '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
