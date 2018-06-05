@@ -22,50 +22,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { changeTask, setUserInfo, changeOnline } from '../../../actions'
 const subModule = 'taskList'
-const classLevel = {
-  1: '',
-  2: 'yellowfc',
-  3: 'red'
-}
 
-const TIMERANGESELECTS = {
-  0: {
-    0: '不限',
-    1: '今日',
-    3: '近7天',
-    6: '超过1天',
-    7: '超过2天',
-    8: '超过5天'
-  },
-  1: {
-    0: '不限',
-    1: '今日',
-    3: '近7天',
-    6: '超过1天',
-    7: '超过2天',
-    8: '超过5天'
-  },
-  2: {
-    1: '今日',
-    2: '近3天',
-    3: '近7天',
-    4: '近14天',
-    5: '近30天'
-  }
-}
-const TIMELABEL = {
-  0: '等待时间',
-  1: '等待时间',
-  2: '完结时间'
-}
-
-const TASKTYPES = {
-  1: '不限',
-  2: '报修',
-  3: '账单投诉',
-  4: '意见反馈',
-  5: '消费预警'
-}
 const TARGETS = {
   1: '我的任务',
   2: '所有客服任务'
@@ -713,131 +670,6 @@ class TaskList extends React.Component {
     const { loading, startTime, endTime, searchingText, showBuild } = this.state
 
     const TIMETITLE = main_phase === 2 ? '用时' : '等待时间'
-    const columns = [
-      {
-        title: '工单编号',
-        dataIndex: 'id',
-        className: 'firstCol selectedHintWraper',
-        width: '8%',
-        render: (text, record, index) => (
-          <span className="">
-            {index === selectedRowIndex ? (
-              <img src={selectedImg} alt="" className="selectedImg" />
-            ) : null}
-            {text}
-          </span>
-        )
-      },
-      {
-        title: '学校',
-        dataIndex: 'schoolName',
-        width: '10%'
-      },
-      {
-        title: '工单类型',
-        dataIndex: 'type',
-        width: '8%',
-        render: text => CONSTANTS.TASKTYPE[text]
-      },
-      {
-        title: '发起人',
-        dataIndex: 'creatorName',
-        width: '10%'
-      },
-      {
-        title: '受理人',
-        dataIndex: 'assignName',
-        width: '10%'
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-        width: '14%',
-        render: (text, record) => Time.getTimeStr(text)
-      },
-      {
-        title: <span>{TIMETITLE}</span>,
-        dataIndex: 'endTime',
-        width: '14%',
-        render: (text, record, index) => {
-          if (record.status === 5 || record.status === 6) {
-            return record.endTime
-              ? Time.getTimeInterval(record.createTime, record.endTime)
-              : Time.getSpan(record.createTime)
-          } else {
-            return record.createTime ? Time.getSpan(record.createTime) : ''
-          }
-        }
-      }
-    ]
-
-    const handlingColumns = [
-      {
-        title: '工单编号',
-        dataIndex: 'id',
-        className: 'firstCol selectedHintWraper',
-        width: '8%',
-        render: (text, record, index) => (
-          <span className="">
-            {index === selectedRowIndex ? (
-              <img src={selectedImg} alt="" className="selectedImg" />
-            ) : null}
-            {text}
-          </span>
-        )
-      },
-      {
-        title: '学校',
-        dataIndex: 'schoolName',
-        width: '10%'
-      },
-      {
-        title: '工单类型',
-        dataIndex: 'type',
-        width: '8%',
-        render: text => CONSTANTS.TASKTYPE[text]
-      },
-      {
-        title: '发起人',
-        dataIndex: 'creatorName',
-        width: '8%'
-      },
-      {
-        title: '受理人',
-        dataIndex: 'assignName',
-        width: '8%'
-      },
-      {
-        title: '紧急程度',
-        dataIndex: 'level',
-        width: '8%',
-        render: (text, record) => (
-          <span className={classLevel[record.level]}>
-            {CONSTANTS.PRIORITY[text]}
-          </span>
-        )
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-        width: '12%',
-        render: (text, record) => Time.getTimeStr(text)
-      },
-      {
-        title: <span>{TIMETITLE}</span>,
-        dataIndex: 'endTime',
-        width: '12%',
-        render: (text, record, index) => {
-          if (record.status === 5 || record.status === 6) {
-            return record.endTime
-              ? Time.getTimeInterval(record.createTime, record.endTime)
-              : Time.getSpan(record.createTime)
-          } else {
-            return record.createTime ? Time.getSpan(record.createTime) : ''
-          }
-        }
-      }
-    ]
 
     const selector1 = (
       <SchoolSelector
@@ -891,12 +723,6 @@ class TaskList extends React.Component {
         <div className="queryPanel">
           <div className="queryLine">
             <div className="block">
-              <span>{TIMELABEL[main_phase]}:</span>
-              <CheckSelect
-                options={TIMERANGESELECTS[main_phase]}
-                value={panel_rangeIndex[main_phase]}
-                onClick={this.changeRange}
-              />
               <RangeSelect
                 className="task-rangeSelect"
                 startTime={startTime}
@@ -920,7 +746,6 @@ class TaskList extends React.Component {
             <div className="block">
               <span>任务类型:</span>
               <CheckSelect
-                options={TASKTYPES}
                 value={panel_type[main_phase]}
                 onClick={this.changeTaskType}
               />
@@ -945,7 +770,6 @@ class TaskList extends React.Component {
             }}
             // dataSource={panel_dataSource[main_phase]}
             dataSource={dataSource}
-            columns={main_phase === 1 ? handlingColumns : columns}
             onChange={this.changePage}
             onRowClick={this.selectRow}
             rowClassName={this.setRowClass}

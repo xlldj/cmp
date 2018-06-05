@@ -1,13 +1,19 @@
 import React from 'react'
-import { Button, Radio, Modal } from 'antd'
+import { Button, Radio, Modal, Cascader } from 'antd'
 import SchoolSelector from '../../component/schoolSelectorWithoutAll'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
 import DeviceSelector from '../../component/deviceWithoutAll'
 import CONSTANTS from '../../../constants'
 import AjaxHandler from '../../../util/ajax'
+import { taskService } from '../../service/index'
+import InsertMsgContainer from '../quickMsg/insertMsg/index'
+import Noti from '../../../util/noti'
+import { changeTask, fetchTaskDetail } from '../../../actions/index'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 // import { locale } from 'moment'
 const { EMPLOYEE_REPAIRMAN } = CONSTANTS
-
+const Fragment = React.Fragment
 const RadioGroup = Radio.Group
 
 class BuildTask extends React.Component {
@@ -17,7 +23,10 @@ class BuildTask extends React.Component {
       schoolId: '',
       schoolError: false,
       type: CONSTANTS.TASK_TYPE_REPAIR,
-      location: '',
+      location: [],
+      selectedLocation: [],
+      localionName: '',
+      residenceId: '',
       locationError: false,
       desc: '',
       descError: false,
@@ -31,13 +40,41 @@ class BuildTask extends React.Component {
       maintainers: {},
       posting: false,
       deviceType: '',
-      deviceTypeError: false
+      deviceTypeError: false,
+      disabled: false
     }
     this.employeeTypes = {}
     this.employeeTypes[CONSTANTS.EMPLOYEE_REPAIRMAN] = '维修员'
     this.taskTypes = {}
     this.taskTypes[CONSTANTS.TASK_TYPE_REPAIR] = '报修工单'
+    this.taskTypes[CONSTANTS.TASK_TYPE_COMPLAINT] = '账单投诉'
+    this.taskTypes[CONSTANTS.TASK_TYPE_FEEDBACK] = '意见反馈'
   }
+  componentWillMount = () => {
+    if (this.props.isChangeRepair) {
+      const { schoolId, description, userMobile } = this.props.taskDetailData
+      this.setState({
+        schoolId: schoolId,
+        disabled: true,
+        desc: description,
+        userMobile,
+        type: CONSTANTS.TASK_TYPE_REPAIR
+      })
+      const { maintainers } = this.state
+      if (schoolId) {
+        if (!maintainers[schoolId]) {
+          const body = {
+            page: 1,
+            size: 10000,
+            schoolId: schoolId,
+            department: EMPLOYEE_REPAIRMAN
+          }
+          this.fetchData(body)
+        }
+      }
+    }
+  }
+  //获取受理人列表
   fetchData = body => {
     let resource = '/api/employee/department/member/list'
     const cb = json => {
@@ -65,7 +102,7 @@ class BuildTask extends React.Component {
     let nextState = {
       schoolId: schoolId
     }
-    let { schoolError, maintainers } = this.state
+    let { schoolError, maintainers, deviceType } = this.state
     if (schoolError) {
       nextState.schoolError = false
     }
@@ -79,8 +116,54 @@ class BuildTask extends React.Component {
           department: EMPLOYEE_REPAIRMAN
         }
         this.fetchData(body)
+        if (deviceType !== '') {
+          this.fetchLocation({
+            schoolId: schoolId,
+            existDevice: true,
+            deviceType: deviceType,
+            residenceLevel: 1
+          })
+        }
       }
     }
+  }
+  fetchLocation = body => {
+    taskService.getLocatonById(body).then(json => {
+      if (json.data) {
+        const locations = json.data.residences
+        locations.forEach((location, index) => {
+          location.label = location.name
+          location.value = location.id
+          location.isLeaf = false
+        })
+        this.setState({ location: locations })
+      }
+    })
+  }
+  loadLocationData = selectedOptions => {
+    const targetOption = selectedOptions[selectedOptions.length - 1]
+    targetOption.loading = true
+    const json = {
+      parentId: targetOption.id,
+      existDevice: true,
+      residenceLevel: parseInt(targetOption.type, 10) + 1,
+      deviceType: this.state.deviceType
+    }
+    taskService.getLocatonById(json).then(json => {
+      if (json.data) {
+        const locations = json.data.residences
+        locations.forEach((location, index) => {
+          location.label = location.name
+          location.value = location.id
+          location.isLeaf = location.type === 3 ? true : false
+        })
+        targetOption.loading = false
+        targetOption.children = locations
+        this.setState({
+          location: [...this.state.location]
+        })
+      }
+    })
   }
   changeType = value => {
     this.setState({
@@ -91,6 +174,15 @@ class BuildTask extends React.Component {
     this.setState({
       deviceType: value
     })
+    const { deviceType, schoolId } = this.state
+    if (schoolId) {
+      this.fetchLocation({
+        schoolId: schoolId,
+        existDevice: true,
+        deviceType: deviceType,
+        residenceLevel: 1
+      })
+    }
   }
   checkDevice = v => {
     if (!v) {
@@ -103,10 +195,21 @@ class BuildTask extends React.Component {
       })
     }
   }
-  changeLocation = e => {
-    let v = e.target.value
+  changeLocation = (value, selectedOptions) => {
+    if (value.length < 3) {
+      this.setState({
+        locationError: true
+      })
+    } else {
+      this.setState({
+        locationError: false
+      })
+    }
     this.setState({
-      location: v
+      selectedLocation: value,
+      localionName: selectedOptions.map(value => {
+        return value.name
+      })
     })
   }
   checkLocation = e => {
@@ -202,7 +305,7 @@ class BuildTask extends React.Component {
   confirm = () => {
     let {
       schoolId,
-      location,
+      selectedLocation,
       desc,
       userMobile,
       urgency,
@@ -220,7 +323,7 @@ class BuildTask extends React.Component {
         deviceTypeError: true
       })
     }
-    if (!location) {
+    if (selectedLocation.length !== 3) {
       return this.setState({
         locationError: true
       })
@@ -253,11 +356,13 @@ class BuildTask extends React.Component {
   postData = () => {
     let {
       schoolId,
-      location,
+      selectedLocation,
+      localionName,
       desc,
       userMobile,
       urgency,
       maintainerType,
+      type,
       maintainerId,
       deviceType
     } = this.state
@@ -267,14 +372,16 @@ class BuildTask extends React.Component {
       department: parseInt(maintainerType, 10),
       description: desc,
       level: urgency,
-      location: location,
+      location: localionName.toString(),
+      residenceId: selectedLocation[2],
       schoolId: schoolId,
-      type: maintainerType,
+      type: type,
       deviceType: parseInt(deviceType, 10),
       userMobile: userMobile,
       env: CONSTANTS.TASK_BUILD_CMP
     }
-    const cb = json => {
+
+    let cb = json => {
       this.setState({
         posting: false
       })
@@ -282,12 +389,50 @@ class BuildTask extends React.Component {
         this.props.success()
       }
     }
+    if (this.props.isChangeRepair) {
+      resource = '/work/order/parseToRepair'
+      body.id = this.props.taskDetailData.id
+      cb = json => {
+        this.setState({
+          posting: false
+        })
+        if (json.data) {
+          if (json.data.result) {
+            this.props.success()
+            this.props.fetchTaskDetail({ id: this.props.taskDetailData.id })
+          } else {
+            Noti.hintLock('操作失败', json.data.failReason)
+          }
+        }
+      }
+    }
     this.setState({
       posting: true
     })
     AjaxHandler.ajax(resource, body, cb)
   }
+  insertMsg = () => {
+    this.props.changeTask('taskDetail', {
+      isShowInsert: true
+    })
+  }
+  closeInsertModal = () => {
+    this.props.changeTask('taskDetail', {
+      isShowInsert: false
+    })
+  }
+  chooseMsg = content => {
+    this.props.changeTask('taskDetail', {
+      isShowInsert: false
+    })
+    let { desc } = this.state
+    desc = desc + content
+    this.setState({
+      desc: desc
+    })
+  }
   render() {
+    const { isShowInsert, isChangeRepair } = this.props
     const {
       schoolError,
       schoolId,
@@ -305,129 +450,158 @@ class BuildTask extends React.Component {
       maintainerIdError,
       maintainers,
       deviceType,
-      deviceTypeError
+      deviceTypeError,
+      selectedLocation,
+      disabled
     } = this.state
 
     const maintainerItems =
       schoolId && maintainers[schoolId] ? maintainers[schoolId] : {}
 
     return (
-      <Modal
-        wrapClassName="modal"
-        width={400}
-        title="创建工单"
-        visible
-        onCancel={this.cancelSubmit}
-        footer={null}
-        okText=""
-      >
-        <div className="info buildTask">
-          <ul>
-            <li>
-              <p>选择学校:</p>
-              <SchoolSelector
-                width={CONSTANTS.SELECTWIDTH}
-                invalidTitle="选择学校"
-                selectedSchool={schoolId}
-                changeSchool={this.changeSchool}
-              />
-              {schoolError && (
-                <span className="checkInvalid">学校不能为空！</span>
-              )}
-            </li>
-            <li>
-              <p>工单类型:</p>
-              <BasicSelector
-                width={CONSTANTS.SELECTWIDTH}
-                staticOpts={this.taskTypes}
-                selectedOpt={type}
-                changeOpt={this.changeType}
-              />
-            </li>
-            <li>
-              <p>设备类型:</p>
-              <DeviceSelector
-                selectedDevice={deviceType}
-                changeDevice={this.changeDevice}
-                checkDevice={this.checkDevice}
-              />
-              {deviceTypeError && (
-                <span className="checkInvalid">请选择设备类型！</span>
-              )}
-            </li>
-            <li>
-              <p>设备位置:</p>
-              <input
-                value={location}
-                onChange={this.changeLocation}
-                onBlur={this.checkLocation}
-              />
-              {locationError && (
-                <span className="checkInvalid">位置不能为空</span>
-              )}
-            </li>
-            <li className="itemsWrapper">
-              <p>问题描述:</p>
-              <textarea
-                value={desc}
-                onChange={this.changeDesc}
-                onBlur={this.checkDesc}
-                placeholder="200字以内"
-              />
-              {descError && <span className="checkInvalid">描述不能为空</span>}
-            </li>
-            <li>
-              <p>用户手机:</p>
-              <input
-                value={userMobile}
-                onChange={this.changeMobile}
-                onBlur={this.checkMobile}
-              />
-              {mobileFormatError && (
-                <span className="checkInvalid">手机号格式不正确!</span>
-              )}
-            </li>
-            <li>
-              <p>紧急程度:</p>
-              <RadioGroup value={urgency} onChange={this.changeUrgency}>
-                <Radio value={CONSTANTS.PRIORITY_NORMAL}>普通</Radio>
-                <Radio value={CONSTANTS.PRIORITY_PRIOR}>优先</Radio>
-                <Radio value={CONSTANTS.PRIORITY_URGENT}>紧急</Radio>
-              </RadioGroup>
-              {urgencyError && (
-                <span className="checkInvalid">紧急程度不能为空！</span>
-              )}
-            </li>
-            <li>
-              <p>受理人:</p>
-              <BasicSelector
-                staticOpts={this.employeeTypes}
-                selectedOpt={maintainerType}
-                changeOpt={this.changeMaintainerType}
-              />
-            </li>
-            <li>
-              <p />
-              <BasicSelector
-                staticOpts={maintainerItems}
-                selectedOpt={maintainerId}
-                changeOpt={this.changeMaintainer}
-              />
-              {maintainerIdError && (
-                <span className="checkInvalid">请选择维修员</span>
-              )}
-            </li>
-          </ul>
-          <div className="btnArea">
-            <Button onClick={this.confirm} type="primary">
-              确认
-            </Button>
-            <Button onClick={this.cancelSubmit}>返回</Button>
+      <Fragment>
+        <Modal
+          wrapClassName="modal"
+          width={400}
+          title={isChangeRepair ? '转为保修工单' : '创建工单'}
+          visible
+          onCancel={this.cancelSubmit}
+          footer={null}
+          okText=""
+        >
+          <div className="info buildTask">
+            <ul>
+              <li>
+                <p>选择学校:</p>
+                <SchoolSelector
+                  width={CONSTANTS.SELECTWIDTH}
+                  disabled={disabled}
+                  invalidTitle="选择学校"
+                  selectedSchool={schoolId}
+                  changeSchool={this.changeSchool}
+                />
+                {schoolError && (
+                  <span className="checkInvalid">学校不能为空！</span>
+                )}
+              </li>
+              <li>
+                <p>工单类型:</p>
+                <BasicSelector
+                  disabled={disabled}
+                  width={CONSTANTS.SELECTWIDTH}
+                  staticOpts={this.taskTypes}
+                  selectedOpt={type}
+                  changeOpt={this.changeType}
+                />
+              </li>
+              <li>
+                <p>设备类型:</p>
+                <DeviceSelector
+                  selectedDevice={deviceType}
+                  changeDevice={this.changeDevice}
+                  checkDevice={this.checkDevice}
+                />
+                {deviceTypeError && (
+                  <span className="checkInvalid">请选择设备类型！</span>
+                )}
+              </li>
+              <li>
+                <p>设备位置:</p>
+                <Cascader
+                  options={location}
+                  loadData={this.loadLocationData}
+                  onChange={this.changeLocation}
+                  value={selectedLocation}
+                  changeOnSelect
+                  placeholder="选择设备所在位置"
+                />
+                {locationError && (
+                  <span className="checkInvalid">位置请选择房间</span>
+                )}
+              </li>
+              <li className="itemsWrapper">
+                <p>问题描述:</p>
+                <div className="insertMsg">
+                  <textarea
+                    value={desc}
+                    onChange={this.changeDesc}
+                    onBlur={this.checkDesc}
+                    placeholder="200字以内"
+                  />
+                  <a onClick={this.insertMsg}>插入快捷消息</a>
+                </div>
+                {descError && (
+                  <span className="checkInvalid">描述不能为空</span>
+                )}
+              </li>
+              <li>
+                <p>用户手机:</p>
+                <input
+                  value={userMobile}
+                  onChange={this.changeMobile}
+                  onBlur={this.checkMobile}
+                />
+                {mobileFormatError && (
+                  <span className="checkInvalid">手机号格式不正确!</span>
+                )}
+              </li>
+              <li>
+                <p>紧急程度:</p>
+                <RadioGroup value={urgency} onChange={this.changeUrgency}>
+                  <Radio value={CONSTANTS.PRIORITY_NORMAL}>普通</Radio>
+                  <Radio value={CONSTANTS.PRIORITY_PRIOR}>优先</Radio>
+                  <Radio value={CONSTANTS.PRIORITY_URGENT}>紧急</Radio>
+                </RadioGroup>
+                {urgencyError && (
+                  <span className="checkInvalid">紧急程度不能为空！</span>
+                )}
+              </li>
+              <li>
+                <p>受理人:</p>
+                <BasicSelector
+                  staticOpts={this.employeeTypes}
+                  selectedOpt={maintainerType}
+                  changeOpt={this.changeMaintainerType}
+                />
+              </li>
+              <li>
+                <p />
+                <BasicSelector
+                  staticOpts={maintainerItems}
+                  selectedOpt={maintainerId}
+                  changeOpt={this.changeMaintainer}
+                />
+                {maintainerIdError && (
+                  <span className="checkInvalid">请选择维修员</span>
+                )}
+              </li>
+            </ul>
+            <div className="btnArea">
+              <Button onClick={this.confirm} type="primary">
+                确认
+              </Button>
+              <Button onClick={this.cancelSubmit}>返回</Button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+        {isShowInsert ? (
+          <InsertMsgContainer
+            closeInsertModal={this.closeInsertModal}
+            chooseMsg={this.chooseMsg}
+          />
+        ) : null}
+      </Fragment>
     )
   }
 }
+const mapStateToProps = (state, ownProps) => {
+  return {
+    isChangeRepair: state.taskModule.taskDetail.isChangeRepair,
+    taskDetailData: state.taskDetailModal.detail,
+    isShowInsert: state.taskModule.taskDetail.isShowInsert
+  }
+}
 
-export default BuildTask
+export default withRouter(
+  connect(mapStateToProps, { changeTask, fetchTaskDetail })(BuildTask)
+)

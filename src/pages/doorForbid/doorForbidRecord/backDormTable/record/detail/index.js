@@ -100,7 +100,7 @@ class BackDormRecordDetail extends React.Component {
 
   componentDidMount() {
     const { forbiddenStatus } = this.props
-    const { CHANGE_BACK_ERROR, DOOR_FORBID_UNBUNDLING } = forbiddenStatus
+    const { CHANGE_BACK_ERROR } = forbiddenStatus
     this.signInColumns = [
       {
         title: '时间',

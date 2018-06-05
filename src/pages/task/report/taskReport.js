@@ -992,15 +992,15 @@ class TaskReport extends React.Component {
     let page = panel_page[mainCate]
     let max = 1
     // unused is used to keep 'max' is the real max
-    let unused =
-      mainCate === REPORT_CATE_COMPLAINT - 1 &&
-      dataSource &&
-      dataSource.length > 0 &&
-      dataSource.forEach(r => {
-        if (r.amount > max) {
-          max = r.amount
-        }
-      })
+    // let unused =
+    //   mainCate === REPORT_CATE_COMPLAINT - 1 &&
+    //   dataSource &&
+    //   dataSource.length > 0 &&
+    //   dataSource.forEach(r => {
+    //     if (r.amount > max) {
+    //       max = r.amount
+    //     }
+    //   })
 
     const sumTable = mainCate === REPORT_CATE_SUM - 1 && (
       <Table
@@ -1195,7 +1195,7 @@ class TaskReport extends React.Component {
             </div>
             <div className="task-select">
               <SchoolSelector
-                className="select-item"
+                className="select-item customSelect"
                 selectedSchool={schoolId}
                 changeSchool={this.changeSchool}
               />

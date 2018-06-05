@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tooltip, Button, Popconfirm } from 'antd'
+import { Popconfirm } from 'antd'
 import Select from './select'
 const { Option } = Select
 const PopConfirmSelect = props => {

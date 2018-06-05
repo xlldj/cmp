@@ -1,7 +1,7 @@
-import * as ActionTypes from '../../actions'
-import Time from '../../util/time'
+import { merge } from 'lodash'
 import getDefaultSchool from '../../util/defaultSchool'
-
+import Time from '../../util/time'
+import * as ActionTypes from '../../actions'
 const selectedSchool = getDefaultSchool()
 // 资金管理
 const initialFundState = {
@@ -56,10 +56,6 @@ const initialFundState = {
     showHandleModal: false,
     selectedRowIndex: -1,
     selectedDetailId: -1
-  },
-  freeGiving: {
-    schoolId: selectedSchool,
-    page: 1
   }
 }
 export const fundModule = (state = initialFundState, action) => {
@@ -67,9 +63,20 @@ export const fundModule = (state = initialFundState, action) => {
 
   if (type === ActionTypes.CHANGE_FUND) {
     const { subModule, keyValuePair } = action
-    const newSubModule = { ...state[subModule], ...keyValuePair }
-    var newState = { ...state, ...{ [subModule]: newSubModule } }
-    return newState
+    return merge({}, state, { [subModule]: keyValuePair })
+  }
+  return state
+}
+
+export const initialFundListModal = {
+  loading: false,
+  list: []
+}
+export const fundListModal = (state = initialFundListModal, action) => {
+  const { type } = action
+  if (type === ActionTypes.CHANGE_MODAL_FUNDLIST) {
+    const { value } = action
+    return { ...state, ...value }
   }
   return state
 }

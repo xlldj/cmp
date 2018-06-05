@@ -1480,7 +1480,6 @@ class TaskDetail extends React.Component {
       images &&
       images.map((r, i) => (
         <img
-          // src='http://img02.sogoucdn.com/app/a/100520020/95cbca3276545c38a65f7827fc56b951'
           src={CONSTANTS.FILEADDR + r}
           onClick={() => this.showDetailImgModel(i)}
           onLoad={this.setWH}
