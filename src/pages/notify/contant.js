@@ -21,10 +21,10 @@ const NOTIFY = {
     2: '人工推送'
   },
   BEINGS_PUSH_PERSON: {
-    1: '全部用户'
-    // 2: '指定用户'
+    2: '全部用户'
+    // 1: '指定用户'
   },
-  BEINGS_PUSH_TARGET_PERSON: 2,
+  BEINGS_PUSH_TARGET_PERSON: 1,
   BEINGS_PUSH_EQUMENT: {
     1: '笑联用户端',
     2: '笑联运维端',
