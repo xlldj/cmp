@@ -305,8 +305,9 @@ class HandleBtn extends React.Component {
                 <Button type="primary">关联</Button>
               </Popconfirm>
             ) : null}
-            {type === CONSTANTS.TASK_TYPE_COMPLAINT ||
-            type === CONSTANTS.TASK_TYPE_FEEDBACK ? (
+            {(type === CONSTANTS.TASK_TYPE_COMPLAINT ||
+              type === CONSTANTS.TASK_TYPE_FEEDBACK) &&
+            handleLimit !== true ? (
               <Popconfirm
                 title="确定要转为报修工单吗"
                 onConfirm={e => {

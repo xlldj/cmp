@@ -9,6 +9,16 @@ import { changeTask } from '../../../../../actions'
 const { TASK_DETAIL_LIST_LENGTH: SIZE, TASK_TYPE_COMPLAINT } = CONSTANTS
 
 class UserComplaintInfo extends Component {
+  setWH = (e, value) => {
+    let img = e.target
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
+    if (w < h) {
+      img.style.width = value ? `${value}px` : '50px'
+    } else {
+      img.style.height = value ? `${value}px` : '50px'
+    }
+  }
   userComplaintsColumns = [
     {
       title: '投诉类型',
