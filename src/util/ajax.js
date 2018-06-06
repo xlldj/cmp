@@ -43,7 +43,7 @@ const domains = {
     user: 'http://10.195.90.167:5081'
   }
 }
-const currentDomain = domains.dxy
+const currentDomain = domains.qa2
 const AjaxHandler = {
   showingError: false
 }

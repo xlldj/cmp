@@ -26,7 +26,9 @@ const ProcessLogs = props => {
         processorName,
         content,
         type,
-        assignId
+        assignId,
+        assignRoleName,
+        processorRoleName
       } = l
       let message = ''
       switch (type) {
@@ -36,7 +38,13 @@ const ProcessLogs = props => {
         case CONSTANTS.TASK_HANDLE_REASSIGN:
           message =
             '转接工单' +
-            (assignName ? `给${assignName}` : '') +
+            (assignName
+              ? `给${
+                  assignRoleName
+                    ? assignRoleName + ':' + assignName
+                    : assignName
+                }`
+              : '') +
             (content ? ` 备注信息: ${content}` : '')
           break
         case CONSTANTS.TASK_HANDLE_ACCEPT:
@@ -91,7 +99,9 @@ const ProcessLogs = props => {
             {createTime ? Time.getTimeStr(createTime) : ''}
           </label>
           <span key={`processor${id}`} className="column">
-            {processorName}
+            {processorRoleName
+              ? processorRoleName + ':' + processorName
+              : processorName}
           </span>
           <span key={`content${id}`} className="column">
             {message}
