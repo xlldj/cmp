@@ -100,10 +100,10 @@ class TaskDetailSidebar extends Component {
       userMobile,
       // creatorName,
       assignName,
-      type
+      type,
+      handleLimit
     } =
       data || {}
-    const handleLimit = false
     const statusClass = status === CONSTANTS.TASK_FINISHED ? '' : 'shalowRed'
     const shouldMessage =
       type === TASK_TYPE_COMPLAINT || type === TASK_TYPE_FEEDBACK

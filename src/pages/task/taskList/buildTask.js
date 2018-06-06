@@ -76,6 +76,9 @@ class BuildTask extends React.Component {
   }
   //获取受理人列表
   fetchData = body => {
+    this.setState({
+      maintainerId: ''
+    })
     let resource = '/api/employee/department/member/list'
     const cb = json => {
       if (json.error) {
@@ -367,7 +370,11 @@ class BuildTask extends React.Component {
     if (posting) {
       return
     }
-    this.postData(success)
+    if (success) {
+      this.postData(success)
+    } else {
+      this.postData()
+    }
   }
   postData = success => {
     let {
@@ -399,14 +406,14 @@ class BuildTask extends React.Component {
       body.deviceType = parseInt(deviceType, 10)
     }
     let tabStatus = CONSTANTS.TASK_LIST_TAB_PENDING
-    if (success) {
-      body.status = CONSTANTS.TASK_FINISHED
-      tabStatus = CONSTANTS.TASK_LIST_TAB_FINISHED
-    }
     if (parseInt(maintainerType, 10) === CONSTANTS.EMPLOYEE_REPAIRMAN) {
       tabStatus = CONSTANTS.TASK_LIST_TAB_HANDLING
     } else {
       tabStatus = CONSTANTS.TASK_LIST_TAB_PENDING
+    }
+    if (success) {
+      body.status = CONSTANTS.TASK_FINISHED
+      tabStatus = CONSTANTS.TASK_LIST_TAB_FINISHED
     }
     let cb = json => {
       this.setState({
@@ -423,7 +430,7 @@ class BuildTask extends React.Component {
         this.setState({
           posting: false
         })
-        if (json.data) {
+        if (json && json.data) {
           if (json.data.result) {
             this.props.success(tabStatus)
             this.props.fetchTaskDetail({ id: this.props.taskDetailData.id })
@@ -436,7 +443,9 @@ class BuildTask extends React.Component {
     this.setState({
       posting: true
     })
-    AjaxHandler.ajax(resource, body, cb)
+    AjaxHandler.fetch(resource, body).then(json => {
+      cb(json)
+    })
   }
   insertMsg = () => {
     this.props.changeTask('taskDetail', {
@@ -454,8 +463,14 @@ class BuildTask extends React.Component {
     })
     let { desc } = this.state
     desc = desc + content
+    if (!desc) {
+      return this.setState({
+        descError: true
+      })
+    }
     this.setState({
-      desc: desc
+      desc: desc,
+      descError: false
     })
   }
   render() {
@@ -614,7 +629,12 @@ class BuildTask extends React.Component {
             </ul>
             {isChangeRepair ? (
               <div className="btnArea">
-                <Button onClick={this.confirm} type="primary">
+                <Button
+                  onClick={() => {
+                    this.confirm()
+                  }}
+                  type="primary"
+                >
                   确认
                 </Button>
                 <Button onClick={this.cancelSubmit}>返回</Button>
@@ -628,7 +648,12 @@ class BuildTask extends React.Component {
                 >
                   创建并完结
                 </Button>
-                <Button onClick={this.confirm} type="primary">
+                <Button
+                  onClick={() => {
+                    this.confirm()
+                  }}
+                  type="primary"
+                >
                   创建工单
                 </Button>
                 <Button onClick={this.cancelSubmit}>返回</Button>

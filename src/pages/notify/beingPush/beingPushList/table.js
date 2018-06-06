@@ -18,7 +18,8 @@ const {
   BEINGS_PUSH_EQUMENT,
   BEINGS_PUSH_TYPE,
   BEING_STATUSTEXT,
-  // PUSH_ERROR_STATUS,
+  PUSH_SUCCESS_STATUS,
+  PUSH_ERROR_STATUS,
   PUSH_CANCEL_STATUS,
   PUSH_WAITE_STATUS,
   BEINGS_PUSH_PERSON
@@ -86,13 +87,22 @@ class BeingsTable extends React.Component {
         render: (text, record) => {
           return BEINGS_PUSH_PERSON[record.range]
             ? BEINGS_PUSH_PERSON[record.range]
-            : null
+            : record.username
         }
       },
       {
         title: '推送时间',
         dataIndex: 'planPushTime',
-        render: (text, record) => Time.getTimeStr(text)
+        render: (text, record) => {
+          if (
+            record.status === PUSH_SUCCESS_STATUS ||
+            record.status === PUSH_ERROR_STATUS
+          ) {
+            return Time.getTimeStr(record.pushTime)
+          } else {
+            return Time.getTimeStr(text)
+          }
+        }
       },
       {
         title: '推送内容',
