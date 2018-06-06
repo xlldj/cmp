@@ -58,7 +58,7 @@ class UserComplaintInfo extends Component {
     this.fetchData(this.props)
   }
   componentWillReceiveProps(nextProps) {
-    if (!checkObject(this.props, nextProps, ['selectedDetailId', 'page'])) {
+    if (!checkObject(this.props, nextProps, ['creatorId', 'page'])) {
       this.fetchData(nextProps)
     }
   }

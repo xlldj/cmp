@@ -104,5 +104,5 @@ const mapStateToProps = (state, ownProps) => ({
   loading: state.fundListModal.loading
 })
 export default connect(mapStateToProps, null)(
-  detailTabHoc(UserFundInfo, fetchData)
+  detailTabHoc(UserFundInfo, fetchData, ['creatorId'])
 )

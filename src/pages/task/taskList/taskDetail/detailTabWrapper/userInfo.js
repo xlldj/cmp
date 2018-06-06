@@ -56,5 +56,5 @@ const mapStateToProps = (state, ownProps) => ({
   data: state.userInfoModal.detail
 })
 export default connect(mapStateToProps, null)(
-  detailTabHoc(UserInfoWrapper, fetchData)
+  detailTabHoc(UserInfoWrapper, fetchData, ['creatoreId'])
 )
