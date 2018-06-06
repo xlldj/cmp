@@ -302,7 +302,9 @@ class TaskDetail extends React.Component {
             cancel={this.cancelChooseDeveloper}
           />
         ) : null}
-        {showFinishModal ? <FinishTaskModal {...this.props} /> : null}
+        {showFinishModal ? (
+          <FinishTaskModal {...this.props} fetchTaskDetail={this.sendFetch} />
+        ) : null}
       </div>
     )
   }

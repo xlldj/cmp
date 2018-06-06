@@ -206,7 +206,6 @@ class TaskList extends React.Component {
       showBuild: false
     })
     const { tabIndex } = this.props
-    debugger
     if (tabIndex !== tab) {
       this.setProps({ type: 'tabIndex', value: { tabIndex: +tab } })
     }

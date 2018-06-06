@@ -36,6 +36,9 @@ class FinishTaskModal extends Component {
       tagError: false,
       finishContentError: false
     })
+    this.props.changeTask(subModule, {
+      showFinishModal: false
+    })
   }
   changeNote = e => {
     this.setState({
@@ -83,17 +86,15 @@ class FinishTaskModal extends Component {
         nextState.tag = ''
         Noti.hintOk('操作成功', '当前工单已完结')
         // refetch details
-        this.props.updateAndClose(id)
       } else {
         Noti.hintWarning('', json.data.failReason || '操作失败，请稍后重试')
       }
       this.setState(nextState)
+      this.closeFinishModal()
+      this.props.fetchTaskDetail()
     }
-    AjaxHandler.ajax(resource, body, cb)
-  }
-  closeFinishModal = () => {
-    this.props.changeTask(subModule, {
-      showFinishModal: false
+    AjaxHandler.fetch(resource, body).then(json => {
+      cb(json)
     })
   }
   render() {

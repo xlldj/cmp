@@ -41,7 +41,7 @@ const ProcessLogs = props => {
             (assignName
               ? `给${
                   assignRoleName
-                    ? assignRoleName + ':' + assignName
+                    ? assignName + '(' + assignRoleName + ')'
                     : assignName
                 }`
               : '') +
@@ -98,9 +98,13 @@ const ProcessLogs = props => {
           <label key={`label${id}`} className="column">
             {createTime ? Time.getTimeStr(createTime) : ''}
           </label>
-          <span key={`processor${id}`} className="column">
+          <span
+            key={`processor${id}`}
+            className="column"
+            style={{ marginRight: '10px' }}
+          >
             {processorRoleName
-              ? processorRoleName + ':' + processorName
+              ? processorName + '(' + processorRoleName + ')'
               : processorName}
           </span>
           <span key={`content${id}`} className="column">

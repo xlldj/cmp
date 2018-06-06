@@ -60,8 +60,8 @@ class BeingsTable extends React.Component {
     })
   }
   getColumns = () => {
-    const { forbiddenStatus } = this.props
-    return [
+    const { forbiddenStatus, type } = this.props
+    const columns = [
       {
         title: '学校',
         dataIndex: 'schoolName',
@@ -192,6 +192,10 @@ class BeingsTable extends React.Component {
         }
       }
     ]
+    if (parseInt(type, 10) === CONSTANTS.BEING_PUSH_AUTO) {
+      columns.splice(6, 1)
+    }
+    return columns
   }
   render() {
     const { dataSource, total, loading, page } = this.props
@@ -222,7 +226,8 @@ const mapStateToProps = (state, ownProps) => {
     dataSource: state[modalName].list,
     loading: state[modalName].listLoading,
     page: state[moduleName][subModule].page,
-    forbiddenStatus: state.setAuthenData.forbiddenStatus
+    forbiddenStatus: state.setAuthenData.forbiddenStatus,
+    type: state[moduleName][subModule].type
   }
 }
 

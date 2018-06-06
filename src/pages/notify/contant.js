@@ -20,6 +20,7 @@ const NOTIFY = {
     1: '自动推送',
     2: '人工推送'
   },
+  BEING_PUSH_AUTO: 1,
   BEINGS_PUSH_PERSON: {
     2: '全部用户'
     // 1: '指定用户'

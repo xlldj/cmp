@@ -95,7 +95,6 @@ class HandleBtn extends React.Component {
       // open different modal according to role
       const modalStateName = roleModalName[key]
       const value = {}
-      debugger
       value[modalStateName] = true
       this.props.changeTask(subModule, value)
     } catch (e) {
