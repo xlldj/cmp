@@ -61,7 +61,7 @@ class QuickInfo extends React.Component {
     if (id) {
       body.id = id
     }
-    if (!content || content.length > 200) {
+    if (!content.trim() || content.length > 200) {
       return this.setState({
         contentError: true
       })

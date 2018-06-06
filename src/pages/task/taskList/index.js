@@ -200,11 +200,15 @@ class TaskList extends React.Component {
       backTaskId: null
     })
   }
-  buildTaskSuccess = () => {
+  buildTaskSuccess = tab => {
     Noti.hintOk('操作成功', '创建工单成功')
     this.setState({
       showBuild: false
     })
+    const { tabIndex } = this.props
+    if (tabIndex !== tab) {
+      this.setProps({ type: 'tabIndex', value: { tabIndex: +tab } })
+    }
     this.sendTaskListFetch()
   }
   changeOnline = e => {

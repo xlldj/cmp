@@ -8,8 +8,8 @@ const OrderComplaintInfo = props => {
     images.map((r, i) => (
       <img
         src={CONSTANTS.FILEADDR + r}
-        onClick={() => this.props.showDetailImgModel(i)}
-        onLoad={this.setWH}
+        onClick={() => props.showDetailImgModel(i)}
+        onLoad={props.setWH}
         key={i}
         alt=""
       />

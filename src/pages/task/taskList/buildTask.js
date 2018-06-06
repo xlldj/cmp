@@ -11,11 +11,11 @@ import Noti from '../../../util/noti'
 import { changeTask, fetchTaskDetail } from '../../../actions/index'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import { ECONNABORTED } from 'constants'
 // import { locale } from 'moment'
 const { EMPLOYEE_REPAIRMAN } = CONSTANTS
 const Fragment = React.Fragment
 const RadioGroup = Radio.Group
-
 class BuildTask extends React.Component {
   constructor(props) {
     super()
@@ -102,18 +102,19 @@ class BuildTask extends React.Component {
     let nextState = {
       schoolId: schoolId
     }
-    let { schoolError, maintainers, deviceType } = this.state
+    let { schoolError, deviceType } = this.state
     if (schoolError) {
       nextState.schoolError = false
     }
+    const { maintainerType } = this.state
     this.setState(nextState)
     if (schoolId) {
-      if (!maintainers[schoolId]) {
+      if (maintainerType) {
         const body = {
           page: 1,
           size: 10000,
           schoolId: schoolId,
-          department: EMPLOYEE_REPAIRMAN
+          department: maintainerType
         }
         this.fetchData(body)
         if (deviceType !== '') {
@@ -278,6 +279,18 @@ class BuildTask extends React.Component {
     this.setState({
       maintainerType: v
     })
+    const { schoolId } = this.state
+    if (v) {
+      if (schoolId) {
+        const body = {
+          page: 1,
+          size: 10000,
+          schoolId: schoolId,
+          department: v
+        }
+        this.fetchData(body)
+      }
+    }
   }
   changeMaintainer = v => {
     this.setState({
@@ -302,7 +315,7 @@ class BuildTask extends React.Component {
     // tell parent to close
     this.props.cancel()
   }
-  confirm = () => {
+  confirm = success => {
     let {
       schoolId,
       selectedLocation,
@@ -311,22 +324,25 @@ class BuildTask extends React.Component {
       urgency,
       maintainerId,
       posting,
-      deviceType
+      deviceType,
+      type
     } = this.state
     if (!schoolId) {
       return this.setState({
         schoolError: true
       })
     }
-    if (!deviceType) {
-      return this.setState({
-        deviceTypeError: true
-      })
-    }
-    if (selectedLocation.length !== 3) {
-      return this.setState({
-        locationError: true
-      })
+    if (parseInt(type, 10) === CONSTANTS.TASK_TYPE_REPAIR) {
+      if (!deviceType) {
+        return this.setState({
+          deviceTypeError: true
+        })
+      }
+      if (selectedLocation.length !== 3) {
+        return this.setState({
+          locationError: true
+        })
+      }
     }
     if (!desc) {
       return this.setState({
@@ -351,9 +367,9 @@ class BuildTask extends React.Component {
     if (posting) {
       return
     }
-    this.postData()
+    this.postData(success)
   }
-  postData = () => {
+  postData = success => {
     let {
       schoolId,
       selectedLocation,
@@ -372,21 +388,32 @@ class BuildTask extends React.Component {
       department: parseInt(maintainerType, 10),
       description: desc,
       level: urgency,
-      location: localionName.toString(),
-      residenceId: selectedLocation[2],
       schoolId: schoolId,
       type: type,
-      deviceType: parseInt(deviceType, 10),
       userMobile: userMobile,
       env: CONSTANTS.TASK_BUILD_CMP
     }
-
+    if (parseInt(type, 10) === CONSTANTS.TASK_TYPE_REPAIR) {
+      body.residenceId = selectedLocation[2]
+      body.location = localionName.toString()
+      body.deviceType = parseInt(deviceType, 10)
+    }
+    let tabStatus = CONSTANTS.TASK_LIST_TAB_PENDING
+    if (success) {
+      body.status = CONSTANTS.TASK_FINISHED
+      tabStatus = CONSTANTS.TASK_LIST_TAB_FINISHED
+    }
+    if (parseInt(maintainerType, 10) === CONSTANTS.EMPLOYEE_REPAIRMAN) {
+      tabStatus = CONSTANTS.TASK_LIST_TAB_HANDLING
+    } else {
+      tabStatus = CONSTANTS.TASK_LIST_TAB_PENDING
+    }
     let cb = json => {
       this.setState({
         posting: false
       })
       if (json.data) {
-        this.props.success()
+        this.props.success(tabStatus)
       }
     }
     if (this.props.isChangeRepair) {
@@ -398,7 +425,7 @@ class BuildTask extends React.Component {
         })
         if (json.data) {
           if (json.data.result) {
-            this.props.success()
+            this.props.success(tabStatus)
             this.props.fetchTaskDetail({ id: this.props.taskDetailData.id })
           } else {
             Noti.hintLock('操作失败', json.data.failReason)
@@ -494,31 +521,36 @@ class BuildTask extends React.Component {
                   changeOpt={this.changeType}
                 />
               </li>
-              <li>
-                <p>设备类型:</p>
-                <DeviceSelector
-                  selectedDevice={deviceType}
-                  changeDevice={this.changeDevice}
-                  checkDevice={this.checkDevice}
-                />
-                {deviceTypeError && (
-                  <span className="checkInvalid">请选择设备类型！</span>
-                )}
-              </li>
-              <li>
-                <p>设备位置:</p>
-                <Cascader
-                  options={location}
-                  loadData={this.loadLocationData}
-                  onChange={this.changeLocation}
-                  value={selectedLocation}
-                  changeOnSelect
-                  placeholder="选择设备所在位置"
-                />
-                {locationError && (
-                  <span className="checkInvalid">位置请选择房间</span>
-                )}
-              </li>
+              {parseInt(type, 10) === CONSTANTS.TASK_TYPE_COMPLAINT ||
+              parseInt(type, 10) === CONSTANTS.TASK_TYPE_FEEDBACK ? null : (
+                <Fragment>
+                  <li>
+                    <p>设备类型:</p>
+                    <DeviceSelector
+                      selectedDevice={deviceType}
+                      changeDevice={this.changeDevice}
+                      checkDevice={this.checkDevice}
+                    />
+                    {deviceTypeError && (
+                      <span className="checkInvalid">请选择设备类型！</span>
+                    )}
+                  </li>
+                  <li>
+                    <p>设备位置:</p>
+                    <Cascader
+                      options={location}
+                      loadData={this.loadLocationData}
+                      onChange={this.changeLocation}
+                      value={selectedLocation}
+                      changeOnSelect
+                      placeholder="选择设备所在位置"
+                    />
+                    {locationError && (
+                      <span className="checkInvalid">位置请选择房间</span>
+                    )}
+                  </li>
+                </Fragment>
+              )}
               <li className="itemsWrapper">
                 <p>问题描述:</p>
                 <div className="insertMsg">
@@ -559,7 +591,11 @@ class BuildTask extends React.Component {
               <li>
                 <p>受理人:</p>
                 <BasicSelector
-                  staticOpts={this.employeeTypes}
+                  staticOpts={
+                    parseInt(type, 10) !== CONSTANTS.TASK_TYPE_REPAIR
+                      ? CONSTANTS.EMPLOYEE_TYPE
+                      : this.employeeTypes
+                  }
                   selectedOpt={maintainerType}
                   changeOpt={this.changeMaintainerType}
                 />
@@ -572,16 +608,32 @@ class BuildTask extends React.Component {
                   changeOpt={this.changeMaintainer}
                 />
                 {maintainerIdError && (
-                  <span className="checkInvalid">请选择维修员</span>
+                  <span className="checkInvalid">请选择受理人员</span>
                 )}
               </li>
             </ul>
-            <div className="btnArea">
-              <Button onClick={this.confirm} type="primary">
-                确认
-              </Button>
-              <Button onClick={this.cancelSubmit}>返回</Button>
-            </div>
+            {isChangeRepair ? (
+              <div className="btnArea">
+                <Button onClick={this.confirm} type="primary">
+                  确认
+                </Button>
+                <Button onClick={this.cancelSubmit}>返回</Button>
+              </div>
+            ) : (
+              <div className="btnArea">
+                <Button
+                  onClick={() => {
+                    this.confirm('success')
+                  }}
+                >
+                  创建并完结
+                </Button>
+                <Button onClick={this.confirm} type="primary">
+                  创建工单
+                </Button>
+                <Button onClick={this.cancelSubmit}>返回</Button>
+              </div>
+            )}
           </div>
         </Modal>
         {isShowInsert ? (

@@ -315,7 +315,7 @@ class HandleBtn extends React.Component {
                 okText="确认"
                 cancelText="取消"
               >
-                <Button type="primary">转保修工单</Button>
+                <Button type="primary">转报修工单</Button>
               </Popconfirm>
             ) : null}
             {related ? (

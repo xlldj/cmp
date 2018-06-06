@@ -42,14 +42,14 @@ class QuickTypeInfo extends React.Component {
     }
   }
   confirmQuick = () => {
-    const { description, id } = this.state
+    let { description, id } = this.state
     const body = {
       description
     }
     if (id) {
       body.id = id
     }
-    if (!description || description.length > 6) {
+    if (!description.trim() || description.length > 6) {
       return this.setState({
         contentError: true
       })
@@ -58,7 +58,7 @@ class QuickTypeInfo extends React.Component {
     saveQuickType(body, closeQuickTypeInfo)
   }
   checkContent = v => {
-    const value = v.target.value
+    const value = v.target.value.trim()
     if (value && value.length <= 6) {
       return this.setState({
         contentError: false

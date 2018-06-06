@@ -151,7 +151,7 @@ class BeingInfo extends React.Component {
         envError: true
       })
     }
-    if (!content || content.length > 50) {
+    if (!content.trim() || content.length > 50) {
       return this.setState({
         contentError: true
       })
@@ -207,7 +207,7 @@ class BeingInfo extends React.Component {
     })
   }
   checkContent = event => {
-    let value = event.target.value.tirm()
+    let value = event.target.value.trim()
     if (!value || value.length > 50) {
       this.setState({
         contentError: true
