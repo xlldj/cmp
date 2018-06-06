@@ -97,5 +97,5 @@ const mapStateToProps = (state, ownProps) => ({
   loading: state.orderListModal.loading
 })
 export default connect(mapStateToProps, null)(
-  detailTabHoc(UserOrderWrapper, fetchData)
+  detailTabHoc(UserOrderWrapper, fetchData, ['creatorId'])
 )

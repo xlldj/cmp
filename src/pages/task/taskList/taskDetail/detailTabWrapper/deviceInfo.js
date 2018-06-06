@@ -94,5 +94,5 @@ const mapStateToProps = (state, ownProps) => ({
   data: state.deviceInfoModal.detail
 })
 export default connect(mapStateToProps, null)(
-  detailTabHoc(DeviceInfo, fetchData)
+  detailTabHoc(DeviceInfo, fetchData, ['deviceType', 'residenceId', 'deviceId'])
 )

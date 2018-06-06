@@ -73,24 +73,28 @@ class TaskInfoWrapper extends Component {
         {type === 1 ? (
           <DeviceRepairInfo
             {...data}
+            setWH={this.setWH}
             showDetailImgModel={this.showDetailImgModel}
           />
         ) : null}
         {type === 2 ? (
           <OrderComplaintInfo
             {...data}
+            setWH={this.setWH}
             showDetailImgModel={this.showDetailImgModel}
           />
         ) : null}
         {type === 3 ? (
           <FeedbackInfo
             {...data}
+            setWH={this.setWH}
             showDetailImgModel={this.showDetailImgModel}
           />
         ) : null}
         {type === 4 ? (
           <OrderwarnInfo
             {...data}
+            setWH={this.setWH}
             showDetailImgModel={this.showDetailImgModel}
           />
         ) : null}

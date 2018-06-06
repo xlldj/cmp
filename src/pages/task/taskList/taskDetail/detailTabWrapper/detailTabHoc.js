@@ -3,13 +3,15 @@ import getDisplayName from '../../../../../public/getDisplayName'
 import { checkObject } from '../../../../../util/checkSame'
 import { Map, is } from 'immutable'
 
-function detailTabHoc(WrappedComponent, fetchData) {
+function detailTabHoc(WrappedComponent, fetchData, compareKeys) {
   class DetailTabHoc extends React.Component {
     componentDidMount() {
       fetchData(this.props)
     }
     componentWillReceiveProps(nextProps) {
-      if (!checkObject(this.props, nextProps, ['selectedDetailId'])) {
+      if (
+        !checkObject(this.props, nextProps, compareKeys || ['selectedDetailId'])
+      ) {
         fetchData(nextProps)
       }
     }

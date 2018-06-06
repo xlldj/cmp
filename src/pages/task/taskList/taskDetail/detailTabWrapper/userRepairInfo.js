@@ -178,5 +178,5 @@ const mapStateToProps = (state, ownProps) => ({
   loading: state.repairListModal.loading
 })
 export default connect(mapStateToProps, null)(
-  detailTabHoc(UserRepairInfo, fetchData)
+  detailTabHoc(UserRepairInfo, fetchData, ['creatorId'])
 )
