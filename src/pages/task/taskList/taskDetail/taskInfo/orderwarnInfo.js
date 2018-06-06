@@ -6,14 +6,19 @@ const OrderWarnIndo = props => {
   const { deviceType, location, roomType, timeRange, consume } = props
   return (
     <ul className="detailList">
-      <li>
-        <label>设备类型:</label>
-        <span>{CONSTANTS.DEVICETYPE[deviceType]}</span>
-      </li>
-      <li>
-        <label>设备位置:</label>
-        <span>{location}</span>
-      </li>
+      {deviceType ? (
+        <li>
+          <label>设备类型:</label>
+          <span>{CONSTANTS.DEVICETYPE[deviceType]}</span>
+        </li>
+      ) : null}
+      {location ? (
+        <li>
+          <label>设备位置:</label>
+          <span>{location}</span>
+        </li>
+      ) : null}
+
       {roomType ? (
         <li>
           <label>宿舍类型:</label>

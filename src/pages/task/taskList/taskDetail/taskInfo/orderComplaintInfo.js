@@ -16,14 +16,18 @@ const OrderComplaintInfo = props => {
     ))
   return (
     <ul className="detailList">
-      <li>
-        <label>投诉类型:</label>
-        <span>{CONSTANTS.COMPLAINTTYPES[orderType]}</span>
-      </li>
-      <li>
-        <label>投诉订单:</label>
-        <span>{orderNo}</span>
-      </li>
+      {orderType ? (
+        <li>
+          <label>投诉类型:</label>
+          <span>{CONSTANTS.COMPLAINTTYPES[orderType]}</span>
+        </li>
+      ) : null}
+      {orderNo ? (
+        <li>
+          <label>投诉订单:</label>
+          <span>{orderNo}</span>
+        </li>
+      ) : null}
       {imgs.length > 0 ? (
         <li className="high">
           <label>投诉图片:</label>
