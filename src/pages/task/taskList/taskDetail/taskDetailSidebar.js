@@ -98,7 +98,7 @@ class TaskDetailSidebar extends Component {
       createTime,
       status,
       userMobile,
-      creatorName,
+      // creatorName,
       assignName,
       type
     } =
@@ -115,20 +115,20 @@ class TaskDetailSidebar extends Component {
             <label>工单编号:</label>
             <span>{id}</span>
           </li>
-          <li>
+          {/* <li>
             <label>发起人:</label>
             <span>{creatorName}</span>
-          </li>
+          </li> */}
           {status !== CONSTANTS.TASK_PENDING ? (
             <li>
               <label>受理人:</label>
               <span>{assignName}</span>
             </li>
           ) : null}
-          <li>
+          {/* <li>
             <label>创建时间:</label>
             <span>{createTime ? Time.getTimeStr(createTime) : ''}</span>
-          </li>
+          </li> */}
           {status !== CONSTANTS.TASK_FINISHED ? (
             <li>
               <label>等待时间:</label>
