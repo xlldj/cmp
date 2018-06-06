@@ -64,7 +64,7 @@ class QuickMsgListQuery extends React.Component {
       <QueryPanel>
         <QueryLine>
           <QueryBlock style={{ alignItems: 'flex-start' }}>
-            <span style={{ marginTop: '10px' }}>类型筛选:</span>
+            <span style={{ marginTop: '7px' }}>类型筛选:</span>
             <CheckSelector
               allOptValue="all"
               allOptTitle="不限"

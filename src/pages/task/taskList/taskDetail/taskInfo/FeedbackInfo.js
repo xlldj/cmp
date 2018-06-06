@@ -8,12 +8,22 @@ const FeedbackInfo = props => {
     images.map((r, i) => (
       <img
         src={CONSTANTS.FILEADDR + r}
-        onClick={() => this.props.showDetailImgModel(i)}
-        onLoad={this.setWH}
+        onClick={() => props.showDetailImgModel(i)}
+        onLoad={setWH}
         key={i}
         alt=""
       />
     ))
+  const setWH = (e, value) => {
+    let img = e.target
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
+    if (w < h) {
+      img.style.width = value ? `${value}px` : '50px'
+    } else {
+      img.style.height = value ? `${value}px` : '50px'
+    }
+  }
   return (
     <ul className="detailList">
       <li>

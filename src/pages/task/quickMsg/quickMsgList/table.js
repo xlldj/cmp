@@ -26,20 +26,21 @@ class QuickMsgListTable extends React.Component {
       {
         title: '快捷消息',
         dataIndex: 'content',
-        className: 'firstCol',
         width: '50%'
       },
       {
-        title: '操作人',
+        title: <p className="center">操作人</p>,
         dataIndex: 'operUserNickname',
-        className: 'firstCol',
-        width: '10%'
+        width: '10%',
+        render: (text, record) => <p className="center">{text}</p>
       },
       {
-        title: '更新时间',
+        title: <p className="center">更新时间</p>,
         dataIndex: 'updateTime',
-        className: 'firstCol',
-        render: (text, record) => Time.getTimeStr(text)
+        width: '10%',
+        render: (text, record) => (
+          <p className="center">{Time.getTimeStr(text)}</p>
+        )
       },
       {
         title: <p className="lastCol">操作</p>,

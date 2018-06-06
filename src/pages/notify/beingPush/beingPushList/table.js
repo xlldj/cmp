@@ -106,6 +106,7 @@ class BeingsTable extends React.Component {
       {
         title: '更新时间',
         dataIndex: 'updateTime',
+        width: '10%',
         render: (text, record) => Time.getTimeStr(text)
       },
       {
