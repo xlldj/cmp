@@ -70,6 +70,7 @@ class BeingsTable extends React.Component {
       {
         title: '推送类型',
         dataIndex: 'type',
+        width: '8%',
         render: (text, record) => {
           return BEINGS_PUSH_TYPE[record.type]
         }
@@ -77,6 +78,7 @@ class BeingsTable extends React.Component {
       {
         title: '推送环境',
         dataIndex: 'env',
+        width: '9%',
         render: (text, record) => {
           return BEINGS_PUSH_EQUMENT[record.env]
         }
@@ -84,6 +86,7 @@ class BeingsTable extends React.Component {
       {
         title: '推送对象',
         dataIndex: 'range',
+        width: '8%',
         render: (text, record) => {
           return BEINGS_PUSH_PERSON[record.range]
             ? BEINGS_PUSH_PERSON[record.range]
@@ -92,6 +95,7 @@ class BeingsTable extends React.Component {
       },
       {
         title: '推送时间',
+        width: '10%',
         dataIndex: 'planPushTime',
         render: (text, record) => {
           if (
@@ -107,10 +111,11 @@ class BeingsTable extends React.Component {
       {
         title: '推送内容',
         dataIndex: 'content',
-        width: '15%'
+        width: '12%'
       },
       {
         title: '操作人',
+        width: '8%',
         dataIndex: 'lastUpdateUserName'
       },
       {

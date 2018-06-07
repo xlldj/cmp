@@ -28,8 +28,8 @@ const NOTIFY = {
   BEINGS_PUSH_TARGET_PERSON: 1,
   BEINGS_PUSH_EQUMENT: {
     1: '笑联用户端',
-    2: '笑联运维端',
-    3: '笑联企业版'
+    2: '笑联运维端'
+    // 3: '笑联企业版'
   },
   BEINGS_PUSH_STATUS: {
     1: '待推送',

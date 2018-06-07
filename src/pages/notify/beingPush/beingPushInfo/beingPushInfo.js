@@ -166,17 +166,17 @@ class BeingInfo extends React.Component {
         targetError: true
       })
     }
-    const fiveMinute = moment().add(5, 'minute')
-    if (fiveMinute > planPushTime) {
-      return this.setState({
-        TimeError: true
-      })
-    }
 
     if (parseInt(target, 10) === BEINGS_PUSH_TARGET_PERSON) {
       body.mobile = mobile
     }
     if (parseInt(methon, 10) === BEING_PUSH_METNON_WAITE) {
+      const fiveMinute = moment().add(5, 'minute')
+      if (fiveMinute > planPushTime) {
+        return this.setState({
+          TimeError: true
+        })
+      }
       body.planPushTime = planPushTime.valueOf()
     }
     this.addBeingInfo(body)
