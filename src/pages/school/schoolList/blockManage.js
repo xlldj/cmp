@@ -261,13 +261,27 @@ class BlockManage extends React.Component {
           <div className="schoolName">
             当前管理的学校：{this.state.schoolName}
           </div>
-          {forbiddenStatus.BUILDING_ADD_OR_EDIT ? null : (
-            <div>
+          <div />
+
+          <div>
+            <Link
+              to={{
+                pathname: '/school/list/blockManage/area',
+                state: {
+                  schoolName: this.state.schoolName,
+                  schoolId: this.state.schoolId
+                }
+              }}
+              style={{ marginRight: '10px' }}
+            >
+              <Button type="primary">区域设置</Button>
+            </Link>
+            {forbiddenStatus.BUILDING_ADD_OR_EDIT ? null : (
               <Link to="/school/list/blockManage/add">
                 <Button type="primary">添加楼栋</Button>
               </Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <Collapse accordion onChange={this.changePanel}>
           {panels}
