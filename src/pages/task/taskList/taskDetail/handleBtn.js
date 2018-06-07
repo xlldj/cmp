@@ -259,7 +259,8 @@ class HandleBtn extends React.Component {
       relatable,
       related,
       csRemindAble,
-      id
+      id,
+      unRelatedAble
     } = data
     const { remTime } = this.state
 
@@ -318,7 +319,7 @@ class HandleBtn extends React.Component {
                 <Button type="primary">转报修工单</Button>
               </Popconfirm>
             ) : null}
-            {related ? (
+            {unRelatedAble ? (
               <Popconfirm
                 title={
                   <span>

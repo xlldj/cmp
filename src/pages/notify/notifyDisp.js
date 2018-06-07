@@ -30,7 +30,7 @@ const breadcrumbNameMap = {
   '/censor/info': '详情',
   '/beings': '消息推送',
   '/beings/info': '推送详情',
-  '/beings/addBeing': '添加推送'
+  '/beings/addbeing': '添加推送'
 }
 
 class NotifyDisp extends React.Component {
