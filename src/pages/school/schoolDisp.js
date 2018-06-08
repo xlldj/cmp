@@ -2,7 +2,6 @@ import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { asyncComponent } from '../component/asyncComponent'
 import './style/style.css'
-
 //import SchoolList from './schoolList/schoolList'
 //import SchoolInfoEdit from './schoolList/schoolInfoEdit'
 //import BlockManage from './schoolList/blockManage'

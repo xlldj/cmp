@@ -34,7 +34,6 @@ export default class MultiSelectModal extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    debugger
     nextProps.dataSource &&
       nextProps.dataSource.forEach(d => {
         if (d.selected === undefined) {

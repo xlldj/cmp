@@ -1,6 +1,8 @@
 import React from 'react'
 import { Button, Popconfirm } from 'antd'
 import AddPlusAbs from '../../component/addPlusAbs'
+import { removeArray } from '../../../util/copy'
+import { areaService } from '../../service/index'
 // import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import MultiSelectModal from '../../component/multiSelectModal'
 const Fragment = React.Fragment
@@ -8,22 +10,40 @@ class AreaManage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      areaList: [{}],
+      areaList: [
+        {
+          id: 1,
+          name: '区域一',
+          buildings: [
+            {
+              id: 1,
+              name: '楼栋一',
+              selected: true
+            }
+          ]
+        }
+      ],
       posting: false,
       buildingIds: [],
       areaIndex: [],
       showBuildingSelect: false,
       buildingScore: [
         {
-          id: 1,
-          name: '楼栋一',
+          id: 2,
+          name: '楼栋二',
+          selected: false
+        },
+        {
+          id: 3,
+          name: '楼栋三',
           selected: false
         }
       ]
     }
     this.buildColumns = [
       {
-        title: <p>楼栋名称</p>,
+        title: '楼栋名称',
+        width: '75%',
         dataIndex: 'name'
       }
     ]
@@ -37,93 +57,159 @@ class AreaManage extends React.Component {
       schoolName
     }
     this.setState(nextProps)
+    const body = {
+      schoolId
+    }
+    this.fetchAreaData(body)
+    this.fetchBuildData(body)
   }
   componentWillUnmount() {
     this.props.hide(true)
   }
+  /**
+   * 获取区域数据
+   */
+  fetchAreaData = body => {
+    areaService.getAreaData(body).then(json => {
+      if (json && json.data) {
+        const areaList =
+          json.data.areas &&
+          json.data.areas.map(area => {
+            const { id, name, buildings } = area
+            buildings.forEach(build => {
+              build.selected = true
+            })
+            return {
+              id,
+              name,
+              buildings
+            }
+          })
+        this.setState({
+          areaList: areaList ? areaList : [{ name: '', buildings: [] }]
+        })
+      }
+    })
+  }
+  /**
+   * 获取未绑定的楼栋
+   */
+  fetchBuildData = body => {
+    areaService.getUnbindBuildings(body).then(json => {
+      if (json && json.data) {
+        const buildings = json.data.buildings || []
+        this.setState({
+          buildingScore: buildings
+        })
+      }
+    })
+  }
+  checkAreaName = (e, i) => {
+    const value = e.target.value.trim()
+    const areaList = JSON.parse(JSON.stringify(this.state.areaList))
+    if (value) {
+      areaList[i].error = false
+    } else {
+      areaList[i].error = true
+    }
+    this.setState({
+      areaList
+    })
+  }
+  /**
+   * 修改区域名
+   */
   changeAreaName = (e, i) => {
     const areaList = JSON.parse(JSON.stringify(this.state.areaList))
-    areaList[i].value = e.target.value
+    areaList[i].name = e.target.value
     this.setState({
       areaList: areaList
     })
   }
-  changeAreaBlock = (e, i) => {
-    const areaList = JSON.parse(JSON.stringify(this.state.areaList))
-    areaList[i].block = e.target.value
-    this.setState({
-      areaList: areaList
-    })
-  }
+  /**
+   * 添加区域
+   */
   addArea = e => {
     const areaList = JSON.parse(JSON.stringify(this.state.areaList))
-    areaList.push({})
+    areaList.push({ name: '', buildings: [] })
     this.setState({
       areaList: areaList
     })
   }
+  /**
+   * 删除区域
+   */
   abstractArea = e => {
     const areaList = JSON.parse(JSON.stringify(this.state.areaList))
+    const buildings =
+      areaList[areaList.length - 1].buildings &&
+      areaList[areaList.length - 1].buildings.map(value => {
+        value.selected = false
+        return value
+      })
     areaList.pop()
+    const { buildingScore } = this.state
+    buildingScore.push(...buildings)
     this.setState({
-      areaList: areaList
+      areaList: areaList,
+      buildingScore
     })
   }
   cancel() {
     //do nothing
   }
-  getBuildingName = buildingIds => {
-    const { buildingsOfSchoolId } = this.props
-    const { schoolId } = this.state
-    const buildingNames =
-      buildingIds === 'all'
-        ? '全部楼栋'
-        : buildingIds &&
-          buildingIds
-            .map(
-              b =>
-                buildingsOfSchoolId[+schoolId] &&
-                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
-                buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
-            )
-            .join('、')
+  /**
+   * 获取区域名
+   */
+  getBuildingName = buildings => {
+    const buildingNames = buildings && buildings.map(b => b.name).join('、')
     return buildingNames
   }
   showBuildingSelect = index => {
-    const { areaList } = this.state
-    debugger
+    const { areaList, buildingScore } = this.state
+    buildingScore.push(...areaList[index].buildings)
     this.setState({
       showBuildingSelect: true,
-      areaIndex: index
+      areaIndex: index,
+      buildingScore
     })
   }
-  confirmBuildings = ({ all, dataSource }) => {
-    let buildingIds = all
-      ? 'all'
-      : dataSource.filter(d => d.selected === true).map(d => d.id)
+  confirmBuildings = dataSource => {
+    let buildings = []
+    if (dataSource.length > 0) {
+      dataSource.forEach((build, index) => {
+        if (build.selected) {
+          buildings.push(build)
+        }
+      })
+      removeArray(dataSource, build => build.selected)
+    }
     const areaList = JSON.parse(JSON.stringify(this.state.areaList))
     const { areaIndex } = this.state
-    areaList[areaIndex].buildingIds = buildingIds
+    areaList[areaIndex].buildings = buildings
     this.setState({
       showBuildingSelect: false,
-      buildingIds: buildingIds,
+      buildingScore: dataSource,
       areaList: areaList
     })
   }
   closeBuildingSelect = () => {
+    const { buildingScore } = this.state
+    if (buildingScore.length > 0) {
+      removeArray(buildingScore, build => build.selected)
+    }
     this.setState({
-      showBuildingSelect: false
+      showBuildingSelect: false,
+      buildingScore
     })
   }
   handleSubmit() {}
   render() {
     const {
       schoolName,
-      schoolId,
       posting,
       areaList,
       showBuildingSelect,
-      buildingIds,
       buildingScore
     } = this.state
     const areaItems =
@@ -138,12 +224,20 @@ class AreaManage extends React.Component {
                   this.changeAreaName(e, i)
                 }}
                 key={`input${i}`}
-                value={r.value ? r.value : ''}
+                onBlur={e => {
+                  this.checkAreaName(e, i)
+                }}
+                value={r.name ? r.name : ''}
               />
+              {r.error ? (
+                <span key={`error${i}`} className="checkInvalid">
+                  区域名称输入不正确
+                </span>
+              ) : null}
             </li>
             <li>
               <p>选中楼栋:</p>
-              {this.getBuildingName(r.buildingIds)}
+              {this.getBuildingName(r.buildings)}
               <a
                 style={{ marginLeft: '10px' }}
                 onClick={() => {
