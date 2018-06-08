@@ -1,4 +1,4 @@
-// import { delete_error, delete_ok } from './generalResponse'
+import { delete_error, delete_ok } from './generalResponse'
 const areaList = {
   data: {
     areas: [
@@ -58,6 +58,14 @@ const areaHandler = (resource, body) => {
   if (resource === '/area/unbind/building/list') {
     let json = unbindBuildings
     return Promise.resolve(json)
+  }
+  if (resource === '/area/check') {
+    if (body.id) {
+      if (body.name.indexOf('一') !== -1) {
+        return Promise.resolve(delete_error)
+      }
+    }
+    return Promise.resolve(delete_ok)
   }
 }
 

@@ -1,8 +1,9 @@
 import React from 'react'
 import { Button, Popconfirm } from 'antd'
 import AddPlusAbs from '../../component/addPlusAbs'
-import { removeArray } from '../../../util/copy'
+import { removeArray, deepCopy } from '../../../util/copy'
 import { areaService } from '../../service/index'
+import Noti from '../../../util/noti'
 // import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import MultiSelectModal from '../../component/multiSelectModal'
 const Fragment = React.Fragment
@@ -10,35 +11,12 @@ class AreaManage extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      areaList: [
-        {
-          id: 1,
-          name: '区域一',
-          buildings: [
-            {
-              id: 1,
-              name: '楼栋一',
-              selected: true
-            }
-          ]
-        }
-      ],
+      areaList: [{ name: '', buildings: [] }],
       posting: false,
       buildingIds: [],
       areaIndex: [],
       showBuildingSelect: false,
-      buildingScore: [
-        {
-          id: 2,
-          name: '楼栋二',
-          selected: false
-        },
-        {
-          id: 3,
-          name: '楼栋三',
-          selected: false
-        }
-      ]
+      buildingScore: []
     }
     this.buildColumns = [
       {
@@ -104,17 +82,41 @@ class AreaManage extends React.Component {
       }
     })
   }
+  /**
+   * 检测区域名
+   */
   checkAreaName = (e, i) => {
     const value = e.target.value.trim()
     const areaList = JSON.parse(JSON.stringify(this.state.areaList))
     if (value) {
-      areaList[i].error = false
+      const body = {
+        schoolId: this.state.schoolId,
+        name: value
+      }
+      if (areaList[i].id) {
+        body.id = areaList[i].id
+      }
+      areaService.checkArea(body).then(json => {
+        if (json && json.data) {
+          if (!json.data.result) {
+            areaList[i].error = false
+          } else {
+            areaList[i].error = true
+            // Noti.hintLock('操作失败', json.data.failReason)
+          }
+        } else {
+          areaList[i].error = true
+        }
+        this.setState({
+          areaList
+        })
+      })
     } else {
       areaList[i].error = true
+      this.setState({
+        areaList
+      })
     }
-    this.setState({
-      areaList
-    })
   }
   /**
    * 修改区域名
@@ -155,8 +157,9 @@ class AreaManage extends React.Component {
       buildingScore
     })
   }
-  cancel() {
-    //do nothing
+  cancel = () => {}
+  cancelSubmit = () => {
+    this.props.history.goBack()
   }
   /**
    * 获取区域名
@@ -165,6 +168,9 @@ class AreaManage extends React.Component {
     const buildingNames = buildings && buildings.map(b => b.name).join('、')
     return buildingNames
   }
+  /**
+   * 显示楼栋选择
+   */
   showBuildingSelect = index => {
     const { areaList, buildingScore } = this.state
     buildingScore.push(...areaList[index].buildings)
@@ -174,6 +180,9 @@ class AreaManage extends React.Component {
       buildingScore
     })
   }
+  /**
+   * 选择楼栋
+   */
   confirmBuildings = dataSource => {
     let buildings = []
     if (dataSource.length > 0) {
@@ -187,23 +196,98 @@ class AreaManage extends React.Component {
     const areaList = JSON.parse(JSON.stringify(this.state.areaList))
     const { areaIndex } = this.state
     areaList[areaIndex].buildings = buildings
+    if (buildings.length < 1) {
+      areaList[areaIndex].blockError = true
+    } else {
+      areaList[areaIndex].blockError = false
+    }
     this.setState({
       showBuildingSelect: false,
       buildingScore: dataSource,
       areaList: areaList
     })
   }
+  /**
+   * 关闭楼栋多选
+   */
   closeBuildingSelect = () => {
     const { buildingScore } = this.state
     if (buildingScore.length > 0) {
       removeArray(buildingScore, build => build.selected)
     }
+    const areaList = JSON.parse(JSON.stringify(this.state.areaList))
+    const { areaIndex } = this.state
+    const buildings = areaList[areaIndex].buildings || []
+    if (buildings.length < 1) {
+      areaList[areaIndex].blockError = true
+    } else {
+      areaList[areaIndex].blockError = false
+    }
     this.setState({
       showBuildingSelect: false,
-      buildingScore
+      buildingScore,
+      areaList: areaList
     })
   }
-  handleSubmit() {}
+  /**
+   * 提交修改
+   */
+  handleSubmit = () => {
+    if (this.checkAllArea()) {
+      let { areaList } = this.state
+      if (areaList && areaList.length) {
+        areaList.forEach(val => {
+          delete val.blockError
+          delete val.error
+          val.residenceIdList = []
+          if (val.buildings) {
+            val.buildings.forEach(build => {
+              delete build.selected
+              val.residenceIdList.push(build.id)
+            })
+          }
+          delete val.buildings
+        })
+      }
+      const body = {
+        schoolId: this.state.schoolId,
+        areaList: areaList
+      }
+      areaService.submitArea(body).then(json => {
+        if (json && json.data) {
+          if (json.data.result) {
+            Noti.hintOk('操作成功', '编辑成功')
+          } else {
+            Noti.hintLock('操作失败', json.data.failReason)
+          }
+        }
+        this.props.history.goBack()
+      })
+    }
+  }
+  /**
+   * 检测区域信息
+   */
+  checkAllArea = () => {
+    const areaList = deepCopy(this.state.areaList)
+    let result = true
+    if (areaList && areaList.length) {
+      areaList.forEach(val => {
+        if (!val.name || val.error) {
+          val.error = true
+          result = false
+        }
+        if (!val.buildings || val.buildings.length < 1) {
+          val.blockError = true
+          result = false
+        }
+      })
+    }
+    this.setState({
+      areaList
+    })
+    return result
+  }
   render() {
     const {
       schoolName,
@@ -246,6 +330,11 @@ class AreaManage extends React.Component {
               >
                 选择楼栋
               </a>
+              {r.blockError ? (
+                <span key={`blockError${i}`} className="checkInvalid">
+                  请选择楼栋
+                </span>
+              ) : null}
             </li>
           </Fragment>
         )
@@ -294,15 +383,6 @@ class AreaManage extends React.Component {
           columns={this.buildColumns}
           suportAllChoose={true}
         />
-        {/* {showBuildingSelect ? (
-          <BuildingMultiSelectModal
-            all={buildingIds === 'all'}
-            selectedItems={buildingIds !== 'all' ? buildingIds : []}
-            schoolId={schoolId}
-            closeModal={this.closeBuildingSelect}
-            confirmBuildings={this.confirmBuildings}
-          />
-        ) : null} */}
       </div>
     )
   }

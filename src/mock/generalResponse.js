@@ -6,6 +6,7 @@ export const add_success = {
 
 export const delete_error = {
   data: {
+    failReason: '已存在',
     result: false
   },
   displayMessage: 'error'
@@ -13,6 +14,7 @@ export const delete_error = {
 
 export const delete_ok = {
   data: {
+    failReason: '',
     result: true
   }
 }
