@@ -61,6 +61,7 @@ class TaskList extends React.Component {
     this.state = {
       showBuild: false
     }
+    this.ti = null
   }
 
   setProps = event => {
@@ -127,6 +128,15 @@ class TaskList extends React.Component {
       body.idList = [queryId]
     }
     props.fetchTaskList(body)
+    /* set a timer of 5 minutes, fetch the data again when timer fires */
+    if (this.ti) {
+      clearTimeout(this.ti)
+      this.ti = null
+    }
+    this.ti = setTimeout(this.refetch, 5 * 60 * 1000)
+  }
+  refetch = () => {
+    this.fetchData()
   }
   componentWillReceiveProps(nextProps) {
     try {
