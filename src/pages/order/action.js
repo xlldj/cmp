@@ -24,6 +24,7 @@ export const fetchOrderList = body => {
   })
   const resource = '/api/order/list'
   AjaxHandler.fetch(resource, body).then(json => {
+    debugger
     const value = {
       loading: false
     }

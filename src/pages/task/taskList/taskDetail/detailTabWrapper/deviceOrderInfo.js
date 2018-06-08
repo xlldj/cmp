@@ -82,9 +82,8 @@ class DeviceOrderWrapper extends Component {
   }
 }
 const fetchData = props => {
-  const { creatorId, residenceId, deviceType } = props
+  const { residenceId, deviceType } = props
   const body = {
-    userId: creatorId,
     page: 1,
     size: SIZE,
     residenceId: residenceId,
@@ -98,9 +97,5 @@ const mapStateToProps = (state, ownProps) => ({
   loading: state.orderListModal.loading
 })
 export default connect(mapStateToProps, null)(
-  detailTabHoc(DeviceOrderWrapper, fetchData, [
-    'creatorId',
-    'residenceId',
-    'deviceType'
-  ])
+  detailTabHoc(DeviceOrderWrapper, fetchData, ['residenceId', 'deviceType'])
 )
