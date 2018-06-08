@@ -396,7 +396,7 @@ shortSeperator {
   display: inline-flex;
   justify-content: space-between;
   margin: 30px 10px 0px 40px;
-  width: 89%;
+  width: 80%;
 }
 .multiSelectModalHeader .hint {
   line-height: 40px;

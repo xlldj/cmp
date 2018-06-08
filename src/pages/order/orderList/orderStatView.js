@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
-import { Table } from 'antd'
+import { Table, Button } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 // import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
@@ -10,6 +10,7 @@ import CheckSelect from '../../component/checkSelect'
 // import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import OrderBarChart from './orderBarChart'
 import RangeSelect from '../../component/rangeSelect'
+import CascadedBuildingSelect from '../../component/cascadedBuildingSelect'
 
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
@@ -432,9 +433,9 @@ class OrderStatView extends React.Component {
     const {
       page,
       deviceType,
-      day
+      day,
       // buildingIds,
-      // schoolId,
+      schoolId
       // buildingsOfSchoolId
     } = this.props
     const {
@@ -447,17 +448,7 @@ class OrderStatView extends React.Component {
       endTime
       // showBuildingSelect
     } = this.state
-    // const buildingNames =
-    //   buildingIds === 'all'
-    //     ? '全部楼栋'
-    //     : buildingIds
-    //         .map(
-    //           b =>
-    //             buildingsOfSchoolId[+schoolId] &&
-    //             buildingsOfSchoolId[+schoolId].find(bs => bs.id === b) &&
-    //             buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
-    //         )
-    //         .join('、')
+
     return (
       <div className="orderStat">
         <QueryPanel>
@@ -484,18 +475,12 @@ class OrderStatView extends React.Component {
               />
             </QueryBlock>
           </QueryLine>
-          {isFushikang ? null : (
-            // <div className="queryLine">
-            //   <div className="block">
-            //     <span>楼栋筛选:</span>
-            //     <span className="customized_select_option">
-            //       {buildingNames}
-            //     </span>
-            //     <Button type="primary" onClick={this.showBuildingSelect}>
-            //       点击选择
-            //     </Button>
-            //   </div>
-            // </div>
+          {isFushikang ? (
+            <Fragment>
+              <span>位置筛选:</span>
+              <CascadedBuildingSelect schoolId={schoolId} />
+            </Fragment>
+          ) : (
             <QueryLine>
               <QueryBlock>
                 <span>设备类型:</span>

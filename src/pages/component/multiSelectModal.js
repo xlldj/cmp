@@ -79,7 +79,7 @@ export default class MultiSelectModal extends React.Component {
   }
   render() {
     const { dataSource } = this.state
-    const { show, suportAllChoose } = this.props
+    const { show, suportAllChoose, width } = this.props
 
     const selectedArr =
       dataSource && dataSource.filter((r, i) => r.selected === true)
@@ -95,7 +95,7 @@ export default class MultiSelectModal extends React.Component {
     return (
       <Modal
         wrapClassName="modal"
-        width={800}
+        width={width || 800}
         visible={show}
         onCancel={this.cancel}
         onOk={this.confirm}

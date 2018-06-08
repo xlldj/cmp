@@ -15,6 +15,7 @@ import SetRuleHint from './setRuleHint.js'
 import RangeSelect from '../rangeSelectDisableMonth.js'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
 import RepairmanTable from '../../../component/repairmanChooseClean.js'
+import CascadedBuildingSelect from '../../../component/cascadedBuildingSelect'
 
 import { checkObject } from '../../../../util/checkSame'
 const subModule = 'orderList'
@@ -716,7 +717,22 @@ class OrderAnalyzeView extends React.Component {
             )
             .join('、')
 
+    console.log(isFushikang)
     const showBuildTaskBtn = selectedRowLengthsOfOrderTable > 0
+    const buildingSelect = isFushikang ? (
+      <Fragment>
+        <span>位置筛选:</span>
+        <CascadedBuildingSelect schoolId={schoolId} />
+      </Fragment>
+    ) : (
+      <Fragment>
+        <span>楼栋筛选:</span>
+        <span className="customized_select_option">{buildingNames}</span>
+        <Button type="primary" onClick={this.showBuildingSelect}>
+          点击选择
+        </Button>
+      </Fragment>
+    )
     return (
       <div className="orderWarnListWrapper">
         <div className="queryPanel">
@@ -753,13 +769,7 @@ class OrderAnalyzeView extends React.Component {
           )}
 
           <div className="queryLine">
-            <div className="block">
-              <span>楼栋筛选:</span>
-              <span className="customized_select_option">{buildingNames}</span>
-              <Button type="primary" onClick={this.showBuildingSelect}>
-                点击选择
-              </Button>
-            </div>
+            <div className="block">{buildingSelect}</div>
           </div>
 
           <div className="queryLine">

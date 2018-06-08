@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import { Table, Badge, Button } from 'antd'
 import AjaxHandler from '../../../../util/ajax'
@@ -13,6 +13,7 @@ import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModa
 import OrderDetail from './orderInfo'
 
 import { checkObject } from '../../../../util/checkSame'
+import CascadedBuildingSelect from '../../../component/cascadedBuildingSelect'
 const subModule = 'orderList'
 
 const {
@@ -418,6 +419,121 @@ class OrderTableView extends React.Component {
       showBuildingSelect: false
     })
   }
+  getColumns = () => {
+    const { selectedRowIndex } = this.props
+    const { isFushikang } = this.state
+    const columns = [
+      {
+        title: '订单号',
+        dataIndex: 'orderNo',
+        className: 'firstCol selectedHintWraper',
+        render: (text, record, index) => (
+          <span className="">
+            {index === selectedRowIndex ? (
+              <img src={selectedImg} alt="" className="selectedImg" />
+            ) : null}
+            {text}
+          </span>
+        )
+      },
+      {
+        title: '用户',
+        dataIndex: 'username'
+      },
+      {
+        title: '使用设备',
+        dataIndex: 'deviceType',
+        render: (text, record, index) => DEVICETYPE[record.deviceType]
+      },
+      {
+        title: '所在学校',
+        dataIndex: 'schoolName'
+      },
+      {
+        title: '设备地址',
+        dataIndex: 'location'
+      },
+      {
+        title: '开始时间',
+        dataIndex: 'createTime',
+        render: (text, record, index) => {
+          return Time.getTimeStr(record.createTime)
+        }
+      },
+      {
+        title: '结束时间',
+        dataIndex: 'finishTime',
+        render: (text, record, index) => {
+          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
+        }
+      },
+      {
+        title: '使用状态',
+        dataIndex: 'status',
+        render: (text, record, index) => {
+          switch (record.status) {
+            case 1:
+              return <Badge status="warning" text="使用中" />
+            case 2:
+              return <Badge status="success" text="使用结束" />
+            case 4:
+              return <Badge status="default" text="已退单" />
+            case 3:
+              return <Badge status="warning" text="异常" />
+            default:
+              return <Badge status="warning" text="异常" />
+          }
+        }
+      },
+      {
+        title: '消费金额',
+        dataIndex: 'paymentType',
+        className: 'shalowRed',
+        render: (text, record, index) => {
+          if (record.status !== 1) {
+            return `${record.consume}` || '暂无'
+          } else if (record.prepay) {
+            return `${record.prepay}`
+          }
+        }
+      }
+    ]
+    if (isFushikang) {
+      columns.splice(
+        1,
+        0,
+        {
+          title: '姓名',
+          dataIndex: 'userName'
+        },
+        {
+          title: '工号',
+          dataIndex: 'userNo'
+        }
+      )
+      columns.splice(
+        0,
+        0,
+        {
+          title: '公寓',
+          dataIndex: 'schoolName'
+        },
+        {
+          title: '区域',
+          dataIndex: 'domain'
+        },
+        {
+          title: '楼栋',
+          dataIndex: 'buildingName'
+        },
+        {
+          title: '楼层',
+          dataIndex: 'floorName'
+        }
+      )
+    }
+    return columns
+  }
 
   render() {
     const {
@@ -426,7 +542,6 @@ class OrderTableView extends React.Component {
       status,
       userType,
       day,
-      selectedRowIndex,
       showDetail,
       selectedDetailId,
       buildingIds,
@@ -459,89 +574,21 @@ class OrderTableView extends React.Component {
                 buildingsOfSchoolId[+schoolId].find(bs => bs.id === b).name
             )
             .join('、')
-    const columns = [
-      {
-        title: '订单号',
-        dataIndex: 'orderNo',
-        width: '20%',
-        className: 'firstCol selectedHintWraper',
-        render: (text, record, index) => (
-          <span className="">
-            {index === selectedRowIndex ? (
-              <img src={selectedImg} alt="" className="selectedImg" />
-            ) : null}
-            {text}
-          </span>
-        )
-      },
-      {
-        title: '用户',
-        dataIndex: 'username',
-        width: '10%'
-      },
-      {
-        title: '使用设备',
-        dataIndex: 'deviceType',
-        width: '7%',
-        render: (text, record, index) => DEVICETYPE[record.deviceType]
-      },
-      {
-        title: '所在学校',
-        dataIndex: 'schoolName'
-      },
-      {
-        title: '设备地址',
-        dataIndex: 'location',
-        width: '10%'
-      },
-      {
-        title: '开始时间',
-        dataIndex: 'createTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return Time.getTimeStr(record.createTime)
-        }
-      },
-      {
-        title: '结束时间',
-        dataIndex: 'finishTime',
-        width: '10%',
-        render: (text, record, index) => {
-          return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
-        }
-      },
-      {
-        title: '使用状态',
-        dataIndex: 'status',
-        width: '10%',
-        render: (text, record, index) => {
-          switch (record.status) {
-            case 1:
-              return <Badge status="warning" text="使用中" />
-            case 2:
-              return <Badge status="success" text="使用结束" />
-            case 4:
-              return <Badge status="default" text="已退单" />
-            case 3:
-              return <Badge status="warning" text="异常" />
-            default:
-              return <Badge status="warning" text="异常" />
-          }
-        }
-      },
-      {
-        title: '消费金额',
-        dataIndex: 'paymentType',
-        className: 'shalowRed',
-        render: (text, record, index) => {
-          if (record.status !== 1) {
-            return `${record.consume}` || '暂无'
-          } else if (record.prepay) {
-            return `${record.prepay}`
-          }
-        }
-      }
-    ]
+    const buildingSelect = isFushikang ? (
+      <Fragment>
+        <span>位置筛选:</span>
+        <CascadedBuildingSelect schoolId={schoolId} />
+      </Fragment>
+    ) : (
+      <Fragment>
+        <span>楼栋筛选:</span>
+        <span className="customized_select_option">{buildingNames}</span>
+        <Button type="primary" onClick={this.showBuildingSelect}>
+          点击选择
+        </Button>
+      </Fragment>
+    )
+
     return (
       <div className="">
         <div className="queryPanel">
@@ -565,13 +612,7 @@ class OrderTableView extends React.Component {
           </div>
 
           <div className="queryLine">
-            <div className="block">
-              <span>楼栋筛选:</span>
-              <span className="customized_select_option">{buildingNames}</span>
-              <Button type="primary" onClick={this.showBuildingSelect}>
-                点击选择
-              </Button>
-            </div>
+            <div className="block">{buildingSelect}</div>
           </div>
           <div className="queryLine">
             <div className="block">
@@ -668,7 +709,7 @@ class OrderTableView extends React.Component {
             }}
             dataSource={dataSource}
             rowKey={record => record.id}
-            columns={columns}
+            columns={this.getColumns()}
             onChange={this.changePage}
             onRowClick={this.selectRow}
             rowClassName={this.setRowClass}
