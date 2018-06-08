@@ -1,5 +1,6 @@
 import React from 'react'
 import { Modal, Table, Button } from 'antd'
+import { EmptyError } from 'rxjs'
 
 export default class MultiSelectModal extends React.Component {
   constructor(props) {
@@ -13,7 +14,8 @@ export default class MultiSelectModal extends React.Component {
         }
       })
     this.state = {
-      dataSource: dataSource ? JSON.parse(JSON.stringify(dataSource)) : []
+      dataSource: dataSource ? JSON.parse(JSON.stringify(dataSource)) : [],
+      emptySelectError: false
     }
     let localColumns = JSON.parse(JSON.stringify(columns))
     localColumns.push({
@@ -46,6 +48,14 @@ export default class MultiSelectModal extends React.Component {
   }
   confirm = () => {
     let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    const selectedCount = dataSource.filter(d => d.selected === true).length
+
+    // 如果禁止为空
+    if (!selectedCount && this.props.forbidEmpty) {
+      return this.setState({
+        emptySelectError: true
+      })
+    }
     this.props.confirm(dataSource)
   }
 
@@ -70,16 +80,26 @@ export default class MultiSelectModal extends React.Component {
   changeSelect = (e, i) => {
     let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
     dataSource[i].selected = !dataSource[i].selected
-    this.setState({
-      dataSource: dataSource
-    })
+
+    const { forbidEmpty } = this.props
+    // 如果禁止为空，且动作为取消最后一个选择的，则不予响应
+    const count = dataSource.filter(d => d.selected === true).length
+    if (count < 1 && forbidEmpty) {
+      return
+    }
+    const nextState = { dataSource }
+    if (this.state.emptySelectError) {
+      nextState.emptySelectError = false
+    }
+
+    this.setState(nextState)
   }
   selectRow = (record, index, event) => {
     this.changeSelect(null, index)
   }
   render() {
-    const { dataSource } = this.state
-    const { show, suportAllChoose, width } = this.props
+    const { dataSource, emptySelectError } = this.state
+    const { show, suportAllChoose, width, forbidEmpty } = this.props
 
     const selectedArr =
       dataSource && dataSource.filter((r, i) => r.selected === true)
@@ -105,7 +125,11 @@ export default class MultiSelectModal extends React.Component {
           <p className="hint">已选择:{selectedItems}</p>
           <div>
             {suportAllChoose ? (
-              <Button className="allChooseButton" onClick={this.allItemChoose}>
+              <Button
+                className="allChooseButton"
+                onClick={this.allItemChoose}
+                style={{ marginRight: '10px' }}
+              >
                 全选
               </Button>
             ) : null}
@@ -127,6 +151,9 @@ export default class MultiSelectModal extends React.Component {
             onRowClick={this.selectRow}
           />
         </div>
+        {emptySelectError && forbidEmpty ? (
+          <span className="checkInvalid">请选择至少一条！</span>
+        ) : null}
       </Modal>
     )
   }

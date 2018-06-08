@@ -8,6 +8,11 @@ const BASIC = {
   CHARTWIDTH: (window.document.body.clientWidth - 100) * 0.9,
   CHARTHEIGHT: 300,
 
+  RESIDENCE_TYPES: { 1: '区域', 2: '楼栋', 3: '楼层' },
+  RESIDENCE_TYPE_ZONE: 1,
+  RESIDENCE_TYPE_BUILDING: 2,
+  RESIDENCE_TYPE_FLOOR: 3,
+
   ERRORALTMESSAGE: '请求出错，请稍后刷新重试',
   NETWORKERRORMESSAGE: '网络出错，请稍后刷新重试',
 

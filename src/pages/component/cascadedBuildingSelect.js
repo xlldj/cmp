@@ -4,7 +4,24 @@ import MultiSelectModal from './multiSelectModal'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { fetchResidence } from '../../actions'
+import CONSTANTS from '../../constants'
+const {
+  RESIDENCE_TYPE_ZONE,
+  RESIDENCE_TYPE_BUILDING,
+  RESIDENCE_TYPE_FLOOR
+} = CONSTANTS
 
+// type: 1: 区域， 2: 楼栋, 3: 楼层
+const IdStateName = {
+  1: 'zoneIds',
+  2: 'buildingIds',
+  3: 'floorIds'
+}
+const ShowModalStateName = {
+  1: 'showZoneSelect',
+  2: 'showBuildingSelect',
+  3: 'showFloorSelect'
+}
 class CascadedBuildingSelect extends Component {
   state = {
     zoneNames: '全部区域',
@@ -43,7 +60,7 @@ class CascadedBuildingSelect extends Component {
     nextState[name] = false
     this.setState(nextState)
   }
-  getBuildingOptions = data => {
+  getBuildingOptions = () => {
     const { zoneIds, buildingIds, floorIds } = this.state
     const { residence } = this.props
     // 区域的选项总是全部的条目
@@ -66,6 +83,12 @@ class CascadedBuildingSelect extends Component {
     const buildingDataSource = []
     const floorDataSource = []
     // 区域不为所有，选择楼栋的选项。同时设置楼层的选项。
+    // 先将没选择的zone的selected清空
+    zoneDataSource.forEach(z => {
+      if (!zoneIds.some(zoneId => zoneId === z.id)) {
+        z.selected = false
+      }
+    })
     zoneIds.forEach(zoneId => {
       const zone = residence.find(r => r.id === zoneId)
       zoneNames += zone.name || ''
@@ -79,7 +102,7 @@ class CascadedBuildingSelect extends Component {
             selected: true
           }
           if (buildingIds !== 'all') {
-            const selected = buildingIds.some(b => b.id === building.id)
+            const selected = buildingIds.some(b => b === building.id)
             // 如果该楼栋在所选择的buildingIds内,
             if (selected) {
               buildingNames += building.name || ''
@@ -88,7 +111,7 @@ class CascadedBuildingSelect extends Component {
                 const floorItem = { id: f.id, name: f.name, selected: true }
                 if (floorIds !== 'all') {
                   const isFloorSelected = floorIds.some(
-                    selectedFloor => selectedFloor.id === f.id
+                    selectedFloorId => selectedFloorId === f.id
                   )
                   // 如果楼层在所选择的floorIds内，添加到名字中
                   if (isFloorSelected) {
@@ -97,7 +120,7 @@ class CascadedBuildingSelect extends Component {
                     floorItem.selected = false
                   }
                 }
-                floorDataSource.push({ id: f.id, name: f.name })
+                floorDataSource.push(floorItem)
               })
             } else {
               // 将对应楼栋的selected改为false
@@ -121,12 +144,72 @@ class CascadedBuildingSelect extends Component {
     }
   }
 
-  setItems = (dataSource, idStateName, showModalStateName) => {
+  setItems = (dataSource, type) => {
     const data = JSON.parse(JSON.stringify(dataSource))
     const selectedIds = data.filter(r => r.selected === true).map(r => r.id)
     const nextState = {}
-    nextState[idStateName] = selectedIds
-    nextState[showModalStateName] = false
+    // 判断是否为全选
+    const isAllSelected =
+      data.filter(d => d.selected === true).length === data.length
+    const nextIds = isAllSelected ? 'all' : selectedIds
+    nextState[ShowModalStateName[type]] = false
+    // 判断当前选择对其它的影响, 这里不用更改弹窗中的表单项，只需要改对应id数组
+    // 首先更新所有的id数组，然后从区域开始逐级更新下级的id
+    let { zoneIds, buildingIds, floorIds } = this.state
+    if (type === RESIDENCE_TYPE_ZONE) {
+      zoneIds = nextIds
+    } else if (type === RESIDENCE_TYPE_BUILDING) {
+      buildingIds = nextIds
+    } else {
+      floorIds = nextIds
+      // 此时只要改这个数组就可以了
+      nextState.floorIds = floorIds
+      return this.setState(nextState)
+    }
+    const { residence } = this.props
+    if (isAllSelected) {
+      nextState[IdStateName[type]] = 'all'
+      return this.setState(nextState)
+    } else {
+      const zones =
+        zoneIds === 'all'
+          ? residence
+          : residence.filter(r => zoneIds.some(z => z === r.id))
+      const buildingIdsAvailable = [],
+        floorIdsAvailable = []
+      zones.forEach(zone => {
+        const buildings = zone && zone.children
+        buildings.forEach(building => {
+          buildingIdsAvailable.push(building.id)
+          const buildingAlreadyExistInState = buildingIds.some(
+            bId => bId === building.id
+          )
+          if (buildingAlreadyExistInState) {
+            // 得到可选的floor的id数组
+            const floors = building.children
+          }
+        })
+      })
+
+      // 删除掉没有在当前区域的building的id. 先搜集所有被选的区域的楼栋的id
+      const allBuildingIdsOfSelectedZone = []
+      selectedIds.forEach(selectedZoneId => {
+        const buildingIdsOfTheZone = residence
+          .find(r => r.id === selectedZoneId)
+          .children.map(building => building.id)
+        allBuildingIdsOfSelectedZone.concat(buildingIdsOfTheZone)
+      })
+      // 清理失效的building id
+      for (let l = buildingIds.length, i = l - 1; i > 0; i--) {
+        const buildingId = buildingIds[i]
+        const stillInSelectedZone = allBuildingIdsOfSelectedZone.some(
+          b => b === buildingId
+        )
+        if (!stillInSelectedZone) {
+          buildingIds.splice(i, 1)
+        }
+      }
+    }
     this.setState(nextState)
   }
 
@@ -167,10 +250,11 @@ class CascadedBuildingSelect extends Component {
         </Button>
         {showZoneSelect ? (
           <MultiSelectModal
-            width={450}
+            width={500}
+            forbidEmpty={true}
             suportAllChoose
             closeModal={e => this.closeModal(e, 'showZoneSelect')}
-            confirm={data => this.setItems(data, 'zoneIds', 'showZoneSelect')}
+            confirm={data => this.setItems(data, RESIDENCE_TYPE_ZONE)}
             show={showZoneSelect}
             dataSource={zone.dataSource}
             columns={this.getColumns('区域')}
@@ -178,17 +262,23 @@ class CascadedBuildingSelect extends Component {
         ) : null}
         {showBuildingSelect ? (
           <MultiSelectModal
+            width={500}
+            forbidEmpty={true}
+            suportAllChoose
             closeModal={e => this.closeModal(e, 'showBuildingSelect')}
-            confirm={this.setBuildingItems}
+            confirm={data => this.setItems(data, RESIDENCE_TYPE_BUILDING)}
             show={showBuildingSelect}
-            dataSource={building.data}
+            dataSource={building.dataSource}
             columns={this.getColumns('楼栋')}
           />
         ) : null}
         {showFloorSelect ? (
           <MultiSelectModal
+            width={500}
+            forbidEmpty={true}
+            suportAllChoose
             closeModal={e => this.closeModal(e, 'showFloorSelect')}
-            confirm={this.setFloorItems}
+            confirm={data => this.setItems(data, RESIDENCE_TYPE_FLOOR)}
             show={showFloorSelect}
             dataSource={floor.dataSource}
             columns={this.getColumns('楼层')}

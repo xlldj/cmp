@@ -422,7 +422,7 @@ class OrderTableView extends React.Component {
   getColumns = () => {
     const { selectedRowIndex } = this.props
     const { isFushikang } = this.state
-    const columns = [
+    let columns = [
       {
         title: '订单号',
         dataIndex: 'orderNo',
@@ -499,21 +499,7 @@ class OrderTableView extends React.Component {
       }
     ]
     if (isFushikang) {
-      columns.splice(
-        1,
-        0,
-        {
-          title: '姓名',
-          dataIndex: 'userName'
-        },
-        {
-          title: '工号',
-          dataIndex: 'userNo'
-        }
-      )
-      columns.splice(
-        0,
-        0,
+      columns = [
         {
           title: '公寓',
           dataIndex: 'schoolName'
@@ -529,8 +515,86 @@ class OrderTableView extends React.Component {
         {
           title: '楼层',
           dataIndex: 'floorName'
+        },
+        {
+          title: '设备地址',
+          dataIndex: 'location'
+        },
+        {
+          title: '订单号',
+          dataIndex: 'orderNo',
+          className: 'firstCol selectedHintWraper',
+          render: (text, record, index) => (
+            <span className="">
+              {index === selectedRowIndex ? (
+                <img src={selectedImg} alt="" className="selectedImg" />
+              ) : null}
+              {text}
+            </span>
+          )
+        },
+        {
+          title: '用户',
+          dataIndex: 'username'
+        },
+        {
+          title: '姓名',
+          dataIndex: 'userName'
+        },
+        {
+          title: '工号',
+          dataIndex: 'userNo'
+        },
+        {
+          title: '使用设备',
+          dataIndex: 'deviceType',
+          render: (text, record, index) => DEVICETYPE[record.deviceType]
+        },
+        {
+          title: '开始时间',
+          dataIndex: 'createTime',
+          render: (text, record, index) => {
+            return Time.getTimeStr(record.createTime)
+          }
+        },
+        {
+          title: '结束时间',
+          dataIndex: 'finishTime',
+          render: (text, record, index) => {
+            return record.finishTime ? Time.getTimeStr(record.finishTime) : ''
+          }
+        },
+        {
+          title: '使用状态',
+          dataIndex: 'status',
+          render: (text, record, index) => {
+            switch (record.status) {
+              case 1:
+                return <Badge status="warning" text="使用中" />
+              case 2:
+                return <Badge status="success" text="使用结束" />
+              case 4:
+                return <Badge status="default" text="已退单" />
+              case 3:
+                return <Badge status="warning" text="异常" />
+              default:
+                return <Badge status="warning" text="异常" />
+            }
+          }
+        },
+        {
+          title: '消费金额',
+          dataIndex: 'paymentType',
+          className: 'shalowRed',
+          render: (text, record, index) => {
+            if (record.status !== 1) {
+              return `${record.consume}` || '暂无'
+            } else if (record.prepay) {
+              return `${record.prepay}`
+            }
+          }
         }
-      )
+      ]
     }
     return columns
   }
