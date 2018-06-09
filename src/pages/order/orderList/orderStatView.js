@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-import { Table, Button } from 'antd'
+import { Table } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 // import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
@@ -50,6 +50,7 @@ class OrderStatView extends React.Component {
       })
     }
     props = props || this.props
+    const { isFushikang } = this.state
 
     let {
       page,
@@ -59,7 +60,10 @@ class OrderStatView extends React.Component {
       order,
       orderBy,
       startTime,
-      endTime
+      endTime,
+      areaIds,
+      buildingIds,
+      floorIds
     } = props
     const body = {
       page: page,
@@ -77,6 +81,17 @@ class OrderStatView extends React.Component {
     // if (buildingIds !== 'all') {
     //   body.buildingIds = buildingIds
     // }
+    if (isFushikang) {
+      if (areaIds !== 'all') {
+        body.areaIds = areaIds
+      }
+      if (buildingIds) {
+        body.buildingIds = buildingIds
+      }
+      if (floorIds) {
+        body.floorIds = floorIds
+      }
+    }
     if (deviceType !== 'all') {
       body.deviceType = parseInt(deviceType, 10)
     }
@@ -111,8 +126,19 @@ class OrderStatView extends React.Component {
       })
     }
     props = props || this.props
+    const { isFushikang } = this.state
 
-    let { page, schoolId, deviceType, day, startTime, endTime } = props
+    let {
+      page,
+      schoolId,
+      deviceType,
+      day,
+      startTime,
+      endTime,
+      areaIds,
+      buildingIds,
+      floorIds
+    } = props
     const body = {
       page: page,
       size: SIZE
@@ -131,6 +157,17 @@ class OrderStatView extends React.Component {
     }
     if (schoolId !== 'all') {
       body.schoolId = parseInt(schoolId, 10)
+    }
+    if (isFushikang) {
+      if (areaIds === 'all') {
+        body.areaIds = areaIds
+      }
+      if (buildingIds === 'all') {
+        body.buildingIds = buildingIds
+      }
+      if (floorIds === 'all') {
+        body.floorIds = floorIds
+      }
     }
 
     let resource = '/api/order/statistic/histogram'
@@ -300,10 +337,26 @@ class OrderStatView extends React.Component {
           )
         }
       )
-      columns.splice(0, 1, {
-        title: '公寓',
-        dataIndex: 'schoolName'
-      })
+      columns.splice(
+        0,
+        1,
+        {
+          title: '公寓',
+          dataIndex: 'schoolName'
+        },
+        {
+          title: '区域',
+          dataIndex: 'domain'
+        },
+        {
+          title: '楼栋',
+          dataIndex: 'buildingName'
+        },
+        {
+          title: '楼层',
+          dataIndex: 'floorName'
+        }
+      )
       columns.splice(columns.length - 1, 1, {
         title: '充值金额(元)',
         dataIndex: 'chargeAmount'
@@ -322,7 +375,10 @@ class OrderStatView extends React.Component {
         'orderBy',
         'schools',
         'startTime',
-        'endTime'
+        'endTime',
+        'areaIds',
+        'buildingIds',
+        'floorIds'
         // 'buildingIds'
       ])
     ) {
@@ -339,7 +395,10 @@ class OrderStatView extends React.Component {
         'schoolId',
         'deviceType',
         'startTime',
-        'endTime'
+        'endTime',
+        'areaIds',
+        'buildingIds',
+        'floorIds'
       ])
     ) {
       return
@@ -429,14 +488,22 @@ class OrderStatView extends React.Component {
       stat_day: 0
     })
   }
+  confirmResidence = ({ areaIds, buildingIds, floorIds }) => {
+    this.props.changeOrder(subModule, {
+      stat_areaIds: areaIds,
+      stat_buildingIds: buildingIds,
+      stat_floorIds: floorIds
+    })
+  }
   render() {
     const {
       page,
       deviceType,
       day,
-      // buildingIds,
+      buildingIds,
+      areaIds,
+      floorIds,
       schoolId
-      // buildingsOfSchoolId
     } = this.props
     const {
       dataSource,
@@ -449,6 +516,18 @@ class OrderStatView extends React.Component {
       // showBuildingSelect
     } = this.state
 
+    const buildingSelect = (
+      <Fragment>
+        <span>位置筛选:</span>
+        <CascadedBuildingSelect
+          schoolId={schoolId}
+          areaIds={areaIds}
+          buildingIds={buildingIds}
+          floorIds={floorIds}
+          confirm={this.confirmResidence}
+        />
+      </Fragment>
+    )
     return (
       <div className="orderStat">
         <QueryPanel>
@@ -475,23 +554,22 @@ class OrderStatView extends React.Component {
               />
             </QueryBlock>
           </QueryLine>
-          {isFushikang ? (
-            <Fragment>
-              <span>位置筛选:</span>
-              <CascadedBuildingSelect schoolId={schoolId} />
-            </Fragment>
-          ) : (
-            <QueryLine>
-              <QueryBlock>
-                <span>设备类型:</span>
-                <CheckSelect
-                  options={DEVICETYPE}
-                  value={deviceType}
-                  onClick={this.changeDevice}
-                />
-              </QueryBlock>
-            </QueryLine>
-          )}
+          <QueryLine>
+            <QueryBlock>
+              {isFushikang ? (
+                buildingSelect
+              ) : (
+                <Fragment>
+                  <span>设备类型:</span>
+                  <CheckSelect
+                    options={DEVICETYPE}
+                    value={deviceType}
+                    onClick={this.changeDevice}
+                  />
+                </Fragment>
+              )}
+            </QueryBlock>
+          </QueryLine>
         </QueryPanel>
 
         <div className="statWrapper">

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Table, Button } from 'antd'
 import { Link } from 'react-router-dom'
 import AjaxHandler from '../../../util/ajax'
@@ -11,6 +11,7 @@ import SearchInput from '../../component/searchInput'
 import CheckSelect from '../../component/checkSelect'
 import BuildingMultiSelectModal from '../../component/buildingMultiSelectModal'
 import { QueryPanel, QueryLine, QueryBlock } from '../../component/query'
+import CascadedBuildingSelect from '../../component/cascadedBuildingSelect'
 
 const subModule = 'userList'
 
@@ -66,6 +67,7 @@ class UserTableView extends React.Component {
     this.setState({
       loading: true
     })
+    const { isFushikang } = this.state
     const resource = '/api/statistics/order/user/consume'
     const {
       schoolId,
@@ -75,7 +77,9 @@ class UserTableView extends React.Component {
       analyze_deviceType: deviceType,
       analyze_selectKey: selectKey,
       analyze_page: page,
-      buildingIds
+      buildingIds,
+      areaIds,
+      floorIds
     } =
       props || this.props
     const body = {
@@ -88,6 +92,14 @@ class UserTableView extends React.Component {
     }
     if (buildingIds !== 'all') {
       body.buildingIds = buildingIds
+    }
+    if (isFushikang) {
+      if (areaIds !== 'all') {
+        body.areaIds = areaIds
+      }
+      if (floorIds !== 'all') {
+        body.floorIds = floorIds
+      }
     }
     if (day) {
       body.day = parseInt(day, 10)
@@ -138,7 +150,9 @@ class UserTableView extends React.Component {
         'analyze_selectKey',
         'analyze_deviceType',
         'buildingIds',
-        'schools'
+        'schools',
+        'areaIds',
+        'floorIds'
       ])
     ) {
       return
@@ -296,11 +310,6 @@ class UserTableView extends React.Component {
               : ''
         }
       ])
-      columns.splice(0, 1, {
-        title: '公寓',
-        dataIndex: 'schoolName',
-        className: 'firstCol'
-      })
       columns.splice(
         2,
         0,
@@ -316,9 +325,33 @@ class UserTableView extends React.Component {
       columns.splice(1, 0, {
         title: '宿舍',
         dataIndex: 'location',
-        width: '7%',
         render: text => text || '暂无'
       })
+      columns.splice(
+        0,
+        1,
+        {
+          title: '公寓',
+          dataIndex: 'schoolName',
+          width: '6%',
+          className: 'firstCol'
+        },
+        {
+          title: '区域',
+          dataIndex: 'domain',
+          width: '6%'
+        },
+        {
+          title: '楼栋',
+          dataIndex: 'buildingName',
+          width: '6%'
+        },
+        {
+          title: '楼层',
+          dataIndex: 'floorName',
+          width: '6%'
+        }
+      )
     }
     columns = columns.concat([
       {
@@ -388,7 +421,13 @@ class UserTableView extends React.Component {
       showBuildingSelect: false
     })
   }
-
+  confirmResidence = ({ areaIds, buildingIds, floorIds }) => {
+    this.props.changeUser(subModule, {
+      areaIds,
+      buildingIds,
+      floorIds
+    })
+  }
   render() {
     const {
       dataSource,
@@ -407,7 +446,9 @@ class UserTableView extends React.Component {
       analyze_deviceType: deviceType,
       buildingIds,
       schoolId,
-      buildingsOfSchoolId
+      buildingsOfSchoolId,
+      areaIds,
+      floorIds
     } = this.props
     const buildingNames =
       buildingIds === 'all'
@@ -422,6 +463,26 @@ class UserTableView extends React.Component {
             .join('、')
     const showClearBtn = !!searchingText
 
+    const buildingSelect = isFushikang ? (
+      <Fragment>
+        <span>位置筛选:</span>
+        <CascadedBuildingSelect
+          schoolId={schoolId}
+          areaIds={areaIds}
+          buildingIds={buildingIds}
+          floorIds={floorIds}
+          confirm={this.confirmResidence}
+        />
+      </Fragment>
+    ) : (
+      <Fragment>
+        <span>楼栋筛选:</span>
+        <span className="customized_select_option">{buildingNames}</span>
+        <Button type="primary" onClick={this.showBuildingSelect}>
+          点击选择
+        </Button>
+      </Fragment>
+    )
     return (
       <div className="">
         <QueryPanel>
@@ -474,19 +535,7 @@ class UserTableView extends React.Component {
             </QueryLine>
           )}
           <QueryLine>
-            <QueryBlock>
-              <span>楼栋筛选:</span>
-              <span className="customized_select_option leftSeperator">
-                {buildingNames}
-              </span>
-              <Button
-                className="leftSeperator"
-                type="primary"
-                onClick={this.showBuildingSelect}
-              >
-                点击选择
-              </Button>
-            </QueryBlock>
+            <QueryBlock>{buildingSelect}</QueryBlock>
             {isFushikang ? (
               <QueryBlock>
                 {showClearBtn ? (

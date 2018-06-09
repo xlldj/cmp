@@ -13,7 +13,7 @@ const {
 
 // type: 1: 区域， 2: 楼栋, 3: 楼层
 const IdStateName = {
-  1: 'zoneIds',
+  1: 'areaIds',
   2: 'buildingIds',
   3: 'floorIds'
 }
@@ -23,14 +23,17 @@ const ShowModalStateName = {
   3: 'showFloorSelect'
 }
 class CascadedBuildingSelect extends Component {
-  state = {
-    zoneNames: '全部区域',
-    showZoneSelect: false,
-    showBuildingSelect: false,
-    showFloorSelect: false,
-    zoneIds: 'all',
-    buildingIds: 'all',
-    floorIds: 'all'
+  constructor(props) {
+    super(props)
+    this.state = {
+      zoneNames: '全部区域',
+      showZoneSelect: false,
+      showBuildingSelect: false,
+      showFloorSelect: false,
+      areaIds: props.areaIds || 'all',
+      buildingIds: props.buildingIds || 'all',
+      floorIds: props.floorIds || 'all'
+    }
   }
   getColumns = name => {
     return [
@@ -61,37 +64,30 @@ class CascadedBuildingSelect extends Component {
     this.setState(nextState)
   }
   getBuildingOptions = () => {
-    const { zoneIds, buildingIds, floorIds } = this.state
+    const { areaIds, buildingIds, floorIds } = this.state
     const { residence } = this.props
     // 区域的选项总是全部的条目
     const zoneDataSource =
       residence &&
       residence.map(r => {
-        return { id: r.id, name: r.name, selected: true }
+        const unselected =
+          areaIds !== 'all' && !areaIds.some(zId => zId === r.id)
+        return { id: r.id, name: r.name, selected: unselected ? false : true }
       })
-    // 如果区域为所有，则楼栋和楼层都只有一个全部选项
-    if (zoneIds === 'all') {
-      return {
-        zone: { dataSource: zoneDataSource, name: '全部区域' },
-        building: { dataSource: [], name: '全部楼栋' },
-        floor: { dataSource: [], name: '全部楼层' }
-      }
-    }
-    let zoneNames = '',
-      buildingNames = '',
-      floorNames = ''
+    let zoneNames = areaIds === 'all' ? '全部区域' : [],
+      buildingNames = buildingIds === 'all' ? '全部楼栋' : [],
+      floorNames = floorIds === 'all' ? '全部楼层' : []
     const buildingDataSource = []
     const floorDataSource = []
-    // 区域不为所有，选择楼栋的选项。同时设置楼层的选项。
-    // 先将没选择的zone的selected清空
-    zoneDataSource.forEach(z => {
-      if (!zoneIds.some(zoneId => zoneId === z.id)) {
-        z.selected = false
+    const zones =
+      areaIds === 'all'
+        ? residence
+        : residence.filter(r => areaIds.some(zId => zId === r.id))
+    zones.forEach(zone => {
+      if (areaIds !== 'all') {
+        // 如果不是全选，则这里的区域为选中的区域
+        zoneNames.push(zone.name || '')
       }
-    })
-    zoneIds.forEach(zoneId => {
-      const zone = residence.find(r => r.id === zoneId)
-      zoneNames += zone.name || ''
       if (zone && zone.children) {
         const buildings = zone.children
         buildings.forEach(building => {
@@ -101,11 +97,12 @@ class CascadedBuildingSelect extends Component {
             name: building.name,
             selected: true
           }
+          // 如果楼栋不是全选，则只要选选中楼栋的楼层就可以了。反之，则将所有可选楼栋的楼层都加到楼层的选项中。
           if (buildingIds !== 'all') {
             const selected = buildingIds.some(b => b === building.id)
             // 如果该楼栋在所选择的buildingIds内,
             if (selected) {
-              buildingNames += building.name || ''
+              buildingNames.push(building.name || '')
               const floors = building.children
               floors.forEach(f => {
                 const floorItem = { id: f.id, name: f.name, selected: true }
@@ -115,7 +112,7 @@ class CascadedBuildingSelect extends Component {
                   )
                   // 如果楼层在所选择的floorIds内，添加到名字中
                   if (isFloorSelected) {
-                    floorNames += f.name || ''
+                    floorNames.push(f.name || '')
                   } else {
                     floorItem.selected = false
                   }
@@ -126,19 +123,37 @@ class CascadedBuildingSelect extends Component {
               // 将对应楼栋的selected改为false
               buildingItem.selected = false
             }
+          } else {
+            const floors = building.children
+            floors.forEach(f => {
+              const floorItem = { id: f.id, name: f.name, selected: true }
+              if (floorIds !== 'all') {
+                const isFloorSelected = floorIds.some(
+                  selectedFloorId => selectedFloorId === f.id
+                )
+                // 如果楼层在所选择的floorIds内，添加到名字中
+                if (isFloorSelected) {
+                  floorNames.push(f.name || '')
+                } else {
+                  floorItem.selected = false
+                }
+              }
+              floorDataSource.push(floorItem)
+            })
           }
           buildingDataSource.push(buildingItem)
         })
       }
     })
-    const buildingNameStr = buildingIds === 'all' ? '全部楼栋' : buildingNames
-    const floorOptionData = buildingIds === 'all' ? [] : floorDataSource
-    const floorNameStr = floorIds === 'all' ? '全部楼层' : floorNames
+    const zoneNameStr = areaIds === 'all' ? '全部区域' : zoneNames.join('/')
+    const buildingNameStr =
+      buildingIds === 'all' ? '全部楼栋' : buildingNames.join('/')
+    const floorNameStr = floorIds === 'all' ? '全部楼层' : floorNames.join('/')
     return {
-      zone: { dataSource: zoneDataSource, name: zoneNames },
+      zone: { dataSource: zoneDataSource, name: zoneNameStr },
       building: { dataSource: buildingDataSource, name: buildingNameStr },
       floor: {
-        dataSource: floorOptionData,
+        dataSource: floorDataSource,
         name: floorNameStr
       }
     }
@@ -149,78 +164,96 @@ class CascadedBuildingSelect extends Component {
     const selectedIds = data.filter(r => r.selected === true).map(r => r.id)
     const nextState = {}
     // 判断是否为全选
-    const isAllSelected =
-      data.filter(d => d.selected === true).length === data.length
+    const isAllSelected = selectedIds.length === data.length
     const nextIds = isAllSelected ? 'all' : selectedIds
     nextState[ShowModalStateName[type]] = false
     // 判断当前选择对其它的影响, 这里不用更改弹窗中的表单项，只需要改对应id数组
     // 首先更新所有的id数组，然后从区域开始逐级更新下级的id
-    let { zoneIds, buildingIds, floorIds } = this.state
+    let { areaIds, buildingIds, floorIds } = this.state
+    const idGroups = { areaIds, buildingIds, floorIds }
     if (type === RESIDENCE_TYPE_ZONE) {
-      zoneIds = nextIds
+      areaIds = nextIds
     } else if (type === RESIDENCE_TYPE_BUILDING) {
       buildingIds = nextIds
     } else {
       floorIds = nextIds
       // 此时只要改这个数组就可以了
       nextState.floorIds = floorIds
+      idGroups.floorIds = floorIds
+      this.props.confirm(idGroups)
       return this.setState(nextState)
     }
     const { residence } = this.props
     if (isAllSelected) {
+      idGroups[IdStateName[type]] = 'all'
       nextState[IdStateName[type]] = 'all'
+      this.props.confirm(idGroups)
       return this.setState(nextState)
     } else {
       const zones =
-        zoneIds === 'all'
+        areaIds === 'all'
           ? residence
-          : residence.filter(r => zoneIds.some(z => z === r.id))
+          : residence.filter(r => areaIds.some(z => z === r.id))
       const buildingIdsAvailable = [],
         floorIdsAvailable = []
       zones.forEach(zone => {
         const buildings = zone && zone.children
         buildings.forEach(building => {
           buildingIdsAvailable.push(building.id)
-          const buildingAlreadyExistInState = buildingIds.some(
-            bId => bId === building.id
-          )
+          let buildingAlreadyExistInState = true
+          if (
+            buildingIds !== 'all' &&
+            !buildingIds.some(bId => bId === building.id)
+          ) {
+            buildingAlreadyExistInState = false
+          }
           if (buildingAlreadyExistInState) {
             // 得到可选的floor的id数组
             const floors = building.children
+            floors.forEach(f => floorIdsAvailable.push(f.id))
           }
         })
       })
 
-      // 删除掉没有在当前区域的building的id. 先搜集所有被选的区域的楼栋的id
-      const allBuildingIdsOfSelectedZone = []
-      selectedIds.forEach(selectedZoneId => {
-        const buildingIdsOfTheZone = residence
-          .find(r => r.id === selectedZoneId)
-          .children.map(building => building.id)
-        allBuildingIdsOfSelectedZone.concat(buildingIdsOfTheZone)
-      })
-      // 清理失效的building id
-      for (let l = buildingIds.length, i = l - 1; i > 0; i--) {
-        const buildingId = buildingIds[i]
-        const stillInSelectedZone = allBuildingIdsOfSelectedZone.some(
-          b => b === buildingId
-        )
-        if (!stillInSelectedZone) {
-          buildingIds.splice(i, 1)
+      // 如果楼栋不是全选，根据楼栋和楼层的id来删除无效的id
+      if (buildingIds !== 'all') {
+        for (let l = buildingIds.length, i = l - 1; i >= 0; i--) {
+          const id = buildingIds[i]
+          const ind = buildingIdsAvailable.findIndex(bId => bId === id)
+          if (ind === -1) {
+            buildingIds.splice(ind, 1)
+          }
         }
       }
+      if (buildingIds.length === 0) {
+        buildingIds = 'all'
+      }
+
+      if (floorIds !== 'all') {
+        for (let l = floorIds.length, i = l - 1; i >= 0; i--) {
+          const id = floorIds[i]
+          const ind = floorIdsAvailable.some(fId => fId === id)
+          if (ind === -1) {
+            floorIds.splice(i, 1)
+          }
+        }
+      }
+      if (floorIds.length === 0) {
+        floorIds = 'all'
+      }
     }
+    nextState.areaIds = areaIds
+    nextState.buildingIds = buildingIds
+    nextState.floorIds = floorIds
+    idGroups.areaIds = areaIds
+    idGroups.buildingIds = buildingIds
+    idGroups.floorIds = floorIds
     this.setState(nextState)
+    this.props.confirm(idGroups)
   }
 
   render() {
-    const {
-      showZoneSelect,
-      showBuildingSelect,
-      showFloorSelect,
-      zoneIds,
-      buildingIds
-    } = this.state
+    const { showZoneSelect, showBuildingSelect, showFloorSelect } = this.state
     const { zone, building, floor } = this.getBuildingOptions()
 
     return (
@@ -235,7 +268,6 @@ class CascadedBuildingSelect extends Component {
         <span className="customized_select_option">{building.name}</span>
         <Button
           type="primary"
-          disabled={zoneIds === 'all'}
           onClick={e => this.showModal(e, 'showBuildingSelect')}
         >
           点击选择
@@ -243,7 +275,6 @@ class CascadedBuildingSelect extends Component {
         <span className="customized_select_option">{floor.name}</span>
         <Button
           type="primary"
-          disabled={buildingIds === 'all'}
           onClick={e => this.showModal(e, 'showFloorSelect')}
         >
           点击选择

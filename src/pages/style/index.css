@@ -399,7 +399,9 @@ shortSeperator {
   width: -webkit-fill-available;
 }
 .multiSelectModalHeader .hint {
-  line-height: 40px;
+  vertical-align: top;
+  width: 50%;
+  line-height: 22px;
 }
 .infoModal .modalDetails_wrapper li {
   width: 100%;

@@ -20,7 +20,9 @@ const initialOrderState = {
     selectedRowIndex: '',
     selectedDetailId: '',
     showDetail: false,
+    areaIds: 'all',
     buildingIds: 'all',
+    floorIds: 'all',
     // below is stat related state
     stat_day: 3, // 3 for today, 4 for 7 days, 5 for 30 days,  'all' for '不限', note need to change 'all' to 6 when sending to server
     stat_dt: 1, // for devicetype of stat.
@@ -30,6 +32,8 @@ const initialOrderState = {
     stat_buildingIds: 'all',
     stat_startTime: '',
     stat_endTime: '',
+    stat_areaIds: 'all',
+    stat_floorIds: 'all',
     // below is state for order analyze
     analyze_day: 1, // 1 for 'today', default setting.
     analyze_deviceType: 1,

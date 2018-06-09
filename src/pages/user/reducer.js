@@ -23,7 +23,9 @@ const initialUserState = {
     analyze_deviceType: 1, // 默认为热水器，1
     analyze_selectKey: '',
     analyze_page: 1,
-    buildingIds: 'all'
+    buildingIds: 'all',
+    areaIds: 'all',
+    floorIds: 'all'
   }
 }
 const userModule = (state = initialUserState, action) => {

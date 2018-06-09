@@ -7,12 +7,14 @@ import SchoolSelectorWithoutAll from '../../component/schoolSelectorWithoutAll'
 import OrderTable from './orderTable/index.js'
 import OrderStatView from './orderStatView'
 import OrderAnalyze from './analyze'
+import UserAnalyzeView from '../../user/userList/userAnalyze'
 
 import PhaseLine from '../../component/phaseLine'
 
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeOrder } from '../../../actions'
+import { changeOrder, changeUser } from '../../../actions'
+import isSchoolFsk from '../../../util/foxconnCheck'
 const subModule = 'orderList'
 const mapStateToProps1 = (state, ownProps) => {
   return {
@@ -26,22 +28,52 @@ const mapStateToProps1 = (state, ownProps) => {
     schools: state.setSchoolList.schools,
     buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
     startTime: state.orderModule[subModule].stat_startTime,
-    endTime: state.orderModule[subModule].stat_endTime
+    endTime: state.orderModule[subModule].stat_endTime,
+    areaIds: state.orderModule[subModule].stat_areaIds,
+    floorIds: state.orderModule[subModule].stat_floorIds
   }
 }
 
-let OrderStat = withRouter(
+const OrderStat = withRouter(
   connect(mapStateToProps1, {
     changeOrder
   })(OrderStatView)
 )
+
+const mapStateToTableProps = (state, ownProps) => ({
+  schoolId: state.orderModule[subModule].schoolId,
+
+  analyze_day: state.userModule.userList.analyze_day,
+  analyze_startTime: state.userModule.userList.analyze_startTime,
+  analyze_endTime: state.userModule.userList.analyze_endTime,
+  analyze_deviceType: state.userModule.userList.analyze_deviceType,
+  analyze_selectKey: state.userModule.userList.analyze_selectKey,
+  analyze_page: state.userModule.userList.analyze_page,
+  buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId,
+  buildingIds: state.userModule.userList.buildingIds,
+  areaIds: state.userModule.userList.areaIds,
+  floorIds: state.userModule.userList.floorIds,
+
+  forbiddenStatus: state.setAuthenData.forbiddenStatus,
+  schools: state.setSchoolList.schools
+})
+
+const UserAnalyze = withRouter(
+  connect(mapStateToTableProps, {
+    changeUser,
+    changeOrder
+  })(UserAnalyzeView)
+)
+
 const {
   ORDER_LIST_TABLE,
   ORDER_LIST_STAT,
   ORDER_LIST_ANALYZE,
+  ORDER_LIST_USERCONSUMPTION,
   ORDER_LIST_PAGE_ORDER_TABLE,
   ORDER_LIST_PAGE_DEVICE_CONSUMPTION_ANALYZE,
-  ORDER_LIST_PAGE_DEVICE_CONSUMPTION_WARN
+  ORDER_LIST_PAGE_DEVICE_CONSUMPTION_WARN,
+  ORDER_LIST_PAGE_USER_CONSUMPTION
 } = CONSTANTS
 
 /* state explanation */
@@ -131,12 +163,14 @@ class OrderList extends React.Component {
         return <OrderStat />
       case ORDER_LIST_ANALYZE:
         return <OrderAnalyze {...this.props} />
+      case ORDER_LIST_USERCONSUMPTION:
+        return <UserAnalyze {...this.props} />
       default:
         return <OrderTable {...this.props} />
     }
   }
   getTabs = () => {
-    const { forbiddenStatus } = this.props
+    const { forbiddenStatus, schoolId, schools } = this.props
     const {
       ORDER_LIST_GET,
       ORDER_CONSUME_ANALYZE_GET,
@@ -151,6 +185,10 @@ class OrderList extends React.Component {
     }
     if (!ORDER_CONSUME_WARN_GET) {
       tabs.push(ORDER_LIST_PAGE_DEVICE_CONSUMPTION_WARN)
+    }
+    const isFoxconn = isSchoolFsk(schools, schoolId)
+    if (isFoxconn) {
+      tabs.push(ORDER_LIST_PAGE_USER_CONSUMPTION)
     }
     return tabs
   }

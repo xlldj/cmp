@@ -103,6 +103,7 @@ export default class MultiSelectModal extends React.Component {
 
     const selectedArr =
       dataSource && dataSource.filter((r, i) => r.selected === true)
+    const allSelected = dataSource.length === selectedArr.length
 
     const selectedItems =
       selectedArr &&
@@ -122,7 +123,11 @@ export default class MultiSelectModal extends React.Component {
         footer={null}
       >
         <div className="multiSelectModalHeader">
-          <p className="hint">已选择:{selectedItems}</p>
+          <p className="hint">
+            已选择:<span className="selectedItemStr">
+              {allSelected ? '全部' : selectedItems}
+            </span>
+          </p>
           <div>
             {suportAllChoose ? (
               <Button

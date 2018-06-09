@@ -74,7 +74,7 @@ class OrderTableView extends React.Component {
   }
   getPostBody = props => {
     let { state } = props.history.location
-
+    const { isFushikang } = this.state
     let {
       page,
       schoolId,
@@ -85,7 +85,9 @@ class OrderTableView extends React.Component {
       endTime,
       userType,
       day,
-      buildingIds
+      buildingIds,
+      areaIds,
+      floorIds
     } = props
     const body = {
       page: page,
@@ -106,6 +108,14 @@ class OrderTableView extends React.Component {
     }
     if (buildingIds !== 'all') {
       body.buildingIds = buildingIds
+    }
+    if (isFushikang) {
+      if (areaIds !== 'all') {
+        body.areaIds = areaIds
+      }
+      if (floorIds !== 'all') {
+        body.floorIds = floorIds
+      }
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
@@ -197,6 +207,7 @@ class OrderTableView extends React.Component {
     } else if (!this.props.showDetail && nextProps.showDetail) {
       this.root.addEventListener('click', this.closeDetail, false)
     }
+
     if (
       checkObject(this.props, nextProps, [
         'day',
@@ -209,7 +220,9 @@ class OrderTableView extends React.Component {
         'endTime',
         'userType',
         'buildingIds',
-        'schools'
+        'schools',
+        'areaIds',
+        'floorIds'
       ])
     ) {
       return
@@ -258,7 +271,9 @@ class OrderTableView extends React.Component {
         'startTime',
         'endTime',
         'userType',
-        'buildingIds'
+        'buildingIds',
+        'areaIds',
+        'floorIds'
       ])
     ) {
       return true
@@ -371,6 +386,13 @@ class OrderTableView extends React.Component {
       endTime: endTime,
       page: 1,
       day: 0
+    })
+  }
+  confirmResidence = ({ areaIds, buildingIds, floorIds }) => {
+    this.props.changeOrder(subModule, {
+      areaIds,
+      buildingIds,
+      floorIds
     })
   }
   selectRow = (record, index, event) => {
@@ -610,7 +632,9 @@ class OrderTableView extends React.Component {
       selectedDetailId,
       buildingIds,
       schoolId,
-      buildingsOfSchoolId
+      buildingsOfSchoolId,
+      areaIds,
+      floorIds
     } = this.props
     const {
       showBuildingSelect,
@@ -641,7 +665,13 @@ class OrderTableView extends React.Component {
     const buildingSelect = isFushikang ? (
       <Fragment>
         <span>位置筛选:</span>
-        <CascadedBuildingSelect schoolId={schoolId} />
+        <CascadedBuildingSelect
+          schoolId={schoolId}
+          areaIds={areaIds}
+          buildingIds={buildingIds}
+          floorIds={floorIds}
+          confirm={this.confirmResidence}
+        />
       </Fragment>
     ) : (
       <Fragment>

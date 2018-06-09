@@ -29,6 +29,10 @@ const ORDER = {
     value: 3,
     text: '消费预警'
   },
+  ORDER_LIST_PAGE_USER_CONSUMPTION: {
+    value: 4,
+    text: '个人消费分析'
+  },
   ORDER_WARN_PAGE_TABS: [
     {
       value: 1,
@@ -80,6 +84,7 @@ const ORDER = {
   ORDER_LIST_TABLE: 1,
   ORDER_LIST_STAT: 2,
   ORDER_LIST_ANALYZE: 3,
+  ORDER_LIST_USERCONSUMPTION: 4,
   X_AXIS_NAME: {
     0: '0元',
     1: '<0.5元',
