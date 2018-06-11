@@ -52,7 +52,10 @@ class UserFeedbackInfo extends Component {
   ]
   state = {
     list: [],
-    loading: false
+    loading: false,
+    index: -1,
+    initialSlide: 0,
+    showTabImg: false
   }
   componentDidMount() {
     this.fetchData(this.props)
@@ -89,6 +92,29 @@ class UserFeedbackInfo extends Component {
           feedbackTotal: json.data.total || 0
         })
       }
+    })
+  }
+  setWH = (e, value) => {
+    let img = e.target
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
+    if (w < h) {
+      img.style.width = value ? `${value}px` : '50px'
+    } else {
+      img.style.height = value ? `${value}px` : '50px'
+    }
+  }
+  showTabImg = (index, i) => {
+    this.setState({
+      index,
+      initialSlide: i,
+      showTabImg: true
+    })
+  }
+  closeTabImgs = () => {
+    this.setState({
+      initialSlide: 0,
+      showTabImg: false
     })
   }
   render() {

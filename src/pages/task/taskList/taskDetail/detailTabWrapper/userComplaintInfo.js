@@ -9,15 +9,12 @@ import { changeTask } from '../../../../../actions'
 const { TASK_DETAIL_LIST_LENGTH: SIZE, TASK_TYPE_COMPLAINT } = CONSTANTS
 
 class UserComplaintInfo extends Component {
-  setWH = (e, value) => {
-    let img = e.target
-    let w = parseInt(window.getComputedStyle(img).width, 10)
-    let h = parseInt(window.getComputedStyle(img).height, 10)
-    if (w < h) {
-      img.style.width = value ? `${value}px` : '50px'
-    } else {
-      img.style.height = value ? `${value}px` : '50px'
-    }
+  state = {
+    list: [],
+    loading: false,
+    index: -1,
+    initialSlide: 0,
+    showTabImg: false
   }
   userComplaintsColumns = [
     {
@@ -60,9 +57,28 @@ class UserComplaintInfo extends Component {
       render: (text, record) => Time.getTimeStr(record.createTime)
     }
   ]
-  state = {
-    list: [],
-    loading: false
+  setWH = (e, value) => {
+    let img = e.target
+    let w = parseInt(window.getComputedStyle(img).width, 10)
+    let h = parseInt(window.getComputedStyle(img).height, 10)
+    if (w < h) {
+      img.style.width = value ? `${value}px` : '50px'
+    } else {
+      img.style.height = value ? `${value}px` : '50px'
+    }
+  }
+  showTabImg = (index, i) => {
+    this.setState({
+      index,
+      initialSlide: i,
+      showTabImg: true
+    })
+  }
+  closeTabImgs = () => {
+    this.setState({
+      initialSlide: 0,
+      showTabImg: false
+    })
   }
   componentDidMount() {
     this.fetchData(this.props)

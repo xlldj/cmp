@@ -136,7 +136,7 @@ class TaskList extends React.Component {
     this.ti = setTimeout(this.refetch, 5 * 60 * 1000)
   }
   refetch = () => {
-    this.fetchData()
+    this.sendTaskListFetch()
   }
   componentWillReceiveProps(nextProps) {
     try {
