@@ -8,11 +8,13 @@ import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import Noti from '../../../../util/noti'
 import Format from '../../../../util/format'
+import { notEmpty } from '../../../../util/types'
 
 import CheckSelect from '../../../component/checkSelect'
 import ThresholdSelector from '../../../component/thresholdSelector'
 import SetRuleHint from './setRuleHint.js'
-import RangeSelect from '../rangeSelectDisableMonth.js'
+// import RangeSelect from '../rangeSelectDisableMonth.js'
+import RangeSelect from '../../../component/rangeSelect'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
 import RepairmanTable from '../../../component/repairmanChooseClean.js'
 
@@ -486,7 +488,7 @@ class OrderAnalyzeView extends React.Component {
         className: 'shalowRed',
         width: '12%',
         render: (text, record, index) =>
-          record.consumption ? `¥${record.consumption}` : 0,
+          notEmpty(record.consumption) ? `¥${record.consumption}` : 0,
         sorter: true
       }
     ]
