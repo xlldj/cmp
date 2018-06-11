@@ -9,6 +9,7 @@ const EMPLOYEE = {
     6: '研发人员'
   },
   EMPLOYEE_TYPE: { 1: '客服', 2: '维修员', 3: '研发人员' },
+  EMPLOYEE_WITHOUT_REPAIRMAN: { 1: '客服', 3: '研发人员' },
   EMPLOYEE_CUSTOMER: 1,
   EMPLOYEE_REPAIRMAN: 2,
   EMPLOYEE_DEVELOPER: 3,

@@ -271,12 +271,12 @@ class HandleBtn extends React.Component {
           <div>
             {handleLimit !== true ? (
               <Dropdown
-                overlay={this.reassignMenu}
-                // overlay={
-                //   type === CONSTANTS.TASK_TYPE_REPAIR
-                //     ? this.reassignMenu
-                //     : this.reassignWithoutRepairman
-                // }
+                // overlay={this.reassignMenu}
+                overlay={
+                  type === CONSTANTS.TASK_TYPE_REPAIR
+                    ? this.reassignMenu
+                    : this.reassignWithoutRepairman
+                }
               >
                 <Button type="primary">转接</Button>
               </Dropdown>

@@ -608,7 +608,7 @@ class BuildTask extends React.Component {
                 <BasicSelector
                   staticOpts={
                     parseInt(type, 10) !== CONSTANTS.TASK_TYPE_REPAIR
-                      ? CONSTANTS.EMPLOYEE_TYPE
+                      ? CONSTANTS.EMPLOYEE_WITHOUT_REPAIRMAN
                       : this.employeeTypes
                   }
                   selectedOpt={maintainerType}
