@@ -101,7 +101,8 @@ class BeingsQuery extends React.Component {
                 }
               />
             </QueryBlock>
-            {forbiddenStatus.ADD_EDIT_PUSH ? null : (
+            {/* 暂时不上 创建消息推送
+            forbiddenStatus.ADD_EDIT_PUSH ? null : (
               <QueryBlock>
                 <Button
                   type="primary"
@@ -112,7 +113,7 @@ class BeingsQuery extends React.Component {
                   创建消息推送
                 </Button>
               </QueryBlock>
-            )}
+            )*/}
           </QueryLine>
           <QueryLine>
             <QueryBlock>

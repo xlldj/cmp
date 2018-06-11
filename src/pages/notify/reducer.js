@@ -13,7 +13,7 @@ const initialNotifyState = {
   },
   beings: {
     schoolId: getDefaultSchool(),
-    type: CONTAIN.PUSH_TYPE_PERSON,
+    type: CONTAIN.PUSH_TYPE_AUTO,
     status: 'all',
     method: 'all',
     page: 1

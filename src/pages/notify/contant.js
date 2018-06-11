@@ -17,8 +17,9 @@ const NOTIFY = {
   },
   BEING_PUSH_METNON_WAITE: 2,
   BEINGS_PUSH_TYPE: {
-    1: '自动推送',
-    2: '人工推送'
+    1: '自动推送'
+    // 暂时不上 人工推送
+    // 2: '人工推送'
   },
   BEING_PUSH_AUTO: 1,
   BEINGS_PUSH_PERSON: {
@@ -44,6 +45,7 @@ const NOTIFY = {
     4: 'default',
     1: 'warning'
   },
+  PUSH_TYPE_AUTO: 1,
   PUSH_TYPE_PERSON: 2,
   PUSH_SUCCESS_STATUS: 2,
   PUSH_ERROR_STATUS: 3,
