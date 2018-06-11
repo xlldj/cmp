@@ -39,8 +39,6 @@ export const fetchResidence = schoolId => {
   return dispatch => {
     const resource = '/api/area/tree'
     const body = {
-      page: 1,
-      size: 1000,
       schoolId: +schoolId
     }
     AjaxHandler.fetch(resource, body).then(json => {
