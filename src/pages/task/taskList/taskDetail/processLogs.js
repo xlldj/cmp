@@ -90,6 +90,9 @@ const ProcessLogs = props => {
         case CONSTANTS.TASK_HANDLE_CHANGETASK:
           message = '转换工单为报修工单'
           break
+        case CONSTANTS.TASK_HANDLE_CHOOSEROOM:
+          message = '选择房间类型' + (content ? ` : ${content}` : '')
+          break
         default:
           message = ''
       }

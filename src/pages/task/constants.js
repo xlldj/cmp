@@ -111,6 +111,7 @@ const TASK = {
   TASK_HANDLE_SETTARGET: 12,
   TASK_HANDLE_REPAIRPART: 13,
   TASK_HANDLE_CHANGETASK: 14,
+  TASK_HANDLE_CHOOSEROOM: 15,
   // constants for task/report
   REPORTCATE: { 1: '工作情况', 2: '投诉分析', 3: '绩效考核' },
   REPORT_CATE_SUM: 1,
