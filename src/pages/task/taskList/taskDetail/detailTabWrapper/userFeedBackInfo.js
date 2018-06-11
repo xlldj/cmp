@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Table } from 'antd'
+import React, { Component, Fragment } from 'react'
+import { Table, Modal, Carousel } from 'antd'
 import Time from '../../../../../util/time'
 import CONSTANTS from '../../../../../constants'
 import AjaxHandler from '../../../../../util/ajax'
@@ -9,6 +9,13 @@ import { changeTask } from '../../../../../actions'
 const { TASK_DETAIL_LIST_LENGTH: SIZE, TASK_TYPE_FEEDBACK } = CONSTANTS
 
 class UserFeedbackInfo extends Component {
+  state = {
+    list: [],
+    loading: false,
+    index: -1,
+    initialSlide: 0,
+    showTabImg: false
+  }
   userFeedbacksColumns = [
     {
       title: '反馈类型',
@@ -50,13 +57,6 @@ class UserFeedbackInfo extends Component {
         record.createTime ? Time.getTimeStr(record.createTime) : '暂无'
     }
   ]
-  state = {
-    list: [],
-    loading: false,
-    index: -1,
-    initialSlide: 0,
-    showTabImg: false
-  }
   componentDidMount() {
     this.fetchData(this.props)
   }
@@ -118,16 +118,57 @@ class UserFeedbackInfo extends Component {
     })
   }
   render() {
-    const { list, loading } = this.state
+    const { list, loading, showTabImg, index, initialSlide } = this.state
+    const images = list && list[index] && list[index].images
+    const tabCarouselItems =
+      images &&
+      images.length > 0 &&
+      images.map((r, i) => {
+        return (
+          <img
+            alt=""
+            key={i}
+            src={CONSTANTS.FILEADDR + r}
+            className="carouselImg"
+          />
+        )
+      })
+    const tabCarousel = (
+      <Carousel
+        dots={true}
+        accessibility={true}
+        className="carouselItem"
+        autoplay={false}
+        arrows={true}
+        initialSlide={initialSlide}
+      >
+        {tabCarouselItems}
+      </Carousel>
+    )
     return (
-      <Table
-        bordered
-        loading={loading}
-        rowKey={record => record.id}
-        pagination={false}
-        dataSource={list}
-        columns={this.userFeedbacksColumns}
-      />
+      <Fragment>
+        <Table
+          bordered
+          loading={loading}
+          rowKey={record => record.id}
+          pagination={false}
+          dataSource={list}
+          columns={this.userFeedbacksColumns}
+        />
+        <Modal
+          visible={showTabImg}
+          title=""
+          closable={true}
+          onCancel={this.closeTabImgs}
+          className="carouselModal"
+          okText=""
+          footer={null}
+        >
+          <div className="carouselContainer">
+            {showTabImg ? tabCarousel : null}
+          </div>
+        </Modal>
+      </Fragment>
     )
   }
 }

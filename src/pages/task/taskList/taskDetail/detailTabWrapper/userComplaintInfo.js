@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Table } from 'antd'
+import React, { Component, Fragment } from 'react'
+import { Table, Carousel, Modal } from 'antd'
 import Time from '../../../../../util/time'
 import CONSTANTS from '../../../../../constants'
 import AjaxHandler from '../../../../../util/ajax'
@@ -118,16 +118,57 @@ class UserComplaintInfo extends Component {
     })
   }
   render() {
-    const { list, loading } = this.state
+    const { list, loading, index, initialSlide, showTabImg } = this.state
+    const images = list && list[index] && list[index].images
+    const tabCarouselItems =
+      images &&
+      images.length > 0 &&
+      images.map((r, i) => {
+        return (
+          <img
+            alt=""
+            key={i}
+            src={CONSTANTS.FILEADDR + r}
+            className="carouselImg"
+          />
+        )
+      })
+    const tabCarousel = (
+      <Carousel
+        dots={true}
+        accessibility={true}
+        className="carouselItem"
+        autoplay={false}
+        arrows={true}
+        initialSlide={initialSlide}
+      >
+        {tabCarouselItems}
+      </Carousel>
+    )
     return (
-      <Table
-        bordered
-        loading={loading}
-        rowKey={record => record.id}
-        pagination={false}
-        dataSource={list}
-        columns={this.userComplaintsColumns}
-      />
+      <Fragment>
+        <Table
+          bordered
+          loading={loading}
+          rowKey={record => record.id}
+          pagination={false}
+          dataSource={list}
+          columns={this.userComplaintsColumns}
+        />
+        <Modal
+          visible={showTabImg}
+          title=""
+          closable={true}
+          onCancel={this.closeTabImgs}
+          className="carouselModal"
+          okText=""
+          footer={null}
+        >
+          <div className="carouselContainer">
+            {showTabImg ? tabCarousel : null}
+          </div>
+        </Modal>
+      </Fragment>
     )
   }
 }
