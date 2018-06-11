@@ -1277,6 +1277,81 @@ shortSeperator {
 .detailPanelWrapper .detailPanel-content .detailList {
   padding: 5px 0;
 }
+.detailPanelWrapperWithSiderbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 100%;
+  min-width: 900px;
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+}
+.detailPanelWrapperWithSiderbar .detailPanelWrapperWithSiderbar-header {
+  display: inline-flex;
+  padding: 0 30px;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  border-bottom: 1px solid #ddd;
+}
+.detailPanelWrapperWithSiderbar .detailPanelWrapperWithSiderbar-content,
+.detailPanelWrapperWithSiderbar .detailPanelWrapperWithSiderbar-sidebar {
+  display: inline-block;
+  padding: 20px 30px;
+  height: auto;
+  border-right: 1px solid #ddd;
+}
+.detailPanelWrapperWithSiderbar .detailPanelWrapperWithSiderbar-content {
+  width: 70%;
+  height: calc(100% - 50px);
+  overflow-y: scroll;
+}
+.detailPanelWrapperWithSiderbar .detailPanelWrapperWithSiderbar-content h3 {
+  font-size: 20px;
+}
+.detailPanelWrapperWithSiderbar
+  .detailPanelWrapperWithSiderbar-content
+  .handleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.detailPanelWrapperWithSiderbar
+  .detailPanelWrapperWithSiderbar-content
+  .handleBtn
+  button {
+  margin-right: 10px;
+}
+.detailPanelWrapperWithSiderbar
+  .detailPanelWrapperWithSiderbar-content
+  .handleBtn
+  .hint {
+  display: inline-block;
+  margin-right: 10px;
+  color: #f5f5f5;
+}
+.detailPanelWrapperWithSiderbar
+  .detailPanelWrapperWithSiderbar-content
+  .processLogs {
+  margin: 0px -30px;
+  padding: 15px 30px;
+  border-top: 1px solid #ddd;
+}
+.detailPanelWrapperWithSiderbar
+  .detailPanelWrapperWithSiderbar-content
+  .processLogs
+  ul {
+  margin-top: 15px;
+  border: 1px solid #ddd;
+}
+.detailPanelWrapperWithSiderbar .detailPanelWrapperWithSiderbar-sidebar {
+  position: absolute;
+  width: 30%;
+}
 .selectedHintWraper {
   position: relative;
 }
@@ -1420,7 +1495,7 @@ shortSeperator {
 .panelSelect li {
   display: inline-block;
   margin-left: 8px;
-  padding: 2px 8px;
+  padding: 2px 4px;
   border-radius: 2px;
   border: 1px solid #ddd;
 }
@@ -1577,6 +1652,7 @@ shortSeperator {
   box-sizing: border-box;
   height: 100vh;
   overflow-y: scroll;
+  min-width: 1005px;
 }
 #root .container .content .main .breadc {
   background-color: #fff;
@@ -1792,7 +1868,7 @@ shortSeperator {
   padding: 10px 20px;
 }
 .queryPanel .queryLine {
-  height: 40px;
+  height: auto;
 }
 .queryPanel > li {
   display: inline-block;
@@ -1834,6 +1910,18 @@ shortSeperator {
   height: 100%;
   display: inline-flex;
   align-items: center;
+}
+.phaseLine .block span:first-child,
+.queryLine .block span:first-child {
+  min-width: 55px;
+}
+.phaseLine .block li,
+.queryLine .block li {
+  margin: 5px;
+}
+.phaseLine .block .checkSelect,
+.queryLine .block .checkSelect {
+  flex-wrap: wrap;
 }
 .phaseLine .block .select,
 .queryLine .block .select {
@@ -1942,4 +2030,58 @@ shortSeperator {
   .rangePicker .ant-input input {
     height: 33px;
   }
+}
+.insertMsg {
+  position: relative;
+  width: auto !important;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  outline: none;
+  background: white;
+}
+.insertMsg a {
+  left: 10px;
+  line-height: 45px;
+  font-size: 14px;
+  padding-left: 10px;
+}
+.insertMsg textarea {
+  border: 0px;
+}
+.buildTask ul {
+  padding: 0;
+  background-color: white !important;
+}
+.buildTask ul li p,
+.buildTask ul li.itemsWrapper p {
+  width: 100px;
+}
+.buildTask ul span.ant-radio + * {
+  padding-left: 0;
+}
+.buildTask .btnArea {
+  padding: 0;
+  background-color: white;
+}
+.msgListDiv {
+  width: 100%;
+  min-height: 100px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.msgListDiv div {
+  text-align: left;
+}
+.ant-calendar-picker.datePicker input {
+  width: 160px;
+}
+li.msgItem {
+  line-height: 30px;
+  height: auto;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #e6e6e6;
+}
+.msgItem:hover {
+  background: #ecf6fd;
 }

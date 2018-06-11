@@ -477,7 +477,7 @@ class OrderTableView extends React.Component {
       },
       {
         title: '用户',
-        dataIndex: 'username',
+        dataIndex: 'mobile',
         width: '10%'
       },
       {

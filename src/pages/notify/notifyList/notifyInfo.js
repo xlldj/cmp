@@ -2,7 +2,7 @@ import React from 'react'
 import moment from 'moment'
 
 import { Button, DatePicker, Table, Modal } from 'antd'
-
+import InsertMsgContainer from '../../task/quickMsg/insertMsg/index'
 import AjaxHandler from '../../../util/ajax'
 import Noti from '../../../util/noti'
 import AddPlusAbs from '../../component/addPlusAbs'
@@ -470,9 +470,26 @@ class NotifyInfo extends React.Component {
       showSchools: true
     })
   }
+  showInsertMsg = () => {
+    this.setState({
+      isInsertMsg: true
+    })
+  }
   closeModal = () => {
     this.setState({
       showSchools: false
+    })
+  }
+  closeMsgModal = () => {
+    this.setState({
+      isInsertMsg: false
+    })
+  }
+  chooseMsg = v => {
+    let { content } = this.state
+    this.setState({
+      content: content + v,
+      isInsertMsg: false
     })
   }
   setSchools = (data, all) => {
@@ -569,21 +586,25 @@ class NotifyInfo extends React.Component {
       mobiles,
       showSchools,
       schools,
-      all
+      all,
+      isInsertMsg
     } = this.state
     const contentInput = (
       <li className="itemsWrapper high">
         <p>公告内容:</p>
-        <div>
+        <div className="insertMsg" style={{ width: 'auto' }}>
           <textarea
             value={content}
             onChange={this.changeContent}
             onBlur={this.checkContent}
           />
-          {contentError ? (
-            <span className="checkInvalid">公告内容不能为空！</span>
-          ) : null}
+          <a onClick={this.showInsertMsg}>插入快捷消息</a>
         </div>
+        {contentError ? (
+          <span className="checkInvalid" style={{ marginTop: '10px' }}>
+            公告内容不能为空！
+          </span>
+        ) : null}
       </li>
     )
     const endItem = (
@@ -711,6 +732,12 @@ class NotifyInfo extends React.Component {
             schools={JSON.parse(JSON.stringify(schools))}
           />
         </div>
+        {isInsertMsg ? (
+          <InsertMsgContainer
+            closeInsertModal={this.closeMsgModal}
+            chooseMsg={this.chooseMsg}
+          />
+        ) : null}
       </div>
     )
   }

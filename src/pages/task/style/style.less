@@ -127,83 +127,18 @@
 .hidden{
   display: none;
 }
-.taskDetailWrapper{
-  position: fixed;
-  top: 0;
-  right: 0;
 
-  width: 70%;
-  height: 100%;
-
-  background: white;
-  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
-  z-index: 999;
-  // transition: width 1s;
-  // animation: slide 1s;
-  .taskDetail-header{
-    display: inline-flex;
-    padding: 0 30px;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-    height: 50px;
-    border-bottom: 1px solid #ddd;
-  }
-  .taskDetail-content, .taskDetail-sidebar{
-    display: inline-block;
-    padding: 20px 30px;
-    // min-height: 100%;
-    height: auto;
-    border-right: 1px solid #ddd;
-  }
-  .taskDetail-content{
-    width: 70%;
-    height: calc(~ '100% - 50px');
-    overflow-y: scroll;
-    h3{
-      font-size: 20px;
-    }
-    .handleBtn{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      button{
-        margin-right: 10px;
-      }
-      .hint{
-        display: inline-block;
-        margin-right: 10px;
-        color: @gray;
-      }
-    }
-    .processLogs{
-      margin: 0px -30px;
-      padding: 15px 30px;
-      border-top: 1px solid #ddd;
-      ul{
-        margin-top: 15px;
-        border: 1px solid #ddd;
-      }
-    }
-    .task-detailList{
-      margin: 10px 0;
-    }
-  }
-  .taskDetail-sidebar{
-    position: absolute;
-    width: 30%;
-    .task-detailList{
-      margin: 15px 0;
-    }
-  }
-}
 .taskDetail-panelWrapper{
   padding: 10px 0px;
   min-height: 180px;
   .task-detailList, .detailList{
     padding: 15px 20px;
     background-color: #f5f5f5;
+  }
+}
+.taskDetailWrapper{
+  .detailList{
+    border-bottom: none !important;
   }
 }
 .columnsWrapper{
@@ -225,32 +160,6 @@
   }
 }
 
-// show the header even loading, or else it can't be closed
-.task-loadWrapper{
-  position: absolute;
-  width: 100%;
-  height: calc(~ '100% - 50px');
-  top: 50px;
-  background-color: rgba(255 , 255, 255, 0.5);
-}
-
-.buildTask{
-  ul{
-    padding: 0;
-    background-color: white !important;
-    li p, li.itemsWrapper p{
-      width: 100px;
-      // width: 100px !important;
-    }
-    span.ant-radio+*{
-      padding-left: 0;
-    }
-  }
-  .btnArea{
-    padding: 0;
-    background-color: white;
-  }
-}
 .longText{
   width: 190px;
   height: 150px;
@@ -265,10 +174,16 @@
     width: 83px !important;
   }
 }
+.msgInfo{
+  margin-bottom: 10px;
+  
+}
 .taskMessage{
   width: 100%;
-  textarea{
+  .insertMsg{
     margin: 15px 0 8px;
+  }
+  textarea{
     width: 100%;
     height: 150px;
   }
@@ -305,4 +220,9 @@
 
 .amountHint{
   vertical-align: middle;
+}
+.schoolDetail{
+  li{
+    display: flex
+  }
 }

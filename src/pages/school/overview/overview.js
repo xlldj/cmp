@@ -13,12 +13,14 @@ import { mul } from '../../../util/numberHandle'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { changeSchool } from '../../../actions'
-const subModule = 'overview'
+import { changeSchool, fetchOverviewData } from '../../../actions'
+// import { stat } from 'fs'
 
 const SIZE = 4
 const { DEVICE_TYPE_BLOWER, DEVICE_TYPE_WASHER, WASHER_RATE_TYPES } = CONSTANTS
-
+const modalName = 'overviewModal'
+const moduleName = 'schoolModule'
+const subModule = 'overview'
 class EditableCell extends React.Component {
   state = {
     value: this.props.value,
@@ -436,25 +438,26 @@ class Overview extends React.Component {
   }
 
   fetchData = body => {
-    let resource = '/school/full/list'
-    const cb = json => {
-      if (json.error) {
-        throw new Error(json.error.displayMessage || json.error)
-      } else {
-        if (json.data) {
-          const ds = json.data.schools.map((record, index) => {
-            record.key = record.id
-            return record
-          })
-          this.setState({
-            dataSource: ds,
-            total: json.data.total,
-            loading: false
-          })
-        }
-      }
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    this.props.fetchOverviewData(body)
+    // let resource = '/school/full/list'
+    // const cb = json => {
+    //   if (json.error) {
+    //     throw new Error(json.error.displayMessage || json.error)
+    //   } else {
+    //     if (json.data) {
+    //       const ds = json.data.schools.map((record, index) => {
+    //         record.key = record.id
+    //         return record
+    //       })
+    //       this.setState({
+    //         dataSource: ds,
+    //         total: json.data.total,
+    //         loading: false
+    //       })
+    //     }
+    //   }
+    // }
+    // AjaxHandler.ajax(resource, body, cb)
   }
   componentDidMount() {
     this.props.hide(false)
@@ -504,8 +507,7 @@ class Overview extends React.Component {
   }
 
   render() {
-    const { dataSource, loading, total } = this.state
-    const { schoolId, page } = this.props
+    const { dataSource, loading, total, schoolId, page } = this.props
 
     return (
       <div className="contentArea">
@@ -538,12 +540,16 @@ class Overview extends React.Component {
 // export default Overview
 
 const mapStateToProps = (state, ownProps) => ({
-  schoolId: state.schoolModule[subModule].schoolId,
-  page: state.schoolModule[subModule].page
+  schoolId: state[moduleName][subModule].schoolId,
+  page: state[moduleName][subModule].page,
+  dataSource: state[modalName].list,
+  loading: state[modalName].listLoading,
+  total: state[modalName].total
 })
 
 export default withRouter(
   connect(mapStateToProps, {
-    changeSchool
+    changeSchool,
+    fetchOverviewData
   })(Overview)
 )

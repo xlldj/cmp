@@ -555,17 +555,18 @@ class OrderAnalyzeView extends React.Component {
   }
   toTaskDetail = (e, id) => {
     e.preventDefault()
-    this.props.changeTask('taskList', {
-      main_phase: 1, // '处理中'
+    this.props.changeTask('taskListContainer', {
+      tabIndex: 2, // '处理中'
       showDetail: true,
       selectedRowIndex: 0,
       selectedDetailId: id,
-      details: {},
-      panel_rangeIndex: [0, 0, 0],
-      main_schoolId: 'all',
-      main_mine: 2,
-      panel_type: [1, 1, 1],
-      panel_selectKey: ['', id, '']
+      schoolId: 'all',
+      mine: 2
+    })
+    this.props.changeTask('pendingList', {
+      day: 'all',
+      type: 'all',
+      selectKey: id
     })
     this.props.history.push({
       pathname: '/task/list',
