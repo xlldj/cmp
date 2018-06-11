@@ -72,7 +72,6 @@ export const initialOrderListModal = {
 export const orderListModal = (state = initialOrderListModal, action) => {
   const { type } = action
   if (type === ActionTypes.CHANGE_MODAL_ORDERLIST) {
-    debugger
     const { value } = action
     return { ...state, ...value }
   }
