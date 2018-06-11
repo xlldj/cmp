@@ -3,7 +3,7 @@ import AjaxHandler from '../util/ajax'
 import { buildAuthenData } from '../util/authenDataHandle'
 import { getStore, setStore, removeStore } from '../util/storage'
 
-import { SET_BUILDING_LIST, fetchBuildings } from './building'
+import { SET_BUILDING_LIST, fetchBuildings, fetchResidence } from './building'
 import { CHANGE_USER, changeUser } from '../pages/user/action'
 import { moduleActionFactory } from './moduleActions'
 
@@ -273,6 +273,7 @@ export {
   fetchBlackPeopleList,
   SET_BUILDING_LIST,
   fetchBuildings,
+  fetchResidence,
   CHANGE_USER,
   changeUser,
   moduleActionFactory,

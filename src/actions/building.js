@@ -37,7 +37,7 @@ export const fetchBuildings = schoolId => {
 
 export const fetchResidence = schoolId => {
   return dispatch => {
-    const resource = '/api/residence/list'
+    const resource = '/api/area/tree'
     const body = {
       page: 1,
       size: 1000,
@@ -46,7 +46,7 @@ export const fetchResidence = schoolId => {
     AjaxHandler.fetch(resource, body).then(json => {
       if (json && json.data) {
         const value = {}
-        value[+schoolId] = json.data.residences
+        value[+schoolId] = json.data.areas
         dispatch({
           type: SET_RESIDENCE_LIST,
           subModule: 'residenceOfSchoolId',

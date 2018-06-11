@@ -3,7 +3,7 @@ import { Button } from 'antd'
 import MultiSelectModal from './multiSelectModal'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { fetchResidence } from '../../actions'
+import { fetchResidence } from '../../actions/index'
 import CONSTANTS from '../../constants'
 const {
   RESIDENCE_TYPE_ZONE,
@@ -33,6 +33,19 @@ class CascadedBuildingSelect extends Component {
       areaIds: props.areaIds || 'all',
       buildingIds: props.buildingIds || 'all',
       floorIds: props.floorIds || 'all'
+    }
+  }
+  componentDidMount() {
+    const { residenceSet, schoolId } = this.props
+    // schoolId 总是存在的，且为某一个学校的id
+    if (!residenceSet) {
+      this.props.fetchResidence(schoolId)
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    const { schoolId, residenceSet } = nextProps
+    if (!residenceSet) {
+      nextProps.fetchResidence(schoolId)
     }
   }
   getColumns = name => {
@@ -322,7 +335,8 @@ class CascadedBuildingSelect extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    residence: state.buildingsSet.residenceOfSchoolId[ownProps.schoolId] || []
+    residence: state.buildingsSet.residenceOfSchoolId[ownProps.schoolId] || [],
+    residenceSet: !!state.buildingsSet.residenceOfSchoolId[ownProps.schoolId]
   }
 }
 
