@@ -719,12 +719,7 @@ class OrderAnalyzeView extends React.Component {
 
     console.log(isFushikang)
     const showBuildTaskBtn = selectedRowLengthsOfOrderTable > 0
-    const buildingSelect = isFushikang ? (
-      <Fragment>
-        <span>位置筛选:</span>
-        <CascadedBuildingSelect schoolId={schoolId} />
-      </Fragment>
-    ) : (
+    const buildingSelect = (
       <Fragment>
         <span>楼栋筛选:</span>
         <span className="customized_select_option">{buildingNames}</span>

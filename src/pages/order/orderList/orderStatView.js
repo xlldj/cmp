@@ -346,7 +346,7 @@ class OrderStatView extends React.Component {
         },
         {
           title: '区域',
-          dataIndex: 'domain'
+          dataIndex: 'areaName'
         },
         {
           title: '楼栋',

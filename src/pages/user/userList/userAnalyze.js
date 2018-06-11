@@ -324,6 +324,7 @@ class UserTableView extends React.Component {
       )
       columns.splice(1, 0, {
         title: '宿舍',
+        width: '6%',
         dataIndex: 'location',
         render: text => text || '暂无'
       })
@@ -526,7 +527,7 @@ class UserTableView extends React.Component {
                   </Button>
                 ) : null}
                 <SearchInput
-                  placeholder="手机号/手机型号"
+                  placeholder="宿舍/手机号/手机型号"
                   searchingText={searchingText}
                   pressEnter={this.pressEnter}
                   changeSearch={this.changeSearch}

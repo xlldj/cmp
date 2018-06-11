@@ -1,7 +1,6 @@
 import AjaxHandler from '../util/ajax'
 
 export const SET_BUILDING_LIST = 'SET_BUILDING_LIST'
-export const SET_RESIDENCE_LIST = 'SET_RESIDENCE_LIST'
 
 let loading = false
 export const fetchBuildings = schoolId => {
@@ -46,7 +45,7 @@ export const fetchResidence = schoolId => {
         const value = {}
         value[+schoolId] = json.data.areas
         dispatch({
-          type: SET_RESIDENCE_LIST,
+          type: SET_BUILDING_LIST,
           subModule: 'residenceOfSchoolId',
           value
         })
