@@ -19,10 +19,8 @@ class SchoolDetail extends React.Component {
   }
   fetchData(body) {
     schoolService.getOverviewList(body).then(json => {
-      if (json.data) {
-        if (json.data.schools) {
-          this.constructorData(json.data.schools[0])
-        }
+      if (json && json.data && json.data.schools && json.data.schools.length) {
+        this.constructorData(json.data.schools[0])
       }
     })
   }
