@@ -6,6 +6,7 @@ import userAuthHandler from './userAuth'
 import lostHandler from './lost'
 import fundCheckHandler from './fundCheck'
 import taskHandler from './task'
+import areaHandler from './area'
 
 import quickListHandler from './quickList'
 import beingPushHandler from './beingPush'
@@ -86,6 +87,10 @@ AjaxHandler.fetch = (resource, body, serviceErrorCb, options, errorCb) => {
     return quickListHandler(resource, body)
   } else if (contain(resource, '/push/list', '/push/one', 'push/delete')) {
     return beingPushHandler(resource, body)
+  } else if (
+    contain(resource, '/area/unbind/building/list', 'area/list', '/area/check')
+  ) {
+    return areaHandler(resource, body)
   }
 }
 

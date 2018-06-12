@@ -2,7 +2,6 @@ import React from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { asyncComponent } from '../component/asyncComponent'
 import './style/style.css'
-
 //import SchoolList from './schoolList/schoolList'
 //import SchoolInfoEdit from './schoolList/schoolInfoEdit'
 //import BlockManage from './schoolList/blockManage'
@@ -26,6 +25,9 @@ const BlockManage = asyncComponent(() =>
 const SchoolBusiness = asyncComponent(() =>
   import(/* webpackChunkName: "schoolBusiness" */ './schoolList/schoolBusiness')
 )
+const AreaManage = asyncComponent(() =>
+  import(/*webpackChunkName: 'areaManage'*/ './schoolList/areaSet')
+)
 const AddingBlock = asyncComponent(() =>
   import(/* webpackChunkName: "addingBlock" */ './schoolList/addingBlock')
 )
@@ -43,6 +45,7 @@ const breadcrumbNameMap = {
   '/list/blockManage': '楼栋管理',
   '/list/blockManage/add': '添加楼栋',
   '/list/blockManage/edit': '编辑楼栋',
+  '/list/blockManage/area': '区域设置',
   '/list/business': '功能入口管理',
   '/overview': '学校信息总览',
   '/infoSet': '学校设置'
@@ -134,6 +137,12 @@ class SchoolDisp extends React.Component {
                 )}
               />
             )}
+            <Route
+              path="/school/list/blockManage/area"
+              render={props => (
+                <AreaManage hide={this.props.hide} {...props} {...this.props} />
+              )}
+            />
             {BUILDING_LIST ? null : (
               <Route
                 path="/school/list/blockManage/:id"
@@ -195,7 +204,8 @@ class SchoolDisp extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  forbiddenStatus: state.setAuthenData.forbiddenStatus
+  forbiddenStatus: state.setAuthenData.forbiddenStatus,
+  buildingsOfSchoolId: state.buildingsSet.buildingsOfSchoolId
 })
 
 export default withRouter(
