@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-import { Table } from 'antd'
+import { Table, Button } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 // import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
@@ -12,6 +12,7 @@ import OrderBarChart from './orderBarChart'
 import RangeSelect from '../../component/rangeSelect'
 import CascadedBuildingSelect from '../../component/cascadedBuildingSelect'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
+import SearchInput from '../../component/searchInput'
 
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
@@ -42,7 +43,8 @@ class OrderStatView extends React.Component {
       isFushikang: false,
       showBuildingSelect: false,
       startTime: '',
-      endTime: ''
+      endTime: '',
+      searchingText: ''
     }
   }
   fetchList = props => {
@@ -66,7 +68,8 @@ class OrderStatView extends React.Component {
       areaIds,
       buildingIds,
       floorIds,
-      dimension
+      dimension,
+      selectKey
     } = props
     const body = {
       page: page,
@@ -96,6 +99,9 @@ class OrderStatView extends React.Component {
       }
       if (dimension) {
         body.dimension = dimension
+      }
+      if (selectKey) {
+        body.selectKey = selectKey
       }
     }
     if (deviceType !== 'all') {
@@ -143,7 +149,8 @@ class OrderStatView extends React.Component {
       areaIds,
       buildingIds,
       floorIds,
-      dimension
+      dimension,
+      selectKey
     } = props
     const body = {
       page: page,
@@ -176,6 +183,9 @@ class OrderStatView extends React.Component {
       }
       if (dimension) {
         body.dimension = dimension
+      }
+      if (selectKey) {
+        body.selectKey = selectKey
       }
     }
 
@@ -224,12 +234,15 @@ class OrderStatView extends React.Component {
     this.syncStateWithProps()
   }
   syncStateWithProps = props => {
-    let { startTime, endTime } = props || this.props
+    let { startTime, endTime, selectKey } = props || this.props
 
     const nextState = {}
     if (startTime !== this.state.startTime) {
       nextState.startTime = startTime
       nextState.endTime = endTime
+    }
+    if (selectKey !== this.state.searchingText) {
+      nextState.searchingText = selectKey
     }
     this.setState(nextState)
   }
@@ -239,7 +252,6 @@ class OrderStatView extends React.Component {
       const { schools, schoolId } = props || this.props
       const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
       const nextState = { isFushikang: false }
-      debugger
       if (fox_index !== -1) {
         const school = schools[fox_index]
         if (school.name === '富士康' || school.name === '富士康工厂') {
@@ -387,7 +399,8 @@ class OrderStatView extends React.Component {
         'areaIds',
         'buildingIds',
         'floorIds',
-        'dimension'
+        'dimension',
+        'selectKey'
         // 'buildingIds'
       ])
     ) {
@@ -406,7 +419,8 @@ class OrderStatView extends React.Component {
         'areaIds',
         'buildingIds',
         'floorIds',
-        'dimension'
+        'dimension',
+        'selectKey'
       ])
     ) {
       this.checkSchoolFsk(nextProps).then(() => {
@@ -514,6 +528,29 @@ class OrderStatView extends React.Component {
       dimension: v
     })
   }
+  changeSearch = e => {
+    const nextState = {}
+    nextState.searchingText = e.target.value
+    this.setState(nextState)
+  }
+  pressEnter = () => {
+    let { selectKey } = this.props
+    let searchingText = this.state.searchingText.trim()
+    if (selectKey !== searchingText) {
+      this.props.changeOrder(subModule, {
+        stat_selectKey: searchingText,
+        page: 1
+      })
+    }
+  }
+  clearMobile = () => {
+    this.setState(
+      {
+        searchingText: ''
+      },
+      this.pressEnter
+    )
+  }
   render() {
     const {
       page,
@@ -532,9 +569,11 @@ class OrderStatView extends React.Component {
       barData,
       isFushikang,
       startTime,
-      endTime
+      endTime,
+      searchingText
       // showBuildingSelect
     } = this.state
+    const showClearBtn = !!searchingText
 
     const buildingSelect = (
       <Fragment>
@@ -595,6 +634,25 @@ class OrderStatView extends React.Component {
                 </Fragment>
               )}
             </QueryBlock>
+            {isFushikang ? (
+              <QueryBlock>
+                {showClearBtn ? (
+                  <Button
+                    onClick={this.clearMobile}
+                    className="rightSeperator"
+                    type="primary"
+                  >
+                    清空
+                  </Button>
+                ) : null}
+                <SearchInput
+                  placeholder="宿舍"
+                  searchingText={searchingText}
+                  pressEnter={this.pressEnter}
+                  changeSearch={this.changeSearch}
+                />
+              </QueryBlock>
+            ) : null}
           </QueryLine>
         </QueryPanel>
 

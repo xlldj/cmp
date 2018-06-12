@@ -31,7 +31,8 @@ const mapStateToProps1 = (state, ownProps) => {
     endTime: state.orderModule[subModule].stat_endTime,
     areaIds: state.orderModule[subModule].stat_areaIds,
     floorIds: state.orderModule[subModule].stat_floorIds,
-    dimension: state.orderModule[subModule].dimension
+    dimension: state.orderModule[subModule].dimension,
+    selectKey: state.orderModule[subModule].stat_selectKey
   }
 }
 

@@ -35,6 +35,7 @@ const initialOrderState = {
     stat_endTime: '',
     stat_areaIds: 'all',
     stat_floorIds: 'all',
+    stat_selectKey: '',
     // below is state for order analyze
     analyze_day: 1, // 1 for 'today', default setting.
     analyze_deviceType: 1,
