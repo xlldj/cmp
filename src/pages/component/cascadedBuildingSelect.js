@@ -247,14 +247,14 @@ class CascadedBuildingSelect extends Component {
       if (floorIds !== 'all') {
         for (let l = floorIds.length, i = l - 1; i >= 0; i--) {
           const id = floorIds[i]
-          const ind = floorIdsAvailable.some(fId => fId === id)
+          const ind = floorIdsAvailable.findIndex(fId => fId === id)
           if (ind === -1) {
             floorIds.splice(i, 1)
           }
         }
-      }
-      if (floorIds.length === 0) {
-        floorIds = 'all'
+        if (floorIds.length === 0) {
+          floorIds = 'all'
+        }
       }
     }
     nextState.areaIds = areaIds
