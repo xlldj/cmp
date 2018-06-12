@@ -388,7 +388,8 @@ class OrderStatView extends React.Component {
         'endTime',
         'areaIds',
         'buildingIds',
-        'floorIds'
+        'floorIds',
+        'dimension'
         // 'buildingIds'
       ])
     ) {
@@ -408,7 +409,8 @@ class OrderStatView extends React.Component {
         'endTime',
         'areaIds',
         'buildingIds',
-        'floorIds'
+        'floorIds',
+        'dimension'
       ])
     ) {
       return
