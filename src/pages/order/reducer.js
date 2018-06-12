@@ -11,7 +11,8 @@ const initialOrderState = {
     page: 1,
     schoolId: selectedSchool,
     day: 1, // 1 for today, 2 for last 7 days , 3 for last 30 days, 0 for custom select
-    userType: ORDER_USER_TYPE_STUDENT, // 'all' for unlimited, 1 for student
+    // userType: ORDER_USER_TYPE_STUDENT, // 'all' for unlimited, 1 for student
+    userType: 'all', // 默认改为了所有
     deviceType: 'all',
     status: 'all',
     selectKey: '',

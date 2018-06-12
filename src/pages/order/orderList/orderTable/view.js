@@ -708,18 +708,6 @@ class OrderTableView extends React.Component {
 
           <div className="queryLine">
             <div className="block">{buildingSelect}</div>
-          </div>
-          <div className="queryLine">
-            <div className="block">
-              <span>用户类型:</span>
-              <CheckSelect
-                allOptTitle="不限"
-                allOptValue="all"
-                options={ORDERUSERTYPES}
-                value={userType}
-                onClick={this.changeUserType}
-              />
-            </div>
             {isFushikang ? (
               <div className="block">
                 {showClearBtn ? (
@@ -740,6 +728,20 @@ class OrderTableView extends React.Component {
               </div>
             ) : null}
           </div>
+          {isFushikang ? null : (
+            <div className="queryLine">
+              <div className="block">
+                <span>用户类型:</span>
+                <CheckSelect
+                  allOptTitle="不限"
+                  allOptValue="all"
+                  options={ORDERUSERTYPES}
+                  value={userType}
+                  onClick={this.changeUserType}
+                />
+              </div>
+            </div>
+          )}
           {isFushikang ? null : (
             <div className="queryLine">
               <div className="block">

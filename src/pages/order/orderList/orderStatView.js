@@ -94,7 +94,7 @@ class OrderStatView extends React.Component {
       if (floorIds && floorIds !== 'all') {
         body.floorIds = floorIds
       }
-      if (dimension && dimension !== 'all') {
+      if (dimension) {
         body.dimension = dimension
       }
     }
@@ -111,19 +111,18 @@ class OrderStatView extends React.Component {
       body.orderBy = parseInt(orderBy, 10)
     }
 
-    let resource = '/api/order/statistic/list'
-    const cb = json => {
-      let nextState = { listLoading: false }
+    const resource = '/api/order/statistic/list'
+    AjaxHandler.fetch(resource, body).then(json => {
+      const nextState = { listLoading: false }
       if (!this.state.histogramLoading) {
         nextState.loading = false
       }
-      if (json.data) {
+      if (json && json.data) {
         nextState.dataSource = json.data.list
         nextState.total = json.data.total
       }
       this.setState(nextState)
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    })
   }
   fetchHistogram = props => {
     if (!this.state.loading) {
@@ -180,14 +179,14 @@ class OrderStatView extends React.Component {
       }
     }
 
-    let resource = '/api/order/statistic/histogram'
-    const cb = json => {
-      let nextState = { histogramLoading: false }
+    const resource = '/api/order/statistic/histogram'
+    AjaxHandler.fetch(resource, body).then(json => {
+      const nextState = { histogramLoading: false }
       if (!this.state.listLoading) {
         nextState.loading = false
       }
-      if (json.data) {
-        let barData = this.getBarData()
+      if (json && json.data) {
+        const barData = this.getBarData()
         barData.forEach(d => {
           let user = json.data.userPoints.find(u => u.x === d.key.toString())
           if (user) {
@@ -201,8 +200,7 @@ class OrderStatView extends React.Component {
         nextState.barData = barData
       }
       this.setState(nextState)
-    }
-    AjaxHandler.ajax(resource, body, cb)
+    })
   }
   getBarData = () => {
     let barData = []
@@ -218,9 +216,11 @@ class OrderStatView extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchList()
-    this.fetchHistogram()
-    this.checkSchoolFsk()
+    this.checkSchoolFsk().then(() => {
+      this.fetchList()
+      this.fetchHistogram()
+    })
+    // this.checkSchoolFsk()
     this.syncStateWithProps()
   }
   syncStateWithProps = props => {
@@ -235,27 +235,25 @@ class OrderStatView extends React.Component {
   }
   //检查选择学校是否为富士康
   checkSchoolFsk = props => {
-    const { schools, schoolId } = props || this.props
-    const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
-    if (fox_index !== -1) {
-      const school = schools[fox_index]
-      if (school.name === '富士康' || school.name === '富士康工厂') {
-        this.setState({
-          isFushikang: true
-        })
-        let { deviceType } = this.props
-        if (deviceType === DEVICE_TYPE_HEATER) {
-          return
+    return new Promise((resolve, reject) => {
+      const { schools, schoolId } = props || this.props
+      const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
+      const nextState = { isFushikang: false }
+      debugger
+      if (fox_index !== -1) {
+        const school = schools[fox_index]
+        if (school.name === '富士康' || school.name === '富士康工厂') {
+          nextState.isFushikang = true
+          const { deviceType } = this.props
+          if (deviceType !== DEVICE_TYPE_HEATER) {
+            this.props.changeOrder(subModule, {
+              stat_dt: DEVICE_TYPE_HEATER,
+              page: 1
+            })
+          }
         }
-        this.props.changeOrder(subModule, {
-          stat_dt: DEVICE_TYPE_HEATER,
-          page: 1
-        })
-        return true
       }
-    }
-    this.setState({
-      isFushikang: false
+      this.setState(nextState, resolve)
     })
   }
   getColumns = () => {
@@ -396,12 +394,10 @@ class OrderStatView extends React.Component {
       return
     }
 
-    this.checkSchoolFsk(nextProps)
     this.syncStateWithProps(nextProps)
-    this.fetchList(nextProps)
     // if these options are same, doesn't need to refetch histogram.
     if (
-      checkObject(this.props, nextProps, [
+      !checkObject(this.props, nextProps, [
         'day',
         'schoolId',
         'deviceType',
@@ -413,9 +409,15 @@ class OrderStatView extends React.Component {
         'dimension'
       ])
     ) {
-      return
+      this.checkSchoolFsk(nextProps).then(() => {
+        this.fetchList(nextProps)
+        this.fetchHistogram(nextProps)
+      })
+    } else {
+      this.checkSchoolFsk(nextProps).then(() => {
+        this.fetchList(nextProps)
+      })
     }
-    this.fetchHistogram(nextProps)
   }
   changeRange = key => {
     this.props.changeOrder(subModule, {
