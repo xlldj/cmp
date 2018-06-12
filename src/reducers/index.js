@@ -4,11 +4,28 @@ import { combineReducers } from 'redux'
 import { getLocal, getStore } from '../util/storage'
 import Time from '../util/time'
 
+import {
+  deviceModule,
+  repairListModal,
+  deviceInfoModal
+} from '../pages/device/reducer'
+
 import heaterModule from '../pages/heater/reducer'
-import orderModule from '../pages/order/reducer'
-import { fundModule, fundCheckModal } from '../pages/fund/reducer'
+import { orderModule, orderListModal } from '../pages/order/reducer'
+import {
+  fundModule,
+  fundListModal,
+  fundCheckModal
+} from '../pages/fund/reducer'
 import buildingsSet from './building'
-import userModule from '../pages/user/reducer.js'
+import { userModule, userInfoModal } from '../pages/user/reducer.js'
+import {
+  taskModule,
+  taskModal,
+  taskDetailModal,
+  quickModal,
+  quickTypeModal
+} from '../pages/task/reducer.js'
 import {
   lostModule,
   lostModal,
@@ -16,7 +33,10 @@ import {
   enableCommentModal
 } from '../pages/lost/reducer.js'
 
+import { notifyModule, beingsModal } from '../pages/notify/reducer'
 import doorForbidModule from '../pages/doorForbid/reducer'
+import { schoolModule, overviewModal } from '../pages/school/reducer'
+
 const recentSchools = getLocal('recentSchools')
 var selectedSchool = 'all'
 if (recentSchools) {
@@ -124,27 +144,6 @@ const setSchoolList = (state = initialSchools, action) => {
   return state
 }
 
-// state of 'school' Module
-const initialSchoolState = {
-  schoolList: {
-    page: 1,
-    schoolId: selectedSchool
-  },
-  overview: {
-    page: 1,
-    schoolId: selectedSchool
-  }
-}
-const schoolModule = (state = initialSchoolState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_SCHOOL) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
 /*
 const initialHeaterState = {
   heaterList: {
@@ -171,61 +170,6 @@ const heaterModule = (state = initialHeaterState, action) => {
 }
 */
 
-const initialDeviceState = {
-  deviceList: {
-    page: 1,
-    schoolId: selectedSchool,
-    deviceType: 'all',
-    selectKey: '',
-    loading: true,
-    dataSource: [],
-    total: ''
-  },
-  components: {
-    page: 1,
-    dataSource: [],
-    total: 0,
-    loading: false
-  },
-  prepay: {
-    page: 1,
-    schoolId: selectedSchool
-  },
-  timeset: {
-    schoolId: selectedSchool,
-    page: 1
-  },
-  suppliers: {
-    page: 1
-  },
-  rateSet: {
-    schoolId: selectedSchool,
-    page: 1
-  },
-  repair: {
-    page: 1,
-    deviceType: 'all',
-    schoolId: selectedSchool,
-    status: 'all'
-  },
-  rateLimit: {
-    schoolId: selectedSchool,
-    page: 1
-  }
-}
-const deviceModule = (state = initialDeviceState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_DEVICE) {
-    const { subModule, keyValuePair } = action
-    const newSubState = {}
-    newSubState[subModule] = { ...state[subModule], ...keyValuePair }
-    return { ...state, ...newSubState }
-    // return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
 // 红包管理
 const initialGiftState = {
   giftList: {
@@ -251,62 +195,6 @@ const giftModule = (state = initialGiftState, action) => {
   return state
 }
 
-// 客服工单
-const initialTaskState = {
-  taskList: {
-    hintRoot: false, // if show the red point in root nav
-    countOfUnviewed: 0, // count of all tasks status changed
-
-    // state for main page
-    main_phase: 0, // '待处理', the first three is for all panels
-    main_schoolId: 'all',
-    main_mine: '2', // 1: '我的工单', 2: '全部'
-    selectedRowIndex: -1, // the row whose detail is being watching
-    selectedDetailId: -1, // id of showing detail
-
-    panel_rangeIndex: [3, 3, 3], // '时间', time select of each panel
-    panel_startTime: ['', '', ''], // startTime of each panel
-    panel_endTime: ['', '', ''], // endTime of each panel
-    panel_type: [1, 1, 1], // 类型
-    panel_selectKey: ['', '', ''],
-    panel_total: [0, 0, 0], // change these parameters will clear former dataSource and reload
-    panel_page: [1, 1, 1], // change this will check if need to reload data
-    panel_dataSource: { 1: [], 2: [], 3: [] }, // store data of different type as element of array. For each type, use 'page' as key to save data.
-    panel_countOfUnviewed: [0, 0, 0], // count of data need to check again(status changed since last time check)
-
-    // state for detail page
-    details: {}, // like panel_dataSource, use 'id' as key, only add or update info. No need to delete.
-    detail_tabIndex: [1, 1, 1], // index for detail tab. Abstracted to be independent on data of detail.
-    showDetail: false,
-    detailLoading: false
-  },
-  report: {
-    mainCate: 0, // 0: '工作情况', 1: '投诉分析', 2: '绩效考核'
-    schoolId: 'all',
-
-    panel_rangeIndex: [1, 3, 3], // range for each category; 1: '今日', 2: '近3天', 3: '近7天', 5: '近30天'.
-    panel_startTime: ['', '', ''], // startTime of each panel
-    panel_endTime: ['', '', ''], // endTime of each panel
-    panel_page: [1, 1, 1],
-    order: [1, 1, 1], // 1 for 'descend', 2 for 'ascend'
-    orderBy: [0, 0, 0], // the param to sort the data with. 0 will be empty.
-
-    assess_dim: 1 // 考核维度，1: '学校', 2: '客服', 3: '维修员'
-  }
-}
-const taskModule = (state = initialTaskState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_TASK) {
-    const { subModule, keyValuePair } = action
-    let newState = {}
-    newState = Object.assign({}, state[subModule], keyValuePair)
-    // console.log(keyValuePair);
-    return Object.assign({}, state, { [subModule]: newState })
-  }
-  return state
-}
-
 // 员工管理
 const initialEmployeeState = {
   employeeList: {
@@ -325,26 +213,6 @@ const employeeModule = (state = initialEmployeeState, action) => {
   const { type } = action
 
   if (type === ActionTypes.CHANGE_EMPLOYEE) {
-    const { subModule, keyValuePair } = action
-    return merge({}, state, { [subModule]: keyValuePair })
-  }
-  return state
-}
-
-// 公告管理
-const initialNotifyState = {
-  notify: {
-    page: 1,
-    type: 'all'
-  },
-  censor: {
-    page: 1
-  }
-}
-const notifyModule = (state = initialNotifyState, action) => {
-  const { type } = action
-
-  if (type === ActionTypes.CHANGE_NOTIFY) {
     const { subModule, keyValuePair } = action
     return merge({}, state, { [subModule]: keyValuePair })
   }
@@ -407,17 +275,25 @@ const rootReducer = combineReducers({
   schoolModule,
   heaterModule,
   deviceModule,
+  deviceInfoModal,
+  repairListModal,
   orderModule,
+  orderListModal,
   fundModule,
+  fundListModal,
   giftModule,
   lostModule,
   lostModal,
   blackModal,
   enableCommentModal,
   userModule,
+  userInfoModal,
   taskModule,
+  taskModal,
+  taskDetailModal,
   employeeModule,
   notifyModule,
+  beingsModal,
   versionModule,
   doorForbidModule,
   setSchoolList,
@@ -428,7 +304,10 @@ const rootReducer = combineReducers({
   setUserInfo,
   setGifts,
   buildingsSet,
-  fundCheckModal
+  fundCheckModal,
+  overviewModal,
+  quickModal,
+  quickTypeModal
 })
 
 export default rootReducer

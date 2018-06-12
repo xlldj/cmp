@@ -48,7 +48,8 @@ export function safeGet(o, keys) {
   }
   let keyArr = keys.split('.'),
     result = o
-  for (let key of keyArr) {
+  for (let i = 0, l = keyArr.length; i < l; i++) {
+    let key = keyArr[i]
     if (hasOwn(result, key)) {
       result = result[key]
     } else {
@@ -59,6 +60,9 @@ export function safeGet(o, keys) {
 }
 
 function hasOwn(o, key) {
+  if (!o || typeof o !== 'object') {
+    return false
+  }
   if (key in o) {
     if (o.hasOwnProperty(key)) {
       return true

@@ -226,6 +226,11 @@ const BASIC = {
           name: '工作报表',
           path: 'report',
           key: 1
+        },
+        {
+          name: '快捷消息',
+          path: 'quick',
+          key: 2
         }
       ]
     },
@@ -273,6 +278,11 @@ const BASIC = {
           name: '公告审核',
           path: 'censor',
           key: 1
+        },
+        {
+          name: '消息推送',
+          path: 'beings',
+          key: 2
         }
       ]
     },
@@ -539,6 +549,8 @@ const BASIC = {
     '公告审核列表/详情': 'CENSOR_GET_LIST',
     删除公告: 'DELETE_NOTIFY',
     审核: 'CENSOR_NOTIFY',
+    推送列表: 'PUSH_LIST_GET',
+    '创建/编辑推送': 'ADD_EDIT_PUSH',
 
     //版本更新模块
     '添加/编辑版本更新': 'VERSON_ADD_OR_EDIT',
@@ -564,6 +576,10 @@ const BASIC = {
     创建工单: 'BUILD_TASK',
     添加标签: 'BUILD_COMPLAINT_TAG',
     工作报表查看: 'REPORT_LIST_GET',
+    快捷消息列表: 'QUICK_MSG_LIST_GET',
+    '创建/编辑/删除快捷消息': 'ADD_EDIT_DEL_QUICKMSG',
+    快捷消息类型列表: 'QUICK_TYPE_LIST_GET',
+    '创建/编辑/删除快捷消息类型': 'ADD_EDIT_DEL_QUICKMSGTYPE',
     //红包管理
     '红包列表/搜索/查询': 'GIFT_LIST_GET',
     '添加/编辑红包': 'GIFT_ADD_OR_EDIT',

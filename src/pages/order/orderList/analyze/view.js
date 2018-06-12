@@ -8,11 +8,13 @@ import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import Noti from '../../../../util/noti'
 import Format from '../../../../util/format'
+import { notEmpty } from '../../../../util/types'
 
 import CheckSelect from '../../../component/checkSelect'
 import ThresholdSelector from '../../../component/thresholdSelector'
 import SetRuleHint from './setRuleHint.js'
-import RangeSelect from '../rangeSelectDisableMonth.js'
+// import RangeSelect from '../rangeSelectDisableMonth.js'
+import RangeSelect from '../../../component/rangeSelect'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
 import RepairmanTable from '../../../component/repairmanChooseClean.js'
 import CascadedBuildingSelect from '../../../component/cascadedBuildingSelect'
@@ -487,7 +489,7 @@ class OrderAnalyzeView extends React.Component {
         className: 'shalowRed',
         width: '12%',
         render: (text, record, index) =>
-          record.consumption ? `¥${record.consumption}` : 0,
+          notEmpty(record.consumption) ? `¥${record.consumption}` : 0,
         sorter: true
       }
     ]
@@ -554,17 +556,18 @@ class OrderAnalyzeView extends React.Component {
   }
   toTaskDetail = (e, id) => {
     e.preventDefault()
-    this.props.changeTask('taskList', {
-      main_phase: 1, // '处理中'
+    this.props.changeTask('taskListContainer', {
+      tabIndex: 2, // '处理中'
       showDetail: true,
       selectedRowIndex: 0,
       selectedDetailId: id,
-      details: {},
-      panel_rangeIndex: [0, 0, 0],
-      main_schoolId: 'all',
-      main_mine: 2,
-      panel_type: [1, 1, 1],
-      panel_selectKey: ['', id, '']
+      schoolId: 'all',
+      mine: 2
+    })
+    this.props.changeTask('pendingList', {
+      day: 'all',
+      type: 'all',
+      selectKey: id
     })
     this.props.history.push({
       pathname: '/task/list',

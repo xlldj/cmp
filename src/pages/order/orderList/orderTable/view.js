@@ -5,8 +5,9 @@ import AjaxHandler from '../../../../util/ajax'
 import Time from '../../../../util/time'
 import CONSTANTS from '../../../../constants'
 import selectedImg from '../../../assets/selected.png'
+import { notEmpty } from '../../../../util/types'
 
-import RangeSelect from '../rangeSelectDisableMonth'
+import RangeSelect from '../../../component/rangeSelect'
 import SearchInput from '../../../component/searchInput'
 import CheckSelect from '../../../component/checkSelect'
 import BuildingMultiSelectModal from '../../../component/buildingMultiSelectModal'
@@ -158,7 +159,7 @@ class OrderTableView extends React.Component {
     })
     AjaxHandler.fetch(resource, body).then(json => {
       let nextState = { sumLoading: false }
-      if (json && json.data) {
+      if (json && notEmpty(json.data)) {
         nextState.totalIncome = json.data || 0
       }
       this.setState(nextState)
@@ -173,7 +174,7 @@ class OrderTableView extends React.Component {
     })
     AjaxHandler.fetch(resource, body).then(json => {
       let nextState = { chargebackSumLoading: false }
-      if (json && json.data) {
+      if (json && notEmpty(json.data)) {
         nextState.totalChargeback = json.data || 0
       }
       this.setState(nextState)
@@ -514,7 +515,7 @@ class OrderTableView extends React.Component {
         render: (text, record, index) => {
           if (record.status !== 1) {
             return `${record.consume}` || '暂无'
-          } else if (record.prepay) {
+          } else if (notEmpty(record.prepay)) {
             return `${record.prepay}`
           }
         }

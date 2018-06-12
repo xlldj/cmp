@@ -38,6 +38,9 @@
 .commentWrapper .commentItem span {
   margin: 0px 10px;
 }
+.commentWrapper .commentItem .ant-divider {
+  margin: 0px 5px;
+}
 .commentWrapper .commentItem .noRightMargin,
 .commentWrapper .commentItem span:first-child {
   margin: 0px;

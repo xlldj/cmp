@@ -1,20 +1,44 @@
-import store from '../../index'
+import store from '../../index.js'
 import AjaxHandler from '../../util/ajax'
-// import AjaxHandler from '../../mock/ajax'
-import { moduleActionFactory } from '../../actions/moduleActions.js'
 
 export const CHANGE_FUND = 'CHANGE_FUND'
 export const CHANGE_MODAL_FUNDCHECK = 'CHANGE_MODAL_FUNDCHECK'
 const modalName = 'fundCheckModal'
 
-/**
- * 更改reducer@fundModule 的通用action
- * @param {*} subModule
- * @param {*} keyValuePair
- */
+export const CHANGE_MODAL_FUNDLIST = 'CHANGE_MODAL_FUNDLIST'
 export const changeFund = (subModule, keyValuePair) => {
-  return dispatch =>
-    moduleActionFactory(dispatch, 'FUND', subModule, keyValuePair)
+  return {
+    type: CHANGE_FUND,
+    subModule,
+    keyValuePair
+  }
+}
+
+export const fetchFundList = body => {
+  const { fundListModal } = store.getState()
+  const { loading } = fundListModal
+  if (loading) {
+    return
+  }
+  store.dispatch({
+    type: CHANGE_MODAL_FUNDLIST,
+    value: {
+      loading: true
+    }
+  })
+  const resource = '/api/funds/list'
+  AjaxHandler.fetch(resource, body).then(json => {
+    const value = {
+      loading: false
+    }
+    if (json && json.data) {
+      value.list = json.data.funds
+    }
+    store.dispatch({
+      type: CHANGE_MODAL_FUNDLIST,
+      value
+    })
+  })
 }
 
 /**
@@ -34,7 +58,7 @@ export const fetchFundCheckList = body => {
         listLoading: true
       }
     })
-    let resource = '/api/fundsCheck/mistake/list'
+    let resource = '/api/funds/abnormal/list'
     return AjaxHandler.fetch(resource, body).then(json => {
       let value = {
         listLoading: false

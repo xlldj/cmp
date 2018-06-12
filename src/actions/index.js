@@ -1,19 +1,65 @@
-import { heartBeat, stopBeat } from '../tasks/heartBeat'
+import { heartBeat } from '../tasks/heartBeat'
 import AjaxHandler from '../util/ajax'
-import { buildAuthenData } from '../util/authenDataHandle'
-import { getStore, setStore, removeStore } from '../util/storage'
+import { setStore } from '../util/storage'
+import {
+  changeOffline,
+  fetchPrivileges,
+  fetchTaskList,
+  fetchTaskDetail,
+  changeTask,
+  CHANGE_TASK,
+  CHANGE_MODAL_TASK,
+  CHANGE_MODAL_TASKDETAIL,
+  relateTask,
+  csRemind,
+  cancelRelate,
+  CHANGE_QUICK_LIST,
+  fetchQuickList,
+  CHANGE_QUICK_TYPE_LIST,
+  fetchQuickTypeList
+} from '../pages/task/action.js'
 
 import { SET_BUILDING_LIST, fetchBuildings, fetchResidence } from './building'
-import { CHANGE_USER, changeUser } from '../pages/user/action'
+import {
+  CHANGE_USER,
+  changeUser,
+  CHANGE_MODAL_USERINFO,
+  fetchUserInfo
+} from '../pages/user/action'
 import { moduleActionFactory } from './moduleActions'
+import {
+  CHANGE_SCHOOL,
+  changeSchool,
+  CHANGE_OVERVIEW,
+  fetchOverviewData
+} from '../pages/school/action'
 
-import { CHANGE_DEVICE, changeDevice, fetchDeviceList } from './device'
+import {
+  CHANGE_DEVICE,
+  changeDevice,
+  fetchDeviceList,
+  fetchRepairList,
+  CHANGE_MODAL_REPAIRLIST,
+  fetchDeviceInfo,
+  CHANGE_MODAL_DEVICEINFO
+} from '../pages/device/action'
+import {
+  changeNotify,
+  CHANGE_NOTIFY,
+  fetchBeingPushList,
+  CHANGE_MODAL_BEING
+} from '../pages/notify/action'
 import {
   CHANGE_HEATER,
   changeHeater,
   fetchHeaterList
 } from '../pages/heater/action'
-import { CHANGE_ORDER, changeOrder } from '../pages/order/action'
+import {
+  CHANGE_ORDER,
+  changeOrder,
+  CHANGE_MODAL_ORDERLIST,
+  fetchOrderList
+} from '../pages/order/action'
 import {
   CHANGE_DOORFORBID,
   changeDoorForbid,
@@ -25,7 +71,9 @@ import {
   changeFund,
   CHANGE_MODAL_FUNDCHECK,
   fetchFundCheckList,
-  fetchFundCheckInfo
+  fetchFundCheckInfo,
+  CHANGE_MODAL_FUNDLIST,
+  fetchFundList
 } from '../pages/fund/action.js'
 
 import {
@@ -72,67 +120,6 @@ export const changeOnline = () => {
         setStore('online', 1)
         // each time change online, start heart beat.
         heartBeat()
-      }
-    }
-    return AjaxHandler.ajax(resource, body, cb)
-  }
-}
-
-export const changeOffline = (forceOffline, stillHasTaskCallback) => {
-  return dispatch => {
-    let resource = '/employee/cs/offline'
-    const body = {
-      force: forceOffline
-    }
-    const cb = json => {
-      if (json.data) {
-        let data = {}
-        if (forceOffline || json.data.amount === 0) {
-          data.csOnline = false
-
-          // set data into store
-          dispatch({
-            type: 'SET_USERINFO',
-            value: data
-          })
-          removeStore('online')
-          stopBeat()
-        } else {
-          if (stillHasTaskCallback) {
-            stillHasTaskCallback()
-          }
-        }
-      }
-    }
-    return AjaxHandler.ajax(resource, body, cb)
-  }
-}
-// fetch privilege/list
-export const fetchPrivileges = () => {
-  return dispatch => {
-    let resource = '/privilege/list'
-    const body = null
-    const cb = json => {
-      let fullPrivileges = json.data.privileges
-      // set full privileges data
-      let full = buildAuthenData(fullPrivileges)
-      let data = {
-        full: full,
-        originalPrivileges: fullPrivileges,
-        authenSet: true
-      }
-      // set data into store
-      dispatch({
-        type: 'SET_AUTHENDATA',
-        value: data
-      })
-      // store info into sessionStorage so it will remain when refresh
-      // sessionStorage/authenInfo should always exist here, because it's set when login
-      let authenInfo = JSON.parse(getStore('authenInfo'))
-      if (authenInfo) {
-        let auth = Object.assign({}, authenInfo, { full: full })
-        console.log(auth)
-        setStore('authenInfo', JSON.stringify(auth))
       }
     }
     return AjaxHandler.ajax(resource, body, cb)
@@ -194,15 +181,6 @@ export const setSchoolList = value => {
   }
 }
 
-export const CHANGE_SCHOOL = 'CHANGE_SCHOOL'
-export const changeSchool = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_SCHOOL,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_GIFT = 'CHANGE_GIFT'
 export const changeGift = (subModule, keyValuePair) => {
   return {
@@ -212,28 +190,10 @@ export const changeGift = (subModule, keyValuePair) => {
   }
 }
 
-export const CHANGE_TASK = 'CHANGE_TASK'
-export const changeTask = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_TASK,
-    subModule,
-    keyValuePair
-  }
-}
-
 export const CHANGE_EMPLOYEE = 'CHANGE_EMPLOYEE'
 export const changeEmployee = (subModule, keyValuePair) => {
   return {
     type: CHANGE_EMPLOYEE,
-    subModule,
-    keyValuePair
-  }
-}
-
-export const CHANGE_NOTIFY = 'CHANGE_NOTIFY'
-export const changeNotify = (subModule, keyValuePair) => {
-  return {
-    type: CHANGE_NOTIFY,
     subModule,
     keyValuePair
   }
@@ -259,13 +219,26 @@ export const changeStat = (subModule, keyValuePair) => {
 
 export {
   CHANGE_DEVICE,
+  CHANGE_MODAL_REPAIRLIST,
   changeDevice,
   fetchDeviceList,
+  fetchRepairList,
+  CHANGE_MODAL_DEVICEINFO,
+  fetchDeviceInfo,
+  CHANGE_FUND,
+  changeFund,
+  fetchFundCheckList,
+  fetchFundCheckInfo,
+  CHANGE_MODAL_FUNDCHECK,
+  CHANGE_MODAL_FUNDLIST,
+  fetchFundList,
   CHANGE_HEATER,
   changeHeater,
   fetchHeaterList,
   CHANGE_ORDER,
   changeOrder,
+  fetchOrderList,
+  CHANGE_MODAL_ORDERLIST,
   CHANGE_DOORFORBID,
   changeDoorForbid,
   fetchDoorForbidList,
@@ -276,6 +249,8 @@ export {
   fetchResidence,
   CHANGE_USER,
   changeUser,
+  CHANGE_MODAL_USERINFO,
+  fetchUserInfo,
   moduleActionFactory,
   changeLost,
   CHANGE_LOST,
@@ -283,9 +258,27 @@ export {
   CHANGE_MODAL_LOST,
   CHANGE_MODAL_ENABLECOMMENT,
   fetchLostFoundList,
-  CHANGE_FUND,
-  changeFund,
-  fetchFundCheckList,
-  fetchFundCheckInfo,
-  CHANGE_MODAL_FUNDCHECK
+  changeOffline,
+  fetchPrivileges,
+  fetchTaskList,
+  fetchTaskDetail,
+  changeTask,
+  CHANGE_TASK,
+  CHANGE_MODAL_TASK,
+  CHANGE_MODAL_TASKDETAIL,
+  changeSchool,
+  CHANGE_SCHOOL,
+  CHANGE_OVERVIEW,
+  fetchOverviewData,
+  relateTask,
+  csRemind,
+  cancelRelate,
+  CHANGE_QUICK_LIST,
+  fetchQuickList,
+  CHANGE_QUICK_TYPE_LIST,
+  fetchQuickTypeList,
+  fetchBeingPushList,
+  CHANGE_MODAL_BEING,
+  changeNotify,
+  CHANGE_NOTIFY
 }

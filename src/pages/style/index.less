@@ -1194,7 +1194,72 @@ shortSeperator{
     }
   }
 }
+.detailPanelWrapperWithSiderbar{
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 70%;
+  height: 100%;
+  min-width: 900px;
 
+  background: white;
+  box-shadow: -4px 0 40px 10px rgba(199, 199, 199, 0.3);
+  z-index: 999;
+  // transition: width 1s;
+  // animation: slide 1s;
+  .detailPanelWrapperWithSiderbar-header{
+    display: inline-flex;
+    padding: 0 30px;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+  }
+  .detailPanelWrapperWithSiderbar-content, .detailPanelWrapperWithSiderbar-sidebar{
+    display: inline-block;
+    padding: 20px 30px;
+    // min-height: 100%;
+    height: auto;
+    border-right: 1px solid #ddd;
+  }
+  // 带sidebar的详情展开页
+  .detailPanelWrapperWithSiderbar-content{
+    width: 70%;
+    height: calc(~ '100% - 50px');
+    overflow-y: scroll;
+    h3{
+      font-size: 20px;
+    }
+    .handleBtn{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      button{
+        margin-right: 10px;
+      }
+      .hint{
+        display: inline-block;
+        margin-right: 10px;
+        color: @gray;
+      }
+    }
+    .processLogs{
+      margin: 0px -30px;
+      padding: 15px 30px;
+      border-top: 1px solid #ddd;
+      ul{
+        margin-top: 15px;
+        border: 1px solid #ddd;
+      }
+    }
+  }
+  .detailPanelWrapperWithSiderbar-sidebar{
+    position: absolute;
+    width: 30%;
+  }
+}
 // for new panel module
 .selectedHintWraper{
   position: relative;
@@ -1350,7 +1415,7 @@ shortSeperator{
   li {
     display: inline-block;
     margin-left: 8px;
-    padding: 2px 8px;
+    padding: 2px 4px;
     border-radius: 2px;
     border: 1px solid #ddd;
   }
@@ -1506,6 +1571,7 @@ shortSeperator{
         box-sizing: border-box;
         height: 100vh;
         overflow-y: scroll;
+        min-width: 1005px;
         .breadc{
           background-color: #fff;
           position: absolute;
@@ -1744,7 +1810,7 @@ shortSeperator{
 .queryPanel{
   padding: 10px 20px;
   .queryLine{
-    height: 40px;
+    height: auto;
   }
   &>li{
     display: inline-block;
@@ -1785,6 +1851,15 @@ shortSeperator{
     height: 100%;
     display: inline-flex;
     align-items: center;
+    span:first-child{
+      min-width: 55px;
+    }
+    li{
+      margin: 5px;
+    }
+    .checkSelect{
+      flex-wrap: wrap
+    }
     .select{
       margin-left: 10px;
       .select-item{
@@ -1914,4 +1989,69 @@ shortSeperator{
       }
     }
   }
+}
+.insertMsg{
+  position: relative;
+  width: auto !important;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  outline: none;
+  background: white;
+  a{
+    left: 10px;
+    line-height: 45px;
+    font-size: 14px;
+    padding-left: 10px
+  }
+  textarea{
+    border: 0px
+  }
+  
+}
+.buildTask{
+  ul{
+    padding: 0;
+    background-color: white !important;
+    // .msgItem{
+    //   line-height: 45px
+    // }
+    // .msgItem:hover{
+    //   background: #ecf6fd
+    // }
+    li p, li.itemsWrapper p{
+      width: 100px;
+      // width: 100px !important;
+    }
+    span.ant-radio+*{
+      padding-left: 0;
+    }
+  }
+  .btnArea{
+    padding: 0;
+    background-color: white;
+  }
+}
+.msgListDiv{
+  width: 100%;
+  min-height: 100px;
+  text-align: center;
+  margin-bottom: 10px;
+  div{
+    text-align: left
+  }
+}
+.ant-calendar-picker.datePicker{
+  input{
+    width: 160px
+  }
+}
+li.msgItem{
+  line-height: 30px;
+  height: auto;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #e6e6e6
+}
+.msgItem:hover{
+  background: #ecf6fd
 }
