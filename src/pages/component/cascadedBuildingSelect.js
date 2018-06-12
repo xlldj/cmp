@@ -298,6 +298,7 @@ class CascadedBuildingSelect extends Component {
           <MultiSelectModal
             width={500}
             forbidEmpty={true}
+            reverseChoose={true}
             suportAllChoose
             closeModal={e => this.closeModal(e, 'showZoneSelect')}
             confirm={data => this.setItems(data, RESIDENCE_TYPE_ZONE)}
@@ -309,6 +310,7 @@ class CascadedBuildingSelect extends Component {
         {showBuildingSelect ? (
           <MultiSelectModal
             width={500}
+            reverseChoose={true}
             forbidEmpty={true}
             suportAllChoose
             closeModal={e => this.closeModal(e, 'showBuildingSelect')}
@@ -323,6 +325,7 @@ class CascadedBuildingSelect extends Component {
             width={500}
             forbidEmpty={true}
             suportAllChoose
+            reverseChoose={true}
             closeModal={e => this.closeModal(e, 'showFloorSelect')}
             confirm={data => this.setItems(data, RESIDENCE_TYPE_FLOOR)}
             show={showFloorSelect}

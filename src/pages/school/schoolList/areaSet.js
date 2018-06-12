@@ -53,7 +53,7 @@ class AreaManage extends React.Component {
         const areaList =
           json.data.areas &&
           json.data.areas.map(area => {
-            const { id, name, buildings } = area
+            const { id, name, buildings = [] } = area
             buildings.forEach(build => {
               build.selected = true
             })

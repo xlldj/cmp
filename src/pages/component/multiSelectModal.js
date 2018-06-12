@@ -68,6 +68,15 @@ export default class MultiSelectModal extends React.Component {
       dataSource: dataSource
     })
   }
+  reverseChoose = () => {
+    let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
+    dataSource.forEach(d => {
+      d.selected = !d.selected
+    })
+    this.setState({
+      dataSource: dataSource
+    })
+  }
   cancel = () => {
     //clear all the data
     let dataSource = JSON.parse(JSON.stringify(this.state.dataSource))
@@ -99,7 +108,13 @@ export default class MultiSelectModal extends React.Component {
   }
   render() {
     const { dataSource, emptySelectError } = this.state
-    const { show, suportAllChoose, width, forbidEmpty } = this.props
+    const {
+      show,
+      suportAllChoose,
+      width,
+      forbidEmpty,
+      reverseChoose
+    } = this.props
 
     const selectedArr =
       dataSource && dataSource.filter((r, i) => r.selected === true)
@@ -136,6 +151,14 @@ export default class MultiSelectModal extends React.Component {
                 style={{ marginRight: '10px' }}
               >
                 全选
+              </Button>
+            ) : null}
+            {reverseChoose ? (
+              <Button
+                onClick={this.reverseChoose}
+                style={{ marginRight: '10px' }}
+              >
+                反选
               </Button>
             ) : null}
             <Button
