@@ -7,7 +7,7 @@ let selectedSchool = getDefaultSchool()
 
 const initialOrderState = {
   orderList: {
-    tabIndex: 1, // 1 for table, 2 for statistics, 3 for analyze
+    tabIndex: 2, // 1 for table, 2 for statistics, 3 for analyze
     page: 1,
     schoolId: selectedSchool,
     day: 1, // 1 for today, 2 for last 7 days , 3 for last 30 days, 0 for custom select
@@ -46,7 +46,8 @@ const initialOrderState = {
     analyze_page: 1,
     analyze_order: -1,
     analyze_orderBy: '',
-    analyze_warnTaskStatus: 'all' // if device has task of order warning type. 'all' for all devices
+    analyze_warnTaskStatus: 'all', // if device has task of order warning type. 'all' for all devices
+    dimension: 1
   },
   abnormal: {
     page: 1,

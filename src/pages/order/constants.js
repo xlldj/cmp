@@ -130,6 +130,11 @@ const ORDER = {
     1: '以上',
     2: '以下'
   },
-  DEVICE_WARN_TASK_HANDLING: 2 // 当前设备有订单预警工单处理中
+  DEVICE_WARN_TASK_HANDLING: 2, // 当前设备有订单预警工单处理中
+  RESIDENCE_DIMENSION: {
+    1: '区域',
+    2: '楼栋',
+    3: '楼层'
+  }
 }
 export default ORDER

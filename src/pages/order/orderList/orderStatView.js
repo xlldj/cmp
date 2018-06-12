@@ -11,6 +11,7 @@ import CheckSelect from '../../component/checkSelect'
 import OrderBarChart from './orderBarChart'
 import RangeSelect from '../../component/rangeSelect'
 import CascadedBuildingSelect from '../../component/cascadedBuildingSelect'
+import BasicSelector from '../../component/basicSelectorWithoutAll'
 
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
@@ -23,7 +24,8 @@ const {
   ORDER_STAT_ORDERBYS,
   ORDER,
   PAGINATION: SIZE,
-  DEVICE_TYPE_HEATER
+  DEVICE_TYPE_HEATER,
+  RESIDENCE_DIMENSION
 } = CONSTANTS
 
 class OrderStatView extends React.Component {
@@ -63,7 +65,8 @@ class OrderStatView extends React.Component {
       endTime,
       areaIds,
       buildingIds,
-      floorIds
+      floorIds,
+      dimension
     } = props
     const body = {
       page: page,
@@ -90,6 +93,9 @@ class OrderStatView extends React.Component {
       }
       if (floorIds) {
         body.floorIds = floorIds
+      }
+      if (dimension) {
+        body.dimension = dimension
       }
     }
     if (deviceType !== 'all') {
@@ -137,7 +143,8 @@ class OrderStatView extends React.Component {
       endTime,
       areaIds,
       buildingIds,
-      floorIds
+      floorIds,
+      dimension
     } = props
     const body = {
       page: page,
@@ -167,6 +174,9 @@ class OrderStatView extends React.Component {
       }
       if (floorIds === 'all') {
         body.floorIds = floorIds
+      }
+      if (dimension) {
+        body.dimension = dimension
       }
     }
 
@@ -495,6 +505,11 @@ class OrderStatView extends React.Component {
       stat_floorIds: floorIds
     })
   }
+  changeDimension = v => {
+    this.props.changeOrder(subModule, {
+      dimension: v
+    })
+  }
   render() {
     const {
       page,
@@ -503,7 +518,8 @@ class OrderStatView extends React.Component {
       buildingIds,
       areaIds,
       floorIds,
-      schoolId
+      schoolId,
+      dimension
     } = this.props
     const {
       dataSource,
@@ -525,6 +541,12 @@ class OrderStatView extends React.Component {
           buildingIds={buildingIds}
           floorIds={floorIds}
           confirm={this.confirmResidence}
+        />
+        <span className="leftSeperator">维度:</span>
+        <BasicSelector
+          staticOpts={RESIDENCE_DIMENSION}
+          selectedOpt={dimension}
+          changeOpt={this.changeDimension}
         />
       </Fragment>
     )
