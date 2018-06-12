@@ -88,13 +88,13 @@ class OrderStatView extends React.Component {
       if (areaIds !== 'all') {
         body.areaIds = areaIds
       }
-      if (buildingIds) {
+      if (buildingIds && buildingIds !== 'all') {
         body.buildingIds = buildingIds
       }
-      if (floorIds) {
+      if (floorIds && floorIds !== 'all') {
         body.floorIds = floorIds
       }
-      if (dimension) {
+      if (dimension && dimension !== 'all') {
         body.dimension = dimension
       }
     }
@@ -166,13 +166,13 @@ class OrderStatView extends React.Component {
       body.schoolId = parseInt(schoolId, 10)
     }
     if (isFushikang) {
-      if (areaIds === 'all') {
+      if (areaIds !== 'all') {
         body.areaIds = areaIds
       }
-      if (buildingIds === 'all') {
+      if (buildingIds !== 'all') {
         body.buildingIds = buildingIds
       }
-      if (floorIds === 'all') {
+      if (floorIds !== 'all') {
         body.floorIds = floorIds
       }
       if (dimension) {
@@ -388,7 +388,8 @@ class OrderStatView extends React.Component {
         'endTime',
         'areaIds',
         'buildingIds',
-        'floorIds'
+        'floorIds',
+        'dimension'
         // 'buildingIds'
       ])
     ) {
@@ -408,7 +409,8 @@ class OrderStatView extends React.Component {
         'endTime',
         'areaIds',
         'buildingIds',
-        'floorIds'
+        'floorIds',
+        'dimension'
       ])
     ) {
       return
