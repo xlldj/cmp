@@ -19,10 +19,8 @@ class SchoolDetail extends React.Component {
   }
   fetchData(body) {
     schoolService.getOverviewList(body).then(json => {
-      if (json.data) {
-        if (json.data.schools) {
-          this.constructorData(json.data.schools[0])
-        }
+      if (json && json.data && json.data.schools && json.data.schools.length) {
+        this.constructorData(json.data.schools[0])
       }
     })
   }
@@ -144,14 +142,13 @@ class SchoolDetail extends React.Component {
     let waterTimeItems =
       waterTimeRange &&
       waterTimeRange.items &&
-      waterTimeRange.items.map((range, index) => (
-        <span key={`range-${index}`}>{Format.rangeToHour(range)}</span>
-      ))
+      waterTimeRange.items.map((range, index) => Format.rangeToHour(range))
+    const waterTimeStr = waterTimeItems && waterTimeItems.join('、')
     return (
       <ul className="detailList schoolDetail">
         <li>
           <label>供水时段:</label>
-          {waterTimeItems ? waterTimeItems : <span>暂无</span>}
+          <span>{waterTimeItems ? waterTimeStr : '暂无'}</span>
         </li>
         <li>
           <label>充值活动:</label>

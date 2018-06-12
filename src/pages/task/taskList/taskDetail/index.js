@@ -94,7 +94,6 @@ class TaskDetail extends React.Component {
   }
   confirmChooseRepairman = () => {
     // reassign to repairman success
-    let { id } = this.state
     this.setState({
       showRepairmanModal: false
     })
@@ -113,7 +112,6 @@ class TaskDetail extends React.Component {
   }
   confirmChooseCustomer = () => {
     // reassign to repairman success
-    let { id } = this.state
     this.setState({
       showCustomerModal: false
     })

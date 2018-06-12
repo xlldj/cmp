@@ -12,7 +12,14 @@ import SchoolDetail from './schoolDetail'
 class DetailTabWrapper extends Component {
   render() {
     const { currentTab, data, selectedDetailId } = this.props
-    const { creatorId, deviceType, deviceId, residenceId, schoolId } = data
+    const {
+      creatorId,
+      deviceType,
+      deviceId,
+      residenceId,
+      schoolId,
+      exist
+    } = data
 
     return (
       <div className="taskDetail-panelWrapper">
@@ -33,6 +40,7 @@ class DetailTabWrapper extends Component {
         ) : null}
         {currentTab === 4 ? (
           <DeviceInfo
+            exist={exist}
             deviceType={deviceType}
             residenceId={residenceId}
             deviceId={deviceId}
