@@ -211,21 +211,23 @@ class CascadedBuildingSelect extends Component {
         floorIdsAvailable = []
       zones.forEach(zone => {
         const buildings = zone && zone.children
-        buildings.forEach(building => {
-          buildingIdsAvailable.push(building.id)
-          let buildingAlreadyExistInState = true
-          if (
-            buildingIds !== 'all' &&
-            !buildingIds.some(bId => bId === building.id)
-          ) {
-            buildingAlreadyExistInState = false
-          }
-          if (buildingAlreadyExistInState) {
-            // 得到可选的floor的id数组
-            const floors = building.children
-            floors.forEach(f => floorIdsAvailable.push(f.id))
-          }
-        })
+        if (buildings) {
+          buildings.forEach(building => {
+            buildingIdsAvailable.push(building.id)
+            let buildingAlreadyExistInState = true
+            if (
+              buildingIds !== 'all' &&
+              !buildingIds.some(bId => bId === building.id)
+            ) {
+              buildingAlreadyExistInState = false
+            }
+            if (buildingAlreadyExistInState) {
+              // 得到可选的floor的id数组
+              const floors = building.children
+              floors.forEach(f => floorIdsAvailable.push(f.id))
+            }
+          })
+        }
       })
 
       // 如果楼栋不是全选，根据楼栋和楼层的id来删除无效的id
