@@ -76,7 +76,7 @@ class UserFeedbackInfo extends Component {
     })
     const { creatorId } = this.props
     const body = {
-      userId: creatorId,
+      creatorId,
       page,
       size: SIZE,
       type: TASK_TYPE_FEEDBACK

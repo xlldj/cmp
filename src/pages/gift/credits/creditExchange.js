@@ -492,7 +492,8 @@ class CreditExchange extends React.Component {
       // all empty or all not empty. js has no
       if (
         (item.credits !== '' && item.giftId !== '') ||
-        (item.credits === '' && item.giftId === '')
+        (item.credits === '' && item.giftId === '') ||
+        (item.credits === '' && !item.giftId)
       ) {
         return true
       } else {
