@@ -86,14 +86,14 @@ class GiftTable extends React.Component {
   confirm = () => {
     // this.props.closeModal()
     let { selectedRowKeys } = this.state
-    if (selectedRowKeys.length === 0) {
-      return this.setState({
-        giftNotSelected: true
-      })
-    }
+    // if (selectedRowKeys.length === 0) {
+    //   return this.setState({
+    //     giftNotSelected: true
+    //   })
+    // }
     this.props.setGift({
       // since only choose one, set
-      giftId: this.state.selectedRowKeys[0]
+      giftId: selectedRowKeys[0] || null
     })
   }
   cancel = () => {
@@ -102,13 +102,16 @@ class GiftTable extends React.Component {
     })
     this.props.closeModal()
   }
-  selectRow = (record, index, event) => {
-    let selectedRows = [record]
-    this.changeSelect(null, selectedRows)
-  }
+  // selectRow = (record, index, event) => {
+  //   let selectedRows = [record]
+  //   this.changeSelect(null, selectedRows)
+  // }
   changeSelect = (selectedRowKeys, selectedRows) => {
     this.setState({
-      selectedRowKeys: [selectedRows[0].id]
+      selectedRowKeys:
+        selectedRowKeys.length > 0
+          ? [selectedRowKeys[selectedRowKeys.length - 1]]
+          : []
     })
   }
   render() {
@@ -138,9 +141,9 @@ class GiftTable extends React.Component {
             rowKey={record => record.id}
             dataSource={dataSource}
             columns={this.columns}
-            onRowClick={this.selectRow}
+            // onRowClick={this.selectRow}
             rowSelection={{
-              type: 'radio',
+              // type: 'radio',
               onChange: this.changeSelect,
               selectedRowKeys: selectedRowKeys
             }}
