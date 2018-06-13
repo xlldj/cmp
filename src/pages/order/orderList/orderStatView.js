@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 
-import { Table, Button } from 'antd'
+import { Table } from 'antd'
 import AjaxHandler from '../../../util/ajax'
 // import AjaxHandler from '../../../mock/ajax.js'
 import CONSTANTS from '../../../constants'
@@ -12,7 +12,6 @@ import OrderBarChart from './orderBarChart'
 import RangeSelect from '../../component/rangeSelect'
 import CascadedBuildingSelect from '../../component/cascadedBuildingSelect'
 import BasicSelector from '../../component/basicSelectorWithoutAll'
-import SearchInput from '../../component/searchInput'
 
 import { checkObject } from '../../../util/checkSame'
 const subModule = 'orderList'
@@ -569,11 +568,9 @@ class OrderStatView extends React.Component {
       barData,
       isFushikang,
       startTime,
-      endTime,
-      searchingText
+      endTime
       // showBuildingSelect
     } = this.state
-    const showClearBtn = !!searchingText
 
     const buildingSelect = (
       <Fragment>
@@ -634,25 +631,6 @@ class OrderStatView extends React.Component {
                 </Fragment>
               )}
             </QueryBlock>
-            {isFushikang ? (
-              <QueryBlock>
-                {showClearBtn ? (
-                  <Button
-                    onClick={this.clearMobile}
-                    className="rightSeperator"
-                    type="primary"
-                  >
-                    清空
-                  </Button>
-                ) : null}
-                <SearchInput
-                  placeholder="宿舍"
-                  searchingText={searchingText}
-                  pressEnter={this.pressEnter}
-                  changeSearch={this.changeSearch}
-                />
-              </QueryBlock>
-            ) : null}
           </QueryLine>
         </QueryPanel>
 
