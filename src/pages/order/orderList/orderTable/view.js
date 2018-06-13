@@ -117,6 +117,10 @@ class OrderTableView extends React.Component {
       if (floorIds !== 'all') {
         body.floorIds = floorIds
       }
+    } else {
+      if (userType && userType !== 'all') {
+        body.userType = parseInt(userType, 10)
+      }
     }
     if (status !== 'all') {
       body.status = parseInt(status, 10)
@@ -125,9 +129,6 @@ class OrderTableView extends React.Component {
     }
     if (selectKey) {
       body.selectKey = selectKey
-    }
-    if (userType && userType !== 'all') {
-      body.userType = parseInt(userType, 10)
     }
     if (state) {
       if (state.path === 'fromDevice') {
@@ -195,7 +196,9 @@ class OrderTableView extends React.Component {
     this.root = root
     root.addEventListener('click', this.closeDetail, false)
     this.syncStateWithProps()
-    this.checkSchoolFsk()
+    this.checkSchoolFsk().then(() => {
+      this.fetchAllData()
+    })
   }
   componentWillUnmount() {
     this.root.removeEventListener('click', this.closeDetail)
@@ -228,37 +231,35 @@ class OrderTableView extends React.Component {
     ) {
       return
     }
-    this.checkSchoolFsk(nextProps)
+    this.checkSchoolFsk(nextProps).then(() => {
+      if (this.onlyPageChanged(this.props, nextProps)) {
+        this.fetchList(nextProps)
+      } else {
+        this.fetchAllData(nextProps)
+      }
+    })
     this.syncStateWithProps(nextProps)
-    if (this.onlyPageChanged(this.props, nextProps)) {
-      this.fetchList(nextProps)
-    } else {
-      this.fetchAllData(nextProps)
-    }
   }
   //检查选择学校是否为富士康
   checkSchoolFsk = props => {
-    const { schools, schoolId } = props || this.props
-    const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
-    if (fox_index !== -1) {
-      const school = schools[fox_index]
-      if (school.name === '富士康' || school.name === '富士康工厂') {
-        this.setState({
-          isFushikang: true
-        })
-        let { deviceType } = this.props
-        if (deviceType === DEVICE_TYPE_HEATER) {
-          return
+    return new Promise((resolve, reject) => {
+      const { schools, schoolId } = props || this.props
+      const fox_index = schools.findIndex(s => s.id === parseInt(schoolId, 10))
+      const nextState = { isFushikang: false }
+      if (fox_index !== -1) {
+        const school = schools[fox_index]
+        if (school.name === '富士康' || school.name === '富士康工厂') {
+          nextState.isFushikang = true
+          const { deviceType } = this.props
+          if (deviceType !== DEVICE_TYPE_HEATER) {
+            this.props.changeOrder(subModule, {
+              stat_dt: DEVICE_TYPE_HEATER,
+              page: 1
+            })
+          }
         }
-        this.props.changeOrder(subModule, {
-          deviceType: DEVICE_TYPE_HEATER,
-          page: 1
-        })
-        return true
       }
-    }
-    this.setState({
-      isFushikang: false
+      this.setState(nextState, resolve)
     })
   }
   onlyPageChanged = (prev, cur) => {
