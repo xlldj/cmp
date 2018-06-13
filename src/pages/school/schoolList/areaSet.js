@@ -53,10 +53,12 @@ class AreaManage extends React.Component {
         const areaList =
           json.data.areas &&
           json.data.areas.map(area => {
-            const { id, name, buildings = [] } = area
-            buildings.forEach(build => {
-              build.selected = true
-            })
+            const { id, name, buildings } = area || {}
+            if (buildings) {
+              buildings.forEach(build => {
+                build.selected = true
+              })
+            }
             return {
               id,
               name,
@@ -143,6 +145,13 @@ class AreaManage extends React.Component {
    */
   abstractArea = e => {
     const areaList = JSON.parse(JSON.stringify(this.state.areaList))
+    // 如果最后一项已经有id，则不予删除
+    const savedInServer =
+      areaList[areaList.length - 1].buildings &&
+      areaList[areaList.length - 1].id
+    if (savedInServer) {
+      return
+    }
     const buildings =
       areaList[areaList.length - 1].buildings &&
       areaList[areaList.length - 1].buildings.map(value => {
