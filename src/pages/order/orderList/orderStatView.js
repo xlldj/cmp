@@ -646,7 +646,7 @@ class OrderStatView extends React.Component {
                 showQuickJumper: true
               }}
               dataSource={dataSource}
-              rowKey={record => record.schoolName}
+              rowKey={(record, index) => index}
               columns={this.getColumns()}
               onChange={this.changeTable}
               onRowClick={this.selectRow}
