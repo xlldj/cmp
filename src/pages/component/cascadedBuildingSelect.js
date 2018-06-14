@@ -36,11 +36,15 @@ class CascadedBuildingSelect extends Component {
     }
   }
   componentDidMount() {
-    const { residenceSet, schoolId } = this.props
+    const { schoolId } = this.props
     // schoolId 总是存在的，且为某一个学校的id
+    /* 
     if (!residenceSet) {
       this.props.fetchResidence(schoolId)
     }
+    */
+    // 总是在mount时加载区域设置的数据
+    this.props.fetchResidence(schoolId)
   }
   componentWillReceiveProps(nextProps) {
     const { schoolId, residenceSet } = nextProps
@@ -341,7 +345,8 @@ class CascadedBuildingSelect extends Component {
 const mapStateToProps = (state, ownProps) => {
   return {
     residence: state.buildingsSet.residenceOfSchoolId[ownProps.schoolId] || [],
-    residenceSet: !!state.buildingsSet.residenceOfSchoolId[ownProps.schoolId]
+    // residenceSet: !!state.buildingsSet.residenceOfSchoolId[ownProps.schoolId]
+    residenceSet: state.buildingsSet.residenceOfSchoolId.residenceFetched
   }
 }
 

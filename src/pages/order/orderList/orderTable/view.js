@@ -231,8 +231,9 @@ class OrderTableView extends React.Component {
     ) {
       return
     }
+    const onlyPageChanged = this.onlyPageChanged(this.props, nextProps)
     this.checkSchoolFsk(nextProps).then(() => {
-      if (this.onlyPageChanged(this.props, nextProps)) {
+      if (onlyPageChanged) {
         this.fetchList(nextProps)
       } else {
         this.fetchAllData(nextProps)

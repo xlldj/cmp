@@ -44,6 +44,7 @@ export const fetchResidence = schoolId => {
       if (json && json.data) {
         const value = {}
         value[+schoolId] = json.data.areas
+        value.residenceFetched = true
         dispatch({
           type: SET_BUILDING_LIST,
           subModule: 'residenceOfSchoolId',
